@@ -1,6 +1,8 @@
 import React from 'react'
 import styles from './styles.module.css'
 
-export const ExampleComponent = ({ text }) => {
-  return <div className={styles.test}>Example Component: {text}</div>
+const WebformEditor = () => {
+  return <div className={styles.test}>Webform Component</div>
 }
+
+export default WebformEditor
