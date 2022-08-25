@@ -3,9 +3,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Roboto+Condensed:wght@300;400&display=swap');
 
 .test {
-  margin: 2em;
-  padding: 0.5em;
-  border: 2px solid #000;
-  font-size: 2em;
-  text-align: center;
+    margin: 2em;
+    padding: 0.5em;
+    border: 2px solid #000;
+    font-size: 2em;
+    text-align: center;
 }

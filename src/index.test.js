@@ -1,7 +1,11 @@
-import { ExampleComponent } from '.'
+import { render, screen } from '@testing-library/react';
+import WebformEditor from '.';
+import '@testing-library/jest-dom';
 
-describe('ExampleComponent', () => {
-  it('is truthy', () => {
-    expect(ExampleComponent).toBeTruthy()
-  })
-})
+describe('App', () => {
+    test('test if element exists', () => {
+        render(<WebformEditor />);
+        const expectedText = screen.getByText(/Webform Component/i);
+        expect(expectedText).toBeInTheDocument();
+    });
+});
