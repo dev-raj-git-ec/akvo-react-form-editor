@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "akvo-react-form survey editor",
   "author": "akvo",
-  "license": "",
+  "license": "AGPL-3.0",
   "repository": "akvo/akvo-react-form-editor",
   "main": "dist/index.js",
   "module": "dist/index.modern.js",

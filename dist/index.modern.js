@@ -2,7 +2,7 @@ import React from 'react';
 
 var styles = {"test":"arfe-test"};
 
-var WebformEditor = function WebformEditor() {
+const WebformEditor = () => {
   return /*#__PURE__*/React.createElement("div", {
     className: styles.test
   }, "Webform Component");
