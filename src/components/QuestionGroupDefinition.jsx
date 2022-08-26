@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Card, Button, Space, Form, Input, Checkbox } from 'antd';
 import { UIStore } from '../lib/store';
-import FormItem from 'antd/es/form/FormItem';
+import styles from '../styles.module.css';
 
 const QuestionGroupSetting = ({ id, name, description }) => {
   const namePreffix = `question_group-${id}`;
@@ -21,12 +21,13 @@ const QuestionGroupSetting = ({ id, name, description }) => {
       >
         <Input.TextArea rows={5} />
       </Form.Item>
-      <FormItem
+      <Form.Item
         initialValue={false}
         name={`${namePreffix}-repeatable`}
+        className={styles['question-group-repeatable']}
       >
-        <Checkbox>Repeat this group</Checkbox>
-      </FormItem>
+        <Checkbox> Repeat this group</Checkbox>
+      </Form.Item>
     </div>
   );
 };
