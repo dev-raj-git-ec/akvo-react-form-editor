@@ -7,7 +7,10 @@ import { UIStore } from './lib/store';
 
 const WebformEditor = () => {
   const current = UIStore.useState((s) => s.current);
+  const UIText = UIStore.useState((s) => s.UIText);
   const { tab: currentTab } = current;
+  const { formTabPane, previewTabPane, mandatoryQuestionCount, version } =
+    UIText;
 
   const handleTabsOnChange = (e) => {
     UIStore.update((s) => {
@@ -27,13 +30,17 @@ const WebformEditor = () => {
         <Tabs
           defaultActiveKey={current.tab}
           onChange={handleTabsOnChange}
+          tabBarExtraContent={
+            <span>{`1 / 10 ${mandatoryQuestionCount} | ${version} : 1`}</span>
+          }
+          tabBarGutter={24}
         >
           <Tabs.TabPane
-            tab="Form"
+            tab={formTabPane}
             key="form"
           />
           <Tabs.TabPane
-            tab="Preview"
+            tab={previewTabPane}
             key="preview"
           />
         </Tabs>
