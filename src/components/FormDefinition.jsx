@@ -18,10 +18,7 @@ const FormDefinition = () => {
         label={inputFormDescriptionLabel}
         name="form-description"
       >
-        <Input.TextArea
-          showCount
-          rows={5}
-        />
+        <Input.TextArea rows={5} />
       </Form.Item>
     </div>
   );
