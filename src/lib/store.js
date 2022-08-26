@@ -1,4 +1,5 @@
 import { Store } from 'pullstate';
+import UIText from './i18n';
 
 const generateId = () => new Date().getTime();
 
@@ -60,14 +61,14 @@ const defaultQuestionGroup = ({
 }) => {
   const qg = {
     id: generateId(),
-    name: name,
+    name: name || 'New Question Group',
     order: prevOrder + 1,
     description: null,
     repeatable: false,
   };
   return {
     ...qg,
-    questions: [...defaultQuestion({ questionGroup: qg })],
+    questions: [defaultQuestion({ questionGroup: qg })],
   };
 };
 
@@ -77,6 +78,7 @@ const UIStore = new Store({
     questionGroupId: null,
     questionId: null,
   },
+  UIText: UIText.en,
 });
 
 const FormStore = new Store({
@@ -86,11 +88,9 @@ const FormStore = new Store({
   description: 'New Form Description',
 });
 
-const QuestionGroupStore = new Store([
-  {
-    ...defaultQuestionGroup(),
-  },
-]);
+const QuestionGroupStore = new Store({
+  questionGroups: [defaultQuestionGroup({ name: null })],
+});
 
 const questionGroupFn = {
   new: defaultQuestionGroup,
@@ -108,11 +108,4 @@ const questionFn = {
     }),
 };
 
-export default {
-  UIStore,
-  FormStore,
-  QuestionGroupStore,
-  questionType,
-  questionGroupFn,
-  questionFn,
-};
+export { UIStore, FormStore, questionType, questionGroupFn, questionFn };
