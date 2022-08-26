@@ -74,6 +74,7 @@ const defaultQuestionGroup = ({
 
 const UIStore = new Store({
   current: {
+    tab: 'form',
     formId: null,
     questionGroupId: null,
     questionId: null,
