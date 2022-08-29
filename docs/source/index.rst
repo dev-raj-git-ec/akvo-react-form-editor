@@ -6,7 +6,7 @@
 Welcome to Akvo React Form Editor's documentation!
 ==================================================
 
-|Build Status| |Repo Size| |Languages| |Issues| |Last Commit|
+|Build Status| |Repo Size| |Languages| |Issues| |Last Commit| |Documentation Status|
 
 Survey Editor for generating `akvo-react form <https://github.com/akvo/akvo-react-form>`__ survey definition.
 
@@ -25,3 +25,6 @@ Survey Editor for generating `akvo-react form <https://github.com/akvo/akvo-reac
    :target: https://img.shields.io/github/issues/akvo/akvo-react-form-editor
 .. |Last Commit| image:: https://img.shields.io/github/last-commit/akvo/akvo-react-form-editor/main
    :target: https://img.shields.io/github/last-commit/akvo/akvo-react-form-editor/main
+.. |Documentation Status| image:: https://readthedocs.org/projects/akvo-react-form-editor/badge/?version=latest
+    :target: https://akvo-react-form-editor.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
