@@ -1,5 +1,5 @@
 import React from 'react';
-import 'antd/dist/antd.css';
+import 'antd/dist/antd.min.css';
 import styles from './styles.module.css';
 import { Card, Tabs } from 'antd';
 import {
