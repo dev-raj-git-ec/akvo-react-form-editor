@@ -29,3 +29,8 @@
 .tabs-wrapper {
   margin-bottom: 12px !important;
 }
+
+.button-save-wrapper {
+  width: 100%;
+  justify-content: end;
+}

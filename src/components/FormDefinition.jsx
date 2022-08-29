@@ -1,8 +1,10 @@
 import React from 'react';
 import { Form, Input } from 'antd';
 import { UIStore } from '../lib/store';
+import { SaveButton } from '../support';
 
 const FormDefinition = () => {
+  const form = Form.useFormInstance();
   const UIText = UIStore.useState((s) => s.UIText);
   const { inputFormNameLabel, inputFormDescriptionLabel } = UIText;
 
@@ -20,6 +22,10 @@ const FormDefinition = () => {
       >
         <Input.TextArea rows={5} />
       </Form.Item>
+      <SaveButton
+        cancelButton={false}
+        onClickSave={form.submit()}
+      />
     </div>
   );
 };

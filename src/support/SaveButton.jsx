@@ -1,18 +1,25 @@
 import React from 'react';
 import { Space, Button } from 'antd';
+import styles from '../styles.module.css';
 import { UIStore } from '../lib/store';
 
-const SaveButton = ({ onClickSave, onClickCancel }) => {
+const SaveButton = ({
+  onClickSave = () => {},
+  cancelButton = true,
+  onClickCancel = () => {},
+}) => {
   const UIText = UIStore.useState((s) => s.UIText);
   return (
-    <Space>
+    <Space className={styles['button-save-wrapper']}>
       <Button
         type="primary"
         onClick={onClickSave}
       >
         {UIText.buttonSaveText}
       </Button>
-      <Button onClick={onClickCancel}>{UIText.buttonCancelText}</Button>
+      {cancelButton && (
+        <Button onClick={onClickCancel}>{UIText.buttonCancelText}</Button>
+      )}
     </Space>
   );
 };

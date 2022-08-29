@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Card, Space } from 'antd';
+import { Card, Space, Form } from 'antd';
 import { UIStore } from '../lib/store';
 import { QuestionGroupSetting, QuestionDefinition } from '.';
 import {
@@ -10,6 +10,7 @@ import {
 } from '../support';
 
 const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
+  const form = Form.useFormInstance();
   const activeQuestionGroups = UIStore.useState((s) => s.activeQuestionGroups);
   const activeEditQuestionGroups = UIStore.useState(
     (s) => s.activeEditQuestionGroups
@@ -104,7 +105,7 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
           <div>
             <QuestionGroupSetting {...questionGroup} />
             <SaveButton
-              onClickSave={() => console.log('save')}
+              onClickSave={() => form.submit()}
               onClickCancel={handleCancelEditGroup}
             />
           </div>

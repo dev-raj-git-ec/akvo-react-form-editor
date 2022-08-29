@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Card, Space, Tabs } from 'antd';
+import { Card, Space, Tabs, Form } from 'antd';
 import styles from '../styles.module.css';
 import { UIStore } from '../lib/store';
 import { QuestionSetting, QuestionSkipLogic } from '.';
@@ -11,6 +11,7 @@ import {
 } from '../support';
 
 const QuestionDefinition = ({ index, question, isLastItem }) => {
+  const form = Form.useFormInstance();
   const UIText = UIStore.useState((s) => s.UIText);
   const activeEditQuestions = UIStore.useState((s) => s.activeEditQuestions);
   const [activeTab, setActiveTab] = useState('setting');
@@ -90,20 +91,20 @@ const QuestionDefinition = ({ index, question, isLastItem }) => {
                 tab={UIText.questionSkipLogicTabPane}
                 key="skip-logic"
               />
-              <Tabs.TabPane
+              {/* <Tabs.TabPane
                 tab={UIText.questionExtraTabPane}
                 key="extra"
               />
               <Tabs.TabPane
                 tab={UIText.questionTranslationTabPane}
                 key="translation"
-              />
+              /> */}
             </Tabs>
             {activeTab === 'setting' && <QuestionSetting {...question} />}
             {activeTab === 'skip-logic' && <QuestionSkipLogic {...question} />}
             <div>
               <SaveButton
-                onClickSave={() => console.log('save')}
+                onClickSave={() => form.submit()}
                 onClickCancel={handleCancelEdit}
               />
             </div>
