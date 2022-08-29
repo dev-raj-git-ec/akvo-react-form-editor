@@ -4,7 +4,7 @@ import styles from '../styles.module.css';
 import { UIStore, questionType } from '../lib/store';
 import { SettingInput, SettingNumber, SettingOption } from './question-type';
 
-const QuestionSetting = (question) => {
+const QuestionSetting = ({ question }) => {
   const { id, name, type, variable, tooltip, required } = question;
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
