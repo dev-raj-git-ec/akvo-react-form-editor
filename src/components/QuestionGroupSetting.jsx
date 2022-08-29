@@ -1,7 +1,8 @@
 import React from 'react';
-import { Form, Input, Checkbox, Button, Space } from 'antd';
+import { Form, Input, Checkbox } from 'antd';
 import styles from '../styles.module.css';
 import { UIStore } from '../lib/store';
+import { SaveButton } from '../support';
 
 const QuestionGroupSetting = ({
   id,
@@ -37,12 +38,10 @@ const QuestionGroupSetting = ({
       >
         <Checkbox> {UIText.inputRepeatThisGroupCheckbox}</Checkbox>
       </Form.Item>
-      <Space>
-        <Button type="primary">{UIText.buttonSaveText}</Button>
-        <Button onClick={handleCancelEditGroup}>
-          {UIText.buttonCancelText}
-        </Button>
-      </Space>
+      <SaveButton
+        onClickSave={() => console.log('save')}
+        onClickCancel={handleCancelEditGroup}
+      />
     </div>
   );
 };

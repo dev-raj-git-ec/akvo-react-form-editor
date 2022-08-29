@@ -1,7 +1,8 @@
 import React from 'react';
-import { Form, Input, Select, Checkbox, Button, Space } from 'antd';
+import { Form, Input, Select, Checkbox } from 'antd';
 import styles from '../styles.module.css';
 import { UIStore, questionType } from '../lib/store';
+import { SaveButton } from '../support';
 
 const QuestionSetting = ({
   id,
@@ -61,10 +62,10 @@ const QuestionSetting = ({
       >
         <Checkbox> {UIText.inputQuestionRequiredCheckbox}</Checkbox>
       </Form.Item>
-      <Space>
-        <Button type="primary">{UIText.buttonSaveText}</Button>
-        <Button onClick={handleCancelEdit}>{UIText.buttonCancelText}</Button>
-      </Space>
+      <SaveButton
+        onClickSave={() => console.log('save')}
+        onClickCancel={handleCancelEdit}
+      />
     </div>
   );
 };
