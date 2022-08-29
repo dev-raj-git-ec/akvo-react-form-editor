@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Card, Space, Tabs } from 'antd';
 import styles from '../styles.module.css';
 import { UIStore } from '../lib/store';
-import { QuestionSetting } from '.';
+import { QuestionSetting, QuestionSkipLogic } from '.';
 import {
   AddMoveButton,
   CardTitle,
@@ -100,7 +100,7 @@ const QuestionDefinition = ({ index, question, isLastItem }) => {
               />
             </Tabs>
             {activeTab === 'setting' && <QuestionSetting {...question} />}
-            {activeTab === 'skip-logic' && 'Skip Logic here..'}
+            {activeTab === 'skip-logic' && <QuestionSkipLogic {...question} />}
             <div>
               <SaveButton
                 onClickSave={() => console.log('save')}

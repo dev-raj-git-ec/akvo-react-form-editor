@@ -3,6 +3,22 @@ import UIStaticText from './i18n';
 
 const generateId = () => new Date().getTime();
 
+const skipLogicOperator = {
+  option: {
+    contains: 'contains',
+  },
+  number: {
+    equal: 'equal',
+    notEqual: 'not_equal',
+    less_than: 'less_than',
+    greater_than: 'greater_than',
+  },
+  date: {
+    before_date: 'before_date',
+    after_date: 'after_date',
+  },
+};
+
 const questionType = {
   input: 'input',
   number: 'number',
@@ -112,4 +128,11 @@ const questionFn = {
     }),
 };
 
-export { UIStore, FormStore, questionType, questionGroupFn, questionFn };
+export {
+  UIStore,
+  FormStore,
+  questionType,
+  questionGroupFn,
+  questionFn,
+  skipLogicOperator,
+};

@@ -27,6 +27,9 @@ const UIStaticText = {
     questionSkipLogicTabPane: 'Skip Logic',
     questionTranslationTabPane: 'Translation',
     questionExtraTabPane: 'Extra',
+    inputQuestionDependentToLabel: 'Dependent to Question',
+    inputQuestionDependentLogicLabel: 'Logic',
+    inputQuestionDependentAnswerLabel: 'Value',
   },
 };
 
