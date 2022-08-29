@@ -8,7 +8,7 @@
   text-align: center;
 }
 
-.question-group-repeatable {
+.input-checkbox-wrapper {
   width: fit-content;
 }
 
@@ -20,4 +20,8 @@
 
 .reorder-wrapper {
   padding: 12px 0;
+}
+
+.select-dropdown {
+  text-align: left;
 }

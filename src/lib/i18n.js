@@ -1,4 +1,4 @@
-const UIText = {
+const UIStaticText = {
   en: {
     inputFormNameLabel: 'Form Name',
     inputFormDescriptionLabel: 'Form Description',
@@ -17,7 +17,12 @@ const UIText = {
     buttonCancelText: 'Cancel',
     buttonAddNewQuestionGroupText: 'Insert group here',
     buttonAddNewQuestionText: 'Add new question',
+    inputQuestionNameLabel: 'Question Name',
+    inputQuestionTypeLabel: 'Question Type',
+    inputQuestionVariableNameLabel: 'Variable Name',
+    inputQuestionTooltipLabel: 'Question Tooltip',
+    inputQuestionRequiredCheckbox: 'Required',
   },
 };
 
-export default UIText;
+export default UIStaticText;

@@ -21,6 +21,7 @@ const QuestionGroupSetting = ({ id, name, description }) => {
         label={inputQuestionGroupNameLabel}
         initialValue={name}
         name={`${namePreffix}-name`}
+        required
       >
         <Input />
       </Form.Item>
@@ -32,9 +33,9 @@ const QuestionGroupSetting = ({ id, name, description }) => {
         <Input.TextArea rows={5} />
       </Form.Item>
       <Form.Item
-        initialValue={false}
+        initialValue={repeatable}
         name={`${namePreffix}-repeatable`}
-        className={styles['question-group-repeatable']}
+        className={styles['input-checkbox-wrapper']}
       >
         <Checkbox> {inputRepeatThisGroupCheckbox}</Checkbox>
       </Form.Item>

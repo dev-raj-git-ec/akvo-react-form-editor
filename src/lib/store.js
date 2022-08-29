@@ -1,5 +1,5 @@
 import { Store } from 'pullstate';
-import UIText from './i18n';
+import UIStaticText from './i18n';
 
 const generateId = () => new Date().getTime();
 
@@ -82,7 +82,7 @@ const UIStore = new Store({
   activeQuestionGroups: [],
   activeEditQuestionGroups: [],
   activeEditQuestions: [],
-  UIText: UIText.en,
+  UIText: UIStaticText.en,
 });
 
 const FormStore = new Store({
