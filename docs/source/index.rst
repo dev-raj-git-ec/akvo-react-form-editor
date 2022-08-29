@@ -8,7 +8,7 @@ Welcome to Akvo React Form Editor's documentation!
 
 |Build Status| |Repo Size| |Languages| |Issues| |Last Commit|
 
-Real Time Monitoring Information Systems
+Survey Editor for generating `akvo-react form <https://github.com/akvo/akvo-react-form>`__ survey definition.
 
 .. toctree::
    :maxdepth: 2

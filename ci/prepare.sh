@@ -23,7 +23,7 @@ docker run --rm \
 if [[ "${CI_BRANCH}" != "main" ]]; then
 docker run -it --rm \
     --volume "$(pwd)/docs:/docs" \
-        akvo/akvo-sphinx:20220525.082728.594558b make html
+        akvo/akvo-sphinx:20220829.093307.b5bbf28 make html
 fi
 
 # STORE IMAGE CACHE
