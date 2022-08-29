@@ -2,7 +2,12 @@ import React, { useMemo } from 'react';
 import { Card, Space } from 'antd';
 import { UIStore } from '../lib/store';
 import { QuestionGroupSetting, QuestionDefinition } from '.';
-import { AddMoveButton, CardTitle, CardExtraButton } from '../support';
+import {
+  AddMoveButton,
+  CardTitle,
+  CardExtraButton,
+  SaveButton,
+} from '../support';
 
 const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
   const activeQuestionGroups = UIStore.useState((s) => s.activeQuestionGroups);
@@ -96,10 +101,13 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
         }
       >
         {isEditQuestionGroup && (
-          <QuestionGroupSetting
-            handleCancelEditGroup={handleCancelEditGroup}
-            {...questionGroup}
-          />
+          <div>
+            <QuestionGroupSetting {...questionGroup} />
+            <SaveButton
+              onClickSave={() => console.log('save')}
+              onClickCancel={handleCancelEditGroup}
+            />
+          </div>
         )}
         {showQuestion &&
           questions.map((q, qi) => (

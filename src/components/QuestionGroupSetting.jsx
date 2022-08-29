@@ -2,15 +2,8 @@ import React from 'react';
 import { Form, Input, Checkbox } from 'antd';
 import styles from '../styles.module.css';
 import { UIStore } from '../lib/store';
-import { SaveButton } from '../support';
 
-const QuestionGroupSetting = ({
-  id,
-  name,
-  description,
-  repeatable,
-  handleCancelEditGroup,
-}) => {
+const QuestionGroupSetting = ({ id, name, description, repeatable }) => {
   const namePreffix = `question_group-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
 
@@ -38,10 +31,6 @@ const QuestionGroupSetting = ({
       >
         <Checkbox> {UIText.inputRepeatThisGroupCheckbox}</Checkbox>
       </Form.Item>
-      <SaveButton
-        onClickSave={() => console.log('save')}
-        onClickCancel={handleCancelEditGroup}
-      />
     </div>
   );
 };

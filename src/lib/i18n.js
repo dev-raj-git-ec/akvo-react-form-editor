@@ -23,6 +23,10 @@ const UIStaticText = {
     inputQuestionTooltipLabel: 'Question Tooltip',
     inputQuestionRequiredCheckbox: 'Required',
     buttonSaveText: 'Save',
+    questionSettingTabPane: 'Setting',
+    questionSkipLogicTabPane: 'Skip Logic',
+    questionTranslationTabPane: 'Translation',
+    questionExtraTabPane: 'Extra',
   },
 };
 

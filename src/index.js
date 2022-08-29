@@ -42,6 +42,7 @@ const WebformEditor = () => {
             <span>{`1 / 10 ${mandatoryQuestionCount} | ${version} : 1`}</span>
           }
           tabBarGutter={24}
+          className={styles['tabs-wrapper']}
         >
           <Tabs.TabPane
             tab={formTabPane}

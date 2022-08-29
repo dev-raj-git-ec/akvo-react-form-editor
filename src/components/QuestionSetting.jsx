@@ -2,17 +2,8 @@ import React from 'react';
 import { Form, Input, Select, Checkbox } from 'antd';
 import styles from '../styles.module.css';
 import { UIStore, questionType } from '../lib/store';
-import { SaveButton } from '../support';
 
-const QuestionSetting = ({
-  id,
-  name,
-  type,
-  variable,
-  tooltip,
-  required,
-  handleCancelEdit,
-}) => {
+const QuestionSetting = ({ id, name, type, variable, tooltip, required }) => {
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
 
@@ -62,10 +53,6 @@ const QuestionSetting = ({
       >
         <Checkbox> {UIText.inputQuestionRequiredCheckbox}</Checkbox>
       </Form.Item>
-      <SaveButton
-        onClickSave={() => console.log('save')}
-        onClickCancel={handleCancelEdit}
-      />
     </div>
   );
 };

@@ -1,12 +1,19 @@
-import React, { useMemo } from 'react';
-import { Card, Space } from 'antd';
+import React, { useMemo, useState } from 'react';
+import { Card, Space, Tabs } from 'antd';
+import styles from '../styles.module.css';
 import { UIStore } from '../lib/store';
 import { QuestionSetting } from '.';
-import { AddMoveButton, CardTitle, CardExtraButton } from '../support';
+import {
+  AddMoveButton,
+  CardTitle,
+  CardExtraButton,
+  SaveButton,
+} from '../support';
 
 const QuestionDefinition = ({ index, question, isLastItem }) => {
-  const { buttonAddNewQuestionText } = UIStore.useState((s) => s.UIText);
+  const UIText = UIStore.useState((s) => s.UIText);
   const activeEditQuestions = UIStore.useState((s) => s.activeEditQuestions);
+  const [activeTab, setActiveTab] = useState('setting');
   const { id, name } = question;
 
   const isEditQuestion = useMemo(() => {
@@ -40,7 +47,7 @@ const QuestionDefinition = ({ index, question, isLastItem }) => {
 
   return (
     <div>
-      <AddMoveButton text={buttonAddNewQuestionText} />
+      <AddMoveButton text={UIText.buttonAddNewQuestionText} />
       <Card
         key={`${index}-${id}`}
         title={
@@ -68,13 +75,42 @@ const QuestionDefinition = ({ index, question, isLastItem }) => {
         }
       >
         {isEditQuestion && (
-          <QuestionSetting
-            handleCancelEdit={handleCancelEdit}
-            {...question}
-          />
+          <div>
+            <Tabs
+              defaultActiveKey={activeTab}
+              onChange={(key) => setActiveTab(key)}
+              tabBarGutter={24}
+              className={styles['tabs-wrapper']}
+            >
+              <Tabs.TabPane
+                tab={UIText.questionSettingTabPane}
+                key="setting"
+              />
+              <Tabs.TabPane
+                tab={UIText.questionSkipLogicTabPane}
+                key="skip-logic"
+              />
+              <Tabs.TabPane
+                tab={UIText.questionExtraTabPane}
+                key="extra"
+              />
+              <Tabs.TabPane
+                tab={UIText.questionTranslationTabPane}
+                key="translation"
+              />
+            </Tabs>
+            {activeTab === 'setting' && <QuestionSetting {...question} />}
+            {activeTab === 'skip-logic' && 'Skip Logic here..'}
+            <div>
+              <SaveButton
+                onClickSave={() => console.log('save')}
+                onClickCancel={handleCancelEdit}
+              />
+            </div>
+          </div>
         )}
       </Card>
-      {isLastItem && <AddMoveButton text={buttonAddNewQuestionText} />}
+      {isLastItem && <AddMoveButton text={UIText.buttonAddNewQuestionText} />}
     </div>
   );
 };

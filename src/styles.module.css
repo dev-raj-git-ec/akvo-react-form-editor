@@ -25,3 +25,7 @@
 .select-dropdown {
   text-align: left;
 }
+
+.tabs-wrapper {
+  margin-bottom: 12px !important;
+}
