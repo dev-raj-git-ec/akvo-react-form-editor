@@ -2,20 +2,29 @@ import React, { useMemo } from 'react';
 import { Card, Button, Space, Form, Input, Checkbox } from 'antd';
 import { UIStore } from '../lib/store';
 import styles from '../styles.module.css';
+import { BiShow, BiHide } from 'react-icons/bi';
+import { TbEdit, TbEditOff } from 'react-icons/tb';
+import { RiDeleteBin2Line } from 'react-icons/ri';
 
 const QuestionGroupSetting = ({ id, name, description }) => {
   const namePreffix = `question_group-${id}`;
+  const {
+    inputQuestionGroupNameLabel,
+    inputQuestionGroupDescriptionLabel,
+    inputRepeatThisGroupCheckbox,
+  } = UIStore.useState((s) => s.UIText);
+
   return (
     <div>
       <Form.Item
-        label="Question Group Name"
+        label={inputQuestionGroupNameLabel}
         initialValue={name}
         name={`${namePreffix}-name`}
       >
         <Input />
       </Form.Item>
       <Form.Item
-        label="Question Group Description"
+        label={inputQuestionGroupDescriptionLabel}
         initialValue={description}
         name={`${namePreffix}-description`}
       >
@@ -26,7 +35,7 @@ const QuestionGroupSetting = ({ id, name, description }) => {
         name={`${namePreffix}-repeatable`}
         className={styles['question-group-repeatable']}
       >
-        <Checkbox> Repeat this group</Checkbox>
+        <Checkbox> {inputRepeatThisGroupCheckbox}</Checkbox>
       </Form.Item>
     </div>
   );
@@ -85,16 +94,40 @@ const QuestionGroupDefinition = ({ index, questionGroup }) => {
       extra={
         <Space>
           {!showQuestion ? (
-            <Button onClick={handleShowQuestions}>Show Questions</Button>
+            <Button
+              type="link"
+              className={styles['icon-button']}
+              onClick={handleShowQuestions}
+              icon={<BiShow />}
+            />
           ) : (
-            <Button onClick={handleHideQuestions}>Hide Questions</Button>
+            <Button
+              type="link"
+              className={styles['icon-button']}
+              onClick={handleHideQuestions}
+              icon={<BiHide />}
+            />
           )}
           {!isEditQuestionGroup ? (
-            <Button onClick={handleEditGroup}>Edit Group</Button>
+            <Button
+              type="link"
+              className={styles['icon-button']}
+              onClick={handleEditGroup}
+              icon={<TbEdit />}
+            />
           ) : (
-            <Button onClick={handleCancelEditGroup}>Cancel Edit Group</Button>
+            <Button
+              type="link"
+              className={styles['icon-button']}
+              onClick={handleCancelEditGroup}
+              icon={<TbEditOff />}
+            />
           )}
-          <Button>Delete</Button>
+          <Button
+            type="link"
+            className={styles['icon-button']}
+            icon={<RiDeleteBin2Line />}
+          />
         </Space>
       }
     >

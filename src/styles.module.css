@@ -11,3 +11,9 @@
 .question-group-repeatable {
   width: fit-content;
 }
+
+.icon-button > svg {
+  margin-top: 2.5px;
+  font-size: 20px;
+  color: rgb(107, 107, 107);
+}
