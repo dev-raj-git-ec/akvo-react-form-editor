@@ -5,7 +5,8 @@ import styles from '../styles.module.css';
 import { BiShow, BiHide, BiMove } from 'react-icons/bi';
 import { TbEdit, TbEditOff } from 'react-icons/tb';
 import { RiDeleteBin2Line } from 'react-icons/ri';
-import { AddMoveButton, QuestionDefinition } from '.';
+import { QuestionDefinition } from '.';
+import { AddMoveButton, CardTitle } from '../support';
 
 const QuestionGroupSetting = ({
   id,
@@ -101,14 +102,10 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
       <Card
         key={`${index}-${id}`}
         title={
-          <Space>
-            <Button
-              type="link"
-              className={styles['button-icon']}
-              icon={<BiMove />}
-            />
-            {name}
-          </Space>
+          <CardTitle
+            title={name}
+            onMoveClick={() => console.log('move')}
+          />
         }
         headStyle={{ textAlign: 'left', padding: '0 12px' }}
         bodyStyle={{ padding: isEditQuestionGroup || showQuestion ? 24 : 0 }}

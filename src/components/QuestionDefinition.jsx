@@ -1,11 +1,10 @@
 import React, { useMemo } from 'react';
 import { Card, Space, Button, Form, Input, Select, Checkbox } from 'antd';
-import { AddMoveButton } from '.';
 import { UIStore, questionType } from '../lib/store';
 import styles from '../styles.module.css';
-import { BiMove } from 'react-icons/bi';
 import { TbEdit, TbEditOff } from 'react-icons/tb';
 import { RiDeleteBin2Line } from 'react-icons/ri';
+import { AddMoveButton, CardTitle } from '../support';
 
 const QuestionSetting = ({
   id,
@@ -100,14 +99,11 @@ const QuestionDefinition = ({ index, question, isLastItem }) => {
       <Card
         key={`${index}-${id}`}
         title={
-          <Space>
-            <Button
-              type="link"
-              className={styles['button-icon']}
-              icon={<BiMove />}
-            />
-            {`${index + 1}. ${name}`}
-          </Space>
+          <CardTitle
+            title={name}
+            numbering={index + 1}
+            onMoveClick={() => console.log('move')}
+          />
         }
         headStyle={{ textAlign: 'left', padding: '0 12px' }}
         bodyStyle={{ padding: isEditQuestion ? 24 : 0 }}
