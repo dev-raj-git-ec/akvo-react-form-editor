@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button, Row, Space } from 'antd';
+import { UIStore } from '../lib/store';
 
 const AddMoveButton = ({
   text,
@@ -9,11 +10,13 @@ const AddMoveButton = ({
   disabled = false,
   onCancel = () => {},
 }) => {
+  const { buttonCancelText } = UIStore.useState((s) => s.UIText);
+
   return (
     <Row
       align="middle"
       justify="start"
-      className={`reorder-wrapper ${className}`}
+      className={`arfe-reorder-wrapper ${className}`}
     >
       <Space>
         <Button
@@ -32,7 +35,7 @@ const AddMoveButton = ({
             size="small"
             onClick={onCancel}
           >
-            Cancel
+            {buttonCancelText}
           </Button>
         )}
       </Space>

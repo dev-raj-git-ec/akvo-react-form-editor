@@ -2,9 +2,10 @@ import React, { useMemo } from 'react';
 import { Card, Button, Space, Form, Input, Checkbox } from 'antd';
 import { UIStore } from '../lib/store';
 import styles from '../styles.module.css';
-import { BiShow, BiHide } from 'react-icons/bi';
+import { BiShow, BiHide, BiMove } from 'react-icons/bi';
 import { TbEdit, TbEditOff } from 'react-icons/tb';
 import { RiDeleteBin2Line } from 'react-icons/ri';
+import AddMoveButton from './AddMoveButton';
 
 const QuestionGroupSetting = ({ id, name, description }) => {
   const namePreffix = `question_group-${id}`;
@@ -41,12 +42,13 @@ const QuestionGroupSetting = ({ id, name, description }) => {
   );
 };
 
-const QuestionGroupDefinition = ({ index, questionGroup }) => {
+const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
   const activeQuestionGroups = UIStore.useState((s) => s.activeQuestionGroups);
   const activeEditQuestionGroups = UIStore.useState(
     (s) => s.activeEditQuestionGroups
   );
   const { id, name } = questionGroup;
+  const { buttonAddNewQuestionGroupText } = UIStore.useState((s) => s.UIText);
 
   const showQuestion = useMemo(() => {
     return activeQuestionGroups.includes(id);
@@ -85,55 +87,68 @@ const QuestionGroupDefinition = ({ index, questionGroup }) => {
   };
 
   return (
-    <Card
-      key={`${index}-${id}`}
-      title={name}
-      headStyle={{ textAlign: 'left' }}
-      bodyStyle={{ padding: isEditQuestionGroup || showQuestion ? 24 : 0 }}
-      loading={false}
-      extra={
-        <Space>
-          {!showQuestion ? (
+    <div>
+      <AddMoveButton text={buttonAddNewQuestionGroupText} />
+      <Card
+        key={`${index}-${id}`}
+        title={
+          <Space>
             <Button
               type="link"
-              className={styles['icon-button']}
-              onClick={handleShowQuestions}
-              icon={<BiShow />}
+              className={styles['button-icon']}
+              icon={<BiMove />}
             />
-          ) : (
+            {name}
+          </Space>
+        }
+        headStyle={{ textAlign: 'left', padding: '0 12px' }}
+        bodyStyle={{ padding: isEditQuestionGroup || showQuestion ? 24 : 0 }}
+        loading={false}
+        extra={
+          <Space>
+            {!showQuestion ? (
+              <Button
+                type="link"
+                className={styles['button-icon']}
+                onClick={handleShowQuestions}
+                icon={<BiShow />}
+              />
+            ) : (
+              <Button
+                type="link"
+                className={styles['button-icon']}
+                onClick={handleHideQuestions}
+                icon={<BiHide />}
+              />
+            )}
+            {!isEditQuestionGroup ? (
+              <Button
+                type="link"
+                className={styles['button-icon']}
+                onClick={handleEditGroup}
+                icon={<TbEdit />}
+              />
+            ) : (
+              <Button
+                type="link"
+                className={styles['button-icon']}
+                onClick={handleCancelEditGroup}
+                icon={<TbEditOff />}
+              />
+            )}
             <Button
               type="link"
-              className={styles['icon-button']}
-              onClick={handleHideQuestions}
-              icon={<BiHide />}
+              className={styles['button-icon']}
+              icon={<RiDeleteBin2Line />}
             />
-          )}
-          {!isEditQuestionGroup ? (
-            <Button
-              type="link"
-              className={styles['icon-button']}
-              onClick={handleEditGroup}
-              icon={<TbEdit />}
-            />
-          ) : (
-            <Button
-              type="link"
-              className={styles['icon-button']}
-              onClick={handleCancelEditGroup}
-              icon={<TbEditOff />}
-            />
-          )}
-          <Button
-            type="link"
-            className={styles['icon-button']}
-            icon={<RiDeleteBin2Line />}
-          />
-        </Space>
-      }
-    >
-      {isEditQuestionGroup && <QuestionGroupSetting {...questionGroup} />}
-      {showQuestion && 'Show Questions here...'}
-    </Card>
+          </Space>
+        }
+      >
+        {isEditQuestionGroup && <QuestionGroupSetting {...questionGroup} />}
+        {showQuestion && 'Show Questions here...'}
+      </Card>
+      {isLastItem && <AddMoveButton text={buttonAddNewQuestionGroupText} />}
+    </div>
   );
 };
 

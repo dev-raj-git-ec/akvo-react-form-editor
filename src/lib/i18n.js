@@ -14,6 +14,9 @@ const UIText = {
     buttonEditGroupText: 'Edit Group',
     buttonCancelEditGroupText: 'Cancel Edit Group',
     buttonDeleteText: 'Delete',
+    buttonCancelText: 'Cancel',
+    buttonAddNewQuestionGroupText: 'Insert group here',
+    buttonAddNewQuestionText: 'Insert question here',
   },
 };
 

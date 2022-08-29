@@ -61,6 +61,7 @@ const WebformEditor = () => {
                   key={`question-group-definition-${qgi}`}
                   index={qgi}
                   questionGroup={qg}
+                  isLastItem={qgi === questionGroups.length - 1}
                 />
               );
             })}
