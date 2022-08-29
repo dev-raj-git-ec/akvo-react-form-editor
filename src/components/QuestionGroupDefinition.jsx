@@ -2,11 +2,8 @@ import React, { useMemo } from 'react';
 import { Card, Button, Space, Form, Input, Checkbox } from 'antd';
 import { UIStore } from '../lib/store';
 import styles from '../styles.module.css';
-import { BiShow, BiHide, BiMove } from 'react-icons/bi';
-import { TbEdit, TbEditOff } from 'react-icons/tb';
-import { RiDeleteBin2Line } from 'react-icons/ri';
 import { QuestionDefinition } from '.';
-import { AddMoveButton, CardTitle } from '../support';
+import { AddMoveButton, CardTitle, CardExtraButton } from '../support';
 
 const QuestionGroupSetting = ({
   id,
@@ -96,6 +93,25 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
     });
   };
 
+  const extraButtons = [
+    {
+      type: 'show-button',
+      isExpand: showQuestion,
+      onClick: handleShowQuestions,
+      onCancel: handleHideQuestions,
+    },
+    {
+      type: 'edit-button',
+      isExpand: isEditQuestionGroup,
+      onClick: handleEditGroup,
+      onCancel: handleCancelEditGroup,
+    },
+    {
+      type: 'delete-button',
+      onClick: () => console.log('delete'),
+    },
+  ];
+
   return (
     <div>
       <AddMoveButton text={buttonAddNewQuestionGroupText} />
@@ -112,41 +128,15 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
         loading={false}
         extra={
           <Space>
-            {!showQuestion ? (
-              <Button
-                type="link"
-                className={styles['button-icon']}
-                onClick={handleShowQuestions}
-                icon={<BiShow />}
+            {extraButtons.map((cfg) => (
+              <CardExtraButton
+                key={`${cfg.type}-${id}`}
+                type={cfg.type}
+                isExpand={cfg.isExpand}
+                onClick={cfg.onClick}
+                onCancel={cfg.onCancel}
               />
-            ) : (
-              <Button
-                type="link"
-                className={styles['button-icon']}
-                onClick={handleHideQuestions}
-                icon={<BiHide />}
-              />
-            )}
-            {!isEditQuestionGroup ? (
-              <Button
-                type="link"
-                className={styles['button-icon']}
-                onClick={handleEditGroup}
-                icon={<TbEdit />}
-              />
-            ) : (
-              <Button
-                type="link"
-                className={styles['button-icon']}
-                onClick={handleCancelEditGroup}
-                icon={<TbEditOff />}
-              />
-            )}
-            <Button
-              type="link"
-              className={styles['button-icon']}
-              icon={<RiDeleteBin2Line />}
-            />
+            ))}
           </Space>
         }
       >

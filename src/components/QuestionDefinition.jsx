@@ -2,9 +2,7 @@ import React, { useMemo } from 'react';
 import { Card, Space, Button, Form, Input, Select, Checkbox } from 'antd';
 import { UIStore, questionType } from '../lib/store';
 import styles from '../styles.module.css';
-import { TbEdit, TbEditOff } from 'react-icons/tb';
-import { RiDeleteBin2Line } from 'react-icons/ri';
-import { AddMoveButton, CardTitle } from '../support';
+import { AddMoveButton, CardTitle, CardExtraButton } from '../support';
 
 const QuestionSetting = ({
   id,
@@ -93,6 +91,19 @@ const QuestionDefinition = ({ index, question, isLastItem }) => {
     });
   };
 
+  const extraButtons = [
+    {
+      type: 'edit-button',
+      isExpand: isEditQuestion,
+      onClick: handleEdit,
+      onCancel: handleCancelEdit,
+    },
+    {
+      type: 'delete-button',
+      onClick: () => console.log('delete'),
+    },
+  ];
+
   return (
     <div>
       <AddMoveButton text={buttonAddNewQuestionText} />
@@ -110,26 +121,15 @@ const QuestionDefinition = ({ index, question, isLastItem }) => {
         loading={false}
         extra={
           <Space>
-            {!isEditQuestion ? (
-              <Button
-                type="link"
-                className={styles['button-icon']}
-                onClick={handleEdit}
-                icon={<TbEdit />}
+            {extraButtons.map((cfg) => (
+              <CardExtraButton
+                key={`${cfg.type}-${id}`}
+                type={cfg.type}
+                isExpand={cfg.isExpand}
+                onClick={cfg.onClick}
+                onCancel={cfg.onCancel}
               />
-            ) : (
-              <Button
-                type="link"
-                className={styles['button-icon']}
-                onClick={handleCancelEdit}
-                icon={<TbEditOff />}
-              />
-            )}
-            <Button
-              type="link"
-              className={styles['button-icon']}
-              icon={<RiDeleteBin2Line />}
-            />
+            ))}
           </Space>
         }
       >
