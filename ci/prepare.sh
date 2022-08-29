@@ -20,6 +20,12 @@ docker run --rm \
        --entrypoint /bin/sh \
        node:17.3.0-alpine3.15 -c './build.sh'
 
+if [[ "${CI_BRANCH}" != "main" ]]; then
+docker run -it --rm \
+    --volume "$(pwd)/docs:/docs" \
+        akvo/akvo-sphinx:20220525.082728.594558b make html
+fi
+
 # STORE IMAGE CACHE
 while IFS= read -r IMAGE_CACHE; do
     IMAGE_CACHE_LOC="./ci/images/${IMAGE_CACHE//\//-}.tar"
