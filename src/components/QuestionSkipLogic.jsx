@@ -4,7 +4,8 @@ import styles from '../styles.module.css';
 import { CardExtraButton } from '../support';
 import { UIStore } from '../lib/store';
 
-const QuestionSkipLogic = ({ id }) => {
+const QuestionSkipLogic = (question) => {
+  const { id } = question;
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
 

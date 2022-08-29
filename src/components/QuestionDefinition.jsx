@@ -100,8 +100,10 @@ const QuestionDefinition = ({ index, question, isLastItem }) => {
                 key="translation"
               /> */}
             </Tabs>
-            {activeTab === 'setting' && <QuestionSetting {...question} />}
-            {activeTab === 'skip-logic' && <QuestionSkipLogic {...question} />}
+            {activeTab === 'setting' && <QuestionSetting question={question} />}
+            {activeTab === 'skip-logic' && (
+              <QuestionSkipLogic question={question} />
+            )}
             <div>
               <SaveButton
                 onClickSave={() => form.submit()}
