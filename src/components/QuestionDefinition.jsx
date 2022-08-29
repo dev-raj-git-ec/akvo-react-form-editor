@@ -7,7 +7,15 @@ import { BiMove } from 'react-icons/bi';
 import { TbEdit, TbEditOff } from 'react-icons/tb';
 import { RiDeleteBin2Line } from 'react-icons/ri';
 
-const QuestionSetting = ({ id, name, type, variable, tooltip, required }) => {
+const QuestionSetting = ({
+  id,
+  name,
+  type,
+  variable,
+  tooltip,
+  required,
+  handleCancelEdit,
+}) => {
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
 
@@ -57,6 +65,10 @@ const QuestionSetting = ({ id, name, type, variable, tooltip, required }) => {
       >
         <Checkbox> {UIText.inputQuestionRequiredCheckbox}</Checkbox>
       </Form.Item>
+      <Space>
+        <Button type="primary">{UIText.buttonSaveText}</Button>
+        <Button onClick={handleCancelEdit}>{UIText.buttonCancelText}</Button>
+      </Space>
     </div>
   );
 };
@@ -125,7 +137,12 @@ const QuestionDefinition = ({ index, question, isLastItem }) => {
           </Space>
         }
       >
-        {isEditQuestion && <QuestionSetting {...question} />}
+        {isEditQuestion && (
+          <QuestionSetting
+            handleCancelEdit={handleCancelEdit}
+            {...question}
+          />
+        )}
       </Card>
       {isLastItem && <AddMoveButton text={buttonAddNewQuestionText} />}
     </div>

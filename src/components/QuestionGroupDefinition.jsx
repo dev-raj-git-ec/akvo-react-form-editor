@@ -7,18 +7,20 @@ import { TbEdit, TbEditOff } from 'react-icons/tb';
 import { RiDeleteBin2Line } from 'react-icons/ri';
 import { AddMoveButton, QuestionDefinition } from '.';
 
-const QuestionGroupSetting = ({ id, name, description }) => {
+const QuestionGroupSetting = ({
+  id,
+  name,
+  description,
+  repeatable,
+  handleCancelEditGroup,
+}) => {
   const namePreffix = `question_group-${id}`;
-  const {
-    inputQuestionGroupNameLabel,
-    inputQuestionGroupDescriptionLabel,
-    inputRepeatThisGroupCheckbox,
-  } = UIStore.useState((s) => s.UIText);
+  const UIText = UIStore.useState((s) => s.UIText);
 
   return (
     <div>
       <Form.Item
-        label={inputQuestionGroupNameLabel}
+        label={UIText.inputQuestionGroupNameLabel}
         initialValue={name}
         name={`${namePreffix}-name`}
         required
@@ -26,7 +28,7 @@ const QuestionGroupSetting = ({ id, name, description }) => {
         <Input />
       </Form.Item>
       <Form.Item
-        label={inputQuestionGroupDescriptionLabel}
+        label={UIText.inputQuestionGroupDescriptionLabel}
         initialValue={description}
         name={`${namePreffix}-description`}
       >
@@ -37,8 +39,14 @@ const QuestionGroupSetting = ({ id, name, description }) => {
         name={`${namePreffix}-repeatable`}
         className={styles['input-checkbox-wrapper']}
       >
-        <Checkbox> {inputRepeatThisGroupCheckbox}</Checkbox>
+        <Checkbox> {UIText.inputRepeatThisGroupCheckbox}</Checkbox>
       </Form.Item>
+      <Space>
+        <Button type="primary">{UIText.buttonSaveText}</Button>
+        <Button onClick={handleCancelEditGroup}>
+          {UIText.buttonCancelText}
+        </Button>
+      </Space>
     </div>
   );
 };
@@ -145,7 +153,12 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
           </Space>
         }
       >
-        {isEditQuestionGroup && <QuestionGroupSetting {...questionGroup} />}
+        {isEditQuestionGroup && (
+          <QuestionGroupSetting
+            handleCancelEditGroup={handleCancelEditGroup}
+            {...questionGroup}
+          />
+        )}
         {showQuestion &&
           questions.map((q, qi) => (
             <QuestionDefinition

@@ -22,6 +22,7 @@ const UIStaticText = {
     inputQuestionVariableNameLabel: 'Variable Name',
     inputQuestionTooltipLabel: 'Question Tooltip',
     inputQuestionRequiredCheckbox: 'Required',
+    buttonSaveText: 'Save',
   },
 };
 
