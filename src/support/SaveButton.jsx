@@ -10,7 +10,7 @@ const SaveButton = ({
 }) => {
   const UIText = UIStore.useState((s) => s.UIText);
   return (
-    <Space className={styles['button-save-wrapper']}>
+    <Space className={styles['space-align-right']}>
       <Button
         type="primary"
         onClick={onClickSave}

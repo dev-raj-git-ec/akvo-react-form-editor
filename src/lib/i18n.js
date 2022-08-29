@@ -30,6 +30,11 @@ const UIStaticText = {
     inputQuestionDependentToLabel: 'Dependent to Question',
     inputQuestionDependentLogicLabel: 'Logic',
     inputQuestionDependentAnswerLabel: 'Value',
+    questionMoreInputTypeSettingText: 'More Input Question Setting',
+    inputQuestionRequireDoubleEntryCheckbox: 'Require double entry of answer',
+    inputQuestionHiddenStringCheckbox: 'Hidden String/Password',
+    questionMoreInputNumberSettingText: 'More Number Question Setting',
+    inputQuestionAllowDecimalCheckbox: 'Allow Decimal',
   },
 };
 
