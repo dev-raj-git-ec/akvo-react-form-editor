@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, Checkbox, Space } from 'antd';
-import styles from '../styles.module.css';
-import { UIStore } from '../lib/store';
+import styles from '../../styles.module.css';
+import { UIStore } from '../../lib/store';
 
 const SettingInput = ({ id }) => {
   const namePreffix = `question-${id}`;

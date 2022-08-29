@@ -35,6 +35,8 @@ const UIStaticText = {
     inputQuestionHiddenStringCheckbox: 'Hidden String/Password',
     questionMoreInputNumberSettingText: 'More Number Question Setting',
     inputQuestionAllowDecimalCheckbox: 'Allow Decimal',
+    questionMoreOptionTypeSettingText: 'More Option Question Setting',
+    inputQuestionAllowOtherCheckbox: 'Allow Other',
   },
 };
 

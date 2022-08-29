@@ -2,7 +2,7 @@ import React from 'react';
 import { Form, Input, Select, Checkbox } from 'antd';
 import styles from '../styles.module.css';
 import { UIStore, questionType } from '../lib/store';
-import { SettingInput, SettingNumber } from './question-type';
+import { SettingInput, SettingNumber, SettingOption } from './question-type';
 
 const QuestionSetting = (question) => {
   const { id, name, type, variable, tooltip, required } = question;
@@ -59,6 +59,9 @@ const QuestionSetting = (question) => {
       </Form.Item>
       {qType === 'input' && <SettingInput {...question} />}
       {qType === 'number' && <SettingNumber {...question} />}
+      {['option', 'multiple_option'].includes(qType) && (
+        <SettingOption {...question} />
+      )}
     </div>
   );
 };
