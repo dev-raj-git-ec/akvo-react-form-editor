@@ -5,7 +5,7 @@ import styles from '../styles.module.css';
 import { BiShow, BiHide, BiMove } from 'react-icons/bi';
 import { TbEdit, TbEditOff } from 'react-icons/tb';
 import { RiDeleteBin2Line } from 'react-icons/ri';
-import AddMoveButton from './AddMoveButton';
+import { AddMoveButton, QuestionDefinition } from '.';
 
 const QuestionGroupSetting = ({ id, name, description }) => {
   const namePreffix = `question_group-${id}`;
@@ -47,16 +47,16 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
   const activeEditQuestionGroups = UIStore.useState(
     (s) => s.activeEditQuestionGroups
   );
-  const { id, name } = questionGroup;
+  const { id, name, questions } = questionGroup;
   const { buttonAddNewQuestionGroupText } = UIStore.useState((s) => s.UIText);
 
   const showQuestion = useMemo(() => {
     return activeQuestionGroups.includes(id);
-  }, [activeQuestionGroups]);
+  }, [activeQuestionGroups, id]);
 
   const isEditQuestionGroup = useMemo(() => {
     return activeEditQuestionGroups.includes(id);
-  }, [activeEditQuestionGroups]);
+  }, [activeEditQuestionGroups, id]);
 
   const handleShowQuestions = () => {
     UIStore.update((s) => {
@@ -145,7 +145,15 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
         }
       >
         {isEditQuestionGroup && <QuestionGroupSetting {...questionGroup} />}
-        {showQuestion && 'Show Questions here...'}
+        {showQuestion &&
+          questions.map((q, qi) => (
+            <QuestionDefinition
+              key={`question-definition-${qi}`}
+              index={qi}
+              question={q}
+              isLastItem={qi === questions.length - 1}
+            />
+          ))}
       </Card>
       {isLastItem && <AddMoveButton text={buttonAddNewQuestionGroupText} />}
     </div>

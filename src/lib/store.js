@@ -81,6 +81,7 @@ const UIStore = new Store({
   },
   activeQuestionGroups: [],
   activeEditQuestionGroups: [],
+  activeEditQuestions: [],
   UIText: UIText.en,
 });
 

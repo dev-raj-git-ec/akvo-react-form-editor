@@ -16,7 +16,7 @@ const UIText = {
     buttonDeleteText: 'Delete',
     buttonCancelText: 'Cancel',
     buttonAddNewQuestionGroupText: 'Insert group here',
-    buttonAddNewQuestionText: 'Insert question here',
+    buttonAddNewQuestionText: 'Add new question',
   },
 };
 
