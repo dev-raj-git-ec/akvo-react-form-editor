@@ -1,5 +1,6 @@
 import { Store } from 'pullstate';
 import UIStaticText from './i18n';
+import { dummyName } from './debug';
 
 const generateId = () => new Date().getTime();
 
@@ -71,13 +72,10 @@ const defaultQuestion = ({
   return q;
 };
 
-const defaultQuestionGroup = ({
-  name = 'New Question Group',
-  prevOrder = 0,
-}) => {
+const defaultQuestionGroup = ({ name = dummyName(), prevOrder = 0 }) => {
   const qg = {
     id: generateId(),
-    name: name || 'New Question Group',
+    name: name || dummyName(),
     order: prevOrder + 1,
     description: null,
     repeatable: false,

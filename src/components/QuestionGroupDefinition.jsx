@@ -142,6 +142,7 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
               : buttonAddNewQuestionGroupText
           }
           disabled={activeMoveQuestionGroup === questionGroup}
+          isLastItem={true}
         />
       )}
     </div>

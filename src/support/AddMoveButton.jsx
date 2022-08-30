@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Row, Space } from 'antd';
+import { Button, Row, Col, Space } from 'antd';
 import { UIStore, questionGroupFn } from '../lib/store';
 import { orderBy } from 'lodash';
 
@@ -7,14 +7,11 @@ const AddMoveButton = ({
   order: prevOrder,
   text,
   className,
-  cancelButton = false,
   disabled = false,
-  onCancel = () => {},
+  isLastItem = false,
 }) => {
   const { buttonCancelText } = UIStore.useState((s) => s.UIText);
-  const activeMoveQuestionGroup = UIStore.useState(
-    (s) => s.activeMoveQuestionGroup
-  );
+  const movingQg = UIStore.useState((s) => s.activeMoveQuestionGroup);
   const { questionGroups } = questionGroupFn.store.useState((s) => s);
 
   const handleOnAdd = () => {
@@ -36,19 +33,52 @@ const AddMoveButton = ({
   };
 
   const handleOnMove = () => {
+    const currentQg = {
+      ...movingQg,
+      order: isLastItem
+        ? prevOrder
+        : prevOrder
+        ? prevOrder > movingQg.order
+          ? prevOrder
+          : prevOrder + 1
+        : 1,
+    };
     const orderedQg = questionGroups
-      .filter((qg) => qg.order !== activeMoveQuestionGroup.order)
+      .filter((qg) => qg.order !== movingQg.order)
       .map((x) => {
-        if (x.order > prevOrder) {
+        if (isLastItem) {
+          if (x.order > movingQg.order) {
+            return { ...x, order: x.order - 1 };
+          }
           return x;
         }
-        return { ...x, norder: x.order - prevOrder || 1 };
+        if (prevOrder > movingQg.order) {
+          if (x.order <= prevOrder && x.order > movingQg.order) {
+            return { ...x, order: x.order - movingQg.order || 1 };
+          }
+          if (x.order >= prevOrder && x.order > movingQg.order) {
+            return x;
+          }
+          return x;
+        }
+        if (
+          prevOrder < movingQg.order &&
+          x.order < movingQg.order &&
+          x.order >= prevOrder + 1
+        ) {
+          return { ...x, order: x.order + (prevOrder || 1) };
+        }
+        return x;
       });
-
-    const currentQg = { ...activeMoveQuestionGroup, order: prevOrder || 1 };
     questionGroupFn.store.update((s) => {
       s.questionGroups = orderBy([...orderedQg, currentQg], 'order');
     });
+    UIStore.update((s) => {
+      s.activeMoveQuestionGroup = null;
+    });
+  };
+
+  const handleOnCancel = () => {
     UIStore.update((s) => {
       s.activeMoveQuestionGroup = null;
     });
@@ -60,27 +90,35 @@ const AddMoveButton = ({
       justify="start"
       className={`arfe-reorder-wrapper ${className}`}
     >
-      <Space>
+      <Col
+        span={movingQg ? 12 : 24}
+        align="left"
+      >
         <Button
-          type="secondary"
+          type="dashed"
           className="reorder-button"
           size="small"
-          onClick={activeMoveQuestionGroup ? handleOnMove : handleOnAdd}
+          onClick={movingQg ? handleOnMove : handleOnAdd}
           disabled={disabled}
         >
           {text}
         </Button>
-        {cancelButton && (
+      </Col>
+      {movingQg && (
+        <Col
+          span={12}
+          align="right"
+        >
           <Button
-            type="secondary"
+            type="dashed"
             className="reorder-button"
             size="small"
-            onClick={onCancel}
+            onClick={handleOnCancel}
           >
             {buttonCancelText}
           </Button>
-        )}
-      </Space>
+        </Col>
+      )}
     </Row>
   );
 };
