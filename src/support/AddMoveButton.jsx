@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Row, Col, Space } from 'antd';
+import { Button, Row, Col } from 'antd';
 import { UIStore, questionGroupFn } from '../lib/store';
 import { orderBy } from 'lodash';
 
@@ -110,7 +110,7 @@ const AddMoveButton = ({
           align="right"
         >
           <Button
-            type="dashed"
+            type="danger"
             className="reorder-button"
             size="small"
             onClick={handleOnCancel}

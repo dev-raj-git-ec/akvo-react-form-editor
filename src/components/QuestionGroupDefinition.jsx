@@ -9,9 +9,7 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
   const activeEditQuestionGroups = UIStore.useState(
     (s) => s.activeEditQuestionGroups
   );
-  const activeMoveQuestionGroup = UIStore.useState(
-    (s) => s.activeMoveQuestionGroup
-  );
+  const movingQg = UIStore.useState((s) => s.activeMoveQuestionGroup);
 
   const { id, name, questions, order } = questionGroup;
   const { buttonAddNewQuestionGroupText, buttonMoveQuestionGroupText } =
@@ -56,7 +54,7 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
   const handleMove = () => {
     UIStore.update((s) => {
       s.activeMoveQuestionGroup =
-        activeMoveQuestionGroup === questionGroup ? null : questionGroup;
+        movingQg === questionGroup ? null : questionGroup;
     });
   };
 
@@ -83,25 +81,30 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
     <div>
       <AddMoveButton
         text={
-          activeMoveQuestionGroup
-            ? buttonMoveQuestionGroupText
-            : buttonAddNewQuestionGroupText
+          movingQg ? buttonMoveQuestionGroupText : buttonAddNewQuestionGroupText
         }
         order={order - 1}
-        disabled={
-          activeMoveQuestionGroup === questionGroup ||
-          activeMoveQuestionGroup?.order + 1 === order
-        }
+        disabled={movingQg === questionGroup || movingQg?.order + 1 === order}
       />
       <Card
         key={`${index}-${id}`}
         title={
           <CardTitle
-            title={`${name} - ${order}`}
+            title={
+              <div className="arfe-question-group-title">
+                {name} | Order: {order}
+              </div>
+            }
             onMoveClick={handleMove}
+            disableMoveButton={!index && isLastItem}
           />
         }
-        headStyle={{ textAlign: 'left', padding: '0 12px' }}
+        headStyle={{
+          textAlign: 'left',
+          padding: '0 12px',
+          backgroundColor: movingQg?.id === id ? '#FFF2CA' : '#FFF',
+          border: movingQg?.id === id ? '1px dashed #ffc107' : 'none',
+        }}
         bodyStyle={{ padding: isEditQuestionGroup || showQuestion ? 24 : 0 }}
         loading={false}
         extra={
@@ -137,11 +140,11 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
         <AddMoveButton
           order={order}
           text={
-            activeMoveQuestionGroup
+            movingQg
               ? buttonMoveQuestionGroupText
               : buttonAddNewQuestionGroupText
           }
-          disabled={activeMoveQuestionGroup === questionGroup}
+          disabled={movingQg === questionGroup}
           isLastItem={true}
         />
       )}

@@ -3,8 +3,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Roboto+Condensed:wght@300;400&display=swap');
 
 .container {
-  padding: 1em;
   font-size: 2em;
+  font-family: 'Roboto Condensed', sans-serif;
   text-align: center;
 }
 
@@ -28,7 +28,17 @@
 }
 
 .tabs-wrapper {
+  font-family: 'Assistant', sans-serif;
   margin-bottom: 12px !important;
+  font-size: 18px;
+  font-weight: bold;
+  color: #6a6a6a;
+}
+
+.question-group-title {
+  font-family: 'Assistant', sans-serif;
+  font-weight: bold;
+  color: #6a6a6a;
 }
 
 .space-align-right {
