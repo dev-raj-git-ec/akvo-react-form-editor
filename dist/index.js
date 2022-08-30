@@ -5,6 +5,7 @@ var React__default = _interopDefault(React);
 require('antd/dist/antd.min.css');
 var antd = require('antd');
 var pullstate = require('pullstate');
+var lodash = require('lodash');
 var bi = require('react-icons/bi');
 var tb = require('react-icons/tb');
 var ri = require('react-icons/ri');
@@ -26,7 +27,7 @@ function _extends() {
   return _extends.apply(this, arguments);
 }
 
-var styles = {"container":"arfe-container","input-checkbox-wrapper":"arfe-input-checkbox-wrapper","button-icon":"arfe-button-icon","reorder-wrapper":"arfe-reorder-wrapper","select-dropdown":"arfe-select-dropdown","tabs-wrapper":"arfe-tabs-wrapper","space-align-right":"arfe-space-align-right","space-align-left":"arfe-space-align-left","space-vertical-align-left":"arfe-space-vertical-align-left","space-vertical-align-right":"arfe-space-vertical-align-right","more-question-setting-text":"arfe-more-question-setting-text"};
+var styles = {"container":"arfe-container","form-definition":"arfe-form-definition","input-checkbox-wrapper":"arfe-input-checkbox-wrapper","button-icon":"arfe-button-icon","reorder-wrapper":"arfe-reorder-wrapper","select-dropdown":"arfe-select-dropdown","tabs-wrapper":"arfe-tabs-wrapper","question-group-title":"arfe-question-group-title","space-align-right":"arfe-space-align-right","space-align-left":"arfe-space-align-left","space-vertical-align-left":"arfe-space-vertical-align-left","space-vertical-align-right":"arfe-space-vertical-align-right","more-question-setting-text":"arfe-more-question-setting-text"};
 
 var FormWrapper = function FormWrapper(_ref) {
   var children = _ref.children;
@@ -70,6 +71,7 @@ var UIStaticText = {
     buttonDeleteText: 'Delete',
     buttonCancelText: 'Cancel',
     buttonAddNewQuestionGroupText: 'Insert group here',
+    buttonMoveQuestionGroupText: 'Move group here',
     buttonAddNewQuestionText: 'Add new question',
     inputQuestionNameLabel: 'Question Name',
     inputQuestionTypeLabel: 'Question Type',
@@ -92,6 +94,13 @@ var UIStaticText = {
     questionMoreOptionTypeSettingText: 'More Option Question Setting',
     inputQuestionAllowOtherCheckbox: 'Allow Other'
   }
+};
+
+var _char = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+var dummyName = function dummyName() {
+  return [1, 2].reduce(function (curr) {
+    return curr + _char.charAt(Math.floor(Math.random() * _char.length));
+  }, '');
 };
 
 var generateId = function generateId() {
@@ -153,12 +162,12 @@ var defaultQuestion = function defaultQuestion(_ref) {
 
 var defaultQuestionGroup = function defaultQuestionGroup(_ref2) {
   var _ref2$name = _ref2.name,
-      name = _ref2$name === void 0 ? 'New Question Group' : _ref2$name,
+      name = _ref2$name === void 0 ? dummyName() : _ref2$name,
       _ref2$prevOrder = _ref2.prevOrder,
       prevOrder = _ref2$prevOrder === void 0 ? 0 : _ref2$prevOrder;
   var qg = {
     id: generateId(),
-    name: name || 'New Question Group',
+    name: name || dummyName(),
     order: prevOrder + 1,
     description: null,
     repeatable: false
@@ -179,6 +188,7 @@ var UIStore = new pullstate.Store({
   },
   activeQuestionGroups: [],
   activeEditQuestionGroups: [],
+  activeMoveQuestionGroup: null,
   activeEditQuestions: [],
   UIText: UIStaticText.en
 });
@@ -202,64 +212,125 @@ var AddMoveButton = function AddMoveButton(_ref) {
   var prevOrder = _ref.order,
       text = _ref.text,
       className = _ref.className,
-      _ref$cancelButton = _ref.cancelButton,
-      cancelButton = _ref$cancelButton === void 0 ? false : _ref$cancelButton,
       _ref$disabled = _ref.disabled,
       disabled = _ref$disabled === void 0 ? false : _ref$disabled,
-      _ref$onCancel = _ref.onCancel,
-      onCancel = _ref$onCancel === void 0 ? function () {} : _ref$onCancel;
+      _ref$isLastItem = _ref.isLastItem,
+      isLastItem = _ref$isLastItem === void 0 ? false : _ref$isLastItem;
 
   var _UIStore$useState = UIStore.useState(function (s) {
     return s.UIText;
   }),
       buttonCancelText = _UIStore$useState.buttonCancelText;
 
+  var movingQg = UIStore.useState(function (s) {
+    return s.activeMoveQuestionGroup;
+  });
+
   var _questionGroupFn$stor = questionGroupFn.store.useState(function (s) {
     return s;
   }),
       questionGroups = _questionGroupFn$stor.questionGroups;
 
-  var prevQg = questionGroups.filter(function (qg) {
-    return qg.order <= prevOrder;
-  });
-  var nextQg = questionGroups.filter(function (qg) {
-    return qg.order > prevOrder;
-  }).map(function (qg) {
-    return _extends({}, qg, {
-      order: prevOrder ? prevOrder + qg.order : 1 + qg.order
+  var handleOnAdd = function handleOnAdd() {
+    var prevQg = questionGroups.filter(function (qg) {
+      return qg.order <= prevOrder;
     });
-  });
-
-  var handleOnClick = function handleOnClick() {
+    var nextQg = questionGroups.filter(function (qg) {
+      return qg.order > prevOrder;
+    }).map(function (qg) {
+      return _extends({}, qg, {
+        order: qg.order + 1
+      });
+    });
     var newQuestionGroups = [].concat(prevQg, [questionGroupFn.add({
-      prevOrder: prevOrder ? prevOrder : 0
+      prevOrder: prevOrder
     })], nextQg);
     questionGroupFn.store.update(function (s) {
       s.questionGroups = newQuestionGroups;
     });
-    console.log(prevOrder, newQuestionGroups);
+  };
+
+  var handleOnMove = function handleOnMove() {
+    var currentQg = _extends({}, movingQg, {
+      order: isLastItem ? prevOrder : prevOrder ? prevOrder > movingQg.order ? prevOrder : prevOrder + 1 : 1
+    });
+
+    var orderedQg = questionGroups.filter(function (qg) {
+      return qg.order !== movingQg.order;
+    }).map(function (x) {
+      if (isLastItem) {
+        if (x.order > movingQg.order) {
+          return _extends({}, x, {
+            order: x.order - 1
+          });
+        }
+
+        return x;
+      }
+
+      if (prevOrder > movingQg.order) {
+        if (x.order <= prevOrder && x.order > movingQg.order) {
+          return _extends({}, x, {
+            order: x.order - movingQg.order || 1
+          });
+        }
+
+        if (x.order >= prevOrder && x.order > movingQg.order) {
+          return x;
+        }
+
+        return x;
+      }
+
+      if (prevOrder < movingQg.order && x.order < movingQg.order && x.order >= prevOrder + 1) {
+        return _extends({}, x, {
+          order: x.order + (prevOrder || 1)
+        });
+      }
+
+      return x;
+    });
+    questionGroupFn.store.update(function (s) {
+      s.questionGroups = lodash.orderBy([].concat(orderedQg, [currentQg]), 'order');
+    });
+    UIStore.update(function (s) {
+      s.activeMoveQuestionGroup = null;
+    });
+  };
+
+  var handleOnCancel = function handleOnCancel() {
+    UIStore.update(function (s) {
+      s.activeMoveQuestionGroup = null;
+    });
   };
 
   return /*#__PURE__*/React__default.createElement(antd.Row, {
     align: "middle",
     justify: "start",
     className: "arfe-reorder-wrapper " + className
-  }, /*#__PURE__*/React__default.createElement(antd.Space, null, /*#__PURE__*/React__default.createElement(antd.Button, {
-    type: "secondary",
+  }, /*#__PURE__*/React__default.createElement(antd.Col, {
+    span: movingQg ? 12 : 24,
+    align: "left"
+  }, /*#__PURE__*/React__default.createElement(antd.Button, {
+    type: "dashed",
     className: "reorder-button",
     size: "small",
-    onClick: handleOnClick,
+    onClick: movingQg ? handleOnMove : handleOnAdd,
     disabled: disabled
-  }, text), cancelButton && /*#__PURE__*/React__default.createElement(antd.Button, {
-    type: "secondary",
+  }, text)), movingQg && /*#__PURE__*/React__default.createElement(antd.Col, {
+    span: 12,
+    align: "right"
+  }, /*#__PURE__*/React__default.createElement(antd.Button, {
+    type: "danger",
     className: "reorder-button",
     size: "small",
-    onClick: onCancel
+    onClick: handleOnCancel
   }, buttonCancelText)));
 };
 
 var CardTitle = function CardTitle(_ref) {
   var title = _ref.title,
+      disableMoveButton = _ref.disableMoveButton,
       _ref$numbering = _ref.numbering,
       numbering = _ref$numbering === void 0 ? null : _ref$numbering,
       _ref$onMoveClick = _ref.onMoveClick,
@@ -267,8 +338,9 @@ var CardTitle = function CardTitle(_ref) {
   return /*#__PURE__*/React__default.createElement(antd.Space, null, /*#__PURE__*/React__default.createElement(antd.Button, {
     type: "link",
     className: styles['button-icon'],
-    icon: /*#__PURE__*/React__default.createElement(bi.BiMove, null),
-    onClick: onMoveClick
+    onClick: onMoveClick,
+    disabled: disableMoveButton,
+    icon: /*#__PURE__*/React__default.createElement(bi.BiMove, null)
   }), numbering ? numbering + ". " + title : title);
 };
 
@@ -347,26 +419,69 @@ var SaveButton = function SaveButton(_ref) {
   }, UIText.buttonCancelText));
 };
 
-var FormDefinition = function FormDefinition() {
+var FormDefinition = function FormDefinition(_ref) {
+  var onSave = _ref.onSave;
   var form = antd.Form.useFormInstance();
+
+  var _questionGroupFn$stor = questionGroupFn.store.useState(function (s) {
+    return s;
+  }),
+      questionGroups = _questionGroupFn$stor.questionGroups;
+
+  var formStore = FormStore.useState(function (s) {
+    return s;
+  });
   var UIText = UIStore.useState(function (s) {
     return s.UIText;
   });
   var inputFormNameLabel = UIText.inputFormNameLabel,
       inputFormDescriptionLabel = UIText.inputFormDescriptionLabel;
+
+  var handleSave = function handleSave() {
+    form.submit();
+
+    if (onSave) {
+      onSave(_extends({}, formStore, {
+        questionGroups: questionGroups
+      }));
+    }
+  };
+
+  React.useEffect(function () {
+    form.setFieldsValue({
+      'form-name': formStore.name,
+      'form-description': formStore.description
+    });
+  }, [form, formStore]);
   return /*#__PURE__*/React__default.createElement("div", {
-    key: "form-definition-input"
+    key: "form-definition-input",
+    className: "arfe-form-definition"
   }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     label: inputFormNameLabel,
     name: "form-name"
-  }, /*#__PURE__*/React__default.createElement(antd.Input, null)), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+  }, /*#__PURE__*/React__default.createElement(antd.Input, {
+    onChange: function onChange(e) {
+      return FormStore.update(function (u) {
+        var _e$target;
+
+        u.name = e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.value;
+      });
+    }
+  })), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     label: inputFormDescriptionLabel,
     name: "form-description"
   }, /*#__PURE__*/React__default.createElement(antd.Input.TextArea, {
-    rows: 5
+    rows: 5,
+    onChange: function onChange(e) {
+      return FormStore.update(function (u) {
+        var _e$target2;
+
+        u.description = e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.value;
+      });
+    }
   })), /*#__PURE__*/React__default.createElement(SaveButton, {
     cancelButton: false,
-    onClickSave: form.submit()
+    onClickSave: handleSave
   }));
 };
 
@@ -374,12 +489,14 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
   var index = _ref.index,
       questionGroup = _ref.questionGroup,
       isLastItem = _ref.isLastItem;
-  var form = antd.Form.useFormInstance();
   var activeQuestionGroups = UIStore.useState(function (s) {
     return s.activeQuestionGroups;
   });
   var activeEditQuestionGroups = UIStore.useState(function (s) {
     return s.activeEditQuestionGroups;
+  });
+  var movingQg = UIStore.useState(function (s) {
+    return s.activeMoveQuestionGroup;
   });
   var id = questionGroup.id,
       name = questionGroup.name,
@@ -389,7 +506,8 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
   var _UIStore$useState = UIStore.useState(function (s) {
     return s.UIText;
   }),
-      buttonAddNewQuestionGroupText = _UIStore$useState.buttonAddNewQuestionGroupText;
+      buttonAddNewQuestionGroupText = _UIStore$useState.buttonAddNewQuestionGroupText,
+      buttonMoveQuestionGroupText = _UIStore$useState.buttonMoveQuestionGroupText;
 
   var showQuestion = React.useMemo(function () {
     return activeQuestionGroups.includes(id);
@@ -426,6 +544,12 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
     });
   };
 
+  var handleMove = function handleMove() {
+    UIStore.update(function (s) {
+      s.activeMoveQuestionGroup = movingQg === questionGroup ? null : questionGroup;
+    });
+  };
+
   var extraButtons = [{
     type: 'show-button',
     isExpand: showQuestion,
@@ -443,22 +567,27 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
     }
   }];
   return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(AddMoveButton, {
-    text: buttonAddNewQuestionGroupText,
-    order: order - 1
+    text: movingQg ? buttonMoveQuestionGroupText : buttonAddNewQuestionGroupText,
+    order: order - 1,
+    disabled: movingQg === questionGroup || (movingQg === null || movingQg === void 0 ? void 0 : movingQg.order) + 1 === order
   }), /*#__PURE__*/React__default.createElement(antd.Card, {
     key: index + "-" + id,
     title: /*#__PURE__*/React__default.createElement(CardTitle, {
-      title: name,
-      onMoveClick: function onMoveClick() {
-        return console.log('move');
-      }
+      title: /*#__PURE__*/React__default.createElement("div", {
+        className: "arfe-question-group-title"
+      }, name, " | Order: ", order),
+      onMoveClick: handleMove,
+      disableMoveButton: !index && isLastItem
     }),
     headStyle: {
       textAlign: 'left',
-      padding: '0 12px'
+      padding: '0 12px',
+      backgroundColor: (movingQg === null || movingQg === void 0 ? void 0 : movingQg.id) === id ? '#FFF2CA' : '#FFF',
+      border: (movingQg === null || movingQg === void 0 ? void 0 : movingQg.id) === id ? '1px dashed #ffc107' : 'none'
     },
     bodyStyle: {
-      padding: isEditQuestionGroup || showQuestion ? 24 : 0
+      padding: isEditQuestionGroup || showQuestion ? 24 : 0,
+      borderTop: isEditQuestionGroup || showQuestion ? '1px solid #f3f3f3' : 'none'
     },
     loading: false,
     extra: /*#__PURE__*/React__default.createElement(antd.Space, null, extraButtons.map(function (cfg) {
@@ -483,15 +612,16 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
     });
   })), isLastItem && /*#__PURE__*/React__default.createElement(AddMoveButton, {
     order: order,
-    text: buttonAddNewQuestionGroupText
+    text: movingQg ? buttonMoveQuestionGroupText : buttonAddNewQuestionGroupText,
+    disabled: movingQg === questionGroup,
+    isLastItem: true
   }));
 };
 
 var QuestionGroupSetting = function QuestionGroupSetting(_ref) {
   var id = _ref.id,
       name = _ref.name,
-      description = _ref.description,
-      repeatable = _ref.repeatable;
+      description = _ref.description;
   var namePreffix = "question_group-" + id;
   var UIText = UIStore.useState(function (s) {
     return s.UIText;
@@ -513,6 +643,38 @@ var QuestionGroupSetting = function QuestionGroupSetting(_ref) {
     });
   };
 
+  var handleChangeDescription = function handleChangeDescription(e) {
+    questionGroupFn.store.update(function (s) {
+      s.questionGroups = s.questionGroups.map(function (x) {
+        if (x.id === id) {
+          var _e$target2;
+
+          return _extends({}, x, {
+            description: e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.value
+          });
+        }
+
+        return x;
+      });
+    });
+  };
+
+  var handleChangeRepeatable = function handleChangeRepeatable(e) {
+    questionGroupFn.store.update(function (s) {
+      s.questionGroups = s.questionGroups.map(function (x) {
+        if (x.id === id) {
+          var _e$target3;
+
+          return _extends({}, x, {
+            repeatable: e === null || e === void 0 ? void 0 : (_e$target3 = e.target) === null || _e$target3 === void 0 ? void 0 : _e$target3.checked
+          });
+        }
+
+        return x;
+      });
+    });
+  };
+
   return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     label: UIText.inputQuestionGroupNameLabel,
     initialValue: name,
@@ -525,12 +687,14 @@ var QuestionGroupSetting = function QuestionGroupSetting(_ref) {
     initialValue: description,
     name: namePreffix + "-description"
   }, /*#__PURE__*/React__default.createElement(antd.Input.TextArea, {
+    onChange: handleChangeDescription,
     rows: 5
   })), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
-    initialValue: repeatable,
     name: namePreffix + "-repeatable",
     className: styles['input-checkbox-wrapper']
-  }, /*#__PURE__*/React__default.createElement(antd.Checkbox, null, " ", UIText.inputRepeatThisGroupCheckbox)));
+  }, /*#__PURE__*/React__default.createElement(antd.Checkbox, {
+    onChange: handleChangeRepeatable
+  }, ' ', UIText.inputRepeatThisGroupCheckbox)));
 };
 
 var QuestionDefinition = function QuestionDefinition(_ref) {
@@ -588,7 +752,7 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
       title: name,
       numbering: index + 1,
       onMoveClick: function onMoveClick() {
-        return console.log('move');
+        console.log('move');
       }
     }),
     headStyle: {
@@ -596,6 +760,7 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
       padding: '0 12px'
     },
     bodyStyle: {
+      borderTop: isEditQuestion ? '1px solid #f3f3f3' : 'none',
       padding: isEditQuestion ? 24 : 0
     },
     loading: false,
@@ -834,7 +999,9 @@ var QuestionSkipLogic = function QuestionSkipLogic(question) {
   }, /*#__PURE__*/React__default.createElement(antd.Input, null)));
 };
 
-var WebformEditor = function WebformEditor() {
+var WebformEditor = function WebformEditor(_ref) {
+  var _ref$onSave = _ref.onSave,
+      onSave = _ref$onSave === void 0 ? false : _ref$onSave;
   var current = UIStore.useState(function (s) {
     return s.current;
   });
@@ -873,7 +1040,9 @@ var WebformEditor = function WebformEditor() {
   }), /*#__PURE__*/React__default.createElement(antd.Tabs.TabPane, {
     tab: previewTabPane,
     key: "preview"
-  })), currentTab === 'form' && /*#__PURE__*/React__default.createElement(FormWrapper, null, /*#__PURE__*/React__default.createElement(FormDefinition, null), questionGroups.map(function (qg, qgi) {
+  })), currentTab === 'form' && /*#__PURE__*/React__default.createElement(FormWrapper, null, /*#__PURE__*/React__default.createElement(FormDefinition, {
+    onSave: onSave
+  }), questionGroups.map(function (qg, qgi) {
     return /*#__PURE__*/React__default.createElement(QuestionGroupDefinition, {
       key: "question-group-definition-" + qgi,
       index: qgi,

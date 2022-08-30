@@ -3,9 +3,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Roboto+Condensed:wght@300;400&display=swap');
 
 .arfe-container {
-  padding: 1em;
   font-size: 2em;
+  font-family: 'Roboto Condensed', sans-serif;
   text-align: center;
+}
+
+.arfe-form-definition {
+  margin-bottom: 20px;
 }
 
 .arfe-input-checkbox-wrapper {
@@ -21,7 +25,8 @@
 }
 
 .arfe-reorder-wrapper {
-  padding: 12px 0;
+  padding: 12px;
+  background-color: #f3f3f3;
 }
 
 .arfe-select-dropdown {
@@ -29,7 +34,17 @@
 }
 
 .arfe-tabs-wrapper {
+  font-family: 'Assistant', sans-serif;
   margin-bottom: 12px !important;
+  font-size: 18px;
+  font-weight: bold;
+  color: #6a6a6a;
+}
+
+.arfe-question-group-title {
+  font-family: 'Assistant', sans-serif;
+  font-weight: bold;
+  color: #6a6a6a;
 }
 
 .arfe-space-align-right {

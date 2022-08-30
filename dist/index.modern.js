@@ -1,12 +1,13 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import 'antd/dist/antd.min.css';
-import { Form, Row, Space, Button, Input, Card, Checkbox, Tabs, Col, InputNumber, Select } from 'antd';
+import { Form, Row, Col, Button, Space, Input, Card, Checkbox, Tabs, InputNumber, Select } from 'antd';
 import { Store } from 'pullstate';
+import { orderBy } from 'lodash';
 import { BiMove, BiHide, BiShow } from 'react-icons/bi';
 import { TbEditOff, TbEdit } from 'react-icons/tb';
 import { RiDeleteBin2Line } from 'react-icons/ri';
 
-var styles = {"container":"arfe-container","input-checkbox-wrapper":"arfe-input-checkbox-wrapper","button-icon":"arfe-button-icon","reorder-wrapper":"arfe-reorder-wrapper","select-dropdown":"arfe-select-dropdown","tabs-wrapper":"arfe-tabs-wrapper","space-align-right":"arfe-space-align-right","space-align-left":"arfe-space-align-left","space-vertical-align-left":"arfe-space-vertical-align-left","space-vertical-align-right":"arfe-space-vertical-align-right","more-question-setting-text":"arfe-more-question-setting-text"};
+var styles = {"container":"arfe-container","form-definition":"arfe-form-definition","input-checkbox-wrapper":"arfe-input-checkbox-wrapper","button-icon":"arfe-button-icon","reorder-wrapper":"arfe-reorder-wrapper","select-dropdown":"arfe-select-dropdown","tabs-wrapper":"arfe-tabs-wrapper","question-group-title":"arfe-question-group-title","space-align-right":"arfe-space-align-right","space-align-left":"arfe-space-align-left","space-vertical-align-left":"arfe-space-vertical-align-left","space-vertical-align-right":"arfe-space-vertical-align-right","more-question-setting-text":"arfe-more-question-setting-text"};
 
 const FormWrapper = ({
   children
@@ -52,6 +53,7 @@ const UIStaticText = {
     buttonDeleteText: 'Delete',
     buttonCancelText: 'Cancel',
     buttonAddNewQuestionGroupText: 'Insert group here',
+    buttonMoveQuestionGroupText: 'Move group here',
     buttonAddNewQuestionText: 'Add new question',
     inputQuestionNameLabel: 'Question Name',
     inputQuestionTypeLabel: 'Question Type',
@@ -74,6 +76,11 @@ const UIStaticText = {
     questionMoreOptionTypeSettingText: 'More Option Question Setting',
     inputQuestionAllowOtherCheckbox: 'Allow Other'
   }
+};
+
+const char = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const dummyName = () => {
+  return [1, 2].reduce(curr => curr + char.charAt(Math.floor(Math.random() * char.length)), '');
 };
 
 const generateId = () => new Date().getTime();
@@ -131,12 +138,12 @@ const defaultQuestion = ({
 };
 
 const defaultQuestionGroup = ({
-  name: _name2 = 'New Question Group',
+  name: _name2 = dummyName(),
   prevOrder: _prevOrder2 = 0
 }) => {
   const qg = {
     id: generateId(),
-    name: _name2 || 'New Question Group',
+    name: _name2 || dummyName(),
     order: _prevOrder2 + 1,
     description: null,
     repeatable: false
@@ -157,6 +164,7 @@ const UIStore = new Store({
   },
   activeQuestionGroups: [],
   activeEditQuestionGroups: [],
+  activeMoveQuestionGroup: null,
   activeEditQuestions: [],
   UIText: UIStaticText.en
 });
@@ -180,59 +188,117 @@ const AddMoveButton = ({
   order: prevOrder,
   text,
   className,
-  cancelButton: _cancelButton = false,
   disabled: _disabled = false,
-  onCancel: _onCancel = () => {}
+  isLastItem: _isLastItem = false
 }) => {
   const {
     buttonCancelText
   } = UIStore.useState(s => s.UIText);
+  const movingQg = UIStore.useState(s => s.activeMoveQuestionGroup);
   const {
     questionGroups
   } = questionGroupFn.store.useState(s => s);
-  const prevQg = questionGroups.filter(qg => qg.order <= prevOrder);
-  const nextQg = questionGroups.filter(qg => qg.order > prevOrder).map(qg => ({ ...qg,
-    order: prevOrder ? prevOrder + qg.order : 1 + qg.order
-  }));
 
-  const handleOnClick = () => {
+  const handleOnAdd = () => {
+    const prevQg = questionGroups.filter(qg => qg.order <= prevOrder);
+    const nextQg = questionGroups.filter(qg => qg.order > prevOrder).map(qg => ({ ...qg,
+      order: qg.order + 1
+    }));
     const newQuestionGroups = [...prevQg, questionGroupFn.add({
-      prevOrder: prevOrder ? prevOrder : 0
+      prevOrder: prevOrder
     }), ...nextQg];
     questionGroupFn.store.update(s => {
       s.questionGroups = newQuestionGroups;
     });
-    console.log(prevOrder, newQuestionGroups);
+  };
+
+  const handleOnMove = () => {
+    const currentQg = { ...movingQg,
+      order: _isLastItem ? prevOrder : prevOrder ? prevOrder > movingQg.order ? prevOrder : prevOrder + 1 : 1
+    };
+    const orderedQg = questionGroups.filter(qg => qg.order !== movingQg.order).map(x => {
+      if (_isLastItem) {
+        if (x.order > movingQg.order) {
+          return { ...x,
+            order: x.order - 1
+          };
+        }
+
+        return x;
+      }
+
+      if (prevOrder > movingQg.order) {
+        if (x.order <= prevOrder && x.order > movingQg.order) {
+          return { ...x,
+            order: x.order - movingQg.order || 1
+          };
+        }
+
+        if (x.order >= prevOrder && x.order > movingQg.order) {
+          return x;
+        }
+
+        return x;
+      }
+
+      if (prevOrder < movingQg.order && x.order < movingQg.order && x.order >= prevOrder + 1) {
+        return { ...x,
+          order: x.order + (prevOrder || 1)
+        };
+      }
+
+      return x;
+    });
+    questionGroupFn.store.update(s => {
+      s.questionGroups = orderBy([...orderedQg, currentQg], 'order');
+    });
+    UIStore.update(s => {
+      s.activeMoveQuestionGroup = null;
+    });
+  };
+
+  const handleOnCancel = () => {
+    UIStore.update(s => {
+      s.activeMoveQuestionGroup = null;
+    });
   };
 
   return /*#__PURE__*/React.createElement(Row, {
     align: "middle",
     justify: "start",
     className: `arfe-reorder-wrapper ${className}`
-  }, /*#__PURE__*/React.createElement(Space, null, /*#__PURE__*/React.createElement(Button, {
-    type: "secondary",
+  }, /*#__PURE__*/React.createElement(Col, {
+    span: movingQg ? 12 : 24,
+    align: "left"
+  }, /*#__PURE__*/React.createElement(Button, {
+    type: "dashed",
     className: "reorder-button",
     size: "small",
-    onClick: handleOnClick,
+    onClick: movingQg ? handleOnMove : handleOnAdd,
     disabled: _disabled
-  }, text), _cancelButton && /*#__PURE__*/React.createElement(Button, {
-    type: "secondary",
+  }, text)), movingQg && /*#__PURE__*/React.createElement(Col, {
+    span: 12,
+    align: "right"
+  }, /*#__PURE__*/React.createElement(Button, {
+    type: "danger",
     className: "reorder-button",
     size: "small",
-    onClick: _onCancel
+    onClick: handleOnCancel
   }, buttonCancelText)));
 };
 
 const CardTitle = ({
   title,
+  disableMoveButton,
   numbering: _numbering = null,
   onMoveClick: _onMoveClick = () => {}
 }) => {
   return /*#__PURE__*/React.createElement(Space, null, /*#__PURE__*/React.createElement(Button, {
     type: "link",
     className: styles['button-icon'],
-    icon: /*#__PURE__*/React.createElement(BiMove, null),
-    onClick: _onMoveClick
+    onClick: _onMoveClick,
+    disabled: disableMoveButton,
+    icon: /*#__PURE__*/React.createElement(BiMove, null)
   }), _numbering ? `${_numbering}. ${title}` : title);
 };
 
@@ -303,26 +369,61 @@ const SaveButton = ({
   }, UIText.buttonCancelText));
 };
 
-const FormDefinition = () => {
+const FormDefinition = ({
+  onSave
+}) => {
   const form = Form.useFormInstance();
+  const {
+    questionGroups
+  } = questionGroupFn.store.useState(s => s);
+  const formStore = FormStore.useState(s => s);
   const UIText = UIStore.useState(s => s.UIText);
   const {
     inputFormNameLabel,
     inputFormDescriptionLabel
   } = UIText;
+
+  const handleSave = () => {
+    form.submit();
+
+    if (onSave) {
+      onSave({ ...formStore,
+        questionGroups: questionGroups
+      });
+    }
+  };
+
+  useEffect(() => {
+    form.setFieldsValue({
+      'form-name': formStore.name,
+      'form-description': formStore.description
+    });
+  }, [form, formStore]);
   return /*#__PURE__*/React.createElement("div", {
-    key: "form-definition-input"
+    key: "form-definition-input",
+    className: "arfe-form-definition"
   }, /*#__PURE__*/React.createElement(Form.Item, {
     label: inputFormNameLabel,
     name: "form-name"
-  }, /*#__PURE__*/React.createElement(Input, null)), /*#__PURE__*/React.createElement(Form.Item, {
+  }, /*#__PURE__*/React.createElement(Input, {
+    onChange: e => FormStore.update(u => {
+      var _e$target;
+
+      u.name = e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.value;
+    })
+  })), /*#__PURE__*/React.createElement(Form.Item, {
     label: inputFormDescriptionLabel,
     name: "form-description"
   }, /*#__PURE__*/React.createElement(Input.TextArea, {
-    rows: 5
+    rows: 5,
+    onChange: e => FormStore.update(u => {
+      var _e$target2;
+
+      u.description = e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.value;
+    })
   })), /*#__PURE__*/React.createElement(SaveButton, {
     cancelButton: false,
-    onClickSave: form.submit()
+    onClickSave: handleSave
   }));
 };
 
@@ -331,9 +432,9 @@ const QuestionGroupDefinition = ({
   questionGroup,
   isLastItem
 }) => {
-  const form = Form.useFormInstance();
   const activeQuestionGroups = UIStore.useState(s => s.activeQuestionGroups);
   const activeEditQuestionGroups = UIStore.useState(s => s.activeEditQuestionGroups);
+  const movingQg = UIStore.useState(s => s.activeMoveQuestionGroup);
   const {
     id,
     name,
@@ -341,7 +442,8 @@ const QuestionGroupDefinition = ({
     order
   } = questionGroup;
   const {
-    buttonAddNewQuestionGroupText
+    buttonAddNewQuestionGroupText,
+    buttonMoveQuestionGroupText
   } = UIStore.useState(s => s.UIText);
   const showQuestion = useMemo(() => {
     return activeQuestionGroups.includes(id);
@@ -374,6 +476,12 @@ const QuestionGroupDefinition = ({
     });
   };
 
+  const handleMove = () => {
+    UIStore.update(s => {
+      s.activeMoveQuestionGroup = movingQg === questionGroup ? null : questionGroup;
+    });
+  };
+
   const extraButtons = [{
     type: 'show-button',
     isExpand: showQuestion,
@@ -389,20 +497,27 @@ const QuestionGroupDefinition = ({
     onClick: () => console.log('delete')
   }];
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(AddMoveButton, {
-    text: buttonAddNewQuestionGroupText,
-    order: order - 1
+    text: movingQg ? buttonMoveQuestionGroupText : buttonAddNewQuestionGroupText,
+    order: order - 1,
+    disabled: movingQg === questionGroup || (movingQg === null || movingQg === void 0 ? void 0 : movingQg.order) + 1 === order
   }), /*#__PURE__*/React.createElement(Card, {
     key: `${index}-${id}`,
     title: /*#__PURE__*/React.createElement(CardTitle, {
-      title: name,
-      onMoveClick: () => console.log('move')
+      title: /*#__PURE__*/React.createElement("div", {
+        className: "arfe-question-group-title"
+      }, name, " | Order: ", order),
+      onMoveClick: handleMove,
+      disableMoveButton: !index && isLastItem
     }),
     headStyle: {
       textAlign: 'left',
-      padding: '0 12px'
+      padding: '0 12px',
+      backgroundColor: (movingQg === null || movingQg === void 0 ? void 0 : movingQg.id) === id ? '#FFF2CA' : '#FFF',
+      border: (movingQg === null || movingQg === void 0 ? void 0 : movingQg.id) === id ? '1px dashed #ffc107' : 'none'
     },
     bodyStyle: {
-      padding: isEditQuestionGroup || showQuestion ? 24 : 0
+      padding: isEditQuestionGroup || showQuestion ? 24 : 0,
+      borderTop: isEditQuestionGroup || showQuestion ? '1px solid #f3f3f3' : 'none'
     },
     loading: false,
     extra: /*#__PURE__*/React.createElement(Space, null, extraButtons.map(cfg => /*#__PURE__*/React.createElement(CardExtraButton, {
@@ -419,7 +534,9 @@ const QuestionGroupDefinition = ({
     isLastItem: qi === questions.length - 1
   }))), isLastItem && /*#__PURE__*/React.createElement(AddMoveButton, {
     order: order,
-    text: buttonAddNewQuestionGroupText
+    text: movingQg ? buttonMoveQuestionGroupText : buttonAddNewQuestionGroupText,
+    disabled: movingQg === questionGroup,
+    isLastItem: true
   }));
 };
 
@@ -448,6 +565,38 @@ const QuestionGroupSetting = ({
     });
   };
 
+  const handleChangeDescription = e => {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(x => {
+        if (x.id === id) {
+          var _e$target2;
+
+          return { ...x,
+            description: e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.value
+          };
+        }
+
+        return x;
+      });
+    });
+  };
+
+  const handleChangeRepeatable = e => {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(x => {
+        if (x.id === id) {
+          var _e$target3;
+
+          return { ...x,
+            repeatable: e === null || e === void 0 ? void 0 : (_e$target3 = e.target) === null || _e$target3 === void 0 ? void 0 : _e$target3.checked
+          };
+        }
+
+        return x;
+      });
+    });
+  };
+
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Form.Item, {
     label: UIText.inputQuestionGroupNameLabel,
     initialValue: name,
@@ -460,12 +609,14 @@ const QuestionGroupSetting = ({
     initialValue: description,
     name: `${namePreffix}-description`
   }, /*#__PURE__*/React.createElement(Input.TextArea, {
+    onChange: handleChangeDescription,
     rows: 5
   })), /*#__PURE__*/React.createElement(Form.Item, {
-    initialValue: repeatable,
     name: `${namePreffix}-repeatable`,
     className: styles['input-checkbox-wrapper']
-  }, /*#__PURE__*/React.createElement(Checkbox, null, " ", UIText.inputRepeatThisGroupCheckbox)));
+  }, /*#__PURE__*/React.createElement(Checkbox, {
+    onChange: handleChangeRepeatable
+  }, ' ', UIText.inputRepeatThisGroupCheckbox)));
 };
 
 const QuestionDefinition = ({
@@ -513,13 +664,16 @@ const QuestionDefinition = ({
     title: /*#__PURE__*/React.createElement(CardTitle, {
       title: name,
       numbering: index + 1,
-      onMoveClick: () => console.log('move')
+      onMoveClick: () => {
+        console.log('move');
+      }
     }),
     headStyle: {
       textAlign: 'left',
       padding: '0 12px'
     },
     bodyStyle: {
+      borderTop: isEditQuestion ? '1px solid #f3f3f3' : 'none',
       padding: isEditQuestion ? 24 : 0
     },
     loading: false,
@@ -742,7 +896,9 @@ const QuestionSkipLogic = question => {
   }, /*#__PURE__*/React.createElement(Input, null)));
 };
 
-const WebformEditor = () => {
+const WebformEditor = ({
+  onSave: _onSave = false
+}) => {
   const current = UIStore.useState(s => s.current);
   const UIText = UIStore.useState(s => s.UIText);
   const questionGroups = questionGroupFn.store.useState(s => s.questionGroups);
@@ -779,7 +935,9 @@ const WebformEditor = () => {
   }), /*#__PURE__*/React.createElement(Tabs.TabPane, {
     tab: previewTabPane,
     key: "preview"
-  })), currentTab === 'form' && /*#__PURE__*/React.createElement(FormWrapper, null, /*#__PURE__*/React.createElement(FormDefinition, null), questionGroups.map((qg, qgi) => {
+  })), currentTab === 'form' && /*#__PURE__*/React.createElement(FormWrapper, null, /*#__PURE__*/React.createElement(FormDefinition, {
+    onSave: _onSave
+  }), questionGroups.map((qg, qgi) => {
     return /*#__PURE__*/React.createElement(QuestionGroupDefinition, {
       key: `question-group-definition-${qgi}`,
       index: qgi,
