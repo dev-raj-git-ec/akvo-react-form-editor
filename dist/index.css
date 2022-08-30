@@ -2,10 +2,58 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Roboto+Condensed:wght@300;400&display=swap');
 
-.arfe-test {
-    margin: 2em;
-    padding: 0.5em;
-    border: 2px solid #000;
-    font-size: 2em;
-    text-align: center;
+.arfe-container {
+  padding: 1em;
+  font-size: 2em;
+  text-align: center;
+}
+
+.arfe-input-checkbox-wrapper {
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+}
+
+.arfe-button-icon > svg {
+  margin-top: 2.5px;
+  font-size: 20px;
+  color: rgb(107, 107, 107);
+}
+
+.arfe-reorder-wrapper {
+  padding: 12px 0;
+}
+
+.arfe-select-dropdown {
+  text-align: left;
+}
+
+.arfe-tabs-wrapper {
+  margin-bottom: 12px !important;
+}
+
+.arfe-space-align-right {
+  width: 100%;
+  justify-content: end;
+}
+
+.arfe-space-align-left {
+  width: 100%;
+  justify-content: start;
+}
+
+.arfe-space-vertical-align-left {
+  width: 100%;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.arfe-space-vertical-align-right {
+  width: 100%;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.arfe-more-question-setting-text {
+  text-align: left;
 }

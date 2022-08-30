@@ -1,11 +1,22 @@
 import React from 'react';
 import { Form, Input, Checkbox } from 'antd';
 import styles from '../styles.module.css';
-import { UIStore } from '../lib/store';
+import { UIStore, questionGroupFn } from '../lib/store';
 
 const QuestionGroupSetting = ({ id, name, description, repeatable }) => {
   const namePreffix = `question_group-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
+
+  const handleChangeName = (e) => {
+    questionGroupFn.store.update((s) => {
+      s.questionGroups = s.questionGroups.map((x) => {
+        if (x.id === id) {
+          return { ...x, name: e?.target?.value };
+        }
+        return x;
+      });
+    });
+  };
 
   return (
     <div>
@@ -15,7 +26,7 @@ const QuestionGroupSetting = ({ id, name, description, repeatable }) => {
         name={`${namePreffix}-name`}
         required
       >
-        <Input />
+        <Input onChange={handleChangeName} />
       </Form.Item>
       <Form.Item
         label={UIText.inputQuestionGroupDescriptionLabel}

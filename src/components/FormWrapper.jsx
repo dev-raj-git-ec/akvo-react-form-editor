@@ -5,15 +5,15 @@ const FormWrapper = ({ children }) => {
   const [form] = Form.useForm();
 
   const handleOnValuesChange = (changedValues, allValues) => {
-    console.log(changedValues, allValues);
+    // console.log(changedValues, allValues);
   };
 
   const handleOnFinish = (values) => {
-    console.log(values);
+    // console.log(values);
   };
 
   const handleOnFinishFailed = ({ values, errorFields, outOfDate }) => {
-    console.log(values, errorFields, outOfDate);
+    // console.log(values, errorFields, outOfDate);
   };
 
   return (

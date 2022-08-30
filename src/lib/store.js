@@ -113,12 +113,12 @@ const QuestionGroupStore = new Store({
 });
 
 const questionGroupFn = {
-  new: defaultQuestionGroup,
+  add: defaultQuestionGroup,
   store: QuestionGroupStore,
 };
 
 const questionFn = {
-  new: defaultQuestion,
+  add: defaultQuestion,
   update: ({ id, type, questionGroup, params }) =>
     defaultQuestion({
       id: id,

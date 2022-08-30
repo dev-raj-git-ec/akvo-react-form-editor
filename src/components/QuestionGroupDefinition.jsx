@@ -2,12 +2,7 @@ import React, { useMemo } from 'react';
 import { Card, Space, Form } from 'antd';
 import { UIStore } from '../lib/store';
 import { QuestionGroupSetting, QuestionDefinition } from '.';
-import {
-  AddMoveButton,
-  CardTitle,
-  CardExtraButton,
-  SaveButton,
-} from '../support';
+import { AddMoveButton, CardTitle, CardExtraButton } from '../support';
 
 const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
   const form = Form.useFormInstance();
@@ -15,7 +10,7 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
   const activeEditQuestionGroups = UIStore.useState(
     (s) => s.activeEditQuestionGroups
   );
-  const { id, name, questions } = questionGroup;
+  const { id, name, questions, order } = questionGroup;
   const { buttonAddNewQuestionGroupText } = UIStore.useState((s) => s.UIText);
 
   const showQuestion = useMemo(() => {
@@ -75,7 +70,10 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
 
   return (
     <div>
-      <AddMoveButton text={buttonAddNewQuestionGroupText} />
+      <AddMoveButton
+        text={buttonAddNewQuestionGroupText}
+        order={order - 1}
+      />
       <Card
         key={`${index}-${id}`}
         title={
@@ -94,8 +92,8 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
                 key={`${cfg.type}-${id}`}
                 type={cfg.type}
                 isExpand={cfg.isExpand}
-                onClick={cfg.onClick}
-                onCancel={cfg.onCancel}
+                onClick={() => cfg.onClick()}
+                onCancel={() => cfg.onCancel()}
               />
             ))}
           </Space>
@@ -104,10 +102,6 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
         {isEditQuestionGroup && (
           <div>
             <QuestionGroupSetting {...questionGroup} />
-            <SaveButton
-              onClickSave={() => form.submit()}
-              onClickCancel={handleCancelEditGroup}
-            />
           </div>
         )}
         {showQuestion &&
@@ -120,7 +114,12 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
             />
           ))}
       </Card>
-      {isLastItem && <AddMoveButton text={buttonAddNewQuestionGroupText} />}
+      {isLastItem && (
+        <AddMoveButton
+          order={order}
+          text={buttonAddNewQuestionGroupText}
+        />
+      )}
     </div>
   );
 };
