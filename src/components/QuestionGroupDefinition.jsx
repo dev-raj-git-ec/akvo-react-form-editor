@@ -105,7 +105,11 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
           backgroundColor: movingQg?.id === id ? '#FFF2CA' : '#FFF',
           border: movingQg?.id === id ? '1px dashed #ffc107' : 'none',
         }}
-        bodyStyle={{ padding: isEditQuestionGroup || showQuestion ? 24 : 0 }}
+        bodyStyle={{
+          padding: isEditQuestionGroup || showQuestion ? 24 : 0,
+          borderTop:
+            isEditQuestionGroup || showQuestion ? '1px solid #f3f3f3' : 'none',
+        }}
         loading={false}
         extra={
           <Space>

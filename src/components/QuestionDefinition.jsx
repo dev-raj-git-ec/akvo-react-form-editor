@@ -61,7 +61,10 @@ const QuestionDefinition = ({ index, question, isLastItem }) => {
           />
         }
         headStyle={{ textAlign: 'left', padding: '0 12px' }}
-        bodyStyle={{ padding: isEditQuestion ? 24 : 0 }}
+        bodyStyle={{
+          borderTop: isEditQuestion ? '1px solid #f3f3f3' : 'none',
+          padding: isEditQuestion ? 24 : 0,
+        }}
         loading={false}
         extra={
           <Space>

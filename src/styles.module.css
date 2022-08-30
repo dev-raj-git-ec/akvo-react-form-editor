@@ -8,6 +8,10 @@
   text-align: center;
 }
 
+.form-definition {
+  margin-bottom: 20px;
+}
+
 .input-checkbox-wrapper {
   width: fit-content;
 }

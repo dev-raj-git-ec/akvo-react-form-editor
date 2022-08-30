@@ -9,7 +9,7 @@ import {
 } from './components';
 import { UIStore, questionGroupFn } from './lib/store';
 
-const WebformEditor = () => {
+const WebformEditor = ({ onSave = false }) => {
   const current = UIStore.useState((s) => s.current);
   const UIText = UIStore.useState((s) => s.UIText);
   const questionGroups = questionGroupFn.store.useState(
@@ -55,7 +55,7 @@ const WebformEditor = () => {
         </Tabs>
         {currentTab === 'form' && (
           <FormWrapper>
-            <FormDefinition />
+            <FormDefinition onSave={onSave} />
             {questionGroups.map((qg, qgi) => {
               return (
                 <QuestionGroupDefinition

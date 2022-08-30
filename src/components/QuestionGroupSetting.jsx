@@ -33,7 +33,7 @@ const QuestionGroupSetting = ({ id, name, description, repeatable }) => {
     questionGroupFn.store.update((s) => {
       s.questionGroups = s.questionGroups.map((x) => {
         if (x.id === id) {
-          return { ...x, repeatable: e.target.checked };
+          return { ...x, repeatable: e?.target?.checked };
         }
         return x;
       });
@@ -61,7 +61,6 @@ const QuestionGroupSetting = ({ id, name, description, repeatable }) => {
         />
       </Form.Item>
       <Form.Item
-        initialValue={repeatable}
         name={`${namePreffix}-repeatable`}
         className={styles['input-checkbox-wrapper']}
       >
