@@ -97,6 +97,7 @@ const UIStore = new Store({
   },
   activeQuestionGroups: [],
   activeEditQuestionGroups: [],
+  activeMoveQuestionGroup: null,
   activeEditQuestions: [],
   UIText: UIStaticText.en,
 });

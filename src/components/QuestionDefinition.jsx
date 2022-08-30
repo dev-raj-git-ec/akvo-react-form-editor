@@ -55,7 +55,9 @@ const QuestionDefinition = ({ index, question, isLastItem }) => {
           <CardTitle
             title={name}
             numbering={index + 1}
-            onMoveClick={() => console.log('move')}
+            onMoveClick={() => {
+              console.log('move');
+            }}
           />
         }
         headStyle={{ textAlign: 'left', padding: '0 12px' }}

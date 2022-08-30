@@ -1,17 +1,21 @@
 import React, { useMemo } from 'react';
-import { Card, Space, Form } from 'antd';
+import { Card, Space } from 'antd';
 import { UIStore } from '../lib/store';
 import { QuestionGroupSetting, QuestionDefinition } from '.';
 import { AddMoveButton, CardTitle, CardExtraButton } from '../support';
 
 const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
-  const form = Form.useFormInstance();
   const activeQuestionGroups = UIStore.useState((s) => s.activeQuestionGroups);
   const activeEditQuestionGroups = UIStore.useState(
     (s) => s.activeEditQuestionGroups
   );
+  const activeMoveQuestionGroup = UIStore.useState(
+    (s) => s.activeMoveQuestionGroup
+  );
+
   const { id, name, questions, order } = questionGroup;
-  const { buttonAddNewQuestionGroupText } = UIStore.useState((s) => s.UIText);
+  const { buttonAddNewQuestionGroupText, buttonMoveQuestionGroupText } =
+    UIStore.useState((s) => s.UIText);
 
   const showQuestion = useMemo(() => {
     return activeQuestionGroups.includes(id);
@@ -49,6 +53,13 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
     });
   };
 
+  const handleMove = () => {
+    UIStore.update((s) => {
+      s.activeMoveQuestionGroup =
+        activeMoveQuestionGroup === questionGroup ? null : questionGroup;
+    });
+  };
+
   const extraButtons = [
     {
       type: 'show-button',
@@ -71,15 +82,23 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
   return (
     <div>
       <AddMoveButton
-        text={buttonAddNewQuestionGroupText}
+        text={
+          activeMoveQuestionGroup
+            ? buttonMoveQuestionGroupText
+            : buttonAddNewQuestionGroupText
+        }
         order={order - 1}
+        disabled={
+          activeMoveQuestionGroup === questionGroup ||
+          activeMoveQuestionGroup?.order + 1 === order
+        }
       />
       <Card
         key={`${index}-${id}`}
         title={
           <CardTitle
-            title={name}
-            onMoveClick={() => console.log('move')}
+            title={`${name} - ${order}`}
+            onMoveClick={handleMove}
           />
         }
         headStyle={{ textAlign: 'left', padding: '0 12px' }}
@@ -117,7 +136,12 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
       {isLastItem && (
         <AddMoveButton
           order={order}
-          text={buttonAddNewQuestionGroupText}
+          text={
+            activeMoveQuestionGroup
+              ? buttonMoveQuestionGroupText
+              : buttonAddNewQuestionGroupText
+          }
+          disabled={activeMoveQuestionGroup === questionGroup}
         />
       )}
     </div>

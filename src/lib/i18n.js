@@ -16,6 +16,7 @@ const UIStaticText = {
     buttonDeleteText: 'Delete',
     buttonCancelText: 'Cancel',
     buttonAddNewQuestionGroupText: 'Insert group here',
+    buttonMoveQuestionGroupText: 'Move group here',
     buttonAddNewQuestionText: 'Add new question',
     inputQuestionNameLabel: 'Question Name',
     inputQuestionTypeLabel: 'Question Type',
