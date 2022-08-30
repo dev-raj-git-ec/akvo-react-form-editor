@@ -18,6 +18,28 @@ const QuestionGroupSetting = ({ id, name, description, repeatable }) => {
     });
   };
 
+  const handleChangeDescription = (e) => {
+    questionGroupFn.store.update((s) => {
+      s.questionGroups = s.questionGroups.map((x) => {
+        if (x.id === id) {
+          return { ...x, description: e?.target?.value };
+        }
+        return x;
+      });
+    });
+  };
+
+  const handleChangeRepeatable = (e) => {
+    questionGroupFn.store.update((s) => {
+      s.questionGroups = s.questionGroups.map((x) => {
+        if (x.id === id) {
+          return { ...x, repeatable: e.target.checked };
+        }
+        return x;
+      });
+    });
+  };
+
   return (
     <div>
       <Form.Item
@@ -33,14 +55,20 @@ const QuestionGroupSetting = ({ id, name, description, repeatable }) => {
         initialValue={description}
         name={`${namePreffix}-description`}
       >
-        <Input.TextArea rows={5} />
+        <Input.TextArea
+          onChange={handleChangeDescription}
+          rows={5}
+        />
       </Form.Item>
       <Form.Item
         initialValue={repeatable}
         name={`${namePreffix}-repeatable`}
         className={styles['input-checkbox-wrapper']}
       >
-        <Checkbox> {UIText.inputRepeatThisGroupCheckbox}</Checkbox>
+        <Checkbox onChange={handleChangeRepeatable}>
+          {' '}
+          {UIText.inputRepeatThisGroupCheckbox}
+        </Checkbox>
       </Form.Item>
     </div>
   );
