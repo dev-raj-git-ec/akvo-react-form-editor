@@ -23,11 +23,11 @@ const AddMoveButton = ({
       .filter((qg) => qg.order > prevOrder)
       .map((qg) => ({
         ...qg,
-        order: prevOrder ? prevOrder + qg.order : 1 + qg.order,
+        order: qg.order + 1,
       }));
     const newQuestionGroups = [
       ...prevQg,
-      questionGroupFn.add({ prevOrder: prevOrder ? prevOrder : 0 }),
+      questionGroupFn.add({ prevOrder: prevOrder }),
       ...nextQg,
     ];
     questionGroupFn.store.update((s) => {
