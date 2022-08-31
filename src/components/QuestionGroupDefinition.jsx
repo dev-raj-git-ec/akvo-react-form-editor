@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Card, Space } from 'antd';
-import { UIStore } from '../lib/store';
+import { UIStore, questionGroupFn } from '../lib/store';
 import { QuestionGroupSetting, QuestionDefinition } from '.';
 import { AddMoveButton, CardTitle, CardExtraButton } from '../support';
 
@@ -58,6 +58,19 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
     });
   };
 
+  const handleDelete = () => {
+    questionGroupFn.store.update((s) => {
+      s.questionGroups = s.questionGroups
+        .filter((qg) => id !== qg.id)
+        .map((qg) => {
+          if (qg.order > order) {
+            return { ...qg, order: qg.order - order };
+          }
+          return qg;
+        });
+    });
+  };
+
   const extraButtons = [
     {
       type: 'show-button',
@@ -73,7 +86,7 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
     },
     {
       type: 'delete-button',
-      onClick: () => console.log('delete'),
+      onClick: handleDelete,
     },
   ];
 

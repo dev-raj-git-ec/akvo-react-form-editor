@@ -2,6 +2,7 @@
   "name": "akvo-react-form-editor-example",
   "homepage": ".",
   "version": "0.0.0",
+  "license": "AGPL-3.0",
   "private": true,
   "scripts": {
     "start": "node ../node_modules/react-scripts/bin/react-scripts.js start",
