@@ -550,6 +550,22 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
     });
   };
 
+  var handleDelete = function handleDelete() {
+    questionGroupFn.store.update(function (s) {
+      s.questionGroups = s.questionGroups.filter(function (qg) {
+        return id !== qg.id;
+      }).map(function (qg) {
+        if (qg.order > order) {
+          return _extends({}, qg, {
+            order: qg.order - order
+          });
+        }
+
+        return qg;
+      });
+    });
+  };
+
   var extraButtons = [{
     type: 'show-button',
     isExpand: showQuestion,
@@ -562,9 +578,7 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
     onCancel: handleCancelEditGroup
   }, {
     type: 'delete-button',
-    onClick: function onClick() {
-      return console.log('delete');
-    }
+    onClick: handleDelete
   }];
   return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(AddMoveButton, {
     text: movingQg ? buttonMoveQuestionGroupText : buttonAddNewQuestionGroupText,

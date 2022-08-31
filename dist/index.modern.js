@@ -482,6 +482,20 @@ const QuestionGroupDefinition = ({
     });
   };
 
+  const handleDelete = () => {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.filter(qg => id !== qg.id).map(qg => {
+        if (qg.order > order) {
+          return { ...qg,
+            order: qg.order - order
+          };
+        }
+
+        return qg;
+      });
+    });
+  };
+
   const extraButtons = [{
     type: 'show-button',
     isExpand: showQuestion,
@@ -494,7 +508,7 @@ const QuestionGroupDefinition = ({
     onCancel: handleCancelEditGroup
   }, {
     type: 'delete-button',
-    onClick: () => console.log('delete')
+    onClick: handleDelete
   }];
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(AddMoveButton, {
     text: movingQg ? buttonMoveQuestionGroupText : buttonAddNewQuestionGroupText,
