@@ -15,10 +15,11 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
   const form = Form.useFormInstance();
   const { questions } = questionGroup;
   const UIText = UIStore.useState((s) => s.UIText);
-  const movingQ = UIStore.useState((s) => s.activeMoveQuestionGroup);
+  const { buttonAddNewQuestionText, buttonMoveQuestionText } = UIText;
+  const movingQ = UIStore.useState((s) => s.activeMoveQuestion);
   const activeEditQuestions = UIStore.useState((s) => s.activeEditQuestions);
   const [activeTab, setActiveTab] = useState('setting');
-  const { id, order, name } = question;
+  const { id, questionGroupId, order, name } = question;
 
   const isEditQuestion = useMemo(() => {
     return activeEditQuestions.includes(id);
@@ -39,6 +40,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
   const handleCancelMove = () => {
     UIStore.update((s) => {
       s.activeMoveQuestion = null;
+      movingQ === question ? null : question;
     });
   };
 
@@ -59,7 +61,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
       });
     questionGroupFn.store.update((s) => {
       s.questionGroups = s.questionGroups.map((qg) => {
-        if (qg.id === question.questionGroupId) {
+        if (qg.id === questionGroupId) {
           return { ...qg, questions: newQuestions };
         }
         return qg;
@@ -82,7 +84,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
     ];
     questionGroupFn.store.update((s) => {
       s.questionGroups = s.questionGroups.map((qg) => {
-        if (qg.id === question.questionGroupId) {
+        if (qg.id === questionGroupId) {
           return { ...qg, questions: orderBy(newQuestions, 'order') };
         }
         return qg;
@@ -107,7 +109,13 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
   return (
     <div>
       <AddMoveButton
-        text={UIText.buttonAddNewQuestionText}
+        text={movingQ ? buttonMoveQuestionText : buttonAddNewQuestionText}
+        disabled={
+          movingQ === question ||
+          (movingQ?.order + 1 === order &&
+            movingQ?.questionGroupId === questionGroupId)
+        }
+        movingItem={movingQ}
         handleCancelMove={handleCancelMove}
         handleOnAdd={() => handleOnAdd(order - 1, true)}
       />
@@ -118,11 +126,15 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
             title={`Q: ${name} | Order: ${order}`}
             numbering={index + 1}
             order={order - 1}
-            movingItem={movingQ}
             onMoveClick={handleMove}
           />
         }
-        headStyle={{ textAlign: 'left', padding: '0 12px' }}
+        headStyle={{
+          textAlign: 'left',
+          padding: '0 12px',
+          backgroundColor: movingQ?.id === id ? '#FFF2CA' : '#FFF',
+          border: movingQ?.id === id ? '1px dashed #ffc107' : 'none',
+        }}
         bodyStyle={{
           borderTop: isEditQuestion ? '1px solid #f3f3f3' : 'none',
           padding: isEditQuestion ? 24 : 0,
@@ -183,7 +195,9 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
       </Card>
       {isLastItem && (
         <AddMoveButton
-          text={UIText.buttonAddNewQuestionText}
+          text={movingQ ? buttonMoveQuestionText : buttonAddNewQuestionText}
+          disabled={movingQ === question}
+          movingItem={movingQ}
           handleCancelMove={handleCancelMove}
           handleOnAdd={() => handleOnAdd(order, true)}
         />

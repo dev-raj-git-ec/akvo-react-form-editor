@@ -18,6 +18,7 @@ const UIStaticText = {
     buttonAddNewQuestionGroupText: 'Insert group here',
     buttonMoveQuestionGroupText: 'Move group here',
     buttonAddNewQuestionText: 'Add new question',
+    buttonMoveQuestionText: 'Move question here',
     inputQuestionNameLabel: 'Question Name',
     inputQuestionTypeLabel: 'Question Type',
     inputQuestionVariableNameLabel: 'Variable Name',
