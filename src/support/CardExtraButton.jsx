@@ -10,6 +10,7 @@ const CardExtraButton = ({
   isExpand = false,
   onClick = () => {},
   onCancel = () => {},
+  disabled = false,
 }) => {
   switch (type) {
     case 'show-button':
@@ -20,6 +21,7 @@ const CardExtraButton = ({
             className={styles['button-icon']}
             onClick={onCancel}
             icon={<BiHide />}
+            disabled={disabled}
           />
         );
       }
@@ -29,6 +31,7 @@ const CardExtraButton = ({
           className={styles['button-icon']}
           onClick={onClick}
           icon={<BiShow />}
+          disabled={disabled}
         />
       );
 
@@ -40,6 +43,7 @@ const CardExtraButton = ({
             className={styles['button-icon']}
             onClick={onCancel}
             icon={<TbEditOff />}
+            disabled={disabled}
           />
         );
       }
@@ -49,6 +53,7 @@ const CardExtraButton = ({
           className={styles['button-icon']}
           onClick={onClick}
           icon={<TbEdit />}
+          disabled={disabled}
         />
       );
 
@@ -59,6 +64,7 @@ const CardExtraButton = ({
           className={styles['button-icon']}
           onClick={onClick}
           icon={<RiDeleteBin2Line />}
+          disabled={disabled}
         />
       );
   }

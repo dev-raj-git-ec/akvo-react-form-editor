@@ -48,6 +48,25 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
     });
   };
 
+  const handleDelete = () => {
+    const newQuestions = questions
+      .filter((q) => q.id !== id)
+      .map((q) => {
+        if (q.order > order) {
+          return { ...q, order: q.order - order };
+        }
+        return q;
+      });
+    questionGroupFn.store.update((s) => {
+      s.questionGroups = s.questionGroups.map((qg) => {
+        if (qg.id === question.questionGroupId) {
+          return { ...qg, questions: newQuestions };
+        }
+        return qg;
+      });
+    });
+  };
+
   const handleOnAdd = (prevOrder) => {
     const prevQ = questions.filter((q) => q.order <= prevOrder);
     const nextQ = questions
@@ -80,7 +99,8 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
     },
     {
       type: 'delete-button',
-      onClick: () => console.log('delete'),
+      onClick: handleDelete,
+      disabled: !index && isLastItem,
     },
   ];
 
@@ -117,6 +137,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
                 isExpand={cfg.isExpand}
                 onClick={() => cfg.onClick()}
                 onCancel={() => cfg.onCancel()}
+                disabled={cfg?.disabled}
               />
             ))}
           </Space>

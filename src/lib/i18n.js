@@ -40,6 +40,8 @@ const UIStaticText = {
     inputQuestionAllowOtherCheckbox: 'Allow Other',
     questionMoreTreeSettingText: 'More Nested List Question Setting',
     inputSelectTreeDropdownValueLabel: 'Select Nested List Value',
+    deleteQuestionGroupError: 'Unable to delete question group',
+    deleteQuestionError: 'Unable to delete question',
   },
 };
 
