@@ -127,6 +127,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
             numbering={index + 1}
             order={order - 1}
             onMoveClick={handleMove}
+            disableMoveButton={!index && isLastItem}
           />
         }
         headStyle={{
