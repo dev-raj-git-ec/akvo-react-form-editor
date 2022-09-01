@@ -48,6 +48,9 @@ const defaultQuestion = ({
     type: type,
     required: false,
     tooltip: null,
+    skipLogic: [
+      { dependentTo: null, dependentLogic: null, dependentAnswer: null },
+    ],
     ...params,
   };
   if (type === questionType.option || type === questionType.multiple_option) {
