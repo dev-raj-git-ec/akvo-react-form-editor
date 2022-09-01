@@ -35,7 +35,7 @@ const questionType = {
 const defaultQuestion = ({
   id,
   questionGroup,
-  name = 'New Question',
+  name,
   prevOrder = 0,
   type = questionType.input,
   params = {},
@@ -43,7 +43,7 @@ const defaultQuestion = ({
   const q = {
     id: id || generateId(),
     questionGroupId: questionGroup.id,
-    name: name,
+    name: name || dummyName(),
     order: prevOrder + 1,
     type: type,
     required: false,
@@ -75,7 +75,7 @@ const defaultQuestion = ({
 const defaultQuestionGroup = ({ name = dummyName(), prevOrder = 0 }) => {
   const qg = {
     id: generateId(),
-    name: name || dummyName(),
+    name: name,
     order: prevOrder + 1,
     description: null,
     repeatable: false,
@@ -97,6 +97,7 @@ const UIStore = new Store({
   activeEditQuestionGroups: [],
   activeMoveQuestionGroup: null,
   activeEditQuestions: [],
+  activeMoveQuestion: null,
   UIText: UIStaticText.en,
 });
 
@@ -108,7 +109,7 @@ const FormStore = new Store({
 });
 
 const QuestionGroupStore = new Store({
-  questionGroups: [defaultQuestionGroup({ name: null })],
+  questionGroups: [defaultQuestionGroup({})],
 });
 
 const questionGroupFn = {

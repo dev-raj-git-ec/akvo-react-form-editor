@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Card, Space, Tabs, Form } from 'antd';
 import styles from '../styles.module.css';
-import { UIStore } from '../lib/store';
+import { UIStore, questionFn, questionGroupFn } from '../lib/store';
 import { QuestionSetting, QuestionSkipLogic } from '.';
 import {
   AddMoveButton,
@@ -9,13 +9,16 @@ import {
   CardExtraButton,
   SaveButton,
 } from '../support';
+import { orderBy } from 'lodash';
 
-const QuestionDefinition = ({ index, question, isLastItem }) => {
+const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
   const form = Form.useFormInstance();
+  const { questions } = questionGroup;
   const UIText = UIStore.useState((s) => s.UIText);
+  const movingQ = UIStore.useState((s) => s.activeMoveQuestionGroup);
   const activeEditQuestions = UIStore.useState((s) => s.activeEditQuestions);
   const [activeTab, setActiveTab] = useState('setting');
-  const { id, name } = question;
+  const { id, order, name } = question;
 
   const isEditQuestion = useMemo(() => {
     return activeEditQuestions.includes(id);
@@ -30,6 +33,41 @@ const QuestionDefinition = ({ index, question, isLastItem }) => {
   const handleCancelEdit = () => {
     UIStore.update((s) => {
       s.activeEditQuestions = activeEditQuestions.filter((qId) => qId !== id);
+    });
+  };
+
+  const handleCancelMove = () => {
+    UIStore.update((s) => {
+      s.activeMoveQuestion = null;
+    });
+  };
+
+  const handleMove = () => {
+    UIStore.update((s) => {
+      s.activeMoveQuestion = movingQ === question ? null : question;
+    });
+  };
+
+  const handleOnAdd = (prevOrder) => {
+    const prevQ = questions.filter((q) => q.order <= prevOrder);
+    const nextQ = questions
+      .filter((q) => q.order > prevOrder)
+      .map((q) => ({
+        ...q,
+        order: q.order + 1,
+      }));
+    const newQuestions = [
+      ...prevQ,
+      questionFn.add({ questionGroup: questionGroup, prevOrder: prevOrder }),
+      ...nextQ,
+    ];
+    questionGroupFn.store.update((s) => {
+      s.questionGroups = s.questionGroups.map((qg) => {
+        if (qg.id === question.questionGroupId) {
+          return { ...qg, questions: orderBy(newQuestions, 'order') };
+        }
+        return qg;
+      });
     });
   };
 
@@ -48,16 +86,20 @@ const QuestionDefinition = ({ index, question, isLastItem }) => {
 
   return (
     <div>
-      <AddMoveButton text={UIText.buttonAddNewQuestionText} />
+      <AddMoveButton
+        text={UIText.buttonAddNewQuestionText}
+        handleCancelMove={handleCancelMove}
+        handleOnAdd={() => handleOnAdd(order - 1, true)}
+      />
       <Card
         key={`${index}-${id}`}
         title={
           <CardTitle
-            title={name}
+            title={`Q: ${name} | Order: ${order}`}
             numbering={index + 1}
-            onMoveClick={() => {
-              console.log('move');
-            }}
+            order={order - 1}
+            movingItem={movingQ}
+            onMoveClick={handleMove}
           />
         }
         headStyle={{ textAlign: 'left', padding: '0 12px' }}
@@ -73,8 +115,8 @@ const QuestionDefinition = ({ index, question, isLastItem }) => {
                 key={`${cfg.type}-${id}`}
                 type={cfg.type}
                 isExpand={cfg.isExpand}
-                onClick={cfg.onClick}
-                onCancel={cfg.onCancel}
+                onClick={() => cfg.onClick()}
+                onCancel={() => cfg.onCancel()}
               />
             ))}
           </Space>
@@ -118,7 +160,13 @@ const QuestionDefinition = ({ index, question, isLastItem }) => {
           </div>
         )}
       </Card>
-      {isLastItem && <AddMoveButton text={UIText.buttonAddNewQuestionText} />}
+      {isLastItem && (
+        <AddMoveButton
+          text={UIText.buttonAddNewQuestionText}
+          handleCancelMove={handleCancelMove}
+          handleOnAdd={() => handleOnAdd(order, true)}
+        />
+      )}
     </div>
   );
 };

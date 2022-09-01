@@ -7,11 +7,11 @@ import { orderBy } from 'lodash';
 
 const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
   const { questionGroups } = questionGroupFn.store.useState((s) => s);
+  const movingQg = UIStore.useState((s) => s.activeMoveQuestionGroup);
   const activeQuestionGroups = UIStore.useState((s) => s.activeQuestionGroups);
   const activeEditQuestionGroups = UIStore.useState(
     (s) => s.activeEditQuestionGroups
   );
-  const movingQg = UIStore.useState((s) => s.activeMoveQuestionGroup);
 
   const { id, name, questions, order } = questionGroup;
   const { buttonAddNewQuestionGroupText, buttonMoveQuestionGroupText } =
@@ -168,7 +168,6 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
         text={
           movingQg ? buttonMoveQuestionGroupText : buttonAddNewQuestionGroupText
         }
-        order={order - 1}
         disabled={movingQg === questionGroup || movingQg?.order + 1 === order}
         movingItem={movingQg}
         handleCancelMove={handleCancelMove}
@@ -225,13 +224,13 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
               key={`question-definition-${qi}`}
               index={qi}
               question={q}
+              questionGroup={questionGroup}
               isLastItem={qi === questions.length - 1}
             />
           ))}
       </Card>
       {isLastItem && (
         <AddMoveButton
-          order={order}
           text={
             movingQg
               ? buttonMoveQuestionGroupText
@@ -240,7 +239,7 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
           disabled={movingQg === questionGroup}
           movingItem={movingQg}
           handleCancelMove={handleCancelMove}
-          handleOnAdd={() => handleOnAdd(order, true)}
+          handleOnAdd={() => handleOnAdd(order)}
           handleOnMove={() => handleOnMove(order, true)}
         />
       )}
