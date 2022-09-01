@@ -1,7 +1,12 @@
 import React from 'react';
 import { Form, Input, Select, Checkbox } from 'antd';
 import styles from '../styles.module.css';
-import { UIStore, questionType } from '../lib/store';
+import {
+  UIStore,
+  questionType,
+  questionGroupFn,
+  questionFn,
+} from '../lib/store';
 import {
   SettingInput,
   SettingTree,
@@ -10,11 +15,45 @@ import {
 } from './question-type';
 
 const QuestionSetting = ({ question }) => {
-  const { id, name, type, variable, tooltip, required } = question;
+  const { id, name, type, variable, tooltip, required, questionGroupId } =
+    question;
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
   const form = Form.useFormInstance();
   const qType = Form.useWatch(`${namePreffix}-type`, form);
+
+  const updateState = (name, value) => {
+    questionGroupFn.store.update((s) => {
+      s.questionGroups = s.questionGroups.map((qg) => {
+        if (qg.id === questionGroupId) {
+          const questions = qg.questions.map((q) => {
+            if (q.id === id) {
+              return {
+                ...q,
+                [name]: value,
+              };
+            }
+            return q;
+          });
+          return {
+            ...qg,
+            questions: questions,
+          };
+        }
+        return qg;
+      });
+    });
+  };
+
+  const handleChangeName = (e) => {
+    updateState('name', e?.target?.value);
+  };
+
+  const handleChangeType = (e) => {
+    updateState('type', e);
+  };
+
+  // variable name, etc, need to be done
 
   return (
     <div>
@@ -24,7 +63,7 @@ const QuestionSetting = ({ question }) => {
         name={`${namePreffix}-name`}
         required
       >
-        <Input />
+        <Input onChange={handleChangeName} />
       </Form.Item>
       <Form.Item
         label={UIText.inputQuestionTypeLabel}
@@ -36,9 +75,10 @@ const QuestionSetting = ({ question }) => {
           className={styles['select-dropdown']}
           options={Object.keys(questionType).map((key) => ({
             label: questionType[key]?.split('_').join(' '),
-            value: key,
+            value: questionType[key],
           }))}
           getPopupContainer={(triggerNode) => triggerNode.parentElement}
+          onChange={handleChangeType}
         />
       </Form.Item>
       <Form.Item
