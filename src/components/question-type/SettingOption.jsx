@@ -171,22 +171,20 @@ const SettingOption = ({ id }) => {
                 icon={<MdOutlineAddCircleOutline />}
                 onClick={() => handleOnAddOption(d)}
               />
-              {di !== 0 && (
-                <Button
-                  type="link"
-                  className={styles['button-icon']}
-                  icon={<MdOutlineArrowCircleUp />}
-                  onClick={() => handleOnMoveOption(d, d.order - 1)}
-                />
-              )}
-              {di !== options.length - 1 && (
-                <Button
-                  type="link"
-                  className={styles['button-icon']}
-                  icon={<MdOutlineArrowCircleDown />}
-                  onClick={() => handleOnMoveOption(d, d.order + 1)}
-                />
-              )}
+              <Button
+                type="link"
+                className={styles['button-icon']}
+                icon={<MdOutlineArrowCircleUp />}
+                onClick={() => handleOnMoveOption(d, d.order - 1)}
+                disabled={di === 0}
+              />
+              <Button
+                type="link"
+                className={styles['button-icon']}
+                icon={<MdOutlineArrowCircleDown />}
+                onClick={() => handleOnMoveOption(d, d.order + 1)}
+                disabled={di === options.length - 1}
+              />
               <Button
                 type="link"
                 className={styles['button-icon']}
