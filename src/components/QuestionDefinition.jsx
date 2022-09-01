@@ -98,8 +98,8 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
       ...movingQ,
       questionGroupId: questionGroupId,
       order:
-        movingQ.order === prevOrder
-          ? prevOrder
+        questionGroupId !== movingQ.questionGroupId
+          ? prevOrder + 1
           : movingQ.order < prevOrder
           ? prevOrder
           : prevOrder + 1,
@@ -111,9 +111,27 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
       .map((qg) => {
         const addedQ = qg.id === questionGroupId ? currentQ : false;
         let newQuestions = qg.questions.filter((q) => q.id !== movingQ.id);
-        if (!addedQ) {
+        if (
+          questionGroupId !== movingQ.questionGroupId &&
+          newQuestions.length < qg.questions.length
+        ) {
           newQuestions = newQuestions.map((q, qi) => ({ ...q, order: qi + 1 }));
-        } else {
+        }
+        if (
+          questionGroupId !== movingQ.questionGroupId &&
+          qg.id === questionGroupId
+        ) {
+          newQuestions = newQuestions.map((x) => {
+            if (lastItem) {
+              return x;
+            }
+            if (x.order >= prevOrder + 1) {
+              return { ...x, order: x.order + 1 };
+            }
+            return x;
+          });
+        }
+        if (questionGroupId === movingQ.questionGroupId) {
           newQuestions = newQuestions.map((x) => {
             if (lastItem) {
               if (x.order > movingQ.order) {
@@ -144,10 +162,14 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
           questions: orderBy(newQuestions, 'order'),
         };
       });
+    let oldQg = questionGroups.filter(
+      (qg) => qg.id !== movingQ.questionGroupId
+    );
+    oldQg =
+      movingQ.questionGroupId !== questionGroupId
+        ? oldQg.filter((qg) => qg.id !== questionGroupId)
+        : oldQg;
     questionGroupFn.store.update((s) => {
-      const oldQg = s.questionGroups.filter(
-        (qg) => qg.id !== movingQ.questionGroupId || qg.id !== questionGroupId
-      );
       s.questionGroups = orderBy([...oldQg, ...changedQg], 'order');
     });
     UIStore.update((s) => {
