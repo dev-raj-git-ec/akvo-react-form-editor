@@ -53,7 +53,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
       .filter((q) => q.id !== id)
       .map((q) => {
         if (q.order > order) {
-          return { ...q, order: q.order - order };
+          return { ...q, order: q.order - 1 };
         }
         return q;
       });

@@ -71,7 +71,7 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
       .filter((qg) => id !== qg.id)
       .map((qg) => {
         if (qg.order > order) {
-          return { ...qg, order: qg.order - order };
+          return { ...qg, order: qg.order - 1 };
         }
         return qg;
       });
