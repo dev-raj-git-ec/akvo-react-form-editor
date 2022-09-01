@@ -38,6 +38,8 @@ const UIStaticText = {
     inputQuestionAllowDecimalCheckbox: 'Allow Decimal',
     questionMoreOptionTypeSettingText: 'More Option Question Setting',
     inputQuestionAllowOtherCheckbox: 'Allow Other',
+    questionMoreTreeSettingText: 'More Nested List Question Setting',
+    inputSelectTreeDropdownValueLabel: 'Select Nested List Value',
   },
 };
 
