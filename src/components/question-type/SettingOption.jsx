@@ -190,6 +190,7 @@ const SettingOption = ({ id }) => {
                 className={styles['button-icon']}
                 icon={<MdOutlineRemoveCircleOutline />}
                 onClick={() => handleOnDeleteOption(d.id)}
+                disabled={options.length === 1}
               />
             </Space>
           </Col>
