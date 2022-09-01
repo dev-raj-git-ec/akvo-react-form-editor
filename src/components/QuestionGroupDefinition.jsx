@@ -101,13 +101,7 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
   const handleOnMove = (prevOrder, lastItem = false) => {
     const currentQg = {
       ...movingQg,
-      order: lastItem
-        ? prevOrder
-        : prevOrder
-        ? prevOrder > movingQg.order
-          ? prevOrder
-          : prevOrder + 1
-        : 1,
+      order: movingQg.order < prevOrder ? prevOrder : prevOrder + 1,
     };
     const orderedQg = questionGroups
       .filter((qg) => qg.order !== movingQg.order)
@@ -118,21 +112,19 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
           }
           return x;
         }
-        if (prevOrder > movingQg.order) {
-          if (x.order <= prevOrder && x.order > movingQg.order) {
-            return { ...x, order: x.order - movingQg.order || 1 };
-          }
-          if (x.order >= prevOrder && x.order > movingQg.order) {
-            return x;
-          }
-          return x;
+        if (
+          prevOrder > movingQg.order &&
+          x.order > movingQg.order &&
+          x.order <= prevOrder
+        ) {
+          return { ...x, order: x.order - 1 };
         }
         if (
           prevOrder < movingQg.order &&
           x.order < movingQg.order &&
           x.order >= prevOrder + 1
         ) {
-          return { ...x, order: x.order + (prevOrder || 1) };
+          return { ...x, order: x.order + 1 };
         }
         return x;
       });
