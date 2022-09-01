@@ -12,6 +12,7 @@ import {
 import { orderBy } from 'lodash';
 
 const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
+  const { questionGroups } = questionGroupFn.store.useState((s) => s);
   const form = Form.useFormInstance();
   const { questions } = questionGroup;
   const UIText = UIStore.useState((s) => s.UIText);
@@ -92,6 +93,68 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
     });
   };
 
+  const handleOnMove = (prevOrder, lastItem = false) => {
+    const currentQ = {
+      ...movingQ,
+      questionGroupId: questionGroupId,
+      order:
+        movingQ.order === prevOrder
+          ? prevOrder
+          : movingQ.order < prevOrder
+          ? prevOrder
+          : prevOrder + 1,
+    };
+    const changedQg = questionGroups
+      .filter(
+        (qg) => qg.id === movingQ.questionGroupId || qg.id === questionGroupId
+      )
+      .map((qg) => {
+        const addedQ = qg.id === questionGroupId ? currentQ : false;
+        let newQuestions = qg.questions.filter((q) => q.id !== movingQ.id);
+        if (!addedQ) {
+          newQuestions = newQuestions.map((q, qi) => ({ ...q, order: qi + 1 }));
+        } else {
+          newQuestions = newQuestions.map((x) => {
+            if (lastItem) {
+              if (x.order > movingQ.order) {
+                return { ...x, order: x.order - 1 };
+              }
+              return x;
+            }
+            if (
+              prevOrder > movingQ.order &&
+              x.order > movingQ.order &&
+              x.order <= prevOrder
+            ) {
+              return { ...x, order: x.order - 1 };
+            }
+            if (
+              prevOrder < movingQ.order &&
+              x.order < movingQ.order &&
+              x.order >= prevOrder + 1
+            ) {
+              return { ...x, order: x.order + 1 };
+            }
+            return x;
+          });
+        }
+        newQuestions = addedQ ? [...newQuestions, addedQ] : newQuestions;
+        return {
+          ...qg,
+          questions: orderBy(newQuestions, 'order'),
+        };
+      });
+    questionGroupFn.store.update((s) => {
+      const oldQg = s.questionGroups.filter(
+        (qg) => qg.id !== movingQ.questionGroupId || qg.id !== questionGroupId
+      );
+      s.questionGroups = orderBy([...oldQg, ...changedQg], 'order');
+    });
+    UIStore.update((s) => {
+      s.activeMoveQuestion = null;
+    });
+  };
+
   const extraButtons = [
     {
       type: 'edit-button',
@@ -115,9 +178,10 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
           (movingQ?.order + 1 === order &&
             movingQ?.questionGroupId === questionGroupId)
         }
-        movingItem={movingQ}
         handleCancelMove={handleCancelMove}
+        movingItem={movingQ}
         handleOnAdd={() => handleOnAdd(order - 1, true)}
+        handleOnMove={() => handleOnMove(order - 1)}
       />
       <Card
         key={`${index}-${id}`}
@@ -201,6 +265,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
           movingItem={movingQ}
           handleCancelMove={handleCancelMove}
           handleOnAdd={() => handleOnAdd(order, true)}
+          handleOnMove={() => handleOnMove(order, true)}
         />
       )}
     </div>
