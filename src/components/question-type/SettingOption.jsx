@@ -8,7 +8,7 @@ import {
   MdOutlineArrowCircleDown,
   MdOutlineArrowCircleUp,
 } from 'react-icons/md';
-import orderBy from 'lodash/orderBy';
+import { orderBy, takeRight } from 'lodash';
 
 const generateId = () => new Date().getTime();
 
@@ -70,12 +70,17 @@ const SettingOption = ({ id }) => {
 
   const handleOnAddOption = (current) => {
     const { order: currentOrder } = current;
+    const lastOrder = takeRight(orderBy(options, 'order'))[0].order;
     // reorder prev option
     const reorderOptions = options.map((opt) => {
       if (opt.order > currentOrder) {
         opt['order'] = opt['order'] + 1;
       }
-      if (opt.order < currentOrder) {
+      if (
+        opt.order < currentOrder &&
+        opt.order !== 1 &&
+        currentOrder !== lastOrder
+      ) {
         opt['order'] = opt['order'] - 1;
       }
       return opt;
@@ -85,6 +90,38 @@ const SettingOption = ({ id }) => {
       defaultOptions({ order: currentOrder + 1 }),
     ];
     setOptions(orderBy(addOptions, 'order'));
+  };
+
+  const handleOnMoveOption = (current, targetOrder) => {
+    const { order: currentOrder } = current;
+
+    const prevOptions = options.filter(
+      (opt) => opt.order !== currentOrder && opt.order !== targetOrder
+    );
+    const currentOption = options
+      .filter((opt) => opt.order === currentOrder)
+      .map((opt) => ({
+        ...opt,
+        order: targetOrder,
+      }));
+    const targetOption = options
+      .filter((opt) => opt.order === targetOrder)
+      .map((opt) => ({
+        ...opt,
+        order: currentOrder,
+      }));
+    setOptions(
+      orderBy([...prevOptions, ...currentOption, ...targetOption], 'order')
+    );
+  };
+
+  const handleOnDeleteOption = (currentId) => {
+    // delete and reorder
+    setOptions(
+      orderBy(options, 'order')
+        .filter((opt) => opt.id !== currentId)
+        .map((opt, opti) => ({ ...opt, order: opti + 1 }))
+    );
   };
 
   return (
@@ -134,20 +171,27 @@ const SettingOption = ({ id }) => {
                 icon={<MdOutlineAddCircleOutline />}
                 onClick={() => handleOnAddOption(d)}
               />
-              <Button
-                type="link"
-                className={styles['button-icon']}
-                icon={<MdOutlineArrowCircleUp />}
-              />
-              <Button
-                type="link"
-                className={styles['button-icon']}
-                icon={<MdOutlineArrowCircleDown />}
-              />
+              {di !== 0 && (
+                <Button
+                  type="link"
+                  className={styles['button-icon']}
+                  icon={<MdOutlineArrowCircleUp />}
+                  onClick={() => handleOnMoveOption(d, d.order - 1)}
+                />
+              )}
+              {di !== options.length - 1 && (
+                <Button
+                  type="link"
+                  className={styles['button-icon']}
+                  icon={<MdOutlineArrowCircleDown />}
+                  onClick={() => handleOnMoveOption(d, d.order + 1)}
+                />
+              )}
               <Button
                 type="link"
                 className={styles['button-icon']}
                 icon={<MdOutlineRemoveCircleOutline />}
+                onClick={() => handleOnDeleteOption(d.id)}
               />
             </Space>
           </Col>
