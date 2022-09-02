@@ -13,6 +13,18 @@ const dependencyTypes = [
         value: 'options',
       },
     ],
+    Component: ({ props, options = [] }) => (
+      <Select
+        className={styles['select-dropdown']}
+        getPopupContainer={(triggerNode) => triggerNode.parentElement}
+        mode="multiple"
+        showSearch
+        allowClear
+        showArrow
+        options={options}
+        {...props}
+      />
+    ),
   },
   {
     type: ['number'],
@@ -34,6 +46,14 @@ const dependencyTypes = [
         value: 'min',
       },
     ],
+    Component: ({ props }) => (
+      <InputNumber
+        style={{ width: '100%' }}
+        controls={false}
+        keyboard={false}
+        {...props}
+      />
+    ),
   },
 ];
 
@@ -200,7 +220,24 @@ const QuestionSkipLogic = ({ question }) => {
     // });
   };
 
-  console.log(dependencies);
+  const DependencyAnswerComponent = ({ dependencyId }) => {
+    if (selectedDependencyQuestion) {
+      const Component = dependencyTypes.find((dt) =>
+        dt.type.includes(selectedDependencyQuestion.type)
+      ).Component;
+      return (
+        <Component
+          props={{
+            onChange: (e) => handleChangeDependentAnswer(dependencyId, e),
+          }}
+          options={dependencyAnswerOptions}
+        />
+      );
+    }
+    return <Input disabled />;
+  };
+
+  console.log(DependencyAnswerComponent);
 
   return (
     <Row gutter={[24, 24]}>
@@ -266,35 +303,7 @@ const QuestionSkipLogic = ({ question }) => {
                 }
                 name={`${namePreffix}-dependent_answer-${dependency.id}`}
               >
-                {!selectedDependencyQuestion && <Input disabled />}
-                {selectedDependencyQuestion?.type === 'number' && (
-                  <InputNumber
-                    style={{ width: '100%' }}
-                    controls={false}
-                    keyboard={false}
-                    onChange={(e) =>
-                      handleChangeDependentAnswer(dependency.id, e)
-                    }
-                  />
-                )}
-                {['option', 'multiple_option'].includes(
-                  selectedDependencyQuestion?.type
-                ) && (
-                  <Select
-                    className={styles['select-dropdown']}
-                    options={dependencyAnswerOptions}
-                    getPopupContainer={(triggerNode) =>
-                      triggerNode.parentElement
-                    }
-                    onChange={(e) =>
-                      handleChangeDependentAnswer(dependency.id, e)
-                    }
-                    mode="multiple"
-                    showSearch
-                    allowClear
-                    showArrow
-                  />
-                )}
+                <DependencyAnswerComponent dependencyId={dependency.id} />
               </Form.Item>
             </Col>
           </Row>
