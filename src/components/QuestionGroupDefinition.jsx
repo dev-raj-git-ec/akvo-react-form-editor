@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 import { Card } from 'antd';
 import { UIStore, questionGroupFn } from '../lib/store';
-import { QuestionGroupSetting, QuestionDefinition } from '.';
+import QuestionGroupSetting from './QuestionGroupSetting';
+import QuestionDefinition from './QuestionDefinition';
 import { AddMoveButton, CardTitle } from '../support';
 import { orderBy } from 'lodash';
 

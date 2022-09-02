@@ -2,7 +2,8 @@ import React, { useMemo, useState } from 'react';
 import { Card, Tabs } from 'antd';
 import styles from '../styles.module.css';
 import { UIStore, questionFn, questionGroupFn } from '../lib/store';
-import { QuestionSetting, QuestionSkipLogic } from '.';
+import QuestionSetting from './QuestionSetting';
+import QuestionSkipLogic from './QuestionSkipLogic';
 import { AddMoveButton, CardTitle, SaveButton } from '../support';
 import { orderBy } from 'lodash';
 
