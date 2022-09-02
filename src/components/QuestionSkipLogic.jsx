@@ -106,7 +106,7 @@ const QuestionSkipLogic = ({ question }) => {
       setOptions(
         selected.options.map((opt) => ({
           label: opt.name,
-          value: opt.id,
+          value: opt.name,
         }))
       );
     } else {

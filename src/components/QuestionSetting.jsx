@@ -1,12 +1,7 @@
 import React from 'react';
 import { Form, Input, Select, Checkbox } from 'antd';
 import styles from '../styles.module.css';
-import {
-  UIStore,
-  questionType,
-  questionGroupFn,
-  questionFn,
-} from '../lib/store';
+import { UIStore, questionType, questionGroupFn } from '../lib/store';
 import {
   SettingInput,
   SettingTree,
@@ -53,7 +48,17 @@ const QuestionSetting = ({ question }) => {
     updateState('type', e);
   };
 
-  // variable name, save, etc function
+  const handleChangeVariableName = (e) => {
+    updateState('variableName', e?.target?.value);
+  };
+
+  const handleChangeTooltip = (e) => {
+    updateState('tooltip', e);
+  };
+
+  const handleChangeRequired = (e) => {
+    updateState('required', e?.target?.checked);
+  };
 
   return (
     <div>
@@ -86,21 +91,24 @@ const QuestionSetting = ({ question }) => {
         initialValue={variable}
         name={`${namePreffix}-variable`}
       >
-        <Input />
+        <Input onChange={handleChangeVariableName} />
       </Form.Item>
       <Form.Item
         label={UIText.inputQuestionTooltipLabel}
         initialValue={tooltip}
         name={`${namePreffix}-tooltip`}
       >
-        <Input.TextArea />
+        <Input.TextArea onChange={handleChangeTooltip} />
       </Form.Item>
       <Form.Item
         initialValue={required}
         name={`${namePreffix}-required`}
         className={styles['input-checkbox-wrapper']}
       >
-        <Checkbox> {UIText.inputQuestionRequiredCheckbox}</Checkbox>
+        <Checkbox onChange={handleChangeRequired}>
+          {' '}
+          {UIText.inputQuestionRequiredCheckbox}
+        </Checkbox>
       </Form.Item>
       {qType === 'input' && <SettingInput {...question} />}
       {qType === 'number' && <SettingNumber {...question} />}
