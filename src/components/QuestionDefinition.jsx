@@ -273,7 +273,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
             )}
             <div>
               <SaveButton
-                onClickSave={() => form.submit()}
+                onClickSave={() => console.log(question)}
                 onClickCancel={handleCancelEdit}
               />
             </div>

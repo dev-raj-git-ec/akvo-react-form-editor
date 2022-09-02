@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, Checkbox, Space, InputNumber, Row, Col } from 'antd';
 import styles from '../../styles.module.css';
-import { UIStore } from '../../lib/store';
+import { UIStore, questionGroupFn } from '../../lib/store';
 
 const SettingNumber = ({ id }) => {
   const namePreffix = `question-${id}`;

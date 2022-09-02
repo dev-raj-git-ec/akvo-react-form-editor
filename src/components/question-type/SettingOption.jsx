@@ -37,7 +37,7 @@ const defaultOptions = ({ init = false, order = 0 }) => {
   };
 };
 
-const SettingOption = ({ id, questionGroupId }) => {
+const SettingOption = ({ id, questionGroupId, allowOther }) => {
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
   const [options, setOptions] = useState(defaultOptions({ init: true }));
@@ -94,6 +94,8 @@ const SettingOption = ({ id, questionGroupId }) => {
       })
     );
   };
+
+  // allow other onchange function
 
   const handleOnAddOption = (current) => {
     const { order: currentOrder } = current;
@@ -158,7 +160,7 @@ const SettingOption = ({ id, questionGroupId }) => {
       </p>
       <Space className={styles['space-align-left']}>
         <Form.Item
-          initialValue={false}
+          initialValue={allowOther}
           name={`${namePreffix}-allow_other`}
         >
           <Checkbox> {UIText.inputQuestionAllowOtherCheckbox}</Checkbox>

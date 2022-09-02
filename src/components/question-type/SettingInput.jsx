@@ -3,7 +3,12 @@ import { Form, Checkbox, Space } from 'antd';
 import styles from '../../styles.module.css';
 import { UIStore, questionGroupFn } from '../../lib/store';
 
-const SettingInput = ({ id, questionGroupId }) => {
+const SettingInput = ({
+  id,
+  questionGroupId,
+  requiredDoubleEntry,
+  hiddenString,
+}) => {
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
 
@@ -45,7 +50,7 @@ const SettingInput = ({ id, questionGroupId }) => {
       </p>
       <Space className={styles['space-align-left']}>
         <Form.Item
-          initialValue={false}
+          initialValue={requiredDoubleEntry}
           name={`${namePreffix}-require_double_entry`}
         >
           <Checkbox onChange={handleChangeDoubleEntry}>
@@ -54,7 +59,7 @@ const SettingInput = ({ id, questionGroupId }) => {
           </Checkbox>
         </Form.Item>
         <Form.Item
-          initialValue={false}
+          initialValue={hiddenString}
           name={`${namePreffix}-hidden_string`}
         >
           <Checkbox onChange={handleChangeHiddenString}>
