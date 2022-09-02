@@ -11,6 +11,7 @@ const QuestionSkipLogic = ({ question }) => {
   const { questionGroups } = questionGroupFn.store.useState((s) => s);
   const [dependentTo, setDependentTo] = useState(null);
   const [operators, setOperators] = useState([]);
+  const [options, setOptions] = useState([]);
 
   const questions = useMemo(() => {
     return questionGroups.flatMap((qg) => qg.questions);
@@ -62,6 +63,12 @@ const QuestionSkipLogic = ({ question }) => {
     let operatorValues = {};
     if (['option', 'multiple_option'].includes(selected.type)) {
       operatorValues = skipLogicOperator.option;
+      setOptions(
+        selected.options.map((opt) => ({
+          label: opt.name,
+          value: opt.id,
+        }))
+      );
     } else {
       operatorValues = skipLogicOperator[selected.type];
     }
@@ -83,7 +90,7 @@ const QuestionSkipLogic = ({ question }) => {
     updateState(skId, 'dependentAnswer', val);
   };
 
-  // ondelete
+  // ondelete function
 
   return (
     <Row gutter={[24, 24]}>
@@ -157,11 +164,15 @@ const QuestionSkipLogic = ({ question }) => {
                 {['option', 'multiple_option'].includes(dependentTo?.type) && (
                   <Select
                     className={styles['select-dropdown']}
-                    options={[]}
+                    options={options}
                     getPopupContainer={(triggerNode) =>
                       triggerNode.parentElement
                     }
                     onChange={(e) => handleChangeDependentAnswer(sk.id, e)}
+                    mode="multiple"
+                    showSearch
+                    allowClear
+                    showArrow
                   />
                 )}
               </Form.Item>

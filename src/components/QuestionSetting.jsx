@@ -53,7 +53,7 @@ const QuestionSetting = ({ question }) => {
     updateState('type', e);
   };
 
-  // variable name, etc, need to be done
+  // variable name, save, etc function
 
   return (
     <div>
