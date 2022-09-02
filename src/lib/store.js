@@ -48,14 +48,6 @@ const defaultQuestion = ({
     type: type,
     required: false,
     tooltip: null,
-    skipLogic: [
-      {
-        id: generateId(),
-        dependentTo: null,
-        dependentLogic: null,
-        dependentAnswer: null,
-      },
-    ],
     ...params,
   };
   if (type === questionType.option || type === questionType.multiple_option) {
@@ -143,4 +135,5 @@ export {
   questionGroupFn,
   questionFn,
   skipLogicOperator,
+  generateId,
 };

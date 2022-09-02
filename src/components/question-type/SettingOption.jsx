@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Checkbox, Space, Row, Col, Input, Button } from 'antd';
 import styles from '../../styles.module.css';
-import { UIStore, questionGroupFn } from '../../lib/store';
+import { UIStore, questionGroupFn, generateId } from '../../lib/store';
 import {
   MdOutlineRemoveCircleOutline,
   MdOutlineAddCircleOutline,
@@ -9,8 +9,6 @@ import {
   MdOutlineArrowCircleUp,
 } from 'react-icons/md';
 import { orderBy, takeRight } from 'lodash';
-
-const generateId = () => new Date().getTime();
 
 const defaultOptions = ({ init = false, order = 0 }) => {
   const option = {

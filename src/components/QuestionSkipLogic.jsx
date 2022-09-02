@@ -1,8 +1,24 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Form, Select, Row, Col, InputNumber, Input } from 'antd';
 import styles from '../styles.module.css';
 import { CardExtraButton } from '../support';
-import { UIStore, questionGroupFn, skipLogicOperator } from '../lib/store';
+import {
+  UIStore,
+  questionGroupFn,
+  skipLogicOperator,
+  generateId,
+} from '../lib/store';
+
+const defaultSkipLogic = () => {
+  return [
+    {
+      id: generateId(),
+      dependentTo: null,
+      dependentLogic: null,
+      dependentAnswer: null,
+    },
+  ];
+};
 
 const QuestionSkipLogic = ({ question }) => {
   const { id, questionGroupId, skipLogic } = question;
@@ -12,6 +28,30 @@ const QuestionSkipLogic = ({ question }) => {
   const [dependentTo, setDependentTo] = useState(null);
   const [operators, setOperators] = useState([]);
   const [options, setOptions] = useState([]);
+
+  useEffect(() => {
+    // add default skip logic value
+    questionGroupFn.store.update((s) => {
+      s.questionGroups = s.questionGroups.map((qg) => {
+        if (qg.id === questionGroupId) {
+          const questions = qg.questions.map((q) => {
+            if (q.id === id) {
+              return {
+                ...q,
+                skipLogic: defaultSkipLogic(),
+              };
+            }
+            return q;
+          });
+          return {
+            ...qg,
+            questions: questions,
+          };
+        }
+        return qg;
+      });
+    });
+  }, []);
 
   const questions = useMemo(() => {
     return questionGroups.flatMap((qg) => qg.questions);
@@ -79,7 +119,9 @@ const QuestionSkipLogic = ({ question }) => {
         value: operatorValues[key],
       }))
     );
-    updateState(skId, 'dependentTo', e);
+    setTimeout(() => {
+      updateState(skId, 'dependentTo', e);
+    }, 500);
   };
 
   const handleChangeDependentLogic = (skId, e) => {
@@ -94,7 +136,7 @@ const QuestionSkipLogic = ({ question }) => {
 
   return (
     <Row gutter={[24, 24]}>
-      {skipLogic.map((sk, ski) => (
+      {skipLogic?.map((sk, ski) => (
         <Col
           key={`skip-logic-${id}-${ski}`}
           span={24}
@@ -122,7 +164,7 @@ const QuestionSkipLogic = ({ question }) => {
               >
                 <CardExtraButton
                   type="delete-button"
-                  onClick={() => console.log('delete')}
+                  onClick={() => handleDeleteDependentTo(sk.id)}
                 />
               </Col>
             </Row>
