@@ -49,7 +49,12 @@ const defaultQuestion = ({
     required: false,
     tooltip: null,
     skipLogic: [
-      { dependentTo: null, dependentLogic: null, dependentAnswer: null },
+      {
+        id: generateId(),
+        dependentTo: null,
+        dependentLogic: null,
+        dependentAnswer: null,
+      },
     ],
     ...params,
   };
