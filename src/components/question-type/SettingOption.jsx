@@ -21,11 +21,13 @@ const defaultOptions = ({ init = false, order = 0 }) => {
       {
         ...option,
         id: generateId(),
+        name: 'New Option 1',
         order: 1,
       },
       {
         ...option,
         id: generateId() + 1,
+        name: 'New Option 2',
         order: 2,
       },
     ];

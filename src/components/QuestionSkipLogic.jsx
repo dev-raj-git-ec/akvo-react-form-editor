@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { Form, Select, Row, Col, InputNumber, Input } from 'antd';
+import { Form, Select, Row, Col, InputNumber, Input, Alert } from 'antd';
 import styles from '../styles.module.css';
 import { CardExtraButton } from '../support';
 import { UIStore, questionGroupFn, generateId } from '../lib/store';
@@ -75,7 +75,6 @@ const QuestionSkipLogic = ({ question }) => {
         (dp.dependentAnswer || dp.dependentAnswer?.length)
     );
     if (check.length) {
-      // add default skip logic value
       const transformDependencies = dependencies.map((dp) => {
         return {
           id: dp.dependentTo,
@@ -200,6 +199,17 @@ const QuestionSkipLogic = ({ question }) => {
       setDependencies(defaultSkipLogic());
     }
   };
+
+  if (!dependentToQuestions?.length) {
+    return (
+      <Alert
+        message={UIText.infoNoDependentQuestionText}
+        type="info"
+        showIcon
+        style={{ marginBottom: 24 }}
+      />
+    );
+  }
 
   return (
     <Row gutter={[24, 24]}>

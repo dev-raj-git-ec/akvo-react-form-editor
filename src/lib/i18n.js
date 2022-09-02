@@ -43,6 +43,7 @@ const UIStaticText = {
     inputSelectTreeDropdownValueLabel: 'Select Nested List Value',
     deleteQuestionGroupError: 'Unable to delete question group',
     deleteQuestionError: 'Unable to delete question',
+    infoNoDependentQuestionText: 'No dependent questions',
   },
 };
 
