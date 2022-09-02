@@ -58,35 +58,52 @@ const QuestionSkipLogic = ({ question }) => {
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
   const { questionGroups } = questionGroupFn.store.useState((s) => s);
-
-  const [dependencies, setDependencies] = useState(
-    dependency?.length ? dependency : defaultSkipLogic()
-  );
+  const [dependencies, setDependencies] = useState([]);
   const [dependentTo, setDependentTo] = useState(null);
 
-  // useEffect(() => {
-  //   // add default skip logic value
-  //   questionGroupFn.store.update((s) => {
-  //     s.questionGroups = s.questionGroups.map((qg) => {
-  //       if (qg.id === questionGroupId) {
-  //         const questions = qg.questions.map((q) => {
-  //           if (q.id === id) {
-  //             return {
-  //               ...q,
-  //               skipLogic: defaultSkipLogic(),
-  //             };
-  //           }
-  //           return q;
-  //         });
-  //         return {
-  //           ...qg,
-  //           questions: questions,
-  //         };
-  //       }
-  //       return qg;
-  //     });
-  //   });
-  // }, []);
+  useEffect(() => {
+    const value = dependency?.length ? dependency : defaultSkipLogic();
+    setDependencies(value);
+    //#TODO:: transform dependency to match default skip logic format
+  }, []);
+
+  useEffect(() => {
+    const check = dependencies.filter(
+      (dp) =>
+        dp.dependentTo &&
+        dp.dependentLogic &&
+        (dp.dependentAnswer || dp.dependentAnswer?.length)
+    );
+    if (check.length) {
+      // add default skip logic value
+      const transformDependencies = dependencies.map((dp) => {
+        return {
+          id: dp.dependentTo,
+          [dp.dependentLogic]: dp.dependentAnswer,
+        };
+      });
+      questionGroupFn.store.update((s) => {
+        s.questionGroups = s.questionGroups.map((qg) => {
+          if (qg.id === questionGroupId) {
+            const questions = qg.questions.map((q) => {
+              if (q.id === id) {
+                return {
+                  ...q,
+                  dependency: transformDependencies,
+                };
+              }
+              return q;
+            });
+            return {
+              ...qg,
+              questions: questions,
+            };
+          }
+          return qg;
+        });
+      });
+    }
+  }, [dependencies]);
 
   const updateLocalState = (dependencyId, name, value) => {
     const updatedDependencies = dependencies.map((dependency) => {
