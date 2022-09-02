@@ -13,18 +13,6 @@ const dependencyTypes = [
         value: 'options',
       },
     ],
-    Component: ({ props, options = [] }) => (
-      <Select
-        className={styles['select-dropdown']}
-        getPopupContainer={(triggerNode) => triggerNode.parentElement}
-        mode="multiple"
-        showSearch
-        allowClear
-        showArrow
-        options={options}
-        {...props}
-      />
-    ),
   },
   {
     type: ['number'],
@@ -46,18 +34,8 @@ const dependencyTypes = [
         value: 'min',
       },
     ],
-    Component: ({ props }) => (
-      <InputNumber
-        style={{ width: '100%' }}
-        controls={false}
-        keyboard={false}
-        {...props}
-      />
-    ),
   },
 ];
-
-console.log();
 
 const defaultSkipLogic = () => {
   return [
@@ -118,6 +96,7 @@ const QuestionSkipLogic = ({ question }) => {
           [name]: value,
         };
       }
+      return dependency;
     });
     setDependencies(updatedDependencies);
   };
@@ -194,50 +173,16 @@ const QuestionSkipLogic = ({ question }) => {
   };
 
   const handleDeleteDependentTo = (dependencyId) => {
-    // questionGroupFn.store.update((s) => {
-    //   s.questionGroups = s.questionGroups.map((qg) => {
-    //     if (qg.id === questionGroupId) {
-    //       const questions = qg.questions.map((q) => {
-    //         if (q.id === id) {
-    //           let skipLogic = q.skipLogic.filter((sk) => sk.id !== skId);
-    //           if (!skipLogic.length) {
-    //             skipLogic = defaultSkipLogic();
-    //           }
-    //           return {
-    //             ...q,
-    //             skipLogic: skipLogic,
-    //           };
-    //         }
-    //         return q;
-    //       });
-    //       return {
-    //         ...qg,
-    //         questions: questions,
-    //       };
-    //     }
-    //     return qg;
-    //   });
-    // });
-  };
-
-  const DependencyAnswerComponent = ({ dependencyId }) => {
-    if (selectedDependencyQuestion) {
-      const Component = dependencyTypes.find((dt) =>
-        dt.type.includes(selectedDependencyQuestion.type)
-      ).Component;
-      return (
-        <Component
-          props={{
-            onChange: (e) => handleChangeDependentAnswer(dependencyId, e),
-          }}
-          options={dependencyAnswerOptions}
-        />
-      );
+    setDependentTo(null);
+    const updatedDependencies = dependencies.filter(
+      (dependency) => dependency.id !== dependencyId
+    );
+    if (updatedDependencies.length) {
+      setDependencies(updatedDependencies);
+    } else {
+      setDependencies(defaultSkipLogic());
     }
-    return <Input disabled />;
   };
-
-  console.log(DependencyAnswerComponent);
 
   return (
     <Row gutter={[24, 24]}>
@@ -303,7 +248,35 @@ const QuestionSkipLogic = ({ question }) => {
                 }
                 name={`${namePreffix}-dependent_answer-${dependency.id}`}
               >
-                <DependencyAnswerComponent dependencyId={dependency.id} />
+                {!selectedDependencyQuestion && <Input disabled />}
+                {selectedDependencyQuestion?.type === 'number' && (
+                  <InputNumber
+                    style={{ width: '100%' }}
+                    controls={false}
+                    keyboard={false}
+                    onChange={(e) =>
+                      handleChangeDependentAnswer(dependency.id, e)
+                    }
+                  />
+                )}
+                {['option', 'multiple_option'].includes(
+                  selectedDependencyQuestion?.type
+                ) && (
+                  <Select
+                    className={styles['select-dropdown']}
+                    options={dependencyAnswerOptions}
+                    getPopupContainer={(triggerNode) =>
+                      triggerNode.parentElement
+                    }
+                    onChange={(e) =>
+                      handleChangeDependentAnswer(dependency.id, e)
+                    }
+                    mode="multiple"
+                    showSearch
+                    allowClear
+                    showArrow
+                  />
+                )}
               </Form.Item>
             </Col>
           </Row>
