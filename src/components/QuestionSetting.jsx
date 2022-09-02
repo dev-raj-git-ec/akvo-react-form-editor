@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Input, Select, Checkbox } from 'antd';
+import { Form, Input, Select, Checkbox, Alert } from 'antd';
 import styles from '../styles.module.css';
 import { UIStore, questionType, questionGroupFn } from '../lib/store';
 import {
@@ -12,6 +12,7 @@ import {
 const QuestionSetting = ({ question }) => {
   const { id, name, type, variable, tooltip, required, questionGroupId } =
     question;
+  const { questionGroups } = questionGroupFn.store.useState((s) => s);
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
   const form = Form.useFormInstance();
@@ -60,8 +61,37 @@ const QuestionSetting = ({ question }) => {
     updateState('required', e?.target?.checked);
   };
 
+  const dependant = questionGroups
+    .map((qg) => {
+      const listDependant = qg.questions
+        .filter((q) => {
+          if (q?.dependency) {
+            return q.dependency.filter((qd) => qd.id === id);
+          }
+          return false;
+        })
+        .filter((d) => d);
+      return listDependant;
+    })
+    .flatMap((d) => d);
+
   return (
     <div>
+      {!!dependant.length && (
+        <Alert
+          message="Dependent Questions:"
+          description={
+            <ul>
+              {dependant.map((d, di) => (
+                <li key={di}>{d.name}</li>
+              ))}
+            </ul>
+          }
+          type="info"
+          style={{ marginBottom: '20px' }}
+          showIcon
+        />
+      )}
       <Form.Item
         label={UIText.inputQuestionNameLabel}
         initialValue={name}
@@ -84,6 +114,7 @@ const QuestionSetting = ({ question }) => {
           }))}
           getPopupContainer={(triggerNode) => triggerNode.parentElement}
           onChange={handleChangeType}
+          disabled={dependant.length}
         />
       </Form.Item>
       <Form.Item

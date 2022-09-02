@@ -65,7 +65,7 @@ const QuestionSkipLogic = ({ question }) => {
     const value = dependency?.length ? dependency : defaultSkipLogic();
     setDependencies(value);
     //#TODO:: transform dependency to match default skip logic format
-  }, []);
+  }, [dependency]);
 
   const updateGlobalStore = (dependencyValue, isDelete = false) => {
     questionGroupFn.store.update((s) => {
@@ -110,7 +110,7 @@ const QuestionSkipLogic = ({ question }) => {
       });
       updateGlobalStore(transformDependencies);
     }
-  }, [dependencies]);
+  }, [dependencies, id, questionGroupId]);
 
   const updateLocalState = (dependencyId, name, value) => {
     const updatedDependencies = dependencies.map((dependency) => {
