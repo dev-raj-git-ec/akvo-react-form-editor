@@ -67,6 +67,33 @@ const QuestionSkipLogic = ({ question }) => {
     //#TODO:: transform dependency to match default skip logic format
   }, []);
 
+  const updateGlobalStore = (dependencyValue, isDelete = false) => {
+    questionGroupFn.store.update((s) => {
+      s.questionGroups = s.questionGroups.map((qg) => {
+        if (qg.id === questionGroupId) {
+          const questions = qg.questions.map((q) => {
+            if (q.id === id && !isDelete) {
+              return {
+                ...q,
+                dependency: dependencyValue,
+              };
+            }
+            if (q.id === id && isDelete) {
+              q.dependency && delete q.dependency;
+              return q;
+            }
+            return q;
+          });
+          return {
+            ...qg,
+            questions: questions,
+          };
+        }
+        return qg;
+      });
+    });
+  };
+
   useEffect(() => {
     const check = dependencies.filter(
       (dp) =>
@@ -81,26 +108,7 @@ const QuestionSkipLogic = ({ question }) => {
           [dp.dependentLogic]: dp.dependentAnswer,
         };
       });
-      questionGroupFn.store.update((s) => {
-        s.questionGroups = s.questionGroups.map((qg) => {
-          if (qg.id === questionGroupId) {
-            const questions = qg.questions.map((q) => {
-              if (q.id === id) {
-                return {
-                  ...q,
-                  dependency: transformDependencies,
-                };
-              }
-              return q;
-            });
-            return {
-              ...qg,
-              questions: questions,
-            };
-          }
-          return qg;
-        });
-      });
+      updateGlobalStore(transformDependencies);
     }
   }, [dependencies]);
 
@@ -145,12 +153,12 @@ const QuestionSkipLogic = ({ question }) => {
   const selectedDependencyQuestion = useMemo(() => {
     if (dependentTo) {
       const question = questions.find((q) => q.id === dependentTo);
-      const findDependencyId = dependencies.find(
-        (dp) => dp.dependentTo === dependentTo
-      )?.id;
-      if (findDependencyId) {
-        updateLocalState(findDependencyId, 'dependentLogic', null);
-      }
+      // const findDependencyId = dependencies.find(
+      //   (dp) => dp.dependentTo === dependentTo
+      // )?.id;
+      // if (findDependencyId) {
+      //   updateLocalState(findDependencyId, 'dependentLogic', null);
+      // }
       return question;
     }
     return null;
@@ -198,6 +206,7 @@ const QuestionSkipLogic = ({ question }) => {
     } else {
       setDependencies(defaultSkipLogic());
     }
+    updateGlobalStore([], true);
   };
 
   if (!dependentToQuestions?.length) {
@@ -241,6 +250,7 @@ const QuestionSkipLogic = ({ question }) => {
               >
                 <CardExtraButton
                   type="delete-button"
+                  disabled={!dependentTo}
                   onClick={() => handleDeleteDependentTo(dependency.id)}
                 />
               </Col>
