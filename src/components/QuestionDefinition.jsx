@@ -177,17 +177,25 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
     });
   };
 
-  const extraButtons = [
-    {
-      type: 'edit-button',
-      isExpand: isEditQuestion,
-      onClick: handleEdit,
-      onCancel: handleCancelEdit,
-    },
+  const rightButtons = [
     {
       type: 'delete-button',
       onClick: handleDelete,
       disabled: !index && isLastItem,
+    },
+  ];
+
+  const leftButtons = [
+    {
+      type: 'move-button',
+      onClick: handleMove,
+      disabled: !index && isLastItem,
+    },
+    {
+      type: 'show-button',
+      isExpand: isEditQuestion,
+      onClick: handleEdit,
+      onCancel: handleCancelEdit,
     },
   ];
 
@@ -208,13 +216,21 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
       <Card
         key={`${index}-${id}`}
         title={
-          <CardTitle
-            title={`Q: ${name} | Order: ${order}`}
-            numbering={index + 1}
-            order={order - 1}
-            onMoveClick={handleMove}
-            disableMoveButton={!index && isLastItem}
-          />
+          <Space>
+            {leftButtons.map((cfg) => (
+              <CardExtraButton
+                key={`${cfg.type}-${id}`}
+                type={cfg.type}
+                isExpand={cfg.isExpand}
+                onClick={() => cfg.onClick()}
+                onCancel={() => cfg.onCancel()}
+                disabled={cfg?.disabled}
+              />
+            ))}
+            <div className="arfe-question-group-title">
+              {order}. {name}
+            </div>
+          </Space>
         }
         headStyle={{
           textAlign: 'left',
@@ -229,7 +245,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
         loading={false}
         extra={
           <Space>
-            {extraButtons.map((cfg) => (
+            {rightButtons.map((cfg) => (
               <CardExtraButton
                 key={`${cfg.type}-${id}`}
                 type={cfg.type}

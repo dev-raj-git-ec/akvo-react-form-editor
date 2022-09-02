@@ -25,23 +25,11 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
     return activeEditQuestionGroups.includes(id);
   }, [activeEditQuestionGroups, id]);
 
-  const handleShowQuestions = () => {
-    UIStore.update((s) => {
-      s.activeQuestionGroups = [...activeQuestionGroups, id];
-    });
-  };
-
   const handleHideQuestions = () => {
     UIStore.update((s) => {
       s.activeQuestionGroups = activeQuestionGroups.filter(
         (qgId) => qgId !== id
       );
-    });
-  };
-
-  const handleEditGroup = () => {
-    UIStore.update((s) => {
-      s.activeEditQuestionGroups = [...activeEditQuestionGroups, id];
     });
   };
 
@@ -51,6 +39,20 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
         (qgId) => qgId !== id
       );
     });
+  };
+
+  const handleShowQuestions = () => {
+    UIStore.update((s) => {
+      s.activeQuestionGroups = [...activeQuestionGroups, id];
+    });
+    handleCancelEditGroup();
+  };
+
+  const handleEditGroup = () => {
+    UIStore.update((s) => {
+      s.activeEditQuestionGroups = [...activeEditQuestionGroups, id];
+    });
+    handleHideQuestions();
   };
 
   const handleCancelMove = () => {
@@ -136,12 +138,11 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
     });
   };
 
-  const extraButtons = [
+  const leftButtons = [
     {
-      type: 'show-button',
-      isExpand: showQuestion,
-      onClick: handleShowQuestions,
-      onCancel: handleHideQuestions,
+      type: 'delete-button',
+      onClick: handleDelete,
+      disabled: !index && isLastItem,
     },
     {
       type: 'edit-button',
@@ -149,10 +150,20 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
       onClick: handleEditGroup,
       onCancel: handleCancelEditGroup,
     },
+  ];
+
+  const rightButtons = [
     {
-      type: 'delete-button',
-      onClick: handleDelete,
+      type: 'move-button',
+      onClick: handleMove,
+      onCancel: handleHideQuestions,
       disabled: !index && isLastItem,
+    },
+    {
+      type: 'show-button',
+      isExpand: showQuestion,
+      onClick: handleShowQuestions,
+      onCancel: handleHideQuestions,
     },
   ];
 
@@ -171,15 +182,21 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
       <Card
         key={`${index}-${id}`}
         title={
-          <CardTitle
-            title={
-              <div className="arfe-question-group-title">
-                {name} | Order: {order}
-              </div>
-            }
-            onMoveClick={handleMove}
-            disableMoveButton={!index && isLastItem}
-          />
+          <Space>
+            {rightButtons.map((cfg) => (
+              <CardExtraButton
+                key={`${cfg.type}-${id}`}
+                type={cfg.type}
+                isExpand={cfg.isExpand}
+                onClick={() => cfg.onClick()}
+                onCancel={() => cfg.onCancel()}
+                disabled={cfg?.disabled}
+              />
+            ))}
+            <div className="arfe-question-group-title">
+              {order}. {name}
+            </div>
+          </Space>
         }
         headStyle={{
           textAlign: 'left',
@@ -195,7 +212,7 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
         loading={false}
         extra={
           <Space>
-            {extraButtons.map((cfg) => (
+            {leftButtons.map((cfg) => (
               <CardExtraButton
                 key={`${cfg.type}-${id}`}
                 type={cfg.type}
