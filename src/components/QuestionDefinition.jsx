@@ -1,19 +1,13 @@
 import React, { useMemo, useState } from 'react';
-import { Card, Space, Tabs, Form } from 'antd';
+import { Card, Tabs } from 'antd';
 import styles from '../styles.module.css';
 import { UIStore, questionFn, questionGroupFn } from '../lib/store';
 import { QuestionSetting, QuestionSkipLogic } from '.';
-import {
-  AddMoveButton,
-  CardTitle,
-  CardExtraButton,
-  SaveButton,
-} from '../support';
+import { AddMoveButton, CardTitle, SaveButton } from '../support';
 import { orderBy } from 'lodash';
 
 const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
   const { questionGroups } = questionGroupFn.store.useState((s) => s);
-  const form = Form.useFormInstance();
   const { questions } = questionGroup;
   const UIText = UIStore.useState((s) => s.UIText);
   const { buttonAddNewQuestionText, buttonMoveQuestionText } = UIText;
@@ -216,21 +210,10 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
       <Card
         key={`${index}-${id}`}
         title={
-          <Space>
-            {leftButtons.map((cfg) => (
-              <CardExtraButton
-                key={`${cfg.type}-${id}`}
-                type={cfg.type}
-                isExpand={cfg.isExpand}
-                onClick={() => cfg.onClick()}
-                onCancel={() => cfg.onCancel()}
-                disabled={cfg?.disabled}
-              />
-            ))}
-            <div className="arfe-question-group-title">
-              {order}. {name}
-            </div>
-          </Space>
+          <CardTitle
+            title={`${order}. ${name}`}
+            buttons={leftButtons}
+          />
         }
         headStyle={{
           textAlign: 'left',
@@ -243,20 +226,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
           padding: isEditQuestion ? 24 : 0,
         }}
         loading={false}
-        extra={
-          <Space>
-            {rightButtons.map((cfg) => (
-              <CardExtraButton
-                key={`${cfg.type}-${id}`}
-                type={cfg.type}
-                isExpand={cfg.isExpand}
-                onClick={() => cfg.onClick()}
-                onCancel={() => cfg.onCancel()}
-                disabled={cfg?.disabled}
-              />
-            ))}
-          </Space>
-        }
+        extra={<CardTitle buttons={rightButtons} />}
       >
         {isEditQuestion && (
           <div>

@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
-import { Card, Space } from 'antd';
+import { Card } from 'antd';
 import { UIStore, questionGroupFn } from '../lib/store';
 import { QuestionGroupSetting, QuestionDefinition } from '.';
-import { AddMoveButton, CardTitle, CardExtraButton } from '../support';
+import { AddMoveButton, CardTitle } from '../support';
 import { orderBy } from 'lodash';
 
 const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
@@ -182,21 +182,10 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
       <Card
         key={`${index}-${id}`}
         title={
-          <Space>
-            {rightButtons.map((cfg) => (
-              <CardExtraButton
-                key={`${cfg.type}-${id}`}
-                type={cfg.type}
-                isExpand={cfg.isExpand}
-                onClick={() => cfg.onClick()}
-                onCancel={() => cfg.onCancel()}
-                disabled={cfg?.disabled}
-              />
-            ))}
-            <div className="arfe-question-group-title">
-              {order}. {name}
-            </div>
-          </Space>
+          <CardTitle
+            buttons={rightButtons}
+            title={`${order}. ${name}`}
+          />
         }
         headStyle={{
           textAlign: 'left',
@@ -210,20 +199,7 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
             isEditQuestionGroup || showQuestion ? '1px solid #f3f3f3' : 'none',
         }}
         loading={false}
-        extra={
-          <Space>
-            {leftButtons.map((cfg) => (
-              <CardExtraButton
-                key={`${cfg.type}-${id}`}
-                type={cfg.type}
-                isExpand={cfg.isExpand}
-                onClick={() => cfg.onClick()}
-                onCancel={() => cfg.onCancel()}
-                disabled={cfg?.disabled}
-              />
-            ))}
-          </Space>
-        }
+        extra={<CardTitle buttons={leftButtons} />}
       >
         {isEditQuestionGroup && (
           <div>
