@@ -119,9 +119,7 @@ const QuestionSkipLogic = ({ question }) => {
         value: operatorValues[key],
       }))
     );
-    setTimeout(() => {
-      updateState(skId, 'dependentTo', e);
-    }, 500);
+    updateState(skId, 'dependentTo', e);
   };
 
   const handleChangeDependentLogic = (skId, e) => {
@@ -132,7 +130,34 @@ const QuestionSkipLogic = ({ question }) => {
     updateState(skId, 'dependentAnswer', val);
   };
 
-  // ondelete function
+  const handleDeleteDependentTo = (skId) => {
+    questionGroupFn.store.update((s) => {
+      s.questionGroups = s.questionGroups.map((qg) => {
+        if (qg.id === questionGroupId) {
+          const questions = qg.questions.map((q) => {
+            if (q.id === id) {
+              let skipLogic = q.skipLogic.filter((sk) => sk.id !== skId);
+              if (!skipLogic.length) {
+                skipLogic = defaultSkipLogic();
+              }
+              return {
+                ...q,
+                skipLogic: skipLogic,
+              };
+            }
+            return q;
+          });
+          return {
+            ...qg,
+            questions: questions,
+          };
+        }
+        return qg;
+      });
+    });
+    setOperators([]);
+    setOptions([]);
+  };
 
   return (
     <Row gutter={[24, 24]}>
@@ -144,7 +169,7 @@ const QuestionSkipLogic = ({ question }) => {
           <Form.Item
             label={UIText.inputQuestionDependentToLabel}
             initialValue={sk.dependentTo || []}
-            name={`${namePreffix}-dependent_to`}
+            name={`${namePreffix}-dependent_to-${sk.id}`}
           >
             <Row
               align="middle"
@@ -178,7 +203,7 @@ const QuestionSkipLogic = ({ question }) => {
               <Form.Item
                 label={UIText.inputQuestionDependentLogicLabel}
                 initialValue={sk.dependentLogic || []}
-                name={`${namePreffix}-dependent_logic`}
+                name={`${namePreffix}-dependent_logic-${sk.id}`}
               >
                 <Select
                   className={styles['select-dropdown']}
@@ -191,8 +216,12 @@ const QuestionSkipLogic = ({ question }) => {
             <Col span={12}>
               <Form.Item
                 label={UIText.inputQuestionDependentAnswerLabel}
-                initialValue={sk.dependentAnswer}
-                name={`${namePreffix}-dependent_answer`}
+                initialValue={
+                  dependentTo?.type === 'number'
+                    ? sk.dependentAnswer
+                    : sk.dependentAnswer || []
+                }
+                name={`${namePreffix}-dependent_answer-${sk.id}`}
               >
                 {!dependentTo && <Input disabled />}
                 {dependentTo?.type === 'number' && (
