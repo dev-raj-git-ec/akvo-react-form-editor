@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Checkbox, Space, Row, Col, Input, Button } from 'antd';
 import styles from '../../styles.module.css';
-import { UIStore } from '../../lib/store';
+import { UIStore, questionGroupFn } from '../../lib/store';
 import {
   MdOutlineRemoveCircleOutline,
   MdOutlineAddCircleOutline,
@@ -39,17 +39,43 @@ const defaultOptions = ({ init = false, order = 0 }) => {
   };
 };
 
-const SettingOption = ({ id }) => {
+const SettingOption = ({ id, questionGroupId }) => {
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
   const [options, setOptions] = useState(defaultOptions({ init: true }));
+
+  useEffect(() => {
+    questionGroupFn.store.update((s) => {
+      s.questionGroups = s.questionGroups.map((qg) => {
+        if (qg.id === questionGroupId) {
+          const questions = qg.questions.map((q) => {
+            if (q.id === id) {
+              return {
+                ...q,
+                options: options,
+              };
+            }
+            return q;
+          });
+          return {
+            ...qg,
+            questions: questions,
+          };
+        }
+        return qg;
+      });
+    });
+  }, [options]);
 
   const handleOnChangeCode = (e, current) => {
     const { id: currentId } = current;
     setOptions(
       options.map((opt) => {
         if (opt.id === currentId) {
-          opt['code'] = e.target.value;
+          return {
+            ...opt,
+            code: e?.target?.value,
+          };
         }
         return opt;
       })
@@ -61,7 +87,10 @@ const SettingOption = ({ id }) => {
     setOptions(
       options.map((opt) => {
         if (opt.id === currentId) {
-          opt['name'] = e.target.value;
+          return {
+            ...opt,
+            name: e?.target?.value,
+          };
         }
         return opt;
       })

@@ -61,7 +61,7 @@ const defaultQuestion = ({
   if (type === questionType.option || type === questionType.multiple_option) {
     return {
       ...q,
-      option: [],
+      options: [],
       allowOther: false,
       ...params,
     };
