@@ -38,7 +38,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
         ...disabled,
         current:
           movingQDependency?.questionGroup?.order === questionGroup.order
-            ? movingQDependency.order <= order
+            ? movingQDependency.order >= order
             : true,
       };
       disabled = {
