@@ -3,6 +3,7 @@ import { Form, Select, Row, Col, InputNumber, Input, Alert } from 'antd';
 import styles from '../styles.module.css';
 import { CardExtraButton } from '../support';
 import { UIStore, questionGroupFn, generateId } from '../lib/store';
+import { useCallback } from 'react';
 
 const dependencyTypes = [
   {
@@ -48,6 +49,31 @@ const defaultSkipLogic = () => {
   ];
 };
 
+const transformDependencyValue = (dependency) => {
+  // transform dependency to match default skip logic format
+  const logicDropdowns = dependencyTypes
+    .flatMap((d) => d.logicDropdowns)
+    .map((x) => x.value);
+  const value = dependency.map((d) => {
+    let dependentLogic = null;
+    const dependentAnswer = logicDropdowns
+      .map((lg) => {
+        if (d?.[lg]) {
+          dependentLogic = lg;
+        }
+        return d?.[lg];
+      })
+      .filter((x) => x)?.[0];
+    return {
+      id: generateId(),
+      dependentTo: d.id,
+      dependentLogic: dependentLogic,
+      dependentAnswer: dependentAnswer,
+    };
+  });
+  return value;
+};
+
 const QuestionSkipLogic = ({ question }) => {
   const {
     id,
@@ -58,65 +84,42 @@ const QuestionSkipLogic = ({ question }) => {
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
   const { questionGroups } = questionGroupFn.store.useState((s) => s);
-  const [dependencies, setDependencies] = useState([]);
+  const [dependencies, setDependencies] = useState(
+    dependency?.length
+      ? transformDependencyValue(dependency)
+      : defaultSkipLogic()
+  );
   const [dependentTo, setDependentTo] = useState(null);
 
-  useEffect(() => {
-    let value = [];
-    if (dependency?.length) {
-      // transform dependency to match default skip logic format
-      const logicDropdowns = dependencyTypes
-        .flatMap((d) => d.logicDropdowns)
-        .map((x) => x.value);
-      value = dependency.map((d) => {
-        let dependentLogic = null;
-        const dependentAnswer = logicDropdowns
-          .map((lg) => {
-            if (d?.[lg]) {
-              dependentLogic = lg;
-            }
-            return d?.[lg];
-          })
-          .filter((x) => x)?.[0];
-        return {
-          id: generateId(),
-          dependentTo: d.id,
-          dependentLogic: dependentLogic,
-          dependentAnswer: dependentAnswer,
-        };
-      });
-    } else {
-      value = defaultSkipLogic();
-    }
-    setDependencies(value);
-  }, []);
-
-  const updateGlobalStore = (dependencyValue, isDelete = false) => {
-    questionGroupFn.store.update((s) => {
-      s.questionGroups = s.questionGroups.map((qg) => {
-        if (qg.id === questionGroupId) {
-          const questions = qg.questions.map((q) => {
-            if (q.id === id && !isDelete) {
-              return {
-                ...q,
-                dependency: dependencyValue,
-              };
-            }
-            if (q.id === id && isDelete) {
-              q.dependency && delete q.dependency;
+  const updateGlobalStore = useCallback(
+    (dependencyValue, isDelete = false) => {
+      questionGroupFn.store.update((s) => {
+        s.questionGroups = s.questionGroups.map((qg) => {
+          if (qg.id === questionGroupId) {
+            const questions = qg.questions.map((q) => {
+              if (q.id === id && !isDelete) {
+                return {
+                  ...q,
+                  dependency: dependencyValue,
+                };
+              }
+              if (q.id === id && isDelete) {
+                q.dependency && delete q.dependency;
+                return q;
+              }
               return q;
-            }
-            return q;
-          });
-          return {
-            ...qg,
-            questions: questions,
-          };
-        }
-        return qg;
+            });
+            return {
+              ...qg,
+              questions: questions,
+            };
+          }
+          return qg;
+        });
       });
-    });
-  };
+    },
+    [id, questionGroupId]
+  );
 
   useEffect(() => {
     // add dependency to global store if all dependency value defined
@@ -137,7 +140,7 @@ const QuestionSkipLogic = ({ question }) => {
       });
       updateGlobalStore(transformDependencies);
     }
-  }, [dependencies, id, questionGroupId]);
+  }, [dependencies, id, questionGroupId, updateGlobalStore]);
 
   const updateLocalState = (dependencyId, name, value) => {
     const updatedDependencies = dependencies.map((dependency) => {
@@ -154,7 +157,7 @@ const QuestionSkipLogic = ({ question }) => {
 
   const currentQuestionGroupOrder = useMemo(() => {
     return questionGroups.find((qg) => qg.id === questionGroupId)?.order;
-  }, [questionGroups]);
+  }, [questionGroups, questionGroupId]);
 
   const questions = useMemo(() => {
     return questionGroups
@@ -166,7 +169,12 @@ const QuestionSkipLogic = ({ question }) => {
             q.order < currentQuestionOrder) ||
           q.questionGroupId !== questionGroupId
       ); // filter by question order
-  }, [questionGroups]);
+  }, [
+    questionGroups,
+    currentQuestionGroupOrder,
+    currentQuestionOrder,
+    questionGroupId,
+  ]);
 
   const dependentToQuestions = useMemo(() => {
     return questions
@@ -178,14 +186,17 @@ const QuestionSkipLogic = ({ question }) => {
   }, [questions]);
 
   const selectedDependencyQuestion = useMemo(() => {
-    if (dependentTo) {
-      const question = questions.find((q) => q.id === dependentTo);
+    if (dependentTo?.id) {
+      const question = questions.find((q) => q.id === dependentTo.id);
+      // delete logic if dependent to question type changed
       // const findDependencyId = dependencies.find(
-      //   (dp) => dp.dependentTo === dependentTo
+      //   (dp) =>
+      //     dp.dependentTo === dependentTo.id &&
+      //     question.type !== dependentTo?.type
       // )?.id;
       // if (findDependencyId) {
-      //   updateLocalState(findDependencyId, 'dependentLogic', []);
-      //   console.log(dependencies);
+      //   console.log(findDependencyId);
+      //   updateLocalState(findDependencyId, 'dependentLogic', null);
       // }
       return question;
     }
@@ -212,7 +223,8 @@ const QuestionSkipLogic = ({ question }) => {
   }, [selectedDependencyQuestion]);
 
   const handleChangeDependentTo = (dependencyId, e) => {
-    setDependentTo(e);
+    const question = questions.find((q) => q.id === e);
+    setDependentTo(question);
     updateLocalState(dependencyId, 'dependentTo', e);
   };
 
