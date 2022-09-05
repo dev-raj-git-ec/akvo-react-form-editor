@@ -63,17 +63,13 @@ const QuestionSetting = ({ question }) => {
 
   const dependant = questionGroups
     .map((qg) => {
-      const listDependant = qg.questions
-        .filter((q) => {
-          if (q?.dependency) {
-            return q.dependency.filter((qd) => qd.id === id);
-          }
-          return false;
-        })
-        .filter((d) => d);
-      return listDependant;
+      return qg.questions;
     })
-    .flatMap((d) => d);
+    .flatMap((x) => x)
+    .filter((q) => q?.dependency?.filter((d) => d.id === id).length || false)
+    .flatMap((q) => q);
+
+  console.log(dependant);
 
   return (
     <div>
