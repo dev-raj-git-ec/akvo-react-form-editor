@@ -69,8 +69,6 @@ const QuestionSetting = ({ question }) => {
     .filter((q) => q?.dependency?.filter((d) => d.id === id).length || false)
     .flatMap((q) => q);
 
-  console.log(dependant);
-
   return (
     <div>
       {!!dependant.length && (
