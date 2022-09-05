@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 #shellcheck disable=SC2039
 
+set -exuo pipefail
+
 IMAGE_CACHE_LIST=$(grep image ./docker-compose.yml \
     | sort -u | sed 's/image\://g' \
     | sed 's/^ *//g')
