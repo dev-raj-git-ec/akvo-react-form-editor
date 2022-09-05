@@ -5,7 +5,7 @@ import { UIStore, questionFn, questionGroupFn } from '../lib/store';
 import QuestionSetting from './QuestionSetting';
 import QuestionSkipLogic from './QuestionSkipLogic';
 import { AddMoveButton, CardTitle, SaveButton } from '../support';
-import { orderBy } from 'lodash';
+import { orderBy, maxBy } from 'lodash';
 
 const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
   const { questionGroups } = questionGroupFn.store.useState((s) => s);
@@ -17,11 +17,33 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
   const [activeTab, setActiveTab] = useState('setting');
   const { id, questionGroupId, order, name } = question;
 
-  const dependant = questionGroups
-    .map((qg) => qg.questions)
-    .flatMap((x) => x)
-    .filter((q) => q?.dependency?.filter((d) => d.id === id).length || false)
-    .flatMap((q) => q);
+  const dependant = useMemo(() => {
+    const allQ = questionGroups
+      .map((qg) => qg.questions)
+      .flatMap((x) => x)
+      .map((q) => ({
+        ...q,
+        questionGroup: questionGroups.find((qg) => q.questionGroupId === qg.id),
+      }));
+    const dependant = allQ.filter(
+      (q) => q?.dependency?.filter((d) => d.id === id).length || false
+    );
+    const movingQDependency = maxBy(
+      movingQ?.dependency?.map((q) => allQ.find((a) => a.id === q.id)),
+      'questionGroup.order'
+    );
+    let disabled = false;
+    if (movingQDependency?.order >= questionGroup?.order) {
+      disabled =
+        movingQDependency.order === questionGroup.order
+          ? movingQDependency.order <= order
+          : true;
+    }
+    return {
+      disabled: disabled,
+      dependant: dependant,
+    };
+  }, [id, order, questionGroup, questionGroups, movingQ]);
 
   const isEditQuestion = useMemo(() => {
     return activeEditQuestions.includes(id);
@@ -182,7 +204,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
     {
       type: 'delete-button',
       onClick: handleDelete,
-      disabled: (!index && isLastItem) || dependant,
+      disabled: (!index && isLastItem) || dependant.dependant.length,
     },
   ];
 
@@ -263,7 +285,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
             {activeTab === 'setting' && (
               <QuestionSetting
                 question={question}
-                dependant={dependant}
+                dependant={dependant.dependant}
               />
             )}
             {activeTab === 'skip-logic' && (
