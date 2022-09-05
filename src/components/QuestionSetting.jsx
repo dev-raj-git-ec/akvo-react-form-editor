@@ -9,10 +9,9 @@ import {
   SettingOption,
 } from './question-type';
 
-const QuestionSetting = ({ question }) => {
+const QuestionSetting = ({ question, dependant }) => {
   const { id, name, type, variable, tooltip, required, questionGroupId } =
     question;
-  const { questionGroups } = questionGroupFn.store.useState((s) => s);
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
   const form = Form.useFormInstance();
@@ -60,20 +59,6 @@ const QuestionSetting = ({ question }) => {
   const handleChangeRequired = (e) => {
     updateState('required', e?.target?.checked);
   };
-
-  const dependant = questionGroups
-    .map((qg) => {
-      const listDependant = qg.questions
-        .filter((q) => {
-          if (q?.dependency) {
-            return q.dependency.filter((qd) => qd.id === id);
-          }
-          return false;
-        })
-        .filter((d) => d);
-      return listDependant;
-    })
-    .flatMap((d) => d);
 
   return (
     <div>
