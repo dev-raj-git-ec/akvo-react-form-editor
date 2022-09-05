@@ -62,10 +62,34 @@ const QuestionSkipLogic = ({ question }) => {
   const [dependentTo, setDependentTo] = useState(null);
 
   useEffect(() => {
-    const value = dependency?.length ? dependency : defaultSkipLogic();
+    let value = [];
+    if (dependency?.length) {
+      // transform dependency to match default skip logic format
+      const logicDropdowns = dependencyTypes
+        .flatMap((d) => d.logicDropdowns)
+        .map((x) => x.value);
+      value = dependency.map((d) => {
+        let dependentLogic = null;
+        const dependentAnswer = logicDropdowns
+          .map((lg) => {
+            if (d?.[lg]) {
+              dependentLogic = lg;
+            }
+            return d?.[lg];
+          })
+          .filter((x) => x)?.[0];
+        return {
+          id: generateId(),
+          dependentTo: d.id,
+          dependentLogic: dependentLogic,
+          dependentAnswer: dependentAnswer,
+        };
+      });
+    } else {
+      value = defaultSkipLogic();
+    }
     setDependencies(value);
-    //#TODO:: transform dependency to match default skip logic format
-  }, [dependency]);
+  }, []);
 
   const updateGlobalStore = (dependencyValue, isDelete = false) => {
     questionGroupFn.store.update((s) => {
