@@ -90,6 +90,7 @@ const QuestionSkipLogic = ({ question }) => {
       : defaultSkipLogic()
   );
   const [dependentTo, setDependentTo] = useState(null);
+  const form = Form.useFormInstance();
 
   const updateGlobalStore = useCallback(
     (dependencyValue, isDelete = false) => {
@@ -176,6 +177,7 @@ const QuestionSkipLogic = ({ question }) => {
     questionGroupId,
   ]);
 
+  // dependency question dropdown value
   const dependentToQuestions = useMemo(() => {
     return questions
       .filter((q) => dependencyTypes.flatMap((dt) => dt.type).includes(q.type))
@@ -188,16 +190,6 @@ const QuestionSkipLogic = ({ question }) => {
   const selectedDependencyQuestion = useMemo(() => {
     if (dependentTo?.id) {
       const question = questions.find((q) => q.id === dependentTo.id);
-      // delete logic if dependent to question type changed
-      // const findDependencyId = dependencies.find(
-      //   (dp) =>
-      //     dp.dependentTo === dependentTo.id &&
-      //     question.type !== dependentTo?.type
-      // )?.id;
-      // if (findDependencyId) {
-      //   console.log(findDependencyId);
-      //   updateLocalState(findDependencyId, 'dependentLogic', null);
-      // }
       return question;
     }
     return null;
@@ -205,9 +197,10 @@ const QuestionSkipLogic = ({ question }) => {
 
   const dependecyLogicDropdownValue = useMemo(() => {
     if (selectedDependencyQuestion) {
-      return dependencyTypes.find((dt) =>
+      const value = dependencyTypes.find((dt) =>
         dt.type.includes(selectedDependencyQuestion.type)
-      ).logicDropdowns;
+      )?.logicDropdowns;
+      return value || [];
     }
     return [];
   }, [selectedDependencyQuestion]);
@@ -221,6 +214,28 @@ const QuestionSkipLogic = ({ question }) => {
     }
     return [];
   }, [selectedDependencyQuestion]);
+
+  useEffect(() => {
+    // delete logic if dependentTo question type changed
+    if (dependencies.length && dependentTo?.id) {
+      const findDependencyId = dependencies.find(
+        (dp) =>
+          dp.dependentTo === dependentTo.id &&
+          selectedDependencyQuestion.type !== dependentTo?.type
+      )?.id;
+      if (findDependencyId) {
+        form.setFieldsValue({
+          [`${namePreffix}-dependent_logic-${findDependencyId}`]: null,
+        });
+      }
+    }
+  }, [
+    dependencies,
+    selectedDependencyQuestion,
+    dependentTo,
+    form,
+    namePreffix,
+  ]);
 
   const handleChangeDependentTo = (dependencyId, e) => {
     const question = questions.find((q) => q.id === e);
