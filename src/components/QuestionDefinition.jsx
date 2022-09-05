@@ -5,7 +5,7 @@ import { UIStore, questionFn, questionGroupFn } from '../lib/store';
 import QuestionSetting from './QuestionSetting';
 import QuestionSkipLogic from './QuestionSkipLogic';
 import { AddMoveButton, CardTitle, SaveButton } from '../support';
-import { orderBy, maxBy } from 'lodash';
+import { orderBy, maxBy, minBy } from 'lodash';
 
 const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
   const { questionGroups } = questionGroupFn.store.useState((s) => s);
@@ -28,11 +28,13 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
     const dependant = allQ.filter(
       (q) => q?.dependency?.filter((d) => d.id === id).length || false
     );
+
+    let disabled = { current: false, last: false };
+
     const movingQDependency = maxBy(
       movingQ?.dependency?.map((q) => allQ.find((a) => a.id === q.id)),
       'questionGroup.order'
     );
-    let disabled = { current: false, last: false };
     if (movingQDependency?.questionGroup?.order >= questionGroup?.order) {
       disabled = {
         ...disabled,
@@ -46,6 +48,29 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
         last:
           movingQDependency?.questionGroup?.order === questionGroup.order
             ? movingQDependency.order >= order + 1
+            : true,
+      };
+    }
+    const movingQDependant = minBy(
+      allQ.filter(
+        (q) =>
+          q?.dependency?.filter((d) => d.id === movingQ?.id).length || false
+      ),
+      'questionGroup.order'
+    );
+    if (movingQDependant?.questionGroup?.order <= questionGroup?.order) {
+      disabled = {
+        ...disabled,
+        current:
+          movingQDependant?.questionGroup?.order === questionGroup.order
+            ? movingQDependant.order <= order - 1
+            : true,
+      };
+      disabled = {
+        ...disabled,
+        last:
+          movingQDependant?.questionGroup?.order === questionGroup.order
+            ? movingQDependant.order <= order
             : true,
       };
     }
