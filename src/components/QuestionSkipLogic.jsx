@@ -19,10 +19,6 @@ const dependencyTypes = [
     type: ['number'],
     logicDropdowns: [
       {
-        label: 'equal',
-        value: 'equal',
-      },
-      {
         label: 'not equal',
         value: 'notEqual',
       },
