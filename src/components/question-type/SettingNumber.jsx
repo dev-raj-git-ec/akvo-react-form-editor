@@ -1,11 +1,55 @@
 import React from 'react';
 import { Form, Checkbox, Space, InputNumber, Row, Col } from 'antd';
 import styles from '../../styles.module.css';
-import { UIStore } from '../../lib/store';
+import { UIStore, questionGroupFn } from '../../lib/store';
 
-const SettingNumber = ({ id }) => {
+const SettingNumber = ({
+  id,
+  questionGroupId,
+  allowDecimal,
+  min,
+  max,
+  equal,
+}) => {
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
+
+  const moreNumberSettings = [
+    { label: UIText.inputQuestionMinimumValue, value: min, key: 'min' },
+    { label: UIText.inputQuestionMaximumValue, value: max, key: 'max' },
+    { label: UIText.inputQuestionEqualValue, value: equal, key: 'equal' },
+  ];
+
+  const updateState = (name, value) => {
+    questionGroupFn.store.update((s) => {
+      s.questionGroups = s.questionGroups.map((qg) => {
+        if (qg.id === questionGroupId) {
+          const questions = qg.questions.map((q) => {
+            if (q.id === id) {
+              return {
+                ...q,
+                [name]: value,
+              };
+            }
+            return q;
+          });
+          return {
+            ...qg,
+            questions: questions,
+          };
+        }
+        return qg;
+      });
+    });
+  };
+
+  const handleChangeAllowDecimal = (e) => {
+    updateState('allowDecimal', e?.target?.checked);
+  };
+
+  const handleChangeMinMaxEqual = (key, e) => {
+    updateState(key, e);
+  };
 
   return (
     <div>
@@ -14,10 +58,13 @@ const SettingNumber = ({ id }) => {
       </p>
       <Space className={styles['space-align-left']}>
         <Form.Item
-          initialValue={false}
+          initialValue={allowDecimal}
           name={`${namePreffix}-allow_decimal`}
         >
-          <Checkbox> {UIText.inputQuestionAllowDecimalCheckbox}</Checkbox>
+          <Checkbox onChange={handleChangeAllowDecimal}>
+            {' '}
+            {UIText.inputQuestionAllowDecimalCheckbox}
+          </Checkbox>
         </Form.Item>
       </Space>
       <Row
@@ -25,45 +72,25 @@ const SettingNumber = ({ id }) => {
         justify="space-between"
         gutter={[12, 12]}
       >
-        <Col span={8}>
-          <Form.Item
-            label="Minimum Value"
-            initialValue={''}
-            name={`${namePreffix}-min`}
+        {moreNumberSettings.map((x) => (
+          <Col
+            key={`${namePreffix}-${x.key}`}
+            span={8}
           >
-            <InputNumber
-              style={{ width: '100%' }}
-              controls={false}
-              keyboard={false}
-            />
-          </Form.Item>
-        </Col>
-        <Col span={8}>
-          <Form.Item
-            label="Maximum Value"
-            initialValue={''}
-            name={`${namePreffix}-max`}
-          >
-            <InputNumber
-              style={{ width: '100%' }}
-              controls={false}
-              keyboard={false}
-            />
-          </Form.Item>
-        </Col>
-        <Col span={8}>
-          <Form.Item
-            label="Equal Value"
-            initialValue={''}
-            name={`${namePreffix}-equal`}
-          >
-            <InputNumber
-              style={{ width: '100%' }}
-              controls={false}
-              keyboard={false}
-            />
-          </Form.Item>
-        </Col>
+            <Form.Item
+              label={x.label}
+              initialValue={x.value}
+              name={`${namePreffix}-${x.key}`}
+            >
+              <InputNumber
+                style={{ width: '100%' }}
+                controls={false}
+                keyboard={false}
+                onChange={(e) => handleChangeMinMaxEqual(x.key, e)}
+              />
+            </Form.Item>
+          </Col>
+        ))}
       </Row>
     </div>
   );
