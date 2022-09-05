@@ -53,7 +53,7 @@ const QuestionSetting = ({ question, dependant }) => {
   };
 
   const handleChangeTooltip = (e) => {
-    updateState('tooltip', e);
+    updateState('tooltip', e?.target?.value);
   };
 
   const handleChangeRequired = (e) => {
