@@ -17,8 +17,8 @@ done <<< "${IMAGE_CACHE_LIST}"
 docker run --rm \
        --volume "$(pwd):/home/akvo-react-form-editor" \
        --workdir "/home/akvo-react-form-editor" \
-       --entrypoint /bin/sh \
-       node:17.3.0-alpine3.15 -c './build.sh'
+       --entrypoint /bin/bash \
+       akvo/akvo-node-17-alpine:20220121.024749.f30b815 -c './build.sh'
 
 if [[ "${CI_BRANCH}" != "main" ]]; then
 docker run -it --rm \
