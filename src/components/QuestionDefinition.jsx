@@ -260,7 +260,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
             )}
             <div>
               <SaveButton
-                onClickSave={() => console.log(question)}
+                onClickSave={() => console.info(question)}
                 onClickCancel={handleCancelEdit}
               />
             </div>

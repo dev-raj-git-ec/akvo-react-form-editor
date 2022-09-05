@@ -63,6 +63,7 @@ const QuestionGroupSetting = ({ id, name, description, repeatable }) => {
       <Form.Item
         name={`${namePreffix}-repeatable`}
         className={styles['input-checkbox-wrapper']}
+        initialValue={repeatable}
       >
         <Checkbox onChange={handleChangeRepeatable}>
           {' '}

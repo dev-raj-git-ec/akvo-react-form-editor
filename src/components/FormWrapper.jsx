@@ -4,15 +4,15 @@ import { Form } from 'antd';
 const FormWrapper = ({ children }) => {
   const [form] = Form.useForm();
 
-  const handleOnValuesChange = (changedValues, allValues) => {
+  const handleOnValuesChange = () => {
     // console.log(changedValues, allValues);
   };
 
-  const handleOnFinish = (values) => {
+  const handleOnFinish = () => {
     // console.log(values);
   };
 
-  const handleOnFinishFailed = ({ values, errorFields, outOfDate }) => {
+  const handleOnFinishFailed = () => {
     // console.log(values, errorFields, outOfDate);
   };
 

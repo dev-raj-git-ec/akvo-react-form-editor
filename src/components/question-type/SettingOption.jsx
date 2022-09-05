@@ -65,7 +65,7 @@ const SettingOption = ({ id, questionGroupId, allowOther }) => {
         return qg;
       });
     });
-  }, [options]);
+  }, [options, id, questionGroupId]);
 
   const handleOnChangeCode = (e, current) => {
     const { id: currentId } = current;
