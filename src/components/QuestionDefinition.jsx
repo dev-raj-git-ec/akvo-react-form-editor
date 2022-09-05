@@ -17,6 +17,12 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
   const [activeTab, setActiveTab] = useState('setting');
   const { id, questionGroupId, order, name } = question;
 
+  const dependant = questionGroups
+    .map((qg) => qg.questions)
+    .flatMap((x) => x)
+    .filter((q) => q?.dependency?.filter((d) => d.id === id).length || false)
+    .flatMap((q) => q);
+
   const isEditQuestion = useMemo(() => {
     return activeEditQuestions.includes(id);
   }, [activeEditQuestions, id]);
@@ -176,7 +182,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
     {
       type: 'delete-button',
       onClick: handleDelete,
-      disabled: !index && isLastItem,
+      disabled: (!index && isLastItem) || dependant,
     },
   ];
 
@@ -254,7 +260,12 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
                 key="translation"
               /> */}
             </Tabs>
-            {activeTab === 'setting' && <QuestionSetting question={question} />}
+            {activeTab === 'setting' && (
+              <QuestionSetting
+                question={question}
+                dependant={dependant}
+              />
+            )}
             {activeTab === 'skip-logic' && (
               <QuestionSkipLogic question={question} />
             )}
