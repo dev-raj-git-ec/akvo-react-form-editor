@@ -119,11 +119,14 @@ const QuestionSkipLogic = ({ question }) => {
   };
 
   useEffect(() => {
+    // add dependency to global store if all dependency value defined
     const check = dependencies.filter(
       (dp) =>
         dp.dependentTo &&
         dp.dependentLogic &&
-        (dp.dependentAnswer || dp.dependentAnswer?.length)
+        (Array.isArray(dp.dependentAnswer)
+          ? dp.dependentAnswer.length
+          : dp.dependentAnswer)
     );
     if (check.length) {
       const transformDependencies = dependencies.map((dp) => {
@@ -181,14 +184,15 @@ const QuestionSkipLogic = ({ question }) => {
       //   (dp) => dp.dependentTo === dependentTo
       // )?.id;
       // if (findDependencyId) {
-      //   updateLocalState(findDependencyId, 'dependentLogic', null);
+      //   updateLocalState(findDependencyId, 'dependentLogic', []);
+      //   console.log(dependencies);
       // }
       return question;
     }
     return null;
   }, [dependentTo, questions]);
 
-  const dependecyLogics = useMemo(() => {
+  const dependecyLogicDropdownValue = useMemo(() => {
     if (selectedDependencyQuestion) {
       return dependencyTypes.find((dt) =>
         dt.type.includes(selectedDependencyQuestion.type)
@@ -197,7 +201,7 @@ const QuestionSkipLogic = ({ question }) => {
     return [];
   }, [selectedDependencyQuestion]);
 
-  const dependencyAnswerOptions = useMemo(() => {
+  const dependencyAnswerDropdownValue = useMemo(() => {
     if (selectedDependencyQuestion && selectedDependencyQuestion?.options) {
       return selectedDependencyQuestion.options.map((opt) => ({
         label: opt.name,
@@ -218,6 +222,11 @@ const QuestionSkipLogic = ({ question }) => {
 
   const handleChangeDependentAnswer = (dependencyId, val) => {
     updateLocalState(dependencyId, 'dependentAnswer', val);
+    // handle when answer value empty
+    if (dependency?.length && (!val || !val?.length)) {
+      // delete dependency from global store
+      updateGlobalStore([], true);
+    }
   };
 
   const handleDeleteDependentTo = (dependencyId) => {
@@ -293,7 +302,7 @@ const QuestionSkipLogic = ({ question }) => {
               >
                 <Select
                   className={styles['select-dropdown']}
-                  options={dependecyLogics}
+                  options={dependecyLogicDropdownValue}
                   getPopupContainer={(triggerNode) => triggerNode.parentElement}
                   onChange={(e) => handleChangeDependentLogic(dependency.id, e)}
                 />
@@ -325,7 +334,7 @@ const QuestionSkipLogic = ({ question }) => {
                 ) && (
                   <Select
                     className={styles['select-dropdown']}
-                    options={dependencyAnswerOptions}
+                    options={dependencyAnswerDropdownValue}
                     getPopupContainer={(triggerNode) =>
                       triggerNode.parentElement
                     }
