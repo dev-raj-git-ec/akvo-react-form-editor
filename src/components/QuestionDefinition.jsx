@@ -32,12 +32,22 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
       movingQ?.dependency?.map((q) => allQ.find((a) => a.id === q.id)),
       'questionGroup.order'
     );
-    let disabled = false;
-    if (movingQDependency?.order >= questionGroup?.order) {
-      disabled =
-        movingQDependency.order === questionGroup.order
-          ? movingQDependency.order <= order
-          : true;
+    let disabled = { current: false, last: false };
+    if (movingQDependency?.questionGroup?.order >= questionGroup?.order) {
+      disabled = {
+        ...disabled,
+        current:
+          movingQDependency?.questionGroup?.order === questionGroup.order
+            ? movingQDependency.order <= order
+            : true,
+      };
+      disabled = {
+        ...disabled,
+        last:
+          movingQDependency?.questionGroup?.order === questionGroup.order
+            ? movingQDependency.order >= order + 1
+            : true,
+      };
     }
     return {
       disabled: disabled,
@@ -229,7 +239,8 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
         disabled={
           movingQ === question ||
           (movingQ?.order + 1 === order &&
-            movingQ?.questionGroupId === questionGroupId)
+            movingQ?.questionGroupId === questionGroupId) ||
+          dependant.disabled.current
         }
         handleCancelMove={handleCancelMove}
         movingItem={movingQ}
@@ -303,7 +314,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
       {isLastItem && (
         <AddMoveButton
           text={movingQ ? buttonMoveQuestionText : buttonAddNewQuestionText}
-          disabled={movingQ === question}
+          disabled={movingQ === question || dependant.disabled.last}
           movingItem={movingQ}
           handleCancelMove={handleCancelMove}
           handleOnAdd={() => handleOnAdd(order, true)}
