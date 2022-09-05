@@ -37,9 +37,9 @@ const UIStaticText = {
     inputQuestionHiddenStringCheckbox: 'Hidden String/Password',
     questionMoreInputNumberSettingText: 'More Number Question Setting',
     inputQuestionAllowDecimalCheckbox: 'Allow Decimal',
-    inputQuestionMinimumValue: 'Minimum Value',
-    inputQuestionMaximumValue: 'Maximum Value',
-    inputQuestionEqualValue: 'Equal Value',
+    inputQuestionMinimumValueLabel: 'Minimum Value',
+    inputQuestionMaximumValueLabel: 'Maximum Value',
+    inputQuestionEqualValueLabel: 'Equal Value',
     questionMoreOptionTypeSettingText: 'More Option Question Setting',
     inputQuestionAllowOtherCheckbox: 'Allow Other',
     questionMoreTreeSettingText: 'More Nested List Question Setting',
@@ -47,6 +47,10 @@ const UIStaticText = {
     deleteQuestionGroupError: 'Unable to delete question group',
     deleteQuestionError: 'Unable to delete question',
     infoNoDependentQuestionText: 'No dependent questions',
+    questionMoreCascadeSettingText: 'More Cascade Question Setting',
+    inputQuestionEndpointLabel: 'Cascade Endpoint',
+    inputQuestionInitialValueLabel: 'Initial Value',
+    inputQuestionListCheckbox: 'List',
   },
 };
 

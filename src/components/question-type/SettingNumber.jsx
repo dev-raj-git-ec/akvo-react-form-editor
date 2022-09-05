@@ -15,9 +15,9 @@ const SettingNumber = ({
   const UIText = UIStore.useState((s) => s.UIText);
 
   const moreNumberSettings = [
-    { label: UIText.inputQuestionMinimumValue, value: min, key: 'min' },
-    { label: UIText.inputQuestionMaximumValue, value: max, key: 'max' },
-    { label: UIText.inputQuestionEqualValue, value: equal, key: 'equal' },
+    { label: UIText.inputQuestionMinimumValueLabel, value: min, key: 'min' },
+    { label: UIText.inputQuestionMaximumValueLabel, value: max, key: 'max' },
+    { label: UIText.inputQuestionEqualValueLabel, value: equal, key: 'equal' },
   ];
 
   const updateState = (name, value) => {

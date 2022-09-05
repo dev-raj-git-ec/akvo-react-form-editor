@@ -7,6 +7,7 @@ import {
   SettingTree,
   SettingNumber,
   SettingOption,
+  SettingCascade,
 } from './question-type';
 
 const QuestionSetting = ({ question, dependant }) => {
@@ -132,6 +133,7 @@ const QuestionSetting = ({ question, dependant }) => {
         <SettingOption {...question} />
       )}
       {qType === 'tree' && <SettingTree {...question} />}
+      {qType === 'cascade' && <SettingCascade {...question} />}
     </div>
   );
 };
