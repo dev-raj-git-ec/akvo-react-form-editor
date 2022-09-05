@@ -5,7 +5,7 @@ import '@testing-library/jest-dom';
 describe('App', () => {
   test('test if element exists', () => {
     render(<WebformEditor />);
-    const expectedText = screen.getByText(/Webform Component/i);
+    const expectedText = screen.getByText(/Form Name/i);
     expect(expectedText).toBeInTheDocument();
   });
 });
