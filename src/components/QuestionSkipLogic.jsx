@@ -43,11 +43,8 @@ const defaultSkipLogic = () => {
     {
       id: generateId(),
       dependentTo: null,
-      dependentToType: null,
       dependentLogic: null,
       dependentAnswer: null,
-      dependencyLogicDropdownValue: [],
-      dependencyAnswerDropdownValue: [],
     },
   ];
 };
@@ -101,6 +98,12 @@ const SettingSkipLogic = ({
 
   const updateGlobalStore = useCallback(
     (dependencyValue, isDelete = false) => {
+      const transformDependencies = dependencyValue.map((dp) => {
+        return {
+          id: dp.dependentTo,
+          [dp.dependentLogic]: dp.dependentAnswer,
+        };
+      });
       questionGroupFn.store.update((s) => {
         s.questionGroups = s.questionGroups.map((qg) => {
           if (qg.id === questionGroupId) {
@@ -108,12 +111,18 @@ const SettingSkipLogic = ({
               if (q.id === id && !isDelete) {
                 return {
                   ...q,
-                  dependency: dependencyValue,
+                  dependency: transformDependencies,
                 };
               }
               if (q.id === id && isDelete) {
-                q.dependency && delete q.dependency;
-                return q;
+                if (!transformDependencies.length) {
+                  q.dependency && delete q.dependency;
+                  return q;
+                }
+                return {
+                  ...q,
+                  dependency: transformDependencies,
+                };
               }
               return q;
             });
@@ -140,13 +149,7 @@ const SettingSkipLogic = ({
           : dp.dependentAnswer)
     );
     if (check.length) {
-      const transformDependencies = dependencies.map((dp) => {
-        return {
-          id: dp.dependentTo,
-          [dp.dependentLogic]: dp.dependentAnswer,
-        };
-      });
-      updateGlobalStore(transformDependencies);
+      updateGlobalStore(dependencies);
     }
   }, [dependencies, id, questionGroupId, updateGlobalStore]);
 
@@ -229,27 +232,33 @@ const SettingSkipLogic = ({
     // handle when answer value empty
     if (dependency?.length && (!val || !val?.length)) {
       // delete dependency from global store
-      updateGlobalStore([], true);
+      const updatedDependencies = dependencies.filter(
+        (dependency) => dependency.id !== dependencyId
+      );
+      updateGlobalStore(updatedDependencies, true);
     }
   };
 
   const handleAddMoreDependency = () => {
-    const newDependencies = [...dependencies, defaultSkipLogic()];
+    const newDependencies = [...dependencies, ...defaultSkipLogic()];
     setDependencies(newDependencies);
   };
 
   const handleDeleteDependentTo = (dependencyId) => {
-    setDependentTo(null);
+    form.setFieldsValue({
+      [`${namePreffix}-dependent_logic-${dependencyId}`]: null,
+    });
     const updatedDependencies = dependencies.filter(
       (dependency) => dependency.id !== dependencyId
     );
     if (updatedDependencies.length) {
       setDependencies(updatedDependencies);
+      updateGlobalStore(updatedDependencies, true);
     } else {
+      setDependentTo(null);
       setDependencies(defaultSkipLogic());
+      updateGlobalStore([], true);
     }
-    // TODO:: fix delete event
-    updateGlobalStore([], true);
   };
 
   return (
