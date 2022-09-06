@@ -70,6 +70,12 @@ const transformDependencyValue = (dependency) => {
   return value;
 };
 
+const findDependentTo = (dependency, questionGroups) => {
+  const questions = questionGroups.flatMap((qg) => qg.questions);
+  const current = questions.find((q) => q.id === dependency[0].id);
+  return current;
+};
+
 const QuestionSkipLogic = ({ question }) => {
   const {
     id,
@@ -85,7 +91,9 @@ const QuestionSkipLogic = ({ question }) => {
       ? transformDependencyValue(dependency)
       : defaultSkipLogic()
   );
-  const [dependentTo, setDependentTo] = useState(null);
+  const [dependentTo, setDependentTo] = useState(
+    dependency?.length ? findDependentTo(dependency, questionGroups) : null
+  );
   const form = Form.useFormInstance();
 
   const updateGlobalStore = useCallback(
@@ -298,6 +306,7 @@ const QuestionSkipLogic = ({ question }) => {
                   options={dependentToQuestions}
                   getPopupContainer={(triggerNode) => triggerNode.parentElement}
                   onChange={(e) => handleChangeDependentTo(dependency.id, e)}
+                  value={dependency.dependentTo || []}
                 />
               </Col>
               <Col
@@ -328,6 +337,7 @@ const QuestionSkipLogic = ({ question }) => {
                   options={dependecyLogicDropdownValue}
                   getPopupContainer={(triggerNode) => triggerNode.parentElement}
                   onChange={(e) => handleChangeDependentLogic(dependency.id, e)}
+                  value={dependency.dependentLogic || []}
                 />
               </Form.Item>
             </Col>
@@ -336,7 +346,7 @@ const QuestionSkipLogic = ({ question }) => {
                 label={UIText.inputQuestionDependentAnswerLabel}
                 initialValue={
                   selectedDependencyQuestion?.type === 'number'
-                    ? dependency.dependentAnswer
+                    ? dependency.dependentAnswer || null
                     : dependency.dependentAnswer || []
                 }
                 name={`${namePreffix}-dependent_answer-${dependency.id}`}
@@ -350,6 +360,7 @@ const QuestionSkipLogic = ({ question }) => {
                     onChange={(e) =>
                       handleChangeDependentAnswer(dependency.id, e)
                     }
+                    value={dependency.dependentAnswer || null}
                   />
                 )}
                 {['option', 'multiple_option'].includes(
@@ -368,6 +379,7 @@ const QuestionSkipLogic = ({ question }) => {
                     showSearch
                     allowClear
                     showArrow
+                    value={dependency.dependentAnswer || []}
                   />
                 )}
               </Form.Item>
