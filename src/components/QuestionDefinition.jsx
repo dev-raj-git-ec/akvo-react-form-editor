@@ -327,12 +327,6 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
             {activeTab === 'skip-logic' && (
               <QuestionSkipLogic question={question} />
             )}
-            <div>
-              <SaveButton
-                onClickSave={() => console.info(question)}
-                onClickCancel={handleCancelEdit}
-              />
-            </div>
           </div>
         )}
       </Card>
