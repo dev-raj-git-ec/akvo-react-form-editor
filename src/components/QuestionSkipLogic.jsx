@@ -228,6 +228,7 @@ const QuestionSkipLogic = ({ question }) => {
           selectedDependencyQuestion.type !== dependentTo?.type
       )?.id;
       if (findDependencyId) {
+        setDependentTo(selectedDependencyQuestion);
         form.setFieldsValue({
           [`${namePreffix}-dependent_logic-${findDependencyId}`]: null,
         });
