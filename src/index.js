@@ -5,6 +5,7 @@ import { Card, Tabs } from 'antd';
 import {
   FormWrapper,
   FormDefinition,
+  FormPreview,
   QuestionGroupDefinition,
 } from './components';
 import { UIStore, questionGroupFn } from './lib/store';
@@ -68,7 +69,7 @@ const WebformEditor = ({ onSave = false }) => {
             })}
           </FormWrapper>
         )}
-        {currentTab === 'preview' && <h3>Preview</h3>}
+        {currentTab === 'preview' && <FormPreview />}
       </Card>
     </div>
   );

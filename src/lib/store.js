@@ -90,6 +90,7 @@ const FormStore = new Store({
   name: 'New Form',
   version: 1,
   description: 'New Form Description',
+  question_group: [],
 });
 
 const QuestionGroupStore = new Store({

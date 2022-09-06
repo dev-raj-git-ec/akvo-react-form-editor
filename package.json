@@ -51,6 +51,9 @@
     "predeploy": "cd example && yarn install && yarn run build",
     "deploy": "gh-pages -d example/build"
   },
+  "resolutions": {
+    "autoprefixer": "9.0.0"
+  },
   "peerDependencies": {
     "react": "^18.2.0"
   },
@@ -62,6 +65,7 @@
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^13.5.0",
+    "buffer": "^6.0.3",
     "cross-env": "^7.0.2",
     "eslint": "^8.22.0",
     "eslint-config-prettier": "^8.5.0",
@@ -85,6 +89,7 @@
     "dist"
   ],
   "dependencies": {
+    "akvo-react-form": "^2.0.0",
     "antd": "^4.20.0",
     "lodash": "^4.17.21",
     "pullstate": "^1.24.0",

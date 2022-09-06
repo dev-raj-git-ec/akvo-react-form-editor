@@ -14,7 +14,6 @@ const FormDefinition = ({ onSave }) => {
   const formStore = FormStore.useState((s) => s);
   const UIText = UIStore.useState((s) => s.UIText);
   const { inputFormNameLabel, inputFormDescriptionLabel } = UIText;
-
   const clearQuestionObj = (keysToRemove, obj) => {
     let clearedQuestion = {};
     Object.keys(obj).forEach((key) => {
@@ -58,6 +57,16 @@ const FormDefinition = ({ onSave }) => {
         };
       });
       onSave({ ...formStore, questionGroups: transformQuestionGroups });
+      FormStore.update((s) => {
+        // TODO: FOLLOW AKVO REACT FORM
+        s.question_group = transformQuestionGroups.map((qg) => ({
+          ...qg,
+          question: qg.questions.map((q) => ({
+            ...q,
+            option: q?.options || null,
+          })),
+        }));
+      });
       questionGroupFn.store.update((s) => {
         s.questionGroups = transformQuestionGroups;
       });
