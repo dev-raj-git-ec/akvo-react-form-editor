@@ -52,28 +52,12 @@ const defaultSkipLogic = () => {
   ];
 };
 
-const transformDependencyValue = (dependency, questionGroups = []) => {
-  const questions = questionGroups.flatMap((qg) => qg.questions);
+const transformDependencyValue = (dependency) => {
   // transform dependency to match default skip logic format
   const logicDropdowns = dependencyTypes
     .flatMap((d) => d.logicDropdowns)
     .map((x) => x.value);
   const value = dependency.map((d) => {
-    const findQ = questions.find((q) => q.id === d.id);
-    let dependecyLogicDropdownValue = [];
-    let dependencyAnswerDropdownValue = [];
-    if (findQ?.id) {
-      dependecyLogicDropdownValue =
-        dependencyTypes.find((dt) => dt.type.includes(findQ.type))
-          ?.logicDropdowns || [];
-      dependencyAnswerDropdownValue = findQ?.options
-        ? findQ.options.map((opt) => ({
-            label: opt.name,
-            value: opt.name,
-          }))
-        : [];
-    }
-
     let dependentLogic = null;
     const dependentAnswer = logicDropdowns
       .map((lg) => {
@@ -87,38 +71,32 @@ const transformDependencyValue = (dependency, questionGroups = []) => {
     return {
       id: generateId(),
       dependentTo: d.id,
-      dependentToType: findQ?.type || null,
       dependentLogic: dependentLogic,
       dependentAnswer: dependentAnswer,
-      dependecyLogicDropdownValue: dependecyLogicDropdownValue,
-      dependencyAnswerDropdownValue: dependencyAnswerDropdownValue,
     };
   });
   return value;
 };
 
-const findDependentTo = (dependency, questionGroups) => {
-  const questions = questionGroups.flatMap((qg) => qg.questions);
-  const current = questions.find((q) => q.id === dependency[0].id);
+const findDependentTo = (currentDependency, questions) => {
+  const current = questions.find((q) => q.id === currentDependency.dependentTo);
   return current;
 };
 
-const QuestionSkipLogic = ({ question }) => {
-  const {
-    id,
-    questionGroupId,
-    dependency,
-    order: currentQuestionOrder,
-  } = question;
+const SettingSkipLogic = ({
+  question,
+  questions,
+  dependency,
+  dependencies,
+  setDependencies,
+  dependentToQuestions,
+}) => {
+  const { id, questionGroupId, dependency: savedDependency } = question;
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
-  const { questionGroups } = questionGroupFn.store.useState((s) => s);
-  const [dependencies, setDependencies] = useState(
-    dependency?.length
-      ? transformDependencyValue(dependency, questionGroups)
-      : defaultSkipLogic()
+  const [dependentTo, setDependentTo] = useState(
+    savedDependency?.length ? findDependentTo(dependency, questions) : null
   );
-  const [dependentTo, setDependentTo] = useState(null);
   const form = Form.useFormInstance();
 
   const updateGlobalStore = useCallback(
@@ -173,48 +151,17 @@ const QuestionSkipLogic = ({ question }) => {
   }, [dependencies, id, questionGroupId, updateGlobalStore]);
 
   const updateLocalState = (dependencyId, name, value) => {
-    const updatedDependencies = dependencies.map((dependency) => {
-      if (dependency.id === dependencyId) {
+    const updatedDependencies = dependencies.map((d) => {
+      if (d.id === dependencyId) {
         return {
-          ...dependency,
+          ...d,
           [name]: value,
         };
       }
-      return dependency;
+      return d;
     });
     setDependencies(updatedDependencies);
   };
-
-  const currentQuestionGroupOrder = useMemo(() => {
-    return questionGroups.find((qg) => qg.id === questionGroupId)?.order;
-  }, [questionGroups, questionGroupId]);
-
-  const questions = useMemo(() => {
-    return questionGroups
-      .filter((qg) => qg.order <= currentQuestionGroupOrder) // filter by group order
-      .flatMap((qg) => qg.questions)
-      .filter(
-        (q) =>
-          (q.questionGroupId === questionGroupId &&
-            q.order < currentQuestionOrder) ||
-          q.questionGroupId !== questionGroupId
-      ); // filter by question order
-  }, [
-    questionGroups,
-    currentQuestionGroupOrder,
-    currentQuestionOrder,
-    questionGroupId,
-  ]);
-
-  // dependency question dropdown value
-  const dependentToQuestions = useMemo(() => {
-    return questions
-      .filter((q) => dependencyTypes.flatMap((dt) => dt.type).includes(q.type))
-      .map((q) => ({
-        label: q.name,
-        value: q.id,
-      }));
-  }, [questions]);
 
   const selectedDependencyQuestion = useMemo(() => {
     if (dependentTo?.id) {
@@ -301,8 +248,162 @@ const QuestionSkipLogic = ({ question }) => {
     } else {
       setDependencies(defaultSkipLogic());
     }
+    // TODO:: fix delete event
     updateGlobalStore([], true);
   };
+
+  return (
+    <Col
+      key={`dependency-${id}-${dependency.id}`}
+      span={24}
+    >
+      <Form.Item
+        label={UIText.inputQuestionDependentToLabel}
+        name={`${namePreffix}-dependent_to-${dependency.id}`}
+      >
+        <Row
+          align="middle"
+          justify="space-between"
+          gutter={[12, 12]}
+        >
+          <Col span={22}>
+            <Select
+              className={styles['select-dropdown']}
+              options={dependentToQuestions}
+              getPopupContainer={(triggerNode) => triggerNode.parentElement}
+              onChange={(e) => handleChangeDependentTo(dependency.id, e)}
+              value={dependency.dependentTo || []}
+            />
+          </Col>
+          <Col
+            span={2}
+            align="end"
+          >
+            <Space>
+              <CardExtraButton
+                type="add-button"
+                disabled={
+                  !dependentToQuestions?.length ||
+                  dependentToQuestions.length === dependencies.length
+                }
+                onClick={handleAddMoreDependency}
+              />
+              <CardExtraButton
+                type="delete-button"
+                disabled={!dependency.dependentTo}
+                onClick={() => handleDeleteDependentTo(dependency.id)}
+              />
+            </Space>
+          </Col>
+        </Row>
+      </Form.Item>
+      <Row
+        align="middle"
+        justify="space-between"
+        gutter={[12, 12]}
+      >
+        <Col span={8}>
+          <Form.Item
+            label={UIText.inputQuestionDependentLogicLabel}
+            initialValue={dependency.dependentLogic || []}
+            name={`${namePreffix}-dependent_logic-${dependency.id}`}
+          >
+            <Select
+              className={styles['select-dropdown']}
+              options={dependecyLogicDropdownValue}
+              getPopupContainer={(triggerNode) => triggerNode.parentElement}
+              onChange={(e) => handleChangeDependentLogic(dependency.id, e)}
+            />
+          </Form.Item>
+        </Col>
+        <Col span={16}>
+          <Form.Item
+            label={UIText.inputQuestionDependentAnswerLabel}
+            name={`${namePreffix}-dependent_answer-${dependency.id}`}
+          >
+            {!selectedDependencyQuestion && <Input disabled />}
+            {selectedDependencyQuestion?.type === questionType.number && (
+              <InputNumber
+                style={{ width: '100%' }}
+                controls={false}
+                keyboard={false}
+                onChange={(e) => handleChangeDependentAnswer(dependency.id, e)}
+                value={dependency.dependentAnswer || null}
+              />
+            )}
+            {[questionType.option, questionType.multiple_option].includes(
+              selectedDependencyQuestion?.type
+            ) && (
+              <Select
+                className={styles['select-dropdown']}
+                options={dependencyAnswerDropdownValue}
+                getPopupContainer={(triggerNode) => triggerNode.parentElement}
+                onChange={(e) => handleChangeDependentAnswer(dependency.id, e)}
+                mode="multiple"
+                showSearch
+                allowClear
+                showArrow
+                value={
+                  Array.isArray(dependency.dependentAnswer)
+                    ? dependency.dependentAnswer
+                    : dependency.dependentAnswer
+                    ? [dependency.dependentAnswer]
+                    : []
+                }
+              />
+            )}
+          </Form.Item>
+        </Col>
+      </Row>
+    </Col>
+  );
+};
+
+const QuestionSkipLogic = ({ question }) => {
+  const {
+    id,
+    questionGroupId,
+    dependency,
+    order: currentQuestionOrder,
+  } = question;
+  const UIText = UIStore.useState((s) => s.UIText);
+  const { questionGroups } = questionGroupFn.store.useState((s) => s);
+  const [dependencies, setDependencies] = useState(
+    dependency?.length
+      ? transformDependencyValue(dependency)
+      : defaultSkipLogic()
+  );
+
+  const currentQuestionGroupOrder = useMemo(() => {
+    return questionGroups.find((qg) => qg.id === questionGroupId)?.order;
+  }, [questionGroups, questionGroupId]);
+
+  const questions = useMemo(() => {
+    return questionGroups
+      .filter((qg) => qg.order <= currentQuestionGroupOrder) // filter by group order
+      .flatMap((qg) => qg.questions)
+      .filter(
+        (q) =>
+          (q.questionGroupId === questionGroupId &&
+            q.order < currentQuestionOrder) ||
+          q.questionGroupId !== questionGroupId
+      ); // filter by question order
+  }, [
+    questionGroups,
+    currentQuestionGroupOrder,
+    currentQuestionOrder,
+    questionGroupId,
+  ]);
+
+  // dependency question dropdown value
+  const dependentToQuestions = useMemo(() => {
+    return questions
+      .filter((q) => dependencyTypes.flatMap((dt) => dt.type).includes(q.type))
+      .map((q) => ({
+        label: q.name,
+        value: q.id,
+      }));
+  }, [questions]);
 
   if (!dependencies?.[0]?.dependentTo && !dependentToQuestions?.length) {
     return (
@@ -318,129 +419,15 @@ const QuestionSkipLogic = ({ question }) => {
   return (
     <Row gutter={[24, 24]}>
       {dependencies?.map((dependency, di) => (
-        <Col
+        <SettingSkipLogic
           key={`dependency-${id}-${di}`}
-          span={24}
-        >
-          <Form.Item
-            label={UIText.inputQuestionDependentToLabel}
-            name={`${namePreffix}-dependent_to-${dependency.id}`}
-          >
-            <Row
-              align="middle"
-              justify="space-between"
-              gutter={[12, 12]}
-            >
-              <Col span={22}>
-                <Select
-                  className={styles['select-dropdown']}
-                  options={dependentToQuestions}
-                  getPopupContainer={(triggerNode) => triggerNode.parentElement}
-                  onChange={(e) => handleChangeDependentTo(dependency.id, e)}
-                  value={dependency.dependentTo || []}
-                />
-              </Col>
-              <Col
-                span={2}
-                align="end"
-              >
-                <Space>
-                  <CardExtraButton
-                    type="add-button"
-                    disabled={
-                      !dependentToQuestions?.length ||
-                      dependentToQuestions.length === dependencies.length
-                    }
-                    onClick={handleAddMoreDependency}
-                  />
-                  <CardExtraButton
-                    type="delete-button"
-                    disabled={!dependency.dependentTo}
-                    onClick={() => handleDeleteDependentTo(dependency.id)}
-                  />
-                </Space>
-              </Col>
-            </Row>
-          </Form.Item>
-          <Row
-            align="middle"
-            justify="space-between"
-            gutter={[12, 12]}
-          >
-            <Col span={8}>
-              <Form.Item
-                label={UIText.inputQuestionDependentLogicLabel}
-                initialValue={dependency.dependentLogic || []}
-                name={`${namePreffix}-dependent_logic-${dependency.id}`}
-              >
-                <Select
-                  className={styles['select-dropdown']}
-                  options={
-                    dependecyLogicDropdownValue.length
-                      ? dependecyLogicDropdownValue
-                      : dependency.dependecyLogicDropdownValue
-                  }
-                  getPopupContainer={(triggerNode) => triggerNode.parentElement}
-                  onChange={(e) => handleChangeDependentLogic(dependency.id, e)}
-                  value={dependency.dependentLogic || []}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={16}>
-              <Form.Item
-                label={UIText.inputQuestionDependentAnswerLabel}
-                name={`${namePreffix}-dependent_answer-${dependency.id}`}
-              >
-                {!dependency?.dependentToType &&
-                  !selectedDependencyQuestion && <Input disabled />}
-                {(dependency?.dependentToType === questionType.number ||
-                  selectedDependencyQuestion?.type === questionType.number) && (
-                  <InputNumber
-                    style={{ width: '100%' }}
-                    controls={false}
-                    keyboard={false}
-                    onChange={(e) =>
-                      handleChangeDependentAnswer(dependency.id, e)
-                    }
-                    value={dependency.dependentAnswer || null}
-                  />
-                )}
-                {([questionType.option, questionType.multiple_option].includes(
-                  dependency?.dependentToType
-                ) ||
-                  [questionType.option, questionType.multiple_option].includes(
-                    selectedDependencyQuestion?.type
-                  )) && (
-                  <Select
-                    className={styles['select-dropdown']}
-                    options={
-                      dependencyAnswerDropdownValue.length
-                        ? dependencyAnswerDropdownValue
-                        : dependency.dependencyAnswerDropdownValue
-                    }
-                    getPopupContainer={(triggerNode) =>
-                      triggerNode.parentElement
-                    }
-                    onChange={(e) =>
-                      handleChangeDependentAnswer(dependency.id, e)
-                    }
-                    mode="multiple"
-                    showSearch
-                    allowClear
-                    showArrow
-                    value={
-                      Array.isArray(dependency.dependentAnswer)
-                        ? dependency.dependentAnswer
-                        : dependency.dependentAnswer
-                        ? [dependency.dependentAnswer]
-                        : []
-                    }
-                  />
-                )}
-              </Form.Item>
-            </Col>
-          </Row>
-        </Col>
+          dependency={dependency}
+          question={question}
+          questions={questions}
+          dependencies={dependencies}
+          setDependencies={setDependencies}
+          dependentToQuestions={dependentToQuestions}
+        />
       ))}
     </Row>
   );
