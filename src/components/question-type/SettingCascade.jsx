@@ -12,7 +12,9 @@ const defaultApiValue = {
 const SettingCascade = ({ id, questionGroupId, api }) => {
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
-  const [apiValue, setApiValue] = useState(defaultApiValue);
+  const [apiValue, setApiValue] = useState(
+    !Object.keys(api).length ? defaultApiValue : api
+  );
 
   useEffect(() => {
     // update global state
