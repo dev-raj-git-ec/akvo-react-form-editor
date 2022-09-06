@@ -15,24 +15,25 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
   const movingQ = UIStore.useState((s) => s.activeMoveQuestion);
   const activeEditQuestions = UIStore.useState((s) => s.activeEditQuestions);
   const [activeTab, setActiveTab] = useState('setting');
-  const { id, questionGroupId, order, name } = question;
+  const { id, questionGroupId, order, name, dependency } = question;
+
+  const allQuestions = questionGroups
+    .map((qg) => qg.questions)
+    .flatMap((x) => x)
+    .map((q) => ({
+      ...q,
+      questionGroup: questionGroups.find((qg) => q.questionGroupId === qg.id),
+    }));
 
   const dependant = useMemo(() => {
-    const allQ = questionGroups
-      .map((qg) => qg.questions)
-      .flatMap((x) => x)
-      .map((q) => ({
-        ...q,
-        questionGroup: questionGroups.find((qg) => q.questionGroupId === qg.id),
-      }));
-    const dependant = allQ.filter(
+    const dependant = allQuestions.filter(
       (q) => q?.dependency?.filter((d) => d.id === id).length || false
     );
 
     let disabled = { current: false, last: false };
 
     const movingQDependency = maxBy(
-      movingQ?.dependency?.map((q) => allQ.find((a) => a.id === q.id)),
+      movingQ?.dependency?.map((q) => allQuestions.find((a) => a.id === q.id)),
       'questionGroup.order'
     );
     if (movingQDependency?.questionGroup?.order >= questionGroup?.order) {
@@ -52,7 +53,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
       };
     }
     const movingQDependant = minBy(
-      allQ.filter(
+      allQuestions.filter(
         (q) =>
           q?.dependency?.filter((d) => d.id === movingQ?.id).length || false
       ),
@@ -78,7 +79,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
       disabled: disabled,
       dependant: dependant,
     };
-  }, [id, order, questionGroup, questionGroups, movingQ]);
+  }, [id, order, questionGroup, allQuestions, movingQ]);
 
   const isEditQuestion = useMemo(() => {
     return activeEditQuestions.includes(id);
@@ -291,7 +292,14 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
           padding: isEditQuestion ? 24 : 0,
         }}
         loading={false}
-        extra={<CardTitle buttons={rightButtons} />}
+        extra={
+          <CardTitle
+            buttons={rightButtons}
+            dependency={allQuestions.filter((q) =>
+              dependency?.find((d) => d.id === q.id)
+            )}
+          />
+        }
       >
         {isEditQuestion && (
           <div>
