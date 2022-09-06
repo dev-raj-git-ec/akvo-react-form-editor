@@ -268,12 +268,25 @@ const SettingSkipLogic = ({
         >
           <Col span={22}>
             <Select
+              showSearch
               className={styles['select-dropdown']}
-              options={dependentToQuestions}
               getPopupContainer={(triggerNode) => triggerNode.parentElement}
               onChange={(e) => handleChangeDependentTo(dependency.id, e)}
               value={dependency.dependentTo || []}
-            />
+              optionFilterProp="children"
+            >
+              {dependentToQuestions.map((dq) => (
+                <Select.Option
+                  key={`${dq.value}-dq`}
+                  value={dq.value}
+                  disabled={dependencies
+                    .map((d) => d.dependentTo)
+                    .includes(dq.value)}
+                >
+                  {dq.label}
+                </Select.Option>
+              ))}
+            </Select>
           </Col>
           <Col
             span={2}
