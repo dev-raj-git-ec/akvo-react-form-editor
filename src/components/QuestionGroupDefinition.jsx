@@ -182,12 +182,24 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
       ),
       'questionGroup.order'
     );
+
     if (movingQDependant?.questionGroup?.order < order) {
       disabled = {
         current: true,
         last: true,
       };
     }
+
+    if (
+      movingQDependant?.questionGroup?.order ===
+      movingQDependency?.questionGroup?.order
+    ) {
+      disabled = {
+        current: false,
+        last: false,
+      };
+    }
+
     return {
       disabled: disabled,
       dependant: dependencies,
