@@ -127,13 +127,13 @@ const QuestionSetting = ({ question, dependant }) => {
           {UIText.inputQuestionRequiredCheckbox}
         </Checkbox>
       </Form.Item>
-      {qType === 'input' && <SettingInput {...question} />}
-      {qType === 'number' && <SettingNumber {...question} />}
-      {['option', 'multiple_option'].includes(qType) && (
+      {qType === questionType.input && <SettingInput {...question} />}
+      {qType === questionType.number && <SettingNumber {...question} />}
+      {[questionType.option, questionType.multiple_option].includes(qType) && (
         <SettingOption {...question} />
       )}
-      {qType === 'tree' && <SettingTree {...question} />}
-      {qType === 'cascade' && <SettingCascade {...question} />}
+      {qType === questionType.tree && <SettingTree {...question} />}
+      {qType === questionType.cascade && <SettingCascade {...question} />}
     </div>
   );
 };
