@@ -5,6 +5,7 @@ import { TbEdit, TbEditOff } from 'react-icons/tb';
 import { RiSettings5Fill, RiSettings5Line } from 'react-icons/ri';
 import { RiDeleteBin2Line } from 'react-icons/ri';
 import { BiMove } from 'react-icons/bi';
+import { MdOutlineAddCircleOutline } from 'react-icons/md';
 
 const CardExtraButton = ({
   type = 'delete-button',
@@ -63,6 +64,16 @@ const CardExtraButton = ({
           className={styles['button-icon']}
           onClick={onClick}
           icon={<RiSettings5Line />}
+          disabled={disabled}
+        />
+      );
+    case 'add-button':
+      return (
+        <Button
+          type="link"
+          className={styles['button-icon']}
+          onClick={onClick}
+          icon={<MdOutlineAddCircleOutline />}
           disabled={disabled}
         />
       );

@@ -1,13 +1,17 @@
-import React, { useMemo, useState, useEffect } from 'react';
-import { Form, Select, Row, Col, InputNumber, Input, Alert } from 'antd';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
+import { Form, Select, Row, Col, InputNumber, Input, Alert, Space } from 'antd';
 import styles from '../styles.module.css';
 import { CardExtraButton } from '../support';
-import { UIStore, questionGroupFn, generateId } from '../lib/store';
-import { useCallback } from 'react';
+import {
+  UIStore,
+  questionGroupFn,
+  generateId,
+  questionType,
+} from '../lib/store';
 
 const dependencyTypes = [
   {
-    type: ['option', 'multiple_option'],
+    type: [questionType.option, questionType.multiple_option],
     logicDropdowns: [
       {
         label: 'contains',
@@ -16,7 +20,7 @@ const dependencyTypes = [
     ],
   },
   {
-    type: ['number'],
+    type: [questionType.number],
     logicDropdowns: [
       {
         label: 'not equal',
@@ -39,18 +43,37 @@ const defaultSkipLogic = () => {
     {
       id: generateId(),
       dependentTo: null,
+      dependentToType: null,
       dependentLogic: null,
       dependentAnswer: null,
+      dependencyLogicDropdownValue: [],
+      dependencyAnswerDropdownValue: [],
     },
   ];
 };
 
-const transformDependencyValue = (dependency) => {
+const transformDependencyValue = (dependency, questionGroups = []) => {
+  const questions = questionGroups.flatMap((qg) => qg.questions);
   // transform dependency to match default skip logic format
   const logicDropdowns = dependencyTypes
     .flatMap((d) => d.logicDropdowns)
     .map((x) => x.value);
   const value = dependency.map((d) => {
+    const findQ = questions.find((q) => q.id === d.id);
+    let dependecyLogicDropdownValue = [];
+    let dependencyAnswerDropdownValue = [];
+    if (findQ?.id) {
+      dependecyLogicDropdownValue =
+        dependencyTypes.find((dt) => dt.type.includes(findQ.type))
+          ?.logicDropdowns || [];
+      dependencyAnswerDropdownValue = findQ?.options
+        ? findQ.options.map((opt) => ({
+            label: opt.name,
+            value: opt.name,
+          }))
+        : [];
+    }
+
     let dependentLogic = null;
     const dependentAnswer = logicDropdowns
       .map((lg) => {
@@ -60,11 +83,15 @@ const transformDependencyValue = (dependency) => {
         return d?.[lg];
       })
       .filter((x) => x)?.[0];
+
     return {
       id: generateId(),
       dependentTo: d.id,
+      dependentToType: findQ?.type || null,
       dependentLogic: dependentLogic,
       dependentAnswer: dependentAnswer,
+      dependecyLogicDropdownValue: dependecyLogicDropdownValue,
+      dependencyAnswerDropdownValue: dependencyAnswerDropdownValue,
     };
   });
   return value;
@@ -88,12 +115,10 @@ const QuestionSkipLogic = ({ question }) => {
   const { questionGroups } = questionGroupFn.store.useState((s) => s);
   const [dependencies, setDependencies] = useState(
     dependency?.length
-      ? transformDependencyValue(dependency)
+      ? transformDependencyValue(dependency, questionGroups)
       : defaultSkipLogic()
   );
-  const [dependentTo, setDependentTo] = useState(
-    dependency?.length ? findDependentTo(dependency, questionGroups) : null
-  );
+  const [dependentTo, setDependentTo] = useState(null);
   const form = Form.useFormInstance();
 
   const updateGlobalStore = useCallback(
@@ -261,6 +286,11 @@ const QuestionSkipLogic = ({ question }) => {
     }
   };
 
+  const handleAddMoreDependency = () => {
+    const newDependencies = [...dependencies, defaultSkipLogic()];
+    setDependencies(newDependencies);
+  };
+
   const handleDeleteDependentTo = (dependencyId) => {
     setDependentTo(null);
     const updatedDependencies = dependencies.filter(
@@ -274,7 +304,7 @@ const QuestionSkipLogic = ({ question }) => {
     updateGlobalStore([], true);
   };
 
-  if (!dependentToQuestions?.length) {
+  if (!dependencies?.[0]?.dependentTo && !dependentToQuestions?.length) {
     return (
       <Alert
         message={UIText.infoNoDependentQuestionText}
@@ -294,14 +324,14 @@ const QuestionSkipLogic = ({ question }) => {
         >
           <Form.Item
             label={UIText.inputQuestionDependentToLabel}
-            initialValue={dependency.dependentTo || []}
             name={`${namePreffix}-dependent_to-${dependency.id}`}
           >
             <Row
               align="middle"
               justify="space-between"
+              gutter={[12, 12]}
             >
-              <Col span={23}>
+              <Col span={22}>
                 <Select
                   className={styles['select-dropdown']}
                   options={dependentToQuestions}
@@ -311,14 +341,24 @@ const QuestionSkipLogic = ({ question }) => {
                 />
               </Col>
               <Col
-                span={1}
+                span={2}
                 align="end"
               >
-                <CardExtraButton
-                  type="delete-button"
-                  disabled={!dependentTo}
-                  onClick={() => handleDeleteDependentTo(dependency.id)}
-                />
+                <Space>
+                  <CardExtraButton
+                    type="add-button"
+                    disabled={
+                      !dependentToQuestions?.length ||
+                      dependentToQuestions.length === dependencies.length
+                    }
+                    onClick={handleAddMoreDependency}
+                  />
+                  <CardExtraButton
+                    type="delete-button"
+                    disabled={!dependency.dependentTo}
+                    onClick={() => handleDeleteDependentTo(dependency.id)}
+                  />
+                </Space>
               </Col>
             </Row>
           </Form.Item>
@@ -327,7 +367,7 @@ const QuestionSkipLogic = ({ question }) => {
             justify="space-between"
             gutter={[12, 12]}
           >
-            <Col span={12}>
+            <Col span={8}>
               <Form.Item
                 label={UIText.inputQuestionDependentLogicLabel}
                 initialValue={dependency.dependentLogic || []}
@@ -335,25 +375,26 @@ const QuestionSkipLogic = ({ question }) => {
               >
                 <Select
                   className={styles['select-dropdown']}
-                  options={dependecyLogicDropdownValue}
+                  options={
+                    dependecyLogicDropdownValue.length
+                      ? dependecyLogicDropdownValue
+                      : dependency.dependecyLogicDropdownValue
+                  }
                   getPopupContainer={(triggerNode) => triggerNode.parentElement}
                   onChange={(e) => handleChangeDependentLogic(dependency.id, e)}
                   value={dependency.dependentLogic || []}
                 />
               </Form.Item>
             </Col>
-            <Col span={12}>
+            <Col span={16}>
               <Form.Item
                 label={UIText.inputQuestionDependentAnswerLabel}
-                initialValue={
-                  selectedDependencyQuestion?.type === 'number'
-                    ? dependency.dependentAnswer || null
-                    : dependency.dependentAnswer || []
-                }
                 name={`${namePreffix}-dependent_answer-${dependency.id}`}
               >
-                {!selectedDependencyQuestion && <Input disabled />}
-                {selectedDependencyQuestion?.type === 'number' && (
+                {!dependency?.dependentToType &&
+                  !selectedDependencyQuestion && <Input disabled />}
+                {(dependency?.dependentToType === questionType.number ||
+                  selectedDependencyQuestion?.type === questionType.number) && (
                   <InputNumber
                     style={{ width: '100%' }}
                     controls={false}
@@ -364,12 +405,19 @@ const QuestionSkipLogic = ({ question }) => {
                     value={dependency.dependentAnswer || null}
                   />
                 )}
-                {['option', 'multiple_option'].includes(
-                  selectedDependencyQuestion?.type
-                ) && (
+                {([questionType.option, questionType.multiple_option].includes(
+                  dependency?.dependentToType
+                ) ||
+                  [questionType.option, questionType.multiple_option].includes(
+                    selectedDependencyQuestion?.type
+                  )) && (
                   <Select
                     className={styles['select-dropdown']}
-                    options={dependencyAnswerDropdownValue}
+                    options={
+                      dependencyAnswerDropdownValue.length
+                        ? dependencyAnswerDropdownValue
+                        : dependency.dependencyAnswerDropdownValue
+                    }
                     getPopupContainer={(triggerNode) =>
                       triggerNode.parentElement
                     }
@@ -380,7 +428,13 @@ const QuestionSkipLogic = ({ question }) => {
                     showSearch
                     allowClear
                     showArrow
-                    value={dependency.dependentAnswer || []}
+                    value={
+                      Array.isArray(dependency.dependentAnswer)
+                        ? dependency.dependentAnswer
+                        : dependency.dependentAnswer
+                        ? [dependency.dependentAnswer]
+                        : []
+                    }
                   />
                 )}
               </Form.Item>
