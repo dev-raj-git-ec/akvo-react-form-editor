@@ -4,7 +4,7 @@ import { UIStore, questionGroupFn } from '../lib/store';
 import QuestionGroupSetting from './QuestionGroupSetting';
 import QuestionDefinition from './QuestionDefinition';
 import { AddMoveButton, CardTitle } from '../support';
-import { orderBy } from 'lodash';
+import { orderBy, maxBy, minBy } from 'lodash';
 
 const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
   const { questionGroups } = questionGroupFn.store.useState((s) => s);
@@ -15,6 +15,7 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
   );
 
   const { id, name, questions, order } = questionGroup;
+  const questionIds = questions.map((q) => q.id);
   const { buttonAddNewQuestionGroupText, buttonMoveQuestionGroupText } =
     UIStore.useState((s) => s.UIText);
 
@@ -139,6 +140,60 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
     });
   };
 
+  const dependant = useMemo(() => {
+    const allQ = questionGroups
+      .map((qg) => qg.questions)
+      .flatMap((x) => x)
+      .map((q) => ({
+        ...q,
+        questionGroup: questionGroups.find((qg) => q.questionGroupId === qg.id),
+      }));
+    const dependencies = allQ.filter(
+      (q) =>
+        q?.dependency?.filter((d) => questionIds.find((qid) => qid === d.id))
+          .length || false
+    );
+
+    let disabled = { current: false, last: false };
+
+    const movingQDependency = maxBy(
+      movingQg?.questions
+        ?.map(
+          (q) =>
+            q?.dependency?.map((q) => allQ.find((a) => a.id === q.id)) || []
+        )
+        ?.flatMap((q) => q) || [],
+      'questionGroup.order'
+    );
+
+    if (movingQDependency?.questionGroup?.order >= order) {
+      disabled = {
+        current: true,
+        last: true,
+      };
+    }
+
+    const movingQDependant = minBy(
+      allQ.filter(
+        (q) =>
+          q?.dependency?.filter((d) =>
+            movingQg?.questions?.find((qs) => qs.id === d.id)
+          ).length || false
+      ),
+      'questionGroup.order'
+    );
+    if (movingQDependant?.questionGroup?.order < order) {
+      disabled = {
+        current: true,
+        last: true,
+      };
+    }
+    return {
+      disabled: disabled,
+      dependant: dependencies,
+    };
+  }, [questionGroups, questionIds, movingQg, order]);
+
   const leftButtons = [
     {
       type: 'delete-button',
@@ -174,7 +229,11 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
         text={
           movingQg ? buttonMoveQuestionGroupText : buttonAddNewQuestionGroupText
         }
-        disabled={movingQg === questionGroup || movingQg?.order + 1 === order}
+        disabled={
+          movingQg === questionGroup ||
+          movingQg?.order + 1 === order ||
+          dependant.disabled.current
+        }
         movingItem={movingQg}
         handleCancelMove={handleCancelMove}
         handleOnAdd={() => handleOnAdd(order - 1)}
@@ -225,7 +284,7 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
               ? buttonMoveQuestionGroupText
               : buttonAddNewQuestionGroupText
           }
-          disabled={movingQg === questionGroup}
+          disabled={movingQg === questionGroup || dependant.disabled.last}
           movingItem={movingQg}
           handleCancelMove={handleCancelMove}
           handleOnAdd={() => handleOnAdd(order)}
