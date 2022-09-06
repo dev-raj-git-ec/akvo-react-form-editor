@@ -230,10 +230,10 @@ const SettingSkipLogic = ({
   const handleChangeDependentAnswer = (dependencyId, val) => {
     updateLocalState(dependencyId, 'dependentAnswer', val);
     // handle when answer value empty
-    if (dependency?.length && (!val || !val?.length)) {
+    if (savedDependency?.length && (!val || !val?.length)) {
       // delete dependency from global store
       const updatedDependencies = dependencies.filter(
-        (dependency) => dependency.id !== dependencyId
+        (d) => d.id !== dependencyId
       );
       updateGlobalStore(updatedDependencies, true);
     }
