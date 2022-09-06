@@ -56,16 +56,24 @@ const FormDefinition = ({ onSave }) => {
           questions: questions,
         };
       });
-      onSave({ ...formStore, questionGroups: transformQuestionGroups });
+      // TODO: FOLLOW AKVO REACT FORM
+      const output = transformQuestionGroups.map((qg) => ({
+        id: qg.id,
+        name: qg.name,
+        order: qg.order,
+        description: qg?.description,
+        question: qg.questions.map((q) => ({
+          ...q,
+          option: q?.options || null,
+          tooltip: q?.tooltip ? { text: q.tooltip } : null,
+        })),
+      }));
       FormStore.update((s) => {
-        // TODO: FOLLOW AKVO REACT FORM
-        s.question_group = transformQuestionGroups.map((qg) => ({
-          ...qg,
-          question: qg.questions.map((q) => ({
-            ...q,
-            option: q?.options || null,
-          })),
-        }));
+        s.question_group = output;
+      });
+      onSave({
+        ...formStore,
+        question_group: output,
       });
       questionGroupFn.store.update((s) => {
         s.questionGroups = transformQuestionGroups;
