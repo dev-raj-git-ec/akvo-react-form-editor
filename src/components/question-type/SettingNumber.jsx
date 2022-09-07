@@ -23,7 +23,7 @@ const SettingNumber = ({
       key: 'min',
       rules: {
         max: max - 1,
-        message: `Min value must be less than ${max}`,
+        message: `${UIText.inputQuestionMinimumValidationText} ${max}`,
       },
     },
     {
@@ -32,7 +32,7 @@ const SettingNumber = ({
       key: 'max',
       rules: {
         min: min + 1,
-        message: `Max value must be greater than ${min}`,
+        message: `${UIText.inputQuestionMaximumValidationText} ${min}`,
       },
     },
   ];

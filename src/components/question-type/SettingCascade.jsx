@@ -71,7 +71,9 @@ const SettingCascade = ({ id, questionGroupId, api = defaultApiValue }) => {
         label={UIText.inputQuestionEndpointLabel}
         initialValue={api?.endpoint || defaultApiValue.endpoint}
         name={`${namePreffix}-api-endpoint`}
-        rules={[{ type: 'url', message: 'Not valid URL' }]}
+        rules={[
+          { type: 'url', message: UIText.inputQuestionEndpointValidationText },
+        ]}
       >
         <Input onChange={handleChangeEndpoint} />
       </Form.Item>
