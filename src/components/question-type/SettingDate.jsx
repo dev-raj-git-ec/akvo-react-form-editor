@@ -2,8 +2,9 @@ import React from 'react';
 import { Form, DatePicker, Row, Col } from 'antd';
 import styles from '../../styles.module.css';
 import { UIStore, questionGroupFn } from '../../lib/store';
+import moment from 'moment';
 
-const SettingDate = ({ id, minDate, maxDate }) => {
+const SettingDate = ({ id, questionGroupId, minDate, maxDate }) => {
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
 
@@ -12,21 +13,40 @@ const SettingDate = ({ id, minDate, maxDate }) => {
       label: UIText.inputQuestionAfterDateValueLabel,
       value: minDate,
       key: 'minDate',
-      rules: {
-        max: minDate,
-        message: `${UIText.inputQuestionAfterDateValidationText} ${minDate}`,
-      },
+      disabledDate: (current) =>
+        current && maxDate && current >= moment(maxDate),
     },
     {
       label: UIText.inputQuestionBeforeDateValueLabel,
       value: maxDate,
       key: 'maxDate',
-      rules: {
-        min: minDate,
-        message: `${UIText.inputQuestionBeforeDateValidationText} ${minDate}`,
-      },
+      disabledDate: (current) =>
+        current && minDate && current <= moment(minDate),
     },
   ];
+
+  const handleChangeAfterBefore = (name, value) => {
+    questionGroupFn.store.update((s) => {
+      s.questionGroups = s.questionGroups.map((qg) => {
+        if (qg.id === questionGroupId) {
+          const questions = qg.questions.map((q) => {
+            if (q.id === id) {
+              return {
+                ...q,
+                [name]: moment(value).format('YYYY-MM-DD'),
+              };
+            }
+            return q;
+          });
+          return {
+            ...qg,
+            questions: questions,
+          };
+        }
+        return qg;
+      });
+    });
+  };
 
   return (
     <div>
@@ -46,11 +66,11 @@ const SettingDate = ({ id, minDate, maxDate }) => {
               label={x.label}
               initialValue={x.value}
               name={`${namePreffix}-${x.key}`}
-              rules={[{ type: 'date', ...x.rules }]}
             >
               <DatePicker
+                disabledDate={x.disabledDate}
                 style={{ width: '100%' }}
-                // onChange={(e) => handleChangeMinMax(x.key, e)}
+                onChange={(e) => handleChangeAfterBefore(x.key, e)}
               />
             </Form.Item>
           </Col>

@@ -59,8 +59,6 @@ const UIStaticText = {
     questionMoreInputDateSettingText: 'More Date Question Setting',
     inputQuestionAfterDateValueLabel: 'After Date',
     inputQuestionBeforeDateValueLabel: 'Before Date',
-    inputQuestionAfterDateValidationText: 'After date must be less than',
-    inputQuestionBeforeDateValidationText: 'Before date must be greater than',
   },
 };
 
