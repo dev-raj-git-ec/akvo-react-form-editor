@@ -118,11 +118,13 @@ const QuestionSetting = ({ question, dependant }) => {
         <Input.TextArea onChange={handleChangeTooltip} />
       </Form.Item>
       <Form.Item
-        initialValue={required}
         name={`${namePreffix}-required`}
         className={styles['input-checkbox-wrapper']}
       >
-        <Checkbox onChange={handleChangeRequired}>
+        <Checkbox
+          onChange={handleChangeRequired}
+          checked={required}
+        >
           {' '}
           {UIText.inputQuestionRequiredCheckbox}
         </Checkbox>

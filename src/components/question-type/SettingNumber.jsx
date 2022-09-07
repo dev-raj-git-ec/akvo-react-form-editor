@@ -57,11 +57,11 @@ const SettingNumber = ({
         {UIText.questionMoreInputNumberSettingText}
       </p>
       <Space className={styles['space-align-left']}>
-        <Form.Item
-          initialValue={allowDecimal}
-          name={`${namePreffix}-allow_decimal`}
-        >
-          <Checkbox onChange={handleChangeAllowDecimal}>
+        <Form.Item name={`${namePreffix}-allow_decimal`}>
+          <Checkbox
+            onChange={handleChangeAllowDecimal}
+            checked={allowDecimal}
+          >
             {' '}
             {UIText.inputQuestionAllowDecimalCheckbox}
           </Checkbox>

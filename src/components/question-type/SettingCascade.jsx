@@ -94,11 +94,11 @@ const SettingCascade = ({ id, questionGroupId, api }) => {
           </Form.Item>
         </Col>
         <Col>
-          <Form.Item
-            initialValue={api?.list || defaultApiValue.list}
-            name={`${namePreffix}-api-list`}
-          >
-            <Checkbox onChange={handleChangeList}>
+          <Form.Item name={`${namePreffix}-api-list`}>
+            <Checkbox
+              onChange={handleChangeList}
+              checked={api?.list || defaultApiValue.list}
+            >
               {' '}
               {UIText.inputQuestionListCheckbox}
             </Checkbox>

@@ -49,20 +49,20 @@ const SettingInput = ({
         {UIText.questionMoreInputTypeSettingText}
       </p>
       <Space className={styles['space-align-left']}>
-        <Form.Item
-          initialValue={requiredDoubleEntry}
-          name={`${namePreffix}-require_double_entry`}
-        >
-          <Checkbox onChange={handleChangeDoubleEntry}>
+        <Form.Item name={`${namePreffix}-require_double_entry`}>
+          <Checkbox
+            onChange={handleChangeDoubleEntry}
+            checked={requiredDoubleEntry}
+          >
             {' '}
             {UIText.inputQuestionRequireDoubleEntryCheckbox}
           </Checkbox>
         </Form.Item>
-        <Form.Item
-          initialValue={hiddenString}
-          name={`${namePreffix}-hidden_string`}
-        >
-          <Checkbox onChange={handleChangeHiddenString}>
+        <Form.Item name={`${namePreffix}-hidden_string`}>
+          <Checkbox
+            onChange={handleChangeHiddenString}
+            checked={hiddenString}
+          >
             {' '}
             {UIText.inputQuestionHiddenStringCheckbox}
           </Checkbox>

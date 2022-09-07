@@ -62,6 +62,7 @@ const FormDefinition = ({ onSave }) => {
         name: qg.name,
         order: qg.order,
         description: qg?.description,
+        repeatable: qg.repeatable,
         question: qg.questions.map((q) => ({
           ...q,
           option: q?.options || null,
