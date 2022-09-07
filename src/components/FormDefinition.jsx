@@ -9,6 +9,7 @@ const FormDefinition = ({ onSave }) => {
   const formStore = FormStore.useState((s) => s);
   const UIText = UIStore.useState((s) => s.UIText);
   const { inputFormNameLabel, inputFormDescriptionLabel } = UIText;
+  const { name, description } = formStore;
 
   const handleSave = () => {
     if (onSave) {
@@ -25,6 +26,7 @@ const FormDefinition = ({ onSave }) => {
       <Form.Item
         label={inputFormNameLabel}
         name="form-name"
+        initialValue={name}
       >
         <Input
           onChange={(e) =>
@@ -37,6 +39,7 @@ const FormDefinition = ({ onSave }) => {
       <Form.Item
         label={inputFormDescriptionLabel}
         name="form-description"
+        initialValue={description}
       >
         <Input.TextArea
           rows={5}
