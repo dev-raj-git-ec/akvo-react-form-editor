@@ -43,14 +43,35 @@ const defaultSkipLogic = () => {
     {
       id: generateId(),
       dependentTo: null,
+      dependentToType: null,
       dependentLogic: null,
       dependentAnswer: null,
+      dependencyLogicDropdownValue: [],
+      dependencyAnswerDropdownValue: [],
     },
   ];
 };
 
-const transformDependencyValue = (dependency) => {
+const fetchDependencyLogicDropdown = (question) => {
+  const value = dependencyTypes.find((dt) =>
+    dt.type.includes(question.type)
+  )?.logicDropdowns;
+  return value || [];
+};
+
+const fetchDependencyAnswerDropdown = (question) => {
+  if (question?.options) {
+    return question.options.map((opt) => ({
+      label: opt.name,
+      value: opt.name,
+    }));
+  }
+  return [];
+};
+
+const transformDependencyValue = (dependency, questionGroups) => {
   // transform dependency to match default skip logic format
+  const questions = questionGroups.flatMap((qg) => qg.questions);
   const logicDropdowns = dependencyTypes
     .flatMap((d) => d.logicDropdowns)
     .map((x) => x.value);
@@ -64,20 +85,18 @@ const transformDependencyValue = (dependency) => {
         return d?.[lg];
       })
       .filter((x) => x)?.[0];
-
+    const findQ = questions.find((q) => q.id === d.id);
     return {
       id: generateId(),
       dependentTo: d.id,
+      dependentToType: findQ.type,
       dependentLogic: dependentLogic,
       dependentAnswer: dependentAnswer,
+      dependencyLogicDropdownValue: fetchDependencyLogicDropdown(findQ),
+      dependencyAnswerDropdownValue: fetchDependencyAnswerDropdown(findQ),
     };
   });
   return value;
-};
-
-const findDependentTo = (currentDependency, questions) => {
-  const current = questions.find((q) => q.id === currentDependency.dependentTo);
-  return current;
 };
 
 const SettingSkipLogic = ({
@@ -91,9 +110,6 @@ const SettingSkipLogic = ({
   const { id, questionGroupId, dependency: savedDependency } = question;
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
-  const [dependentTo, setDependentTo] = useState(
-    savedDependency?.length ? findDependentTo(dependency, questions) : null
-  );
   const form = Form.useFormInstance();
 
   const updateGlobalStore = useCallback(
@@ -169,82 +185,74 @@ const SettingSkipLogic = ({
     }
   }, [dependencies, id, questionGroupId, updateGlobalStore]);
 
-  const updateLocalState = (dependencyId, name, value) => {
-    const updatedDependencies = dependencies.map((d) => {
-      if (d.id === dependencyId) {
-        return {
-          ...d,
-          [name]: value,
-        };
-      }
-      return d;
-    });
-    setDependencies(updatedDependencies);
-  };
-
-  const selectedDependencyQuestion = useMemo(() => {
-    if (dependentTo?.id) {
-      const question = questions.find((q) => q.id === dependentTo.id);
-      return question;
-    }
-    return null;
-  }, [dependentTo, questions]);
-
-  const dependecyLogicDropdownValue = useMemo(() => {
-    if (selectedDependencyQuestion) {
-      const value = dependencyTypes.find((dt) =>
-        dt.type.includes(selectedDependencyQuestion.type)
-      )?.logicDropdowns;
-      return value || [];
-    }
-    return [];
-  }, [selectedDependencyQuestion]);
-
-  const dependencyAnswerDropdownValue = useMemo(() => {
-    if (selectedDependencyQuestion && selectedDependencyQuestion?.options) {
-      return selectedDependencyQuestion.options.map((opt) => ({
-        label: opt.name,
-        value: opt.name,
-      }));
-    }
-    return [];
-  }, [selectedDependencyQuestion]);
+  const updateLocalState = useCallback(
+    (dependencyId, values = {}) => {
+      const updatedDependencies = dependencies
+        .map((d) => {
+          if (d.id === dependencyId) {
+            return {
+              ...d,
+              ...values,
+            };
+          }
+          return d;
+        })
+        .filter((d) =>
+          dependencyTypes.flatMap((dt) => dt.type).includes(d.dependentToType)
+        );
+      setDependencies(updatedDependencies);
+    },
+    [dependencies, setDependencies]
+  );
 
   useEffect(() => {
     // delete logic if dependentTo question type changed
-    if (dependencies.length && dependentTo?.id) {
-      const findDependencyId = dependencies.find(
-        (dp) =>
-          dp.dependentTo === dependentTo.id &&
-          selectedDependencyQuestion.type !== dependentTo?.type
-      )?.id;
-      if (findDependencyId) {
-        setDependentTo(selectedDependencyQuestion);
-        form.setFieldsValue({
-          [`${namePreffix}-dependent_logic-${findDependencyId}`]: null,
+    setTimeout(() => {
+      const checkChangedType = dependencies
+        .map((d) => {
+          const findQ = questions.find((q) => q.id === d.dependentTo);
+          if (findQ?.id && findQ.type !== d.dependentToType) {
+            return findQ;
+          }
+          return false;
+        })
+        .filter((x) => x);
+      if (dependencies.length && checkChangedType.length) {
+        checkChangedType.forEach((q) => {
+          const updatedDependency = dependencies.find(
+            (d) => d.dependentTo === q.id
+          );
+          updateLocalState(updatedDependency.id, {
+            ...updatedDependency,
+            dependentToType: q.type,
+            dependencyLogicDropdownValue: fetchDependencyLogicDropdown(q),
+            dependencyAnswerDropdownValue: fetchDependencyAnswerDropdown(q),
+          });
+          form.setFieldsValue({
+            [`${namePreffix}-dependent_logic-${updatedDependency.id}`]: null,
+          });
         });
       }
-    }
-  }, [
-    dependencies,
-    selectedDependencyQuestion,
-    dependentTo,
-    form,
-    namePreffix,
-  ]);
+    }, 500);
+  }, [dependencies, questions, form, namePreffix, updateLocalState]);
 
   const handleChangeDependentTo = (dependencyId, e) => {
     const question = questions.find((q) => q.id === e);
-    setDependentTo(question);
-    updateLocalState(dependencyId, 'dependentTo', e);
+    const values = {
+      dependentTo: e,
+      dependentToType: question.type,
+      dependencyLogicDropdownValue: fetchDependencyLogicDropdown(question),
+      dependencyAnswerDropdownValue: fetchDependencyAnswerDropdown(question),
+    };
+    updateLocalState(dependencyId, values);
   };
 
   const handleChangeDependentLogic = (dependencyId, e) => {
-    updateLocalState(dependencyId, 'dependentLogic', e);
+    updateLocalState(dependencyId, { dependentLogic: e });
   };
 
   const handleChangeDependentAnswer = (dependencyId, val) => {
-    updateLocalState(dependencyId, 'dependentAnswer', val);
+    updateLocalState(dependencyId, { dependentAnswer: val });
     // handle when answer value empty
     if (savedDependency?.length) {
       // delete dependency from global store
@@ -277,7 +285,6 @@ const SettingSkipLogic = ({
     if (updatedDependencies.length) {
       setDependencies(updatedDependencies);
     } else {
-      setDependentTo(null);
       setDependencies(defaultSkipLogic());
       updateGlobalStore([], true);
     }
@@ -354,7 +361,7 @@ const SettingSkipLogic = ({
           >
             <Select
               className={styles['select-dropdown']}
-              options={dependecyLogicDropdownValue}
+              options={dependency.dependencyLogicDropdownValue}
               getPopupContainer={(triggerNode) => triggerNode.parentElement}
               onChange={(e) => handleChangeDependentLogic(dependency.id, e)}
             />
@@ -365,8 +372,8 @@ const SettingSkipLogic = ({
             label={UIText.inputQuestionDependentAnswerLabel}
             name={`${namePreffix}-dependent_answer-${dependency.id}`}
           >
-            {!selectedDependencyQuestion && <Input disabled />}
-            {selectedDependencyQuestion?.type === questionType.number && (
+            {!dependency.dependentTo && <Input disabled />}
+            {dependency.dependentToType === questionType.number && (
               <InputNumber
                 style={{ width: '100%' }}
                 controls={false}
@@ -376,11 +383,11 @@ const SettingSkipLogic = ({
               />
             )}
             {[questionType.option, questionType.multiple_option].includes(
-              selectedDependencyQuestion?.type
+              dependency.dependentToType
             ) && (
               <Select
                 className={styles['select-dropdown']}
-                options={dependencyAnswerDropdownValue}
+                options={dependency.dependencyAnswerDropdownValue}
                 getPopupContainer={(triggerNode) => triggerNode.parentElement}
                 onChange={(e) => handleChangeDependentAnswer(dependency.id, e)}
                 mode="multiple"
@@ -414,7 +421,7 @@ const QuestionSkipLogic = ({ question }) => {
   const { questionGroups } = questionGroupFn.store.useState((s) => s);
   const [dependencies, setDependencies] = useState(
     dependency?.length
-      ? transformDependencyValue(dependency)
+      ? transformDependencyValue(dependency, questionGroups)
       : defaultSkipLogic()
   );
 
