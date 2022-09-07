@@ -154,10 +154,17 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
           .length || false
     );
 
+    const movingQids = movingQg?.questions?.map((q) => q.id) || [];
+    const movingQ = movingQg?.questions?.filter((q) => {
+      const selfDependency =
+        q?.dependency?.filter((d) => movingQids.includes(d.id))?.length || 0;
+      return selfDependency;
+    });
+
     let disabled = { current: false, last: false };
 
     const movingQDependency = maxBy(
-      movingQg?.questions
+      movingQ
         ?.map(
           (q) =>
             q?.dependency?.map((q) => allQ.find((a) => a.id === q.id)) || []
@@ -176,9 +183,8 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
     const movingQDependant = minBy(
       allQ.filter(
         (q) =>
-          q?.dependency?.filter((d) =>
-            movingQg?.questions?.find((qs) => qs.id === d.id)
-          ).length || false
+          q?.dependency?.filter((d) => movingQ?.find((qs) => qs.id === d.id))
+            .length || false
       ),
       'questionGroup.order'
     );
@@ -187,16 +193,6 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
       disabled = {
         current: true,
         last: true,
-      };
-    }
-
-    if (
-      movingQDependant?.questionGroup?.order ===
-      movingQDependency?.questionGroup?.order
-    ) {
-      disabled = {
-        current: false,
-        last: false,
       };
     }
 
