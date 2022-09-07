@@ -15,7 +15,7 @@ const SettingCascade = ({
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
 
-  const updateGlobalState = (name, value) => {
+  const updateGlobalState = (values = {}) => {
     questionGroupFn.store.update((s) => {
       s.questionGroups = s.questionGroups.map((qg) => {
         if (qg.id === questionGroupId) {
@@ -25,7 +25,7 @@ const SettingCascade = ({
                 ...q,
                 api: {
                   ...q?.api,
-                  [name]: value,
+                  ...values,
                 },
               };
             }
@@ -42,16 +42,18 @@ const SettingCascade = ({
   };
 
   const handleChangeEndpoint = (e) => {
-    updateGlobalState('endpoint', e?.target?.value);
-    updateGlobalState('initial', 0);
+    updateGlobalState({
+      endpoint: e?.target?.value,
+      initial: api?.initial || 0,
+    });
   };
 
   const handleChangeInitial = (e) => {
-    updateGlobalState('initial', e);
+    updateGlobalState({ initial: e });
   };
 
   const handleChangeList = (value) => {
-    updateGlobalState('list', value);
+    updateGlobalState({ list: value, initial: api?.initial || 0 });
   };
 
   return (
