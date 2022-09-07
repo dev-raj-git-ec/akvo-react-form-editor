@@ -9,7 +9,7 @@ const defaultApiValue = {
   list: false,
 };
 
-const SettingCascade = ({ id, questionGroupId, api }) => {
+const SettingCascade = ({ id, questionGroupId, api = defaultApiValue }) => {
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
   const [apiValue, setApiValue] = useState(
