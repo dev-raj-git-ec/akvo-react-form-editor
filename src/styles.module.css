@@ -25,6 +25,9 @@
   padding: 12px;
   background-color: #f3f3f3;
 }
+.reorder-wrapper .reorder-button {
+  background-color: #f3f3f3;
+}
 
 .select-dropdown {
   text-align: left;

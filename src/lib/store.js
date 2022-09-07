@@ -72,11 +72,12 @@ const defaultQuestionGroup = ({ name = dummyName(), prevOrder = 0 }) => {
 
 const UIStore = new Store({
   current: {
-    tab: 'form',
+    tab: 'edit-form',
     formId: null,
     questionGroupId: null,
     questionId: null,
   },
+  activeEditFormSetting: true,
   activeQuestionGroups: [],
   activeEditQuestionGroups: [],
   activeMoveQuestionGroup: null,

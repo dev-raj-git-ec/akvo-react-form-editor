@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, Row, Col } from 'antd';
 import { UIStore } from '../lib/store';
+import { PlusOutlined, CaretRightOutlined } from '@ant-design/icons';
 
 const AddMoveButton = ({
   text,
@@ -25,10 +26,11 @@ const AddMoveButton = ({
       >
         <Button
           type="dashed"
-          className="reorder-button"
+          className="arfe-reorder-button"
           size="small"
           onClick={movingItem ? handleOnMove : handleOnAdd}
           disabled={disabled}
+          icon={movingItem ? <CaretRightOutlined /> : <PlusOutlined />}
         >
           {text}
         </Button>

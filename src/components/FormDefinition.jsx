@@ -1,22 +1,10 @@
 import React from 'react';
 import { Form, Input } from 'antd';
-import { UIStore, FormStore, questionGroupFn } from '../lib/store';
-import data from '../lib/data';
-import { SaveButton } from '../support';
+import { UIStore, FormStore } from '../lib/store';
 
-const FormDefinition = ({ onSave }) => {
-  const { questionGroups } = questionGroupFn.store.useState((s) => s);
-  const formStore = FormStore.useState((s) => s);
+const FormDefinition = ({ name, description }) => {
   const UIText = UIStore.useState((s) => s.UIText);
   const { inputFormNameLabel, inputFormDescriptionLabel } = UIText;
-  const { name, description } = formStore;
-
-  const handleSave = () => {
-    if (onSave) {
-      // transform questions to remove unused setting by question type
-      onSave(data.toWebform(formStore, questionGroups));
-    }
-  };
 
   return (
     <div
@@ -50,10 +38,6 @@ const FormDefinition = ({ onSave }) => {
           }
         />
       </Form.Item>
-      <SaveButton
-        cancelButton={false}
-        onClickSave={handleSave}
-      />
     </div>
   );
 };

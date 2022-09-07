@@ -1,20 +1,26 @@
 import React from 'react';
 import 'antd/dist/antd.min.css';
 import styles from './styles.module.css';
-import { Card, Tabs, Tag } from 'antd';
+import { Card, Tabs, Tag, Space } from 'antd';
 import {
   FormWrapper,
   FormDefinition,
   FormPreview,
   QuestionGroupDefinition,
 } from './components';
-import { UIStore, questionGroupFn } from './lib/store';
+import { CardExtraButton } from './support';
+import { FormStore, UIStore, questionGroupFn } from './lib/store';
+import data from './lib/data';
 
 const WebformEditor = ({ onSave = false }) => {
+  const formStore = FormStore.useState((s) => s);
   const current = UIStore.useState((s) => s.current);
   const UIText = UIStore.useState((s) => s.UIText);
   const questionGroups = questionGroupFn.store.useState(
     (s) => s.questionGroups
+  );
+  const activeEditFormSetting = UIStore.useState(
+    (s) => s.activeEditFormSetting
   );
 
   const { tab: currentTab } = current;
@@ -36,6 +42,20 @@ const WebformEditor = ({ onSave = false }) => {
     });
   };
 
+  const handleShowFormSetting = (e) => {
+    e.preventDefault();
+    UIStore.update((s) => {
+      s.activeEditFormSetting = activeEditFormSetting ? false : true;
+    });
+  };
+
+  const handleSave = () => {
+    if (onSave) {
+      // transform questions to remove unused setting by question type
+      onSave(data.toWebform(formStore, questionGroups));
+    }
+  };
+
   const questions = questionGroups.reduce(
     (curr, qg) => [...curr, ...qg.questions],
     []
@@ -54,16 +74,28 @@ const WebformEditor = ({ onSave = false }) => {
           onChange={handleTabsOnChange}
           tabBarExtraContent={
             <div className={styles['right-tabs']}>
-              <Tag>
-                {questions.length} {questionCount}
-              </Tag>
-              <Tag>
-                {mandatory.length} {mandatoryQuestionCount}
-              </Tag>
-              <Tag>
-                {questionGroups.length} {questionGroupCount}
-              </Tag>
-              <Tag>{version} 1</Tag>
+              <Space>
+                <Tag style={{ margin: 0 }}>
+                  {questions.length} {questionCount}
+                </Tag>
+                <Tag style={{ margin: 0 }}>
+                  {mandatory.length} {mandatoryQuestionCount}
+                </Tag>
+                <Tag style={{ margin: 0 }}>
+                  {questionGroups.length} {questionGroupCount}
+                </Tag>
+                <Tag style={{ margin: 0 }}>{version} 1</Tag>
+                <CardExtraButton
+                  type="edit-button"
+                  isExpand={activeEditFormSetting}
+                  onClick={handleShowFormSetting}
+                  onCancel={handleShowFormSetting}
+                />
+                <CardExtraButton
+                  type="save-button"
+                  onClick={handleSave}
+                />
+              </Space>
             </div>
           }
           tabBarGutter={24}
@@ -71,16 +103,16 @@ const WebformEditor = ({ onSave = false }) => {
         >
           <Tabs.TabPane
             tab={formTabPane}
-            key="form"
+            key="edit-form"
           />
           <Tabs.TabPane
             tab={previewTabPane}
             key="preview"
           />
         </Tabs>
-        {currentTab === 'form' && (
+        {currentTab === 'edit-form' && (
           <FormWrapper>
-            <FormDefinition onSave={onSave} />
+            {activeEditFormSetting && <FormDefinition {...formStore} />}
             {questionGroups.map((qg, qgi) => {
               return (
                 <QuestionGroupDefinition
