@@ -56,6 +56,11 @@ const UIStaticText = {
     inputQuestionEndpointValidationText: 'Invalid URL',
     inputQuestionInitialValueLabel: 'Initial Value',
     inputQuestionListCheckbox: 'List',
+    questionMoreInputDateSettingText: 'More Date Question Setting',
+    inputQuestionAfterDateValueLabel: 'After Date',
+    inputQuestionBeforeDateValueLabel: 'Before Date',
+    inputQuestionAfterDateValidationText: 'After date must be less than',
+    inputQuestionBeforeDateValidationText: 'Before date must be greater than',
   },
 };
 

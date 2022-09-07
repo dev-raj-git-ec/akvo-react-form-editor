@@ -8,6 +8,7 @@ import {
   SettingNumber,
   SettingOption,
   SettingCascade,
+  SettingDate,
 } from './question-type';
 
 const QuestionSetting = ({ question, dependant }) => {
@@ -136,6 +137,7 @@ const QuestionSetting = ({ question, dependant }) => {
       )}
       {qType === questionType.tree && <SettingTree {...question} />}
       {qType === questionType.cascade && <SettingCascade {...question} />}
+      {qType === questionType.date && <SettingDate {...question} />}
     </div>
   );
 };
