@@ -10,17 +10,31 @@ const SettingNumber = ({
     allowDecimal: false,
     min: null,
     max: null,
-    equal: null,
   },
 }) => {
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
-  const { allowDecimal, min, max, equal } = rule;
+  const { allowDecimal, min, max } = rule;
 
   const moreNumberSettings = [
-    { label: UIText.inputQuestionMinimumValueLabel, value: min, key: 'min' },
-    { label: UIText.inputQuestionMaximumValueLabel, value: max, key: 'max' },
-    { label: UIText.inputQuestionEqualValueLabel, value: equal, key: 'equal' },
+    {
+      label: UIText.inputQuestionMinimumValueLabel,
+      value: min,
+      key: 'min',
+      rules: {
+        max: max - 1,
+        message: `Min value must be less than ${max}`,
+      },
+    },
+    {
+      label: UIText.inputQuestionMaximumValueLabel,
+      value: max,
+      key: 'max',
+      rules: {
+        min: min + 1,
+        message: `Max value must be greater than ${min}`,
+      },
+    },
   ];
 
   const updateState = (name, value) => {
@@ -53,7 +67,7 @@ const SettingNumber = ({
     updateState('allowDecimal', e?.target?.checked);
   };
 
-  const handleChangeMinMaxEqual = (key, e) => {
+  const handleChangeMinMax = (key, e) => {
     updateState(key, e);
   };
 
@@ -75,8 +89,7 @@ const SettingNumber = ({
       </Space>
       <Row
         align="middle"
-        justify="space-between"
-        gutter={[12, 12]}
+        gutter={[24, 24]}
       >
         {moreNumberSettings.map((x) => (
           <Col
@@ -87,12 +100,13 @@ const SettingNumber = ({
               label={x.label}
               initialValue={x.value}
               name={`${namePreffix}-${x.key}`}
+              rules={[{ type: 'number', ...x.rules }]}
             >
               <InputNumber
                 style={{ width: '100%' }}
                 controls={false}
                 keyboard={false}
-                onChange={(e) => handleChangeMinMaxEqual(x.key, e)}
+                onChange={(e) => handleChangeMinMax(x.key, e)}
               />
             </Form.Item>
           </Col>
