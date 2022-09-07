@@ -6,13 +6,16 @@ import { UIStore, questionGroupFn } from '../../lib/store';
 const SettingNumber = ({
   id,
   questionGroupId,
-  allowDecimal,
-  min,
-  max,
-  equal,
+  rule = {
+    allowDecimal: false,
+    min: null,
+    max: null,
+    equal: null,
+  },
 }) => {
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
+  const { allowDecimal, min, max, equal } = rule;
 
   const moreNumberSettings = [
     { label: UIText.inputQuestionMinimumValueLabel, value: min, key: 'min' },
@@ -28,7 +31,10 @@ const SettingNumber = ({
             if (q.id === id) {
               return {
                 ...q,
-                [name]: value,
+                rule: {
+                  ...q?.rule,
+                  [name]: value,
+                },
               };
             }
             return q;
