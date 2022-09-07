@@ -9,6 +9,7 @@ const UIStaticText = {
     inputQuestionGroupNameLabel: 'Question Group Name',
     inputQuestionGroupDescriptionLabel: 'Question Group Description',
     inputRepeatThisGroupCheckbox: 'Repeat this group',
+    inputRepeatTextLabel: 'Repeat Text',
     buttonShowQuestionsText: 'Show Questions',
     buttonHideQuestionsText: 'Hide Questions',
     buttonEditGroupText: 'Edit Group',
