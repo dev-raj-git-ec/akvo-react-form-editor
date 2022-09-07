@@ -39,7 +39,7 @@ const defaultOptions = ({ init = false, order = 0 }) => {
   };
 };
 
-const SettingOption = ({ id, questionGroupId, allowOther }) => {
+const SettingOption = ({ id, questionGroupId, allowOther, allowOtherText }) => {
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
   const [options, setOptions] = useState(defaultOptions({ init: true }));
@@ -76,6 +76,10 @@ const SettingOption = ({ id, questionGroupId, allowOther }) => {
 
   const handleOnChangeAllowOther = (e) => {
     updateState('allowOther', e?.target?.checked);
+  };
+
+  const handleOnChangeAllowOtherText = (e) => {
+    updateState('allowOtherText', e?.target?.value);
   };
 
   const handleOnChangeCode = (e, current) => {
@@ -171,17 +175,33 @@ const SettingOption = ({ id, questionGroupId, allowOther }) => {
       <p className={styles['more-question-setting-text']}>
         {UIText.questionMoreOptionTypeSettingText}
       </p>
-      <Space className={styles['space-align-left']}>
-        <Form.Item name={`${namePreffix}-allow_other`}>
-          <Checkbox
-            onChange={handleOnChangeAllowOther}
-            checked={allowOther}
-          >
-            {' '}
-            {UIText.inputQuestionAllowOtherCheckbox}
-          </Checkbox>
-        </Form.Item>
-      </Space>
+      <Row
+        align="bottom"
+        gutter={[24, 24]}
+      >
+        <Col>
+          <Form.Item name={`${namePreffix}-allow_other`}>
+            <Checkbox
+              onChange={handleOnChangeAllowOther}
+              checked={allowOther}
+            >
+              {' '}
+              {UIText.inputQuestionAllowOtherCheckbox}
+            </Checkbox>
+          </Form.Item>
+        </Col>
+        {allowOther && (
+          <Col span={11}>
+            <Form.Item
+              label={UIText.inputQuestionAllowOtherTextLabel}
+              name={`${namePreffix}-allow_other_text`}
+              initialValue={allowOtherText}
+            >
+              <Input onChange={handleOnChangeAllowOtherText} />
+            </Form.Item>
+          </Col>
+        )}
+      </Row>
       {orderBy(options, 'order').map((d, di) => (
         <Row
           key={`option-${id}-${di}`}

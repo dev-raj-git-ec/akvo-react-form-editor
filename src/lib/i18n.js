@@ -42,6 +42,7 @@ const UIStaticText = {
     inputQuestionEqualValueLabel: 'Equal Value',
     questionMoreOptionTypeSettingText: 'More Option Question Setting',
     inputQuestionAllowOtherCheckbox: 'Allow Other',
+    inputQuestionAllowOtherTextLabel: 'Allow Other Text',
     questionMoreTreeSettingText: 'More Nested List Question Setting',
     inputSelectTreeDropdownValueLabel: 'Select Nested List Value',
     deleteQuestionGroupError: 'Unable to delete question group',
