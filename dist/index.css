@@ -27,6 +27,9 @@
   padding: 12px;
   background-color: #f3f3f3;
 }
+.arfe-reorder-wrapper .arfe-reorder-button {
+  background-color: #f3f3f3;
+}
 
 .arfe-select-dropdown {
   text-align: left;
@@ -39,6 +42,11 @@
   font-size: 18px;
   font-weight: bold;
   color: #6a6a6a;
+}
+
+.arfe-tabs-wrapper .arfe-right-tabs {
+  font-family: 'Roboto Condensed', sans-serif;
+  font-weight: normal;
 }
 
 .arfe-question-group-title {

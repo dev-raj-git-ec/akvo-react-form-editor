@@ -1,47 +1,29 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React__default, { useState, useCallback, useEffect, createContext, useContext, forwardRef, createElement, useMemo } from 'react';
 import 'antd/dist/antd.min.css';
-import { Form, Row, Col, Button, Space, Tag, Input, Checkbox, InputNumber, Select, DatePicker, Alert, Card, Tabs } from 'antd';
+import { Form, Input, Row, Col, Checkbox, Space, InputNumber, Button, Select, DatePicker, Alert, Tag, Card, Tabs } from 'antd';
 import 'akvo-react-form/dist/index.css';
 import { Webform } from 'akvo-react-form';
 import { Store } from 'pullstate';
-import { TbEditOff, TbEdit } from 'react-icons/tb';
-import { RiDeleteBin2Line, RiSettings5Fill, RiSettings5Line } from 'react-icons/ri';
-import { BiMove } from 'react-icons/bi';
 import { MdOutlineAddCircleOutline, MdOutlineArrowCircleUp, MdOutlineArrowCircleDown, MdOutlineRemoveCircleOutline } from 'react-icons/md';
 import { orderBy, takeRight, map, groupBy, maxBy, minBy } from 'lodash';
+import { TbEditOff, TbEdit } from 'react-icons/tb';
+import { RiDeleteBin2Line, RiSave3Fill, RiSettings5Fill, RiSettings5Line } from 'react-icons/ri';
+import { BiMove } from 'react-icons/bi';
 
-function _extends() {
-  _extends = Object.assign ? Object.assign.bind() : function (target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
+var styles = {"container":"arfe-container","form-definition":"arfe-form-definition","input-checkbox-wrapper":"arfe-input-checkbox-wrapper","button-icon":"arfe-button-icon","reorder-wrapper":"arfe-reorder-wrapper","reorder-button":"arfe-reorder-button","select-dropdown":"arfe-select-dropdown","tabs-wrapper":"arfe-tabs-wrapper","right-tabs":"arfe-right-tabs","question-group-title":"arfe-question-group-title","space-align-right":"arfe-space-align-right","space-align-left":"arfe-space-align-left","space-vertical-align-left":"arfe-space-vertical-align-left","space-vertical-align-right":"arfe-space-vertical-align-right","more-question-setting-text":"arfe-more-question-setting-text"};
 
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
-    }
+const FormWrapper = ({
+  children
+}) => {
+  const [form] = Form.useForm();
 
-    return target;
-  };
-  return _extends.apply(this, arguments);
-}
+  const handleOnValuesChange = () => {};
 
-var styles = {"container":"arfe-container","form-definition":"arfe-form-definition","input-checkbox-wrapper":"arfe-input-checkbox-wrapper","button-icon":"arfe-button-icon","reorder-wrapper":"arfe-reorder-wrapper","select-dropdown":"arfe-select-dropdown","tabs-wrapper":"arfe-tabs-wrapper","question-group-title":"arfe-question-group-title","space-align-right":"arfe-space-align-right","space-align-left":"arfe-space-align-left","space-vertical-align-left":"arfe-space-vertical-align-left","space-vertical-align-right":"arfe-space-vertical-align-right","more-question-setting-text":"arfe-more-question-setting-text"};
+  const handleOnFinish = () => {};
 
-var FormWrapper = function FormWrapper(_ref) {
-  var children = _ref.children;
+  const handleOnFinishFailed = () => {};
 
-  var _Form$useForm = Form.useForm(),
-      form = _Form$useForm[0];
-
-  var handleOnValuesChange = function handleOnValuesChange() {};
-
-  var handleOnFinish = function handleOnFinish() {};
-
-  var handleOnFinishFailed = function handleOnFinishFailed() {};
-
-  return /*#__PURE__*/React.createElement(Form, {
+  return /*#__PURE__*/React__default.createElement(Form, {
     form: form,
     key: "akvo-react-form-editor",
     name: "akvo-react-form-editor",
@@ -52,12 +34,14 @@ var FormWrapper = function FormWrapper(_ref) {
   }, children);
 };
 
-var UIStaticText = {
+const UIStaticText = {
   en: {
     inputFormNameLabel: 'Form Name',
     inputFormDescriptionLabel: 'Form Description',
-    formTabPane: 'Form',
+    formTabPane: 'Edit Form',
     previewTabPane: 'Preview',
+    questionCount: 'Questions',
+    questionGroupCount: 'Question Groups',
     mandatoryQuestionCount: 'Mandatory Questions',
     version: 'Version',
     inputQuestionGroupNameLabel: 'Question Group Name',
@@ -192,31 +176,21 @@ var fake = [
 	"augue"
 ];
 
-var titleCase = function titleCase(str) {
-  return str.replace(/\w\S*/g, function (txt) {
-    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-  });
+const titleCase = str => {
+  return str.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
 };
 
-var getWords = function getWords() {
+const getWords = () => {
   return fake[Math.floor(Math.random() * fake.length)];
 };
 
-var dummyName = function dummyName(len) {
-  if (len === void 0) {
-    len = 2;
-  }
-
-  return Array.from('x'.repeat(len)).reduce(function (curr) {
-    return curr + ' ' + getWords();
-  }, titleCase(getWords()));
+const dummyName = (len = 2) => {
+  return Array.from('x'.repeat(len)).reduce(curr => curr + ' ' + getWords(), titleCase(getWords()));
 };
 
-var generateId = function generateId() {
-  return new Date().getTime();
-};
+const generateId = () => new Date().getTime();
 
-var questionType = {
+const questionType = {
   input: 'input',
   number: 'number',
   cascade: 'cascade',
@@ -228,73 +202,73 @@ var questionType = {
   autofield: 'autofield'
 };
 
-var defaultQuestion = function defaultQuestion(_ref) {
-  var id = _ref.id,
-      questionGroup = _ref.questionGroup,
-      name = _ref.name,
-      _ref$prevOrder = _ref.prevOrder,
-      prevOrder = _ref$prevOrder === void 0 ? 0 : _ref$prevOrder,
-      _ref$type = _ref.type,
-      type = _ref$type === void 0 ? questionType.input : _ref$type,
-      _ref$params = _ref.params,
-      params = _ref$params === void 0 ? {} : _ref$params;
-
-  var q = _extends({
+const defaultQuestion = ({
+  id,
+  questionGroup,
+  name,
+  prevOrder: _prevOrder = 0,
+  type: _type = questionType.input,
+  params: _params = {}
+}) => {
+  const q = {
     id: id || generateId(),
     questionGroupId: questionGroup.id,
     name: name || dummyName(5),
-    order: prevOrder + 1,
-    type: type,
+    order: _prevOrder + 1,
+    type: _type,
     required: false,
-    tooltip: null
-  }, params);
+    tooltip: null,
+    ..._params
+  };
 
-  if (type === questionType.option || type === questionType.multiple_option) {
-    return _extends({}, q, {
+  if (_type === questionType.option || _type === questionType.multiple_option) {
+    return { ...q,
       options: [],
-      allowOther: false
-    }, params);
+      allowOther: false,
+      ..._params
+    };
   }
 
-  if (type === questionType.cascade) {
-    return _extends({}, q, {
+  if (_type === questionType.cascade) {
+    return { ...q,
       api: {
         endpoint: null,
         initial: 0,
         list: false
-      }
-    }, params);
+      },
+      ..._params
+    };
   }
 
   return q;
 };
 
-var defaultQuestionGroup = function defaultQuestionGroup(_ref2) {
-  var _ref2$name = _ref2.name,
-      name = _ref2$name === void 0 ? dummyName() : _ref2$name,
-      _ref2$prevOrder = _ref2.prevOrder,
-      prevOrder = _ref2$prevOrder === void 0 ? 0 : _ref2$prevOrder;
-  var qg = {
+const defaultQuestionGroup = ({
+  name: _name = dummyName(),
+  prevOrder: _prevOrder2 = 0
+}) => {
+  const qg = {
     id: generateId(),
-    name: name,
-    order: prevOrder + 1,
+    name: _name,
+    order: _prevOrder2 + 1,
     description: null,
     repeatable: false
   };
-  return _extends({}, qg, {
+  return { ...qg,
     questions: [defaultQuestion({
       questionGroup: qg
     })]
-  });
+  };
 };
 
-var UIStore = new Store({
+const UIStore = new Store({
   current: {
-    tab: 'form',
+    tab: 'edit-form',
     formId: null,
     questionGroupId: null,
     questionId: null
   },
+  activeEditFormSetting: true,
   activeQuestionGroups: [],
   activeEditQuestionGroups: [],
   activeMoveQuestionGroup: null,
@@ -302,49 +276,49 @@ var UIStore = new Store({
   activeMoveQuestion: null,
   UIText: UIStaticText.en
 });
-var FormStore = new Store({
+const FormStore = new Store({
   id: generateId(),
   name: 'New Form',
   version: 1,
   description: 'New Form Description'
 });
-var QuestionGroupStore = new Store({
+const QuestionGroupStore = new Store({
   questionGroups: [defaultQuestionGroup({})]
 });
-var questionGroupFn = {
+const questionGroupFn = {
   add: defaultQuestionGroup,
   store: QuestionGroupStore
 };
-var questionFn = {
+const questionFn = {
   add: defaultQuestion,
-  update: function update(_ref3) {
-    var id = _ref3.id,
-        type = _ref3.type,
-        questionGroup = _ref3.questionGroup,
-        params = _ref3.params;
-    return defaultQuestion(_extends({
-      id: id,
-      type: type,
-      questionGroup: questionGroup
-    }, params));
-  }
+  update: ({
+    id,
+    type,
+    questionGroup,
+    params
+  }) => defaultQuestion({
+    id: id,
+    type: type,
+    questionGroup: questionGroup,
+    ...params
+  })
 };
 
-var clearQuestionObj = function clearQuestionObj(keysToRemove, obj) {
-  var clearedQuestion = {};
-  Object.keys(obj).forEach(function (key) {
+const clearQuestionObj = (keysToRemove, obj) => {
+  let clearedQuestion = {};
+  Object.keys(obj).forEach(key => {
     if (!keysToRemove.includes(key)) {
-      var _extends2;
-
-      clearedQuestion = _extends({}, clearedQuestion, (_extends2 = {}, _extends2[key] = obj[key], _extends2));
+      clearedQuestion = { ...clearedQuestion,
+        [key]: obj[key]
+      };
     }
   });
   return clearedQuestion;
 };
 
-var toWebform = function toWebform(formData, questionGroups) {
-  var output = questionGroups.map(function (qg) {
-    var questions = qg.questions.map(function (q) {
+const toWebform = (formData, questionGroups) => {
+  const output = questionGroups.map(qg => {
+    const questions = qg.questions.map(q => {
       var _q, _q2;
 
       if (q.type !== questionType.input) {
@@ -356,9 +330,9 @@ var toWebform = function toWebform(formData, questionGroups) {
       }
 
       if ([questionType.option, questionType.multiple_option].includes(q.type)) {
-        q = _extends({}, q, {
+        q = { ...q,
           option: q.options
-        });
+        };
       }
 
       if (![questionType.option, questionType.multiple_option].includes(q.type)) {
@@ -370,42 +344,42 @@ var toWebform = function toWebform(formData, questionGroups) {
       }
 
       if ((_q = q) !== null && _q !== void 0 && _q.tooltip) {
-        q = _extends({}, q, {
+        q = { ...q,
           tooltip: {
             text: q.tooltip
           }
-        });
+        };
       } else {
         q = clearQuestionObj(['tooltip'], q);
       }
 
       if ((_q2 = q) !== null && _q2 !== void 0 && _q2.dependency) {
-        var dependency = q.dependency.map(function (d) {
+        const dependency = q.dependency.map(d => {
           var _d, _d2;
 
           if ((_d = d) !== null && _d !== void 0 && _d.max) {
-            d = _extends({}, d, {
+            d = { ...d,
               max: d.max - 1
-            });
+            };
           }
 
           if ((_d2 = d) !== null && _d2 !== void 0 && _d2.min) {
-            d = _extends({}, d, {
+            d = { ...d,
               min: d.min + 1
-            });
+            };
           }
 
           return d;
         });
-        q = _extends({}, q, {
+        q = { ...q,
           dependency: dependency
-        });
+        };
       }
 
       q = clearQuestionObj(['options'], q);
       return q;
     });
-    var result = {
+    let result = {
       id: qg.id,
       name: qg.name,
       order: qg.order,
@@ -414,292 +388,93 @@ var toWebform = function toWebform(formData, questionGroups) {
     };
 
     if (qg !== null && qg !== void 0 && qg.repeatText) {
-      result = _extends({}, result, {
+      result = { ...result,
         repeatText: qg.repeatText
-      });
+      };
     }
 
     if (qg !== null && qg !== void 0 && qg.description) {
-      result = _extends({}, result, {
+      result = { ...result,
         description: qg.description
-      });
+      };
     }
 
     return result;
   });
-  return _extends({}, formData, {
+  return { ...formData,
     question_group: output
-  });
+  };
 };
 
-var data = {
+const data = {
   toWebform: toWebform
 };
 
-var FormPreview = function FormPreview() {
-  var _questionGroupFn$stor = questionGroupFn.store.useState(function (s) {
-    return s;
-  }),
-      questionGroups = _questionGroupFn$stor.questionGroups;
-
-  var formStore = FormStore.useState(function (s) {
-    return s;
-  });
-  return /*#__PURE__*/React.createElement(Webform, {
+const FormPreview = () => {
+  const {
+    questionGroups
+  } = questionGroupFn.store.useState(s => s);
+  const formStore = FormStore.useState(s => s);
+  return /*#__PURE__*/React__default.createElement(Webform, {
     forms: data.toWebform(formStore, questionGroups)
   });
 };
 
-var AddMoveButton = function AddMoveButton(_ref) {
-  var text = _ref.text,
-      className = _ref.className,
-      _ref$movingItem = _ref.movingItem,
-      movingItem = _ref$movingItem === void 0 ? null : _ref$movingItem,
-      _ref$handleCancelMove = _ref.handleCancelMove,
-      handleCancelMove = _ref$handleCancelMove === void 0 ? function () {} : _ref$handleCancelMove,
-      _ref$disabled = _ref.disabled,
-      disabled = _ref$disabled === void 0 ? false : _ref$disabled,
-      _ref$handleOnAdd = _ref.handleOnAdd,
-      handleOnAdd = _ref$handleOnAdd === void 0 ? function () {} : _ref$handleOnAdd,
-      _ref$handleOnMove = _ref.handleOnMove,
-      handleOnMove = _ref$handleOnMove === void 0 ? function () {} : _ref$handleOnMove;
-
-  var _UIStore$useState = UIStore.useState(function (s) {
-    return s.UIText;
-  }),
-      buttonCancelText = _UIStore$useState.buttonCancelText;
-
-  return /*#__PURE__*/React.createElement(Row, {
-    align: "middle",
-    justify: "start",
-    className: "arfe-reorder-wrapper " + className
-  }, /*#__PURE__*/React.createElement(Col, {
-    span: movingItem ? 12 : 24,
-    align: "left"
-  }, /*#__PURE__*/React.createElement(Button, {
-    type: "dashed",
-    className: "reorder-button",
-    size: "small",
-    onClick: movingItem ? handleOnMove : handleOnAdd,
-    disabled: disabled
-  }, text)), movingItem && /*#__PURE__*/React.createElement(Col, {
-    span: 12,
-    align: "right"
-  }, /*#__PURE__*/React.createElement(Button, {
-    type: "danger",
-    className: "reorder-button",
-    size: "small",
-    onClick: handleCancelMove
-  }, buttonCancelText)));
-};
-
-var CardExtraButton = function CardExtraButton(_ref) {
-  var _ref$type = _ref.type,
-      type = _ref$type === void 0 ? 'delete-button' : _ref$type,
-      _ref$isExpand = _ref.isExpand,
-      isExpand = _ref$isExpand === void 0 ? false : _ref$isExpand,
-      _ref$onClick = _ref.onClick,
-      onClick = _ref$onClick === void 0 ? function () {} : _ref$onClick,
-      _ref$onCancel = _ref.onCancel,
-      onCancel = _ref$onCancel === void 0 ? function () {} : _ref$onCancel,
-      _ref$disabled = _ref.disabled,
-      disabled = _ref$disabled === void 0 ? false : _ref$disabled;
-
-  switch (type) {
-    case 'show-button':
-      if (isExpand) {
-        return /*#__PURE__*/React.createElement(Button, {
-          type: "link",
-          className: styles['button-icon'],
-          onClick: onCancel,
-          icon: /*#__PURE__*/React.createElement(TbEditOff, null),
-          disabled: disabled
-        });
-      }
-
-      return /*#__PURE__*/React.createElement(Button, {
-        type: "link",
-        className: styles['button-icon'],
-        onClick: onClick,
-        icon: /*#__PURE__*/React.createElement(TbEdit, null),
-        disabled: disabled
-      });
-
-    case 'move-button':
-      return /*#__PURE__*/React.createElement(Button, {
-        type: "link",
-        className: styles['button-icon'],
-        onClick: onClick,
-        disabled: disabled,
-        icon: /*#__PURE__*/React.createElement(BiMove, null)
-      });
-
-    case 'edit-button':
-      if (isExpand) {
-        return /*#__PURE__*/React.createElement(Button, {
-          type: "link",
-          className: styles['button-icon'],
-          onClick: onCancel,
-          icon: /*#__PURE__*/React.createElement(RiSettings5Fill, null),
-          disabled: disabled
-        });
-      }
-
-      return /*#__PURE__*/React.createElement(Button, {
-        type: "link",
-        className: styles['button-icon'],
-        onClick: onClick,
-        icon: /*#__PURE__*/React.createElement(RiSettings5Line, null),
-        disabled: disabled
-      });
-
-    case 'add-button':
-      return /*#__PURE__*/React.createElement(Button, {
-        type: "link",
-        className: styles['button-icon'],
-        onClick: onClick,
-        icon: /*#__PURE__*/React.createElement(MdOutlineAddCircleOutline, null),
-        disabled: disabled
-      });
-
-    default:
-      return /*#__PURE__*/React.createElement(Button, {
-        type: "link",
-        className: styles['button-icon'],
-        onClick: onClick,
-        icon: /*#__PURE__*/React.createElement(RiDeleteBin2Line, null),
-        disabled: disabled
-      });
-  }
-};
-
-var CardTitle = function CardTitle(_ref) {
-  var id = _ref.id,
-      title = _ref.title,
-      buttons = _ref.buttons,
-      _ref$dependency = _ref.dependency,
-      dependency = _ref$dependency === void 0 ? [] : _ref$dependency;
-  return /*#__PURE__*/React.createElement(Space, null, !!dependency.length && /*#__PURE__*/React.createElement(Tag, {
-    style: {
-      margin: 'auto'
-    }
-  }, dependency.length, " Dependenc", dependency.length > 1 ? 'ies' : 'y'), buttons === null || buttons === void 0 ? void 0 : buttons.map(function (cfg) {
-    return /*#__PURE__*/React.createElement(CardExtraButton, {
-      key: cfg.type + "-" + id,
-      type: cfg.type,
-      isExpand: cfg.isExpand,
-      onClick: function onClick() {
-        return cfg.onClick();
-      },
-      onCancel: function onCancel() {
-        return cfg.onCancel();
-      },
-      disabled: cfg === null || cfg === void 0 ? void 0 : cfg.disabled
-    });
-  }), title && /*#__PURE__*/React.createElement("div", {
-    className: "arfe-question-group-title"
-  }, title));
-};
-
-var SaveButton = function SaveButton(_ref) {
-  var _ref$onClickSave = _ref.onClickSave,
-      onClickSave = _ref$onClickSave === void 0 ? function () {} : _ref$onClickSave,
-      _ref$cancelButton = _ref.cancelButton,
-      cancelButton = _ref$cancelButton === void 0 ? true : _ref$cancelButton,
-      _ref$onClickCancel = _ref.onClickCancel,
-      onClickCancel = _ref$onClickCancel === void 0 ? function () {} : _ref$onClickCancel;
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
-  return /*#__PURE__*/React.createElement(Space, {
-    className: styles['space-align-right']
-  }, /*#__PURE__*/React.createElement(Button, {
-    type: "primary",
-    onClick: onClickSave
-  }, UIText.buttonSaveText), cancelButton && /*#__PURE__*/React.createElement(Button, {
-    onClick: onClickCancel
-  }, UIText.buttonCancelText));
-};
-
-var FormDefinition = function FormDefinition(_ref) {
-  var onSave = _ref.onSave;
-
-  var _questionGroupFn$stor = questionGroupFn.store.useState(function (s) {
-    return s;
-  }),
-      questionGroups = _questionGroupFn$stor.questionGroups;
-
-  var formStore = FormStore.useState(function (s) {
-    return s;
-  });
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
-  var inputFormNameLabel = UIText.inputFormNameLabel,
-      inputFormDescriptionLabel = UIText.inputFormDescriptionLabel;
-  var name = formStore.name,
-      description = formStore.description;
-
-  var handleSave = function handleSave() {
-    if (onSave) {
-      onSave(data.toWebform(formStore, questionGroups));
-    }
-  };
-
-  return /*#__PURE__*/React.createElement("div", {
+const FormDefinition = ({
+  name,
+  description
+}) => {
+  const UIText = UIStore.useState(s => s.UIText);
+  const {
+    inputFormNameLabel,
+    inputFormDescriptionLabel
+  } = UIText;
+  return /*#__PURE__*/React__default.createElement("div", {
     key: "form-definition-input",
     className: "arfe-form-definition"
-  }, /*#__PURE__*/React.createElement(Form.Item, {
+  }, /*#__PURE__*/React__default.createElement(Form.Item, {
     label: inputFormNameLabel,
     name: "form-name",
     initialValue: name
-  }, /*#__PURE__*/React.createElement(Input, {
-    onChange: function onChange(e) {
-      return FormStore.update(function (u) {
-        var _e$target;
+  }, /*#__PURE__*/React__default.createElement(Input, {
+    onChange: e => FormStore.update(u => {
+      var _e$target;
 
-        u.name = e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.value;
-      });
-    }
-  })), /*#__PURE__*/React.createElement(Form.Item, {
+      u.name = e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.value;
+    })
+  })), /*#__PURE__*/React__default.createElement(Form.Item, {
     label: inputFormDescriptionLabel,
     name: "form-description",
     initialValue: description
-  }, /*#__PURE__*/React.createElement(Input.TextArea, {
+  }, /*#__PURE__*/React__default.createElement(Input.TextArea, {
     rows: 5,
-    onChange: function onChange(e) {
-      return FormStore.update(function (u) {
-        var _e$target2;
+    onChange: e => FormStore.update(u => {
+      var _e$target2;
 
-        u.description = e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.value;
-      });
-    }
-  })), /*#__PURE__*/React.createElement(SaveButton, {
-    cancelButton: false,
-    onClickSave: handleSave
-  }));
+      u.description = e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.value;
+    })
+  })));
 };
 
-var QuestionGroupSetting = function QuestionGroupSetting(_ref) {
-  var id = _ref.id,
-      name = _ref.name,
-      description = _ref.description,
-      repeatable = _ref.repeatable,
-      repeatText = _ref.repeatText;
-  var namePreffix = "question_group-" + id;
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
+const QuestionGroupSetting = ({
+  id,
+  name,
+  description,
+  repeatable,
+  repeatText
+}) => {
+  const namePreffix = `question_group-${id}`;
+  const UIText = UIStore.useState(s => s.UIText);
 
-  var handleChangeName = function handleChangeName(e) {
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (x) {
+  const handleChangeName = e => {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(x => {
         if (x.id === id) {
           var _e$target;
 
-          return _extends({}, x, {
+          return { ...x,
             name: e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.value
-          });
+          };
         }
 
         return x;
@@ -707,15 +482,15 @@ var QuestionGroupSetting = function QuestionGroupSetting(_ref) {
     });
   };
 
-  var handleChangeDescription = function handleChangeDescription(e) {
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (x) {
+  const handleChangeDescription = e => {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(x => {
         if (x.id === id) {
           var _e$target2;
 
-          return _extends({}, x, {
+          return { ...x,
             description: e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.value
-          });
+          };
         }
 
         return x;
@@ -723,15 +498,15 @@ var QuestionGroupSetting = function QuestionGroupSetting(_ref) {
     });
   };
 
-  var handleChangeRepeatable = function handleChangeRepeatable(e) {
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (x) {
+  const handleChangeRepeatable = e => {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(x => {
         if (x.id === id) {
           var _e$target3;
 
-          return _extends({}, x, {
+          return { ...x,
             repeatable: e === null || e === void 0 ? void 0 : (_e$target3 = e.target) === null || _e$target3 === void 0 ? void 0 : _e$target3.checked
-          });
+          };
         }
 
         return x;
@@ -739,15 +514,15 @@ var QuestionGroupSetting = function QuestionGroupSetting(_ref) {
     });
   };
 
-  var handleChangeRepeatText = function handleChangeRepeatText(e) {
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (x) {
+  const handleChangeRepeatText = e => {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(x => {
         if (x.id === id) {
           var _e$target4;
 
-          return _extends({}, x, {
+          return { ...x,
             repeatText: e === null || e === void 0 ? void 0 : (_e$target4 = e.target) === null || _e$target4 === void 0 ? void 0 : _e$target4.value
-          });
+          };
         }
 
         return x;
@@ -755,66 +530,65 @@ var QuestionGroupSetting = function QuestionGroupSetting(_ref) {
     });
   };
 
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Form.Item, {
+  return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionGroupNameLabel,
     initialValue: name,
-    name: namePreffix + "-name",
+    name: `${namePreffix}-name`,
     required: true
-  }, /*#__PURE__*/React.createElement(Input, {
+  }, /*#__PURE__*/React__default.createElement(Input, {
     onChange: handleChangeName
-  })), /*#__PURE__*/React.createElement(Form.Item, {
+  })), /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionGroupDescriptionLabel,
     initialValue: description,
-    name: namePreffix + "-description"
-  }, /*#__PURE__*/React.createElement(Input.TextArea, {
+    name: `${namePreffix}-description`
+  }, /*#__PURE__*/React__default.createElement(Input.TextArea, {
     onChange: handleChangeDescription,
     rows: 5
-  })), /*#__PURE__*/React.createElement(Row, {
+  })), /*#__PURE__*/React__default.createElement(Row, {
     align: "bottom",
     gutter: [24, 24]
-  }, /*#__PURE__*/React.createElement(Col, null, /*#__PURE__*/React.createElement(Form.Item, {
-    name: namePreffix + "-repeatable",
+  }, /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement(Form.Item, {
+    name: `${namePreffix}-repeatable`,
     className: styles['input-checkbox-wrapper']
-  }, /*#__PURE__*/React.createElement(Checkbox, {
+  }, /*#__PURE__*/React__default.createElement(Checkbox, {
     onChange: handleChangeRepeatable,
     checked: repeatable
-  }, ' ', UIText.inputRepeatThisGroupCheckbox))), repeatable && /*#__PURE__*/React.createElement(Col, {
+  }, ' ', UIText.inputRepeatThisGroupCheckbox))), repeatable && /*#__PURE__*/React__default.createElement(Col, {
     span: 10
-  }, /*#__PURE__*/React.createElement(Form.Item, {
+  }, /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputRepeatTextLabel,
-    name: namePreffix + "-repeat_text",
+    name: `${namePreffix}-repeat_text`,
     initialValue: repeatText
-  }, /*#__PURE__*/React.createElement(Input, {
+  }, /*#__PURE__*/React__default.createElement(Input, {
     onChange: handleChangeRepeatText
   })))));
 };
 
-var SettingInput = function SettingInput(_ref) {
-  var id = _ref.id,
-      questionGroupId = _ref.questionGroupId,
-      requiredDoubleEntry = _ref.requiredDoubleEntry,
-      hiddenString = _ref.hiddenString;
-  var namePreffix = "question-" + id;
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
+const SettingInput = ({
+  id,
+  questionGroupId,
+  requiredDoubleEntry,
+  hiddenString
+}) => {
+  const namePreffix = `question-${id}`;
+  const UIText = UIStore.useState(s => s.UIText);
 
-  var updateState = function updateState(name, value) {
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (qg) {
+  const updateState = (name, value) => {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(qg => {
         if (qg.id === questionGroupId) {
-          var questions = qg.questions.map(function (q) {
+          const questions = qg.questions.map(q => {
             if (q.id === id) {
-              var _extends2;
-
-              return _extends({}, q, (_extends2 = {}, _extends2[name] = value, _extends2));
+              return { ...q,
+                [name]: value
+              };
             }
 
             return q;
           });
-          return _extends({}, qg, {
+          return { ...qg,
             questions: questions
-          });
+          };
         }
 
         return qg;
@@ -822,58 +596,58 @@ var SettingInput = function SettingInput(_ref) {
     });
   };
 
-  var handleChangeDoubleEntry = function handleChangeDoubleEntry(e) {
+  const handleChangeDoubleEntry = e => {
     var _e$target;
 
     updateState('requiredDoubleEntry', e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.checked);
   };
 
-  var handleChangeHiddenString = function handleChangeHiddenString(e) {
+  const handleChangeHiddenString = e => {
     var _e$target2;
 
     updateState('hiddenString', e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.checked);
   };
 
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
+  return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("p", {
     className: styles['more-question-setting-text']
-  }, UIText.questionMoreInputTypeSettingText), /*#__PURE__*/React.createElement(Space, {
+  }, UIText.questionMoreInputTypeSettingText), /*#__PURE__*/React__default.createElement(Space, {
     className: styles['space-align-left']
-  }, /*#__PURE__*/React.createElement(Form.Item, {
-    name: namePreffix + "-require_double_entry"
-  }, /*#__PURE__*/React.createElement(Checkbox, {
+  }, /*#__PURE__*/React__default.createElement(Form.Item, {
+    name: `${namePreffix}-require_double_entry`
+  }, /*#__PURE__*/React__default.createElement(Checkbox, {
     onChange: handleChangeDoubleEntry,
     checked: requiredDoubleEntry
-  }, ' ', UIText.inputQuestionRequireDoubleEntryCheckbox)), /*#__PURE__*/React.createElement(Form.Item, {
-    name: namePreffix + "-hidden_string"
-  }, /*#__PURE__*/React.createElement(Checkbox, {
+  }, ' ', UIText.inputQuestionRequireDoubleEntryCheckbox)), /*#__PURE__*/React__default.createElement(Form.Item, {
+    name: `${namePreffix}-hidden_string`
+  }, /*#__PURE__*/React__default.createElement(Checkbox, {
     onChange: handleChangeHiddenString,
     checked: hiddenString
   }, ' ', UIText.inputQuestionHiddenStringCheckbox))));
 };
 
-var SettingNumber = function SettingNumber(_ref) {
-  var id = _ref.id,
-      questionGroupId = _ref.questionGroupId,
-      _ref$rule = _ref.rule,
-      rule = _ref$rule === void 0 ? {
+const SettingNumber = ({
+  id,
+  questionGroupId,
+  rule: _rule = {
     allowDecimal: false,
     min: null,
     max: null
-  } : _ref$rule;
-  var namePreffix = "question-" + id;
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
-  var allowDecimal = rule.allowDecimal,
-      min = rule.min,
-      max = rule.max;
-  var moreNumberSettings = [{
+  }
+}) => {
+  const namePreffix = `question-${id}`;
+  const UIText = UIStore.useState(s => s.UIText);
+  const {
+    allowDecimal,
+    min,
+    max
+  } = _rule;
+  const moreNumberSettings = [{
     label: UIText.inputQuestionMinimumValueLabel,
     value: min,
     key: 'min',
     rules: {
       max: max - 1,
-      message: UIText.inputQuestionMinimumValidationText + " " + max
+      message: `${UIText.inputQuestionMinimumValidationText} ${max}`
     }
   }, {
     label: UIText.inputQuestionMaximumValueLabel,
@@ -881,28 +655,28 @@ var SettingNumber = function SettingNumber(_ref) {
     key: 'max',
     rules: {
       min: min + 1,
-      message: UIText.inputQuestionMaximumValidationText + " " + min
+      message: `${UIText.inputQuestionMaximumValidationText} ${min}`
     }
   }];
 
-  var updateState = function updateState(name, value) {
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (qg) {
+  const updateState = (name, value) => {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(qg => {
         if (qg.id === questionGroupId) {
-          var questions = qg.questions.map(function (q) {
+          const questions = qg.questions.map(q => {
             if (q.id === id) {
-              var _extends2;
-
-              return _extends({}, q, {
-                rule: _extends({}, q === null || q === void 0 ? void 0 : q.rule, (_extends2 = {}, _extends2[name] = value, _extends2))
-              });
+              return { ...q,
+                rule: { ...(q === null || q === void 0 ? void 0 : q.rule),
+                  [name]: value
+                }
+              };
             }
 
             return q;
           });
-          return _extends({}, qg, {
+          return { ...qg,
             questions: questions
-          });
+          };
         }
 
         return qg;
@@ -910,169 +684,166 @@ var SettingNumber = function SettingNumber(_ref) {
     });
   };
 
-  var handleChangeAllowDecimal = function handleChangeAllowDecimal(e) {
+  const handleChangeAllowDecimal = e => {
     var _e$target;
 
     updateState('allowDecimal', e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.checked);
   };
 
-  var handleChangeMinMax = function handleChangeMinMax(key, e) {
+  const handleChangeMinMax = (key, e) => {
     updateState(key, e);
   };
 
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
+  return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("p", {
     className: styles['more-question-setting-text']
-  }, UIText.questionMoreInputNumberSettingText), /*#__PURE__*/React.createElement(Space, {
+  }, UIText.questionMoreInputNumberSettingText), /*#__PURE__*/React__default.createElement(Space, {
     className: styles['space-align-left']
-  }, /*#__PURE__*/React.createElement(Form.Item, {
-    name: namePreffix + "-allow_decimal"
-  }, /*#__PURE__*/React.createElement(Checkbox, {
+  }, /*#__PURE__*/React__default.createElement(Form.Item, {
+    name: `${namePreffix}-allow_decimal`
+  }, /*#__PURE__*/React__default.createElement(Checkbox, {
     onChange: handleChangeAllowDecimal,
     checked: allowDecimal
-  }, ' ', UIText.inputQuestionAllowDecimalCheckbox))), /*#__PURE__*/React.createElement(Row, {
+  }, ' ', UIText.inputQuestionAllowDecimalCheckbox))), /*#__PURE__*/React__default.createElement(Row, {
     align: "middle",
     gutter: [24, 24]
-  }, moreNumberSettings.map(function (x) {
-    return /*#__PURE__*/React.createElement(Col, {
-      key: namePreffix + "-" + x.key,
-      span: 8
-    }, /*#__PURE__*/React.createElement(Form.Item, {
-      label: x.label,
-      initialValue: x.value,
-      name: namePreffix + "-" + x.key,
-      rules: [_extends({
-        type: 'number'
-      }, x.rules)]
-    }, /*#__PURE__*/React.createElement(InputNumber, {
-      style: {
-        width: '100%'
-      },
-      controls: false,
-      keyboard: false,
-      onChange: function onChange(e) {
-        return handleChangeMinMax(x.key, e);
-      }
-    })));
-  })));
+  }, moreNumberSettings.map(x => /*#__PURE__*/React__default.createElement(Col, {
+    key: `${namePreffix}-${x.key}`,
+    span: 8
+  }, /*#__PURE__*/React__default.createElement(Form.Item, {
+    label: x.label,
+    initialValue: x.value,
+    name: `${namePreffix}-${x.key}`,
+    rules: [{
+      type: 'number',
+      ...x.rules
+    }]
+  }, /*#__PURE__*/React__default.createElement(InputNumber, {
+    style: {
+      width: '100%'
+    },
+    controls: false,
+    keyboard: false,
+    onChange: e => handleChangeMinMax(x.key, e)
+  }))))));
 };
 
-var defaultOptions = function defaultOptions(_ref) {
-  var _ref$init = _ref.init,
-      init = _ref$init === void 0 ? false : _ref$init,
-      _ref$order = _ref.order,
-      order = _ref$order === void 0 ? 0 : _ref$order;
-  var option = {
+const defaultOptions = ({
+  init: _init = false,
+  order: _order = 0
+}) => {
+  const option = {
     code: null,
     name: 'New Option',
     order: 1
   };
 
-  if (init) {
-    return [_extends({}, option, {
+  if (_init) {
+    return [{ ...option,
       id: generateId(),
       name: 'New Option 1',
       order: 1
-    }), _extends({}, option, {
+    }, { ...option,
       id: generateId() + 1,
       name: 'New Option 2',
       order: 2
-    })];
+    }];
   }
 
-  return _extends({}, option, {
+  return { ...option,
     id: generateId(),
-    order: order
-  });
+    order: _order
+  };
 };
 
-var SettingOption = function SettingOption(_ref2) {
-  var id = _ref2.id,
-      questionGroupId = _ref2.questionGroupId,
-      allowOther = _ref2.allowOther,
-      allowOtherText = _ref2.allowOtherText;
-  var namePreffix = "question-" + id;
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
-
-  var _useState = useState(defaultOptions({
+const SettingOption = ({
+  id,
+  questionGroupId,
+  allowOther,
+  allowOtherText
+}) => {
+  const namePreffix = `question-${id}`;
+  const UIText = UIStore.useState(s => s.UIText);
+  const [options, setOptions] = useState(defaultOptions({
     init: true
-  })),
-      options = _useState[0],
-      setOptions = _useState[1];
-
-  var updateState = useCallback(function (name, value) {
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (qg) {
+  }));
+  const updateState = useCallback((name, value) => {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(qg => {
         if (qg.id === questionGroupId) {
-          var questions = qg.questions.map(function (q) {
+          const questions = qg.questions.map(q => {
             if (q.id === id) {
-              var _extends2;
-
-              return _extends({}, q, (_extends2 = {}, _extends2[name] = value, _extends2));
+              return { ...q,
+                [name]: value
+              };
             }
 
             return q;
           });
-          return _extends({}, qg, {
+          return { ...qg,
             questions: questions
-          });
+          };
         }
 
         return qg;
       });
     });
   }, [id, questionGroupId]);
-  useEffect(function () {
+  useEffect(() => {
     updateState('options', options);
   }, [options, id, questionGroupId, updateState]);
 
-  var handleOnChangeAllowOther = function handleOnChangeAllowOther(e) {
+  const handleOnChangeAllowOther = e => {
     var _e$target;
 
     updateState('allowOther', e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.checked);
   };
 
-  var handleOnChangeAllowOtherText = function handleOnChangeAllowOtherText(e) {
+  const handleOnChangeAllowOtherText = e => {
     var _e$target2;
 
     updateState('allowOtherText', e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.value);
   };
 
-  var handleOnChangeCode = function handleOnChangeCode(e, current) {
-    var currentId = current.id;
-    setOptions(options.map(function (opt) {
+  const handleOnChangeCode = (e, current) => {
+    const {
+      id: currentId
+    } = current;
+    setOptions(options.map(opt => {
       if (opt.id === currentId) {
         var _e$target3;
 
-        return _extends({}, opt, {
+        return { ...opt,
           code: e === null || e === void 0 ? void 0 : (_e$target3 = e.target) === null || _e$target3 === void 0 ? void 0 : _e$target3.value
-        });
+        };
       }
 
       return opt;
     }));
   };
 
-  var handleOnChangeOption = function handleOnChangeOption(e, current) {
-    var currentId = current.id;
-    setOptions(options.map(function (opt) {
+  const handleOnChangeOption = (e, current) => {
+    const {
+      id: currentId
+    } = current;
+    setOptions(options.map(opt => {
       if (opt.id === currentId) {
         var _e$target4;
 
-        return _extends({}, opt, {
+        return { ...opt,
           name: e === null || e === void 0 ? void 0 : (_e$target4 = e.target) === null || _e$target4 === void 0 ? void 0 : _e$target4.value
-        });
+        };
       }
 
       return opt;
     }));
   };
 
-  var handleOnAddOption = function handleOnAddOption(current) {
-    var currentOrder = current.order;
-    var lastOrder = takeRight(orderBy(options, 'order'))[0].order;
-    var reorderOptions = options.map(function (opt) {
+  const handleOnAddOption = current => {
+    const {
+      order: currentOrder
+    } = current;
+    const lastOrder = takeRight(orderBy(options, 'order'))[0].order;
+    const reorderOptions = options.map(opt => {
       if (opt.order > currentOrder) {
         opt['order'] = opt['order'] + 1;
       }
@@ -1083,179 +854,145 @@ var SettingOption = function SettingOption(_ref2) {
 
       return opt;
     });
-    var addOptions = [].concat(reorderOptions, [defaultOptions({
+    const addOptions = [...reorderOptions, defaultOptions({
       order: currentOrder + 1
-    })]);
+    })];
     setOptions(orderBy(addOptions, 'order'));
   };
 
-  var handleOnMoveOption = function handleOnMoveOption(current, targetOrder) {
-    var currentOrder = current.order;
-    var prevOptions = options.filter(function (opt) {
-      return opt.order !== currentOrder && opt.order !== targetOrder;
-    });
-    var currentOption = options.filter(function (opt) {
-      return opt.order === currentOrder;
-    }).map(function (opt) {
-      return _extends({}, opt, {
-        order: targetOrder
-      });
-    });
-    var targetOption = options.filter(function (opt) {
-      return opt.order === targetOrder;
-    }).map(function (opt) {
-      return _extends({}, opt, {
-        order: currentOrder
-      });
-    });
-    setOptions(orderBy([].concat(prevOptions, currentOption, targetOption), 'order'));
-  };
-
-  var handleOnDeleteOption = function handleOnDeleteOption(currentId) {
-    setOptions(orderBy(options, 'order').filter(function (opt) {
-      return opt.id !== currentId;
-    }).map(function (opt, opti) {
-      return _extends({}, opt, {
-        order: opti + 1
-      });
+  const handleOnMoveOption = (current, targetOrder) => {
+    const {
+      order: currentOrder
+    } = current;
+    const prevOptions = options.filter(opt => opt.order !== currentOrder && opt.order !== targetOrder);
+    const currentOption = options.filter(opt => opt.order === currentOrder).map(opt => ({ ...opt,
+      order: targetOrder
     }));
+    const targetOption = options.filter(opt => opt.order === targetOrder).map(opt => ({ ...opt,
+      order: currentOrder
+    }));
+    setOptions(orderBy([...prevOptions, ...currentOption, ...targetOption], 'order'));
   };
 
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
+  const handleOnDeleteOption = currentId => {
+    setOptions(orderBy(options, 'order').filter(opt => opt.id !== currentId).map((opt, opti) => ({ ...opt,
+      order: opti + 1
+    })));
+  };
+
+  return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("p", {
     className: styles['more-question-setting-text']
-  }, UIText.questionMoreOptionTypeSettingText), /*#__PURE__*/React.createElement(Row, {
+  }, UIText.questionMoreOptionTypeSettingText), /*#__PURE__*/React__default.createElement(Row, {
     align: "bottom",
     gutter: [24, 24]
-  }, /*#__PURE__*/React.createElement(Col, null, /*#__PURE__*/React.createElement(Form.Item, {
-    name: namePreffix + "-allow_other"
-  }, /*#__PURE__*/React.createElement(Checkbox, {
+  }, /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement(Form.Item, {
+    name: `${namePreffix}-allow_other`
+  }, /*#__PURE__*/React__default.createElement(Checkbox, {
     onChange: handleOnChangeAllowOther,
     checked: allowOther
-  }, ' ', UIText.inputQuestionAllowOtherCheckbox))), allowOther && /*#__PURE__*/React.createElement(Col, {
+  }, ' ', UIText.inputQuestionAllowOtherCheckbox))), allowOther && /*#__PURE__*/React__default.createElement(Col, {
     span: 11
-  }, /*#__PURE__*/React.createElement(Form.Item, {
+  }, /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionAllowOtherTextLabel,
-    name: namePreffix + "-allow_other_text",
+    name: `${namePreffix}-allow_other_text`,
     initialValue: allowOtherText
-  }, /*#__PURE__*/React.createElement(Input, {
+  }, /*#__PURE__*/React__default.createElement(Input, {
     onChange: handleOnChangeAllowOtherText
-  })))), orderBy(options, 'order').map(function (d, di) {
-    return /*#__PURE__*/React.createElement(Row, {
-      key: "option-" + id + "-" + di,
-      align: "start",
-      justify: "start",
-      gutter: [12, 12]
-    }, /*#__PURE__*/React.createElement(Col, {
-      span: 4
-    }, /*#__PURE__*/React.createElement(Form.Item, {
-      initialValue: d.code,
-      name: namePreffix + "-option-code-" + d.id
-    }, /*#__PURE__*/React.createElement(Input, {
-      placeholder: "Code",
-      onChange: function onChange(e) {
-        return handleOnChangeCode(e, d);
-      }
-    }))), /*#__PURE__*/React.createElement(Col, {
-      span: 10
-    }, /*#__PURE__*/React.createElement(Form.Item, {
-      initialValue: d.name,
-      name: namePreffix + "-option-name-" + d.id
-    }, /*#__PURE__*/React.createElement(Input, {
-      onChange: function onChange(e) {
-        return handleOnChangeOption(e, d);
-      }
-    }))), /*#__PURE__*/React.createElement(Col, null, /*#__PURE__*/React.createElement(Space, null, /*#__PURE__*/React.createElement(Button, {
-      type: "link",
-      className: styles['button-icon'],
-      icon: /*#__PURE__*/React.createElement(MdOutlineAddCircleOutline, null),
-      onClick: function onClick() {
-        return handleOnAddOption(d);
-      }
-    }), /*#__PURE__*/React.createElement(Button, {
-      type: "link",
-      className: styles['button-icon'],
-      icon: /*#__PURE__*/React.createElement(MdOutlineArrowCircleUp, null),
-      onClick: function onClick() {
-        return handleOnMoveOption(d, d.order - 1);
-      },
-      disabled: di === 0
-    }), /*#__PURE__*/React.createElement(Button, {
-      type: "link",
-      className: styles['button-icon'],
-      icon: /*#__PURE__*/React.createElement(MdOutlineArrowCircleDown, null),
-      onClick: function onClick() {
-        return handleOnMoveOption(d, d.order + 1);
-      },
-      disabled: di === options.length - 1
-    }), /*#__PURE__*/React.createElement(Button, {
-      type: "link",
-      className: styles['button-icon'],
-      icon: /*#__PURE__*/React.createElement(MdOutlineRemoveCircleOutline, null),
-      onClick: function onClick() {
-        return handleOnDeleteOption(d.id);
-      },
-      disabled: options.length === 1
-    }))));
-  }));
+  })))), orderBy(options, 'order').map((d, di) => /*#__PURE__*/React__default.createElement(Row, {
+    key: `option-${id}-${di}`,
+    align: "start",
+    justify: "start",
+    gutter: [12, 12]
+  }, /*#__PURE__*/React__default.createElement(Col, {
+    span: 4
+  }, /*#__PURE__*/React__default.createElement(Form.Item, {
+    initialValue: d.code,
+    name: `${namePreffix}-option-code-${d.id}`
+  }, /*#__PURE__*/React__default.createElement(Input, {
+    placeholder: "Code",
+    onChange: e => handleOnChangeCode(e, d)
+  }))), /*#__PURE__*/React__default.createElement(Col, {
+    span: 10
+  }, /*#__PURE__*/React__default.createElement(Form.Item, {
+    initialValue: d.name,
+    name: `${namePreffix}-option-name-${d.id}`
+  }, /*#__PURE__*/React__default.createElement(Input, {
+    onChange: e => handleOnChangeOption(e, d)
+  }))), /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement(Space, null, /*#__PURE__*/React__default.createElement(Button, {
+    type: "link",
+    className: styles['button-icon'],
+    icon: /*#__PURE__*/React__default.createElement(MdOutlineAddCircleOutline, null),
+    onClick: () => handleOnAddOption(d)
+  }), /*#__PURE__*/React__default.createElement(Button, {
+    type: "link",
+    className: styles['button-icon'],
+    icon: /*#__PURE__*/React__default.createElement(MdOutlineArrowCircleUp, null),
+    onClick: () => handleOnMoveOption(d, d.order - 1),
+    disabled: di === 0
+  }), /*#__PURE__*/React__default.createElement(Button, {
+    type: "link",
+    className: styles['button-icon'],
+    icon: /*#__PURE__*/React__default.createElement(MdOutlineArrowCircleDown, null),
+    onClick: () => handleOnMoveOption(d, d.order + 1),
+    disabled: di === options.length - 1
+  }), /*#__PURE__*/React__default.createElement(Button, {
+    type: "link",
+    className: styles['button-icon'],
+    icon: /*#__PURE__*/React__default.createElement(MdOutlineRemoveCircleOutline, null),
+    onClick: () => handleOnDeleteOption(d.id),
+    disabled: options.length === 1
+  }))))));
 };
 
-var SettingTree = function SettingTree(_ref) {
-  var id = _ref.id,
-      _ref$dropdownValues = _ref.dropdownValues,
-      dropdownValues = _ref$dropdownValues === void 0 ? [] : _ref$dropdownValues;
-  var namePreffix = "question-" + id;
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
+const SettingTree = ({
+  id,
+  dropdownValues: _dropdownValues = []
+}) => {
+  const namePreffix = `question-${id}`;
+  const UIText = UIStore.useState(s => s.UIText);
+  return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("p", {
     className: styles['more-question-setting-text']
-  }, UIText.questionMoreTreeSettingText), /*#__PURE__*/React.createElement(Form.Item, {
+  }, UIText.questionMoreTreeSettingText), /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputSelectTreeDropdownValueLabel,
     initialValue: false,
-    name: namePreffix + "-tree-options"
-  }, /*#__PURE__*/React.createElement(Select, {
+    name: `${namePreffix}-tree-options`
+  }, /*#__PURE__*/React__default.createElement(Select, {
     className: styles['select-dropdown'],
-    options: dropdownValues,
-    getPopupContainer: function getPopupContainer(triggerNode) {
-      return triggerNode.parentElement;
-    }
+    options: _dropdownValues,
+    getPopupContainer: triggerNode => triggerNode.parentElement
   })));
 };
 
-var SettingCascade = function SettingCascade(_ref) {
-  var id = _ref.id,
-      questionGroupId = _ref.questionGroupId,
-      _ref$api = _ref.api,
-      api = _ref$api === void 0 ? {
+const SettingCascade = ({
+  id,
+  questionGroupId,
+  api: _api = {
     endpoint: null,
     initial: 0,
     list: false
-  } : _ref$api;
-  var namePreffix = "question-" + id;
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
+  }
+}) => {
+  const namePreffix = `question-${id}`;
+  const UIText = UIStore.useState(s => s.UIText);
 
-  var updateGlobalState = function updateGlobalState(values) {
-    if (values === void 0) {
-      values = {};
-    }
-
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (qg) {
+  const updateGlobalState = (values = {}) => {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(qg => {
         if (qg.id === questionGroupId) {
-          var questions = qg.questions.map(function (q) {
+          const questions = qg.questions.map(q => {
             if (q.id === id) {
-              return _extends({}, q, {
-                api: _extends({}, q === null || q === void 0 ? void 0 : q.api, values)
-              });
+              return { ...q,
+                api: { ...(q === null || q === void 0 ? void 0 : q.api),
+                  ...values
+                }
+              };
             }
 
             return q;
           });
-          return _extends({}, qg, {
+          return { ...qg,
             questions: questions
-          });
+          };
         }
 
         return qg;
@@ -1263,73 +1000,73 @@ var SettingCascade = function SettingCascade(_ref) {
     });
   };
 
-  var handleChangeEndpoint = function handleChangeEndpoint(e) {
+  const handleChangeEndpoint = e => {
     var _e$target;
 
     updateGlobalState({
       endpoint: e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.value,
-      initial: (api === null || api === void 0 ? void 0 : api.initial) || 0
+      initial: (_api === null || _api === void 0 ? void 0 : _api.initial) || 0
     });
   };
 
-  var handleChangeInitial = function handleChangeInitial(e) {
+  const handleChangeInitial = e => {
     updateGlobalState({
       initial: e
     });
   };
 
-  var handleChangeList = function handleChangeList(value) {
+  const handleChangeList = value => {
     updateGlobalState({
       list: value,
-      initial: (api === null || api === void 0 ? void 0 : api.initial) || 0
+      initial: (_api === null || _api === void 0 ? void 0 : _api.initial) || 0
     });
   };
 
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
+  return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("p", {
     className: styles['more-question-setting-text']
-  }, UIText.questionMoreCascadeSettingText), /*#__PURE__*/React.createElement(Form.Item, {
+  }, UIText.questionMoreCascadeSettingText), /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionEndpointLabel,
-    initialValue: api === null || api === void 0 ? void 0 : api.endpoint,
-    name: namePreffix + "-api-endpoint",
+    initialValue: _api === null || _api === void 0 ? void 0 : _api.endpoint,
+    name: `${namePreffix}-api-endpoint`,
     rules: [{
       type: 'url',
       message: UIText.inputQuestionEndpointValidationText
     }]
-  }, /*#__PURE__*/React.createElement(Input, {
+  }, /*#__PURE__*/React__default.createElement(Input, {
     onChange: handleChangeEndpoint
-  })), /*#__PURE__*/React.createElement(Row, {
+  })), /*#__PURE__*/React__default.createElement(Row, {
     align: "bottom",
     gutter: [24, 24]
-  }, /*#__PURE__*/React.createElement(Col, {
+  }, /*#__PURE__*/React__default.createElement(Col, {
     span: 4
-  }, /*#__PURE__*/React.createElement(Form.Item, {
+  }, /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionInitialValueLabel,
-    initialValue: api === null || api === void 0 ? void 0 : api.initial,
-    name: namePreffix + "-api-initial"
-  }, /*#__PURE__*/React.createElement(InputNumber, {
+    initialValue: _api === null || _api === void 0 ? void 0 : _api.initial,
+    name: `${namePreffix}-api-initial`
+  }, /*#__PURE__*/React__default.createElement(InputNumber, {
     style: {
       width: '100%'
     },
     controls: false,
     keyboard: false,
     onChange: handleChangeInitial
-  }))), /*#__PURE__*/React.createElement(Col, null, /*#__PURE__*/React.createElement(Form.Item, {
-    name: namePreffix + "-api-list-checkbox"
-  }, /*#__PURE__*/React.createElement(Checkbox, {
-    onChange: function onChange(e) {
+  }))), /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement(Form.Item, {
+    name: `${namePreffix}-api-list-checkbox`
+  }, /*#__PURE__*/React__default.createElement(Checkbox, {
+    onChange: e => {
       var _e$target2;
 
       return handleChangeList(e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.checked);
     },
-    checked: api !== null && api !== void 0 && api.list ? true : false
-  }, ' ', UIText.inputQuestionListCheckbox))), (api === null || api === void 0 ? void 0 : api.list) && /*#__PURE__*/React.createElement(Col, {
+    checked: _api !== null && _api !== void 0 && _api.list ? true : false
+  }, ' ', UIText.inputQuestionListCheckbox))), (_api === null || _api === void 0 ? void 0 : _api.list) && /*#__PURE__*/React__default.createElement(Col, {
     span: 8
-  }, /*#__PURE__*/React.createElement(Form.Item, {
+  }, /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionListLabel,
-    initialValue: api !== null && api !== void 0 && api.list ? api.list !== true ? api.list : null : null,
-    name: namePreffix + "-api-list"
-  }, /*#__PURE__*/React.createElement(Input, {
-    onChange: function onChange(e) {
+    initialValue: _api !== null && _api !== void 0 && _api.list ? _api.list !== true ? _api.list : null : null,
+    name: `${namePreffix}-api-list`
+  }, /*#__PURE__*/React__default.createElement(Input, {
+    onChange: e => {
       var _e$target3;
 
       return handleChangeList(e === null || e === void 0 ? void 0 : (_e$target3 = e.target) === null || _e$target3 === void 0 ? void 0 : _e$target3.value);
@@ -7026,47 +6763,42 @@ var moment = createCommonjsModule(function (module, exports) {
 })));
 });
 
-var SettingDate = function SettingDate(_ref) {
-  var id = _ref.id,
-      questionGroupId = _ref.questionGroupId,
-      minDate = _ref.minDate,
-      maxDate = _ref.maxDate;
-  var namePreffix = "question-" + id;
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
-  var moreDateSettings = [{
+const SettingDate = ({
+  id,
+  questionGroupId,
+  minDate,
+  maxDate
+}) => {
+  const namePreffix = `question-${id}`;
+  const UIText = UIStore.useState(s => s.UIText);
+  const moreDateSettings = [{
     label: UIText.inputQuestionAfterDateValueLabel,
     value: minDate,
     key: 'minDate',
-    disabledDate: function disabledDate(current) {
-      return current && maxDate && current >= moment(maxDate);
-    }
+    disabledDate: current => current && maxDate && current >= moment(maxDate)
   }, {
     label: UIText.inputQuestionBeforeDateValueLabel,
     value: maxDate,
     key: 'maxDate',
-    disabledDate: function disabledDate(current) {
-      return current && minDate && current <= moment(minDate);
-    }
+    disabledDate: current => current && minDate && current <= moment(minDate)
   }];
 
-  var handleChangeAfterBefore = function handleChangeAfterBefore(name, value) {
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (qg) {
+  const handleChangeAfterBefore = (name, value) => {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(qg => {
         if (qg.id === questionGroupId) {
-          var questions = qg.questions.map(function (q) {
+          const questions = qg.questions.map(q => {
             if (q.id === id) {
-              var _extends2;
-
-              return _extends({}, q, (_extends2 = {}, _extends2[name] = moment(value).format('YYYY-MM-DD'), _extends2));
+              return { ...q,
+                [name]: moment(value).format('YYYY-MM-DD')
+              };
             }
 
             return q;
           });
-          return _extends({}, qg, {
+          return { ...qg,
             questions: questions
-          });
+          };
         }
 
         return qg;
@@ -7074,64 +6806,61 @@ var SettingDate = function SettingDate(_ref) {
     });
   };
 
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
+  return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("p", {
     className: styles['more-question-setting-text']
-  }, UIText.questionMoreInputDateSettingText), /*#__PURE__*/React.createElement(Row, {
+  }, UIText.questionMoreInputDateSettingText), /*#__PURE__*/React__default.createElement(Row, {
     align: "middle",
     gutter: [24, 24]
-  }, moreDateSettings.map(function (x) {
-    return /*#__PURE__*/React.createElement(Col, {
-      key: namePreffix + "-" + x.key,
-      span: 8
-    }, /*#__PURE__*/React.createElement(Form.Item, {
-      label: x.label,
-      initialValue: x.value,
-      name: namePreffix + "-" + x.key
-    }, /*#__PURE__*/React.createElement(DatePicker, {
-      disabledDate: x.disabledDate,
-      style: {
-        width: '100%'
-      },
-      onChange: function onChange(e) {
-        return handleChangeAfterBefore(x.key, e);
-      }
-    })));
-  })));
+  }, moreDateSettings.map(x => /*#__PURE__*/React__default.createElement(Col, {
+    key: `${namePreffix}-${x.key}`,
+    span: 8
+  }, /*#__PURE__*/React__default.createElement(Form.Item, {
+    label: x.label,
+    initialValue: x.value,
+    name: `${namePreffix}-${x.key}`
+  }, /*#__PURE__*/React__default.createElement(DatePicker, {
+    disabledDate: x.disabledDate,
+    style: {
+      width: '100%'
+    },
+    onChange: e => handleChangeAfterBefore(x.key, e)
+  }))))));
 };
 
-var QuestionSetting = function QuestionSetting(_ref) {
-  var question = _ref.question,
-      dependant = _ref.dependant;
-  var id = question.id,
-      name = question.name,
-      type = question.type,
-      variable = question.variable,
-      tooltip = question.tooltip,
-      required = question.required,
-      questionGroupId = question.questionGroupId;
-  var namePreffix = "question-" + id;
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
-  var form = Form.useFormInstance();
-  var qType = Form.useWatch(namePreffix + "-type", form);
+const QuestionSetting = ({
+  question,
+  dependant
+}) => {
+  const {
+    id,
+    name,
+    type,
+    variable,
+    tooltip,
+    required,
+    questionGroupId
+  } = question;
+  const namePreffix = `question-${id}`;
+  const UIText = UIStore.useState(s => s.UIText);
+  const form = Form.useFormInstance();
+  const qType = Form.useWatch(`${namePreffix}-type`, form);
 
-  var updateState = function updateState(name, value) {
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (qg) {
+  const updateState = (name, value) => {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(qg => {
         if (qg.id === questionGroupId) {
-          var questions = qg.questions.map(function (q) {
+          const questions = qg.questions.map(q => {
             if (q.id === id) {
-              var _extends2;
-
-              return _extends({}, q, (_extends2 = {}, _extends2[name] = value, _extends2));
+              return { ...q,
+                [name]: value
+              };
             }
 
             return q;
           });
-          return _extends({}, qg, {
+          return { ...qg,
             questions: questions
-          });
+          };
         }
 
         return qg;
@@ -7139,61 +6868,59 @@ var QuestionSetting = function QuestionSetting(_ref) {
     });
   };
 
-  var handleChangeName = function handleChangeName(e) {
+  const handleChangeName = e => {
     var _e$target;
 
     updateState('name', e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.value);
   };
 
-  var handleChangeType = function handleChangeType(e) {
+  const handleChangeType = e => {
     updateState('type', e);
   };
 
-  var handleChangeVariableName = function handleChangeVariableName(e) {
+  const handleChangeVariableName = e => {
     var _e$target2;
 
     updateState('variableName', e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.value);
   };
 
-  var handleChangeTooltip = function handleChangeTooltip(e) {
+  const handleChangeTooltip = e => {
     var _e$target3;
 
     updateState('tooltip', e === null || e === void 0 ? void 0 : (_e$target3 = e.target) === null || _e$target3 === void 0 ? void 0 : _e$target3.value);
   };
 
-  var handleChangeRequired = function handleChangeRequired(e) {
+  const handleChangeRequired = e => {
     var _e$target4;
 
     updateState('required', e === null || e === void 0 ? void 0 : (_e$target4 = e.target) === null || _e$target4 === void 0 ? void 0 : _e$target4.checked);
   };
 
-  return /*#__PURE__*/React.createElement("div", null, !!dependant.length && /*#__PURE__*/React.createElement(Alert, {
+  return /*#__PURE__*/React__default.createElement("div", null, !!dependant.length && /*#__PURE__*/React__default.createElement(Alert, {
     message: "Dependent Questions:",
-    description: /*#__PURE__*/React.createElement("ul", null, dependant.map(function (d, di) {
-      return /*#__PURE__*/React.createElement("li", {
-        key: di
-      }, d.name);
-    })),
+    description: /*#__PURE__*/React__default.createElement("ul", null, dependant.map((d, di) => /*#__PURE__*/React__default.createElement("li", {
+      key: di
+    }, d.name))),
     type: "info",
     style: {
       marginBottom: '20px'
     },
     showIcon: true
-  }), /*#__PURE__*/React.createElement(Form.Item, {
+  }), /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionNameLabel,
     initialValue: name,
-    name: namePreffix + "-name",
+    name: `${namePreffix}-name`,
     required: true
-  }, /*#__PURE__*/React.createElement(Input, {
+  }, /*#__PURE__*/React__default.createElement(Input, {
     onChange: handleChangeName
-  })), /*#__PURE__*/React.createElement(Form.Item, {
+  })), /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionTypeLabel,
     initialValue: type,
-    name: namePreffix + "-type",
+    name: `${namePreffix}-type`,
     required: true
-  }, /*#__PURE__*/React.createElement(Select, {
+  }, /*#__PURE__*/React__default.createElement(Select, {
     className: styles['select-dropdown'],
-    options: Object.keys(questionType).map(function (key) {
+    options: Object.keys(questionType).map(key => {
       var _questionType$key;
 
       return {
@@ -7201,33 +6928,1510 @@ var QuestionSetting = function QuestionSetting(_ref) {
         value: questionType[key]
       };
     }),
-    getPopupContainer: function getPopupContainer(triggerNode) {
-      return triggerNode.parentElement;
-    },
+    getPopupContainer: triggerNode => triggerNode.parentElement,
     onChange: handleChangeType,
     disabled: dependant.length
-  })), /*#__PURE__*/React.createElement(Form.Item, {
+  })), /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionVariableNameLabel,
     initialValue: variable,
-    name: namePreffix + "-variable"
-  }, /*#__PURE__*/React.createElement(Input, {
+    name: `${namePreffix}-variable`
+  }, /*#__PURE__*/React__default.createElement(Input, {
     onChange: handleChangeVariableName
-  })), /*#__PURE__*/React.createElement(Form.Item, {
+  })), /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionTooltipLabel,
     initialValue: tooltip,
-    name: namePreffix + "-tooltip"
-  }, /*#__PURE__*/React.createElement(Input.TextArea, {
+    name: `${namePreffix}-tooltip`
+  }, /*#__PURE__*/React__default.createElement(Input.TextArea, {
     onChange: handleChangeTooltip
-  })), /*#__PURE__*/React.createElement(Form.Item, {
-    name: namePreffix + "-required",
+  })), /*#__PURE__*/React__default.createElement(Form.Item, {
+    name: `${namePreffix}-required`,
     className: styles['input-checkbox-wrapper']
-  }, /*#__PURE__*/React.createElement(Checkbox, {
+  }, /*#__PURE__*/React__default.createElement(Checkbox, {
     onChange: handleChangeRequired,
     checked: required
-  }, ' ', UIText.inputQuestionRequiredCheckbox)), qType === questionType.input && /*#__PURE__*/React.createElement(SettingInput, question), qType === questionType.number && /*#__PURE__*/React.createElement(SettingNumber, question), [questionType.option, questionType.multiple_option].includes(qType) && /*#__PURE__*/React.createElement(SettingOption, question), qType === questionType.tree && /*#__PURE__*/React.createElement(SettingTree, question), qType === questionType.cascade && /*#__PURE__*/React.createElement(SettingCascade, question), qType === questionType.date && /*#__PURE__*/React.createElement(SettingDate, question));
+  }, ' ', UIText.inputQuestionRequiredCheckbox)), qType === questionType.input && /*#__PURE__*/React__default.createElement(SettingInput, question), qType === questionType.number && /*#__PURE__*/React__default.createElement(SettingNumber, question), [questionType.option, questionType.multiple_option].includes(qType) && /*#__PURE__*/React__default.createElement(SettingOption, question), qType === questionType.tree && /*#__PURE__*/React__default.createElement(SettingTree, question), qType === questionType.cascade && /*#__PURE__*/React__default.createElement(SettingCascade, question), qType === questionType.date && /*#__PURE__*/React__default.createElement(SettingDate, question));
 };
 
-var dependencyTypes = [{
+var IconContext = /*#__PURE__*/createContext({});
+
+function _defineProperty(obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+}
+
+function ownKeys(object, enumerableOnly) {
+  var keys = Object.keys(object);
+
+  if (Object.getOwnPropertySymbols) {
+    var symbols = Object.getOwnPropertySymbols(object);
+    enumerableOnly && (symbols = symbols.filter(function (sym) {
+      return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+    })), keys.push.apply(keys, symbols);
+  }
+
+  return keys;
+}
+
+function _objectSpread2(target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = null != arguments[i] ? arguments[i] : {};
+    i % 2 ? ownKeys(Object(source), !0).forEach(function (key) {
+      _defineProperty(target, key, source[key]);
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) {
+      Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+    });
+  }
+
+  return target;
+}
+
+function _arrayWithHoles(arr) {
+  if (Array.isArray(arr)) return arr;
+}
+
+function _iterableToArrayLimit(arr, i) {
+  var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"];
+
+  if (_i == null) return;
+  var _arr = [];
+  var _n = true;
+  var _d = false;
+
+  var _s, _e;
+
+  try {
+    for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) {
+      _arr.push(_s.value);
+
+      if (i && _arr.length === i) break;
+    }
+  } catch (err) {
+    _d = true;
+    _e = err;
+  } finally {
+    try {
+      if (!_n && _i["return"] != null) _i["return"]();
+    } finally {
+      if (_d) throw _e;
+    }
+  }
+
+  return _arr;
+}
+
+function _arrayLikeToArray(arr, len) {
+  if (len == null || len > arr.length) len = arr.length;
+
+  for (var i = 0, arr2 = new Array(len); i < len; i++) {
+    arr2[i] = arr[i];
+  }
+
+  return arr2;
+}
+
+function _unsupportedIterableToArray(o, minLen) {
+  if (!o) return;
+  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+  var n = Object.prototype.toString.call(o).slice(8, -1);
+  if (n === "Object" && o.constructor) n = o.constructor.name;
+  if (n === "Map" || n === "Set") return Array.from(o);
+  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+}
+
+function _nonIterableRest() {
+  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+
+function _slicedToArray(arr, i) {
+  return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
+}
+
+function _objectWithoutPropertiesLoose(source, excluded) {
+  if (source == null) return {};
+  var target = {};
+  var sourceKeys = Object.keys(source);
+  var key, i;
+
+  for (i = 0; i < sourceKeys.length; i++) {
+    key = sourceKeys[i];
+    if (excluded.indexOf(key) >= 0) continue;
+    target[key] = source[key];
+  }
+
+  return target;
+}
+
+function _objectWithoutProperties(source, excluded) {
+  if (source == null) return {};
+  var target = _objectWithoutPropertiesLoose(source, excluded);
+  var key, i;
+
+  if (Object.getOwnPropertySymbols) {
+    var sourceSymbolKeys = Object.getOwnPropertySymbols(source);
+
+    for (i = 0; i < sourceSymbolKeys.length; i++) {
+      key = sourceSymbolKeys[i];
+      if (excluded.indexOf(key) >= 0) continue;
+      if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue;
+      target[key] = source[key];
+    }
+  }
+
+  return target;
+}
+
+var classnames = createCommonjsModule(function (module) {
+/*!
+  Copyright (c) 2018 Jed Watson.
+  Licensed under the MIT License (MIT), see
+  http://jedwatson.github.io/classnames
+*/
+/* global define */
+
+(function () {
+
+	var hasOwn = {}.hasOwnProperty;
+
+	function classNames() {
+		var classes = [];
+
+		for (var i = 0; i < arguments.length; i++) {
+			var arg = arguments[i];
+			if (!arg) continue;
+
+			var argType = typeof arg;
+
+			if (argType === 'string' || argType === 'number') {
+				classes.push(arg);
+			} else if (Array.isArray(arg)) {
+				if (arg.length) {
+					var inner = classNames.apply(null, arg);
+					if (inner) {
+						classes.push(inner);
+					}
+				}
+			} else if (argType === 'object') {
+				if (arg.toString === Object.prototype.toString) {
+					for (var key in arg) {
+						if (hasOwn.call(arg, key) && arg[key]) {
+							classes.push(key);
+						}
+					}
+				} else {
+					classes.push(arg.toString());
+				}
+			}
+		}
+
+		return classes.join(' ');
+	}
+
+	if ( module.exports) {
+		classNames.default = classNames;
+		module.exports = classNames;
+	} else {
+		window.classNames = classNames;
+	}
+}());
+});
+
+function _typeof(obj) {
+  "@babel/helpers - typeof";
+
+  return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+  }, _typeof(obj);
+}
+
+/**
+ * Take input from [0, n] and return it as [0, 1]
+ * @hidden
+ */
+function bound01(n, max) {
+    if (isOnePointZero(n)) {
+        n = '100%';
+    }
+    var isPercent = isPercentage(n);
+    n = max === 360 ? n : Math.min(max, Math.max(0, parseFloat(n)));
+    // Automatically convert percentage into number
+    if (isPercent) {
+        n = parseInt(String(n * max), 10) / 100;
+    }
+    // Handle floating point rounding errors
+    if (Math.abs(n - max) < 0.000001) {
+        return 1;
+    }
+    // Convert into [0, 1] range if it isn't already
+    if (max === 360) {
+        // If n is a hue given in degrees,
+        // wrap around out-of-range values into [0, 360] range
+        // then convert into [0, 1].
+        n = (n < 0 ? (n % max) + max : n % max) / parseFloat(String(max));
+    }
+    else {
+        // If n not a hue given in degrees
+        // Convert into [0, 1] range if it isn't already.
+        n = (n % max) / parseFloat(String(max));
+    }
+    return n;
+}
+/**
+ * Need to handle 1.0 as 100%, since once it is a number, there is no difference between it and 1
+ * <http://stackoverflow.com/questions/7422072/javascript-how-to-detect-number-as-a-decimal-including-1-0>
+ * @hidden
+ */
+function isOnePointZero(n) {
+    return typeof n === 'string' && n.indexOf('.') !== -1 && parseFloat(n) === 1;
+}
+/**
+ * Check to see if string passed in is a percentage
+ * @hidden
+ */
+function isPercentage(n) {
+    return typeof n === 'string' && n.indexOf('%') !== -1;
+}
+/**
+ * Return a valid alpha value [0,1] with all invalid values being set to 1
+ * @hidden
+ */
+function boundAlpha(a) {
+    a = parseFloat(a);
+    if (isNaN(a) || a < 0 || a > 1) {
+        a = 1;
+    }
+    return a;
+}
+/**
+ * Replace a decimal with it's percentage value
+ * @hidden
+ */
+function convertToPercentage(n) {
+    if (n <= 1) {
+        return "".concat(Number(n) * 100, "%");
+    }
+    return n;
+}
+/**
+ * Force a hex value to have 2 characters
+ * @hidden
+ */
+function pad2(c) {
+    return c.length === 1 ? '0' + c : String(c);
+}
+
+// `rgbToHsl`, `rgbToHsv`, `hslToRgb`, `hsvToRgb` modified from:
+// <http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript>
+/**
+ * Handle bounds / percentage checking to conform to CSS color spec
+ * <http://www.w3.org/TR/css3-color/>
+ * *Assumes:* r, g, b in [0, 255] or [0, 1]
+ * *Returns:* { r, g, b } in [0, 255]
+ */
+function rgbToRgb(r, g, b) {
+    return {
+        r: bound01(r, 255) * 255,
+        g: bound01(g, 255) * 255,
+        b: bound01(b, 255) * 255,
+    };
+}
+function hue2rgb(p, q, t) {
+    if (t < 0) {
+        t += 1;
+    }
+    if (t > 1) {
+        t -= 1;
+    }
+    if (t < 1 / 6) {
+        return p + (q - p) * (6 * t);
+    }
+    if (t < 1 / 2) {
+        return q;
+    }
+    if (t < 2 / 3) {
+        return p + (q - p) * (2 / 3 - t) * 6;
+    }
+    return p;
+}
+/**
+ * Converts an HSL color value to RGB.
+ *
+ * *Assumes:* h is contained in [0, 1] or [0, 360] and s and l are contained [0, 1] or [0, 100]
+ * *Returns:* { r, g, b } in the set [0, 255]
+ */
+function hslToRgb(h, s, l) {
+    var r;
+    var g;
+    var b;
+    h = bound01(h, 360);
+    s = bound01(s, 100);
+    l = bound01(l, 100);
+    if (s === 0) {
+        // achromatic
+        g = l;
+        b = l;
+        r = l;
+    }
+    else {
+        var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        var p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1 / 3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1 / 3);
+    }
+    return { r: r * 255, g: g * 255, b: b * 255 };
+}
+/**
+ * Converts an RGB color value to HSV
+ *
+ * *Assumes:* r, g, and b are contained in the set [0, 255] or [0, 1]
+ * *Returns:* { h, s, v } in [0,1]
+ */
+function rgbToHsv(r, g, b) {
+    r = bound01(r, 255);
+    g = bound01(g, 255);
+    b = bound01(b, 255);
+    var max = Math.max(r, g, b);
+    var min = Math.min(r, g, b);
+    var h = 0;
+    var v = max;
+    var d = max - min;
+    var s = max === 0 ? 0 : d / max;
+    if (max === min) {
+        h = 0; // achromatic
+    }
+    else {
+        switch (max) {
+            case r:
+                h = (g - b) / d + (g < b ? 6 : 0);
+                break;
+            case g:
+                h = (b - r) / d + 2;
+                break;
+            case b:
+                h = (r - g) / d + 4;
+                break;
+        }
+        h /= 6;
+    }
+    return { h: h, s: s, v: v };
+}
+/**
+ * Converts an HSV color value to RGB.
+ *
+ * *Assumes:* h is contained in [0, 1] or [0, 360] and s and v are contained in [0, 1] or [0, 100]
+ * *Returns:* { r, g, b } in the set [0, 255]
+ */
+function hsvToRgb(h, s, v) {
+    h = bound01(h, 360) * 6;
+    s = bound01(s, 100);
+    v = bound01(v, 100);
+    var i = Math.floor(h);
+    var f = h - i;
+    var p = v * (1 - s);
+    var q = v * (1 - f * s);
+    var t = v * (1 - (1 - f) * s);
+    var mod = i % 6;
+    var r = [v, q, p, p, t, v][mod];
+    var g = [t, v, v, q, p, p][mod];
+    var b = [p, p, t, v, v, q][mod];
+    return { r: r * 255, g: g * 255, b: b * 255 };
+}
+/**
+ * Converts an RGB color to hex
+ *
+ * Assumes r, g, and b are contained in the set [0, 255]
+ * Returns a 3 or 6 character hex
+ */
+function rgbToHex(r, g, b, allow3Char) {
+    var hex = [
+        pad2(Math.round(r).toString(16)),
+        pad2(Math.round(g).toString(16)),
+        pad2(Math.round(b).toString(16)),
+    ];
+    // Return a 3 character hex if possible
+    if (allow3Char &&
+        hex[0].startsWith(hex[0].charAt(1)) &&
+        hex[1].startsWith(hex[1].charAt(1)) &&
+        hex[2].startsWith(hex[2].charAt(1))) {
+        return hex[0].charAt(0) + hex[1].charAt(0) + hex[2].charAt(0);
+    }
+    return hex.join('');
+}
+/** Converts a hex value to a decimal */
+function convertHexToDecimal(h) {
+    return parseIntFromHex(h) / 255;
+}
+/** Parse a base-16 hex value into a base-10 integer */
+function parseIntFromHex(val) {
+    return parseInt(val, 16);
+}
+
+// https://github.com/bahamas10/css-color-names/blob/master/css-color-names.json
+/**
+ * @hidden
+ */
+var names = {
+    aliceblue: '#f0f8ff',
+    antiquewhite: '#faebd7',
+    aqua: '#00ffff',
+    aquamarine: '#7fffd4',
+    azure: '#f0ffff',
+    beige: '#f5f5dc',
+    bisque: '#ffe4c4',
+    black: '#000000',
+    blanchedalmond: '#ffebcd',
+    blue: '#0000ff',
+    blueviolet: '#8a2be2',
+    brown: '#a52a2a',
+    burlywood: '#deb887',
+    cadetblue: '#5f9ea0',
+    chartreuse: '#7fff00',
+    chocolate: '#d2691e',
+    coral: '#ff7f50',
+    cornflowerblue: '#6495ed',
+    cornsilk: '#fff8dc',
+    crimson: '#dc143c',
+    cyan: '#00ffff',
+    darkblue: '#00008b',
+    darkcyan: '#008b8b',
+    darkgoldenrod: '#b8860b',
+    darkgray: '#a9a9a9',
+    darkgreen: '#006400',
+    darkgrey: '#a9a9a9',
+    darkkhaki: '#bdb76b',
+    darkmagenta: '#8b008b',
+    darkolivegreen: '#556b2f',
+    darkorange: '#ff8c00',
+    darkorchid: '#9932cc',
+    darkred: '#8b0000',
+    darksalmon: '#e9967a',
+    darkseagreen: '#8fbc8f',
+    darkslateblue: '#483d8b',
+    darkslategray: '#2f4f4f',
+    darkslategrey: '#2f4f4f',
+    darkturquoise: '#00ced1',
+    darkviolet: '#9400d3',
+    deeppink: '#ff1493',
+    deepskyblue: '#00bfff',
+    dimgray: '#696969',
+    dimgrey: '#696969',
+    dodgerblue: '#1e90ff',
+    firebrick: '#b22222',
+    floralwhite: '#fffaf0',
+    forestgreen: '#228b22',
+    fuchsia: '#ff00ff',
+    gainsboro: '#dcdcdc',
+    ghostwhite: '#f8f8ff',
+    goldenrod: '#daa520',
+    gold: '#ffd700',
+    gray: '#808080',
+    green: '#008000',
+    greenyellow: '#adff2f',
+    grey: '#808080',
+    honeydew: '#f0fff0',
+    hotpink: '#ff69b4',
+    indianred: '#cd5c5c',
+    indigo: '#4b0082',
+    ivory: '#fffff0',
+    khaki: '#f0e68c',
+    lavenderblush: '#fff0f5',
+    lavender: '#e6e6fa',
+    lawngreen: '#7cfc00',
+    lemonchiffon: '#fffacd',
+    lightblue: '#add8e6',
+    lightcoral: '#f08080',
+    lightcyan: '#e0ffff',
+    lightgoldenrodyellow: '#fafad2',
+    lightgray: '#d3d3d3',
+    lightgreen: '#90ee90',
+    lightgrey: '#d3d3d3',
+    lightpink: '#ffb6c1',
+    lightsalmon: '#ffa07a',
+    lightseagreen: '#20b2aa',
+    lightskyblue: '#87cefa',
+    lightslategray: '#778899',
+    lightslategrey: '#778899',
+    lightsteelblue: '#b0c4de',
+    lightyellow: '#ffffe0',
+    lime: '#00ff00',
+    limegreen: '#32cd32',
+    linen: '#faf0e6',
+    magenta: '#ff00ff',
+    maroon: '#800000',
+    mediumaquamarine: '#66cdaa',
+    mediumblue: '#0000cd',
+    mediumorchid: '#ba55d3',
+    mediumpurple: '#9370db',
+    mediumseagreen: '#3cb371',
+    mediumslateblue: '#7b68ee',
+    mediumspringgreen: '#00fa9a',
+    mediumturquoise: '#48d1cc',
+    mediumvioletred: '#c71585',
+    midnightblue: '#191970',
+    mintcream: '#f5fffa',
+    mistyrose: '#ffe4e1',
+    moccasin: '#ffe4b5',
+    navajowhite: '#ffdead',
+    navy: '#000080',
+    oldlace: '#fdf5e6',
+    olive: '#808000',
+    olivedrab: '#6b8e23',
+    orange: '#ffa500',
+    orangered: '#ff4500',
+    orchid: '#da70d6',
+    palegoldenrod: '#eee8aa',
+    palegreen: '#98fb98',
+    paleturquoise: '#afeeee',
+    palevioletred: '#db7093',
+    papayawhip: '#ffefd5',
+    peachpuff: '#ffdab9',
+    peru: '#cd853f',
+    pink: '#ffc0cb',
+    plum: '#dda0dd',
+    powderblue: '#b0e0e6',
+    purple: '#800080',
+    rebeccapurple: '#663399',
+    red: '#ff0000',
+    rosybrown: '#bc8f8f',
+    royalblue: '#4169e1',
+    saddlebrown: '#8b4513',
+    salmon: '#fa8072',
+    sandybrown: '#f4a460',
+    seagreen: '#2e8b57',
+    seashell: '#fff5ee',
+    sienna: '#a0522d',
+    silver: '#c0c0c0',
+    skyblue: '#87ceeb',
+    slateblue: '#6a5acd',
+    slategray: '#708090',
+    slategrey: '#708090',
+    snow: '#fffafa',
+    springgreen: '#00ff7f',
+    steelblue: '#4682b4',
+    tan: '#d2b48c',
+    teal: '#008080',
+    thistle: '#d8bfd8',
+    tomato: '#ff6347',
+    turquoise: '#40e0d0',
+    violet: '#ee82ee',
+    wheat: '#f5deb3',
+    white: '#ffffff',
+    whitesmoke: '#f5f5f5',
+    yellow: '#ffff00',
+    yellowgreen: '#9acd32',
+};
+
+/**
+ * Given a string or object, convert that input to RGB
+ *
+ * Possible string inputs:
+ * ```
+ * "red"
+ * "#f00" or "f00"
+ * "#ff0000" or "ff0000"
+ * "#ff000000" or "ff000000"
+ * "rgb 255 0 0" or "rgb (255, 0, 0)"
+ * "rgb 1.0 0 0" or "rgb (1, 0, 0)"
+ * "rgba (255, 0, 0, 1)" or "rgba 255, 0, 0, 1"
+ * "rgba (1.0, 0, 0, 1)" or "rgba 1.0, 0, 0, 1"
+ * "hsl(0, 100%, 50%)" or "hsl 0 100% 50%"
+ * "hsla(0, 100%, 50%, 1)" or "hsla 0 100% 50%, 1"
+ * "hsv(0, 100%, 100%)" or "hsv 0 100% 100%"
+ * ```
+ */
+function inputToRGB(color) {
+    var rgb = { r: 0, g: 0, b: 0 };
+    var a = 1;
+    var s = null;
+    var v = null;
+    var l = null;
+    var ok = false;
+    var format = false;
+    if (typeof color === 'string') {
+        color = stringInputToObject(color);
+    }
+    if (typeof color === 'object') {
+        if (isValidCSSUnit(color.r) && isValidCSSUnit(color.g) && isValidCSSUnit(color.b)) {
+            rgb = rgbToRgb(color.r, color.g, color.b);
+            ok = true;
+            format = String(color.r).substr(-1) === '%' ? 'prgb' : 'rgb';
+        }
+        else if (isValidCSSUnit(color.h) && isValidCSSUnit(color.s) && isValidCSSUnit(color.v)) {
+            s = convertToPercentage(color.s);
+            v = convertToPercentage(color.v);
+            rgb = hsvToRgb(color.h, s, v);
+            ok = true;
+            format = 'hsv';
+        }
+        else if (isValidCSSUnit(color.h) && isValidCSSUnit(color.s) && isValidCSSUnit(color.l)) {
+            s = convertToPercentage(color.s);
+            l = convertToPercentage(color.l);
+            rgb = hslToRgb(color.h, s, l);
+            ok = true;
+            format = 'hsl';
+        }
+        if (Object.prototype.hasOwnProperty.call(color, 'a')) {
+            a = color.a;
+        }
+    }
+    a = boundAlpha(a);
+    return {
+        ok: ok,
+        format: color.format || format,
+        r: Math.min(255, Math.max(rgb.r, 0)),
+        g: Math.min(255, Math.max(rgb.g, 0)),
+        b: Math.min(255, Math.max(rgb.b, 0)),
+        a: a,
+    };
+}
+// <http://www.w3.org/TR/css3-values/#integers>
+var CSS_INTEGER = '[-\\+]?\\d+%?';
+// <http://www.w3.org/TR/css3-values/#number-value>
+var CSS_NUMBER = '[-\\+]?\\d*\\.\\d+%?';
+// Allow positive/negative integer/number.  Don't capture the either/or, just the entire outcome.
+var CSS_UNIT = "(?:".concat(CSS_NUMBER, ")|(?:").concat(CSS_INTEGER, ")");
+// Actual matching.
+// Parentheses and commas are optional, but not required.
+// Whitespace can take the place of commas or opening paren
+var PERMISSIVE_MATCH3 = "[\\s|\\(]+(".concat(CSS_UNIT, ")[,|\\s]+(").concat(CSS_UNIT, ")[,|\\s]+(").concat(CSS_UNIT, ")\\s*\\)?");
+var PERMISSIVE_MATCH4 = "[\\s|\\(]+(".concat(CSS_UNIT, ")[,|\\s]+(").concat(CSS_UNIT, ")[,|\\s]+(").concat(CSS_UNIT, ")[,|\\s]+(").concat(CSS_UNIT, ")\\s*\\)?");
+var matchers = {
+    CSS_UNIT: new RegExp(CSS_UNIT),
+    rgb: new RegExp('rgb' + PERMISSIVE_MATCH3),
+    rgba: new RegExp('rgba' + PERMISSIVE_MATCH4),
+    hsl: new RegExp('hsl' + PERMISSIVE_MATCH3),
+    hsla: new RegExp('hsla' + PERMISSIVE_MATCH4),
+    hsv: new RegExp('hsv' + PERMISSIVE_MATCH3),
+    hsva: new RegExp('hsva' + PERMISSIVE_MATCH4),
+    hex3: /^#?([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})$/,
+    hex6: /^#?([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/,
+    hex4: /^#?([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})$/,
+    hex8: /^#?([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/,
+};
+/**
+ * Permissive string parsing.  Take in a number of formats, and output an object
+ * based on detected format.  Returns `{ r, g, b }` or `{ h, s, l }` or `{ h, s, v}`
+ */
+function stringInputToObject(color) {
+    color = color.trim().toLowerCase();
+    if (color.length === 0) {
+        return false;
+    }
+    var named = false;
+    if (names[color]) {
+        color = names[color];
+        named = true;
+    }
+    else if (color === 'transparent') {
+        return { r: 0, g: 0, b: 0, a: 0, format: 'name' };
+    }
+    // Try to match string input using regular expressions.
+    // Keep most of the number bounding out of this function - don't worry about [0,1] or [0,100] or [0,360]
+    // Just return an object and let the conversion functions handle that.
+    // This way the result will be the same whether the tinycolor is initialized with string or object.
+    var match = matchers.rgb.exec(color);
+    if (match) {
+        return { r: match[1], g: match[2], b: match[3] };
+    }
+    match = matchers.rgba.exec(color);
+    if (match) {
+        return { r: match[1], g: match[2], b: match[3], a: match[4] };
+    }
+    match = matchers.hsl.exec(color);
+    if (match) {
+        return { h: match[1], s: match[2], l: match[3] };
+    }
+    match = matchers.hsla.exec(color);
+    if (match) {
+        return { h: match[1], s: match[2], l: match[3], a: match[4] };
+    }
+    match = matchers.hsv.exec(color);
+    if (match) {
+        return { h: match[1], s: match[2], v: match[3] };
+    }
+    match = matchers.hsva.exec(color);
+    if (match) {
+        return { h: match[1], s: match[2], v: match[3], a: match[4] };
+    }
+    match = matchers.hex8.exec(color);
+    if (match) {
+        return {
+            r: parseIntFromHex(match[1]),
+            g: parseIntFromHex(match[2]),
+            b: parseIntFromHex(match[3]),
+            a: convertHexToDecimal(match[4]),
+            format: named ? 'name' : 'hex8',
+        };
+    }
+    match = matchers.hex6.exec(color);
+    if (match) {
+        return {
+            r: parseIntFromHex(match[1]),
+            g: parseIntFromHex(match[2]),
+            b: parseIntFromHex(match[3]),
+            format: named ? 'name' : 'hex',
+        };
+    }
+    match = matchers.hex4.exec(color);
+    if (match) {
+        return {
+            r: parseIntFromHex(match[1] + match[1]),
+            g: parseIntFromHex(match[2] + match[2]),
+            b: parseIntFromHex(match[3] + match[3]),
+            a: convertHexToDecimal(match[4] + match[4]),
+            format: named ? 'name' : 'hex8',
+        };
+    }
+    match = matchers.hex3.exec(color);
+    if (match) {
+        return {
+            r: parseIntFromHex(match[1] + match[1]),
+            g: parseIntFromHex(match[2] + match[2]),
+            b: parseIntFromHex(match[3] + match[3]),
+            format: named ? 'name' : 'hex',
+        };
+    }
+    return false;
+}
+/**
+ * Check to see if it looks like a CSS unit
+ * (see `matchers` above for definition).
+ */
+function isValidCSSUnit(color) {
+    return Boolean(matchers.CSS_UNIT.exec(String(color)));
+}
+
+var hueStep = 2; // 色相阶梯
+
+var saturationStep = 0.16; // 饱和度阶梯，浅色部分
+
+var saturationStep2 = 0.05; // 饱和度阶梯，深色部分
+
+var brightnessStep1 = 0.05; // 亮度阶梯，浅色部分
+
+var brightnessStep2 = 0.15; // 亮度阶梯，深色部分
+
+var lightColorCount = 5; // 浅色数量，主色上
+
+var darkColorCount = 4; // 深色数量，主色下
+// 暗色主题颜色映射关系表
+
+var darkColorMap = [{
+  index: 7,
+  opacity: 0.15
+}, {
+  index: 6,
+  opacity: 0.25
+}, {
+  index: 5,
+  opacity: 0.3
+}, {
+  index: 5,
+  opacity: 0.45
+}, {
+  index: 5,
+  opacity: 0.65
+}, {
+  index: 5,
+  opacity: 0.85
+}, {
+  index: 4,
+  opacity: 0.9
+}, {
+  index: 3,
+  opacity: 0.95
+}, {
+  index: 2,
+  opacity: 0.97
+}, {
+  index: 1,
+  opacity: 0.98
+}]; // Wrapper function ported from TinyColor.prototype.toHsv
+// Keep it here because of `hsv.h * 360`
+
+function toHsv(_ref) {
+  var r = _ref.r,
+      g = _ref.g,
+      b = _ref.b;
+  var hsv = rgbToHsv(r, g, b);
+  return {
+    h: hsv.h * 360,
+    s: hsv.s,
+    v: hsv.v
+  };
+} // Wrapper function ported from TinyColor.prototype.toHexString
+// Keep it here because of the prefix `#`
+
+
+function toHex(_ref2) {
+  var r = _ref2.r,
+      g = _ref2.g,
+      b = _ref2.b;
+  return "#".concat(rgbToHex(r, g, b, false));
+} // Wrapper function ported from TinyColor.prototype.mix, not treeshakable.
+// Amount in range [0, 1]
+// Assume color1 & color2 has no alpha, since the following src code did so.
+
+
+function mix(rgb1, rgb2, amount) {
+  var p = amount / 100;
+  var rgb = {
+    r: (rgb2.r - rgb1.r) * p + rgb1.r,
+    g: (rgb2.g - rgb1.g) * p + rgb1.g,
+    b: (rgb2.b - rgb1.b) * p + rgb1.b
+  };
+  return rgb;
+}
+
+function getHue(hsv, i, light) {
+  var hue; // 根据色相不同，色相转向不同
+
+  if (Math.round(hsv.h) >= 60 && Math.round(hsv.h) <= 240) {
+    hue = light ? Math.round(hsv.h) - hueStep * i : Math.round(hsv.h) + hueStep * i;
+  } else {
+    hue = light ? Math.round(hsv.h) + hueStep * i : Math.round(hsv.h) - hueStep * i;
+  }
+
+  if (hue < 0) {
+    hue += 360;
+  } else if (hue >= 360) {
+    hue -= 360;
+  }
+
+  return hue;
+}
+
+function getSaturation(hsv, i, light) {
+  // grey color don't change saturation
+  if (hsv.h === 0 && hsv.s === 0) {
+    return hsv.s;
+  }
+
+  var saturation;
+
+  if (light) {
+    saturation = hsv.s - saturationStep * i;
+  } else if (i === darkColorCount) {
+    saturation = hsv.s + saturationStep;
+  } else {
+    saturation = hsv.s + saturationStep2 * i;
+  } // 边界值修正
+
+
+  if (saturation > 1) {
+    saturation = 1;
+  } // 第一格的 s 限制在 0.06-0.1 之间
+
+
+  if (light && i === lightColorCount && saturation > 0.1) {
+    saturation = 0.1;
+  }
+
+  if (saturation < 0.06) {
+    saturation = 0.06;
+  }
+
+  return Number(saturation.toFixed(2));
+}
+
+function getValue(hsv, i, light) {
+  var value;
+
+  if (light) {
+    value = hsv.v + brightnessStep1 * i;
+  } else {
+    value = hsv.v - brightnessStep2 * i;
+  }
+
+  if (value > 1) {
+    value = 1;
+  }
+
+  return Number(value.toFixed(2));
+}
+
+function generate(color) {
+  var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  var patterns = [];
+  var pColor = inputToRGB(color);
+
+  for (var i = lightColorCount; i > 0; i -= 1) {
+    var hsv = toHsv(pColor);
+    var colorString = toHex(inputToRGB({
+      h: getHue(hsv, i, true),
+      s: getSaturation(hsv, i, true),
+      v: getValue(hsv, i, true)
+    }));
+    patterns.push(colorString);
+  }
+
+  patterns.push(toHex(pColor));
+
+  for (var _i = 1; _i <= darkColorCount; _i += 1) {
+    var _hsv = toHsv(pColor);
+
+    var _colorString = toHex(inputToRGB({
+      h: getHue(_hsv, _i),
+      s: getSaturation(_hsv, _i),
+      v: getValue(_hsv, _i)
+    }));
+
+    patterns.push(_colorString);
+  } // dark theme patterns
+
+
+  if (opts.theme === 'dark') {
+    return darkColorMap.map(function (_ref3) {
+      var index = _ref3.index,
+          opacity = _ref3.opacity;
+      var darkColorString = toHex(mix(inputToRGB(opts.backgroundColor || '#141414'), inputToRGB(patterns[index]), opacity * 100));
+      return darkColorString;
+    });
+  }
+
+  return patterns;
+}
+
+var presetPrimaryColors = {
+  red: '#F5222D',
+  volcano: '#FA541C',
+  orange: '#FA8C16',
+  gold: '#FAAD14',
+  yellow: '#FADB14',
+  lime: '#A0D911',
+  green: '#52C41A',
+  cyan: '#13C2C2',
+  blue: '#1890FF',
+  geekblue: '#2F54EB',
+  purple: '#722ED1',
+  magenta: '#EB2F96',
+  grey: '#666666'
+};
+var presetPalettes = {};
+var presetDarkPalettes = {};
+Object.keys(presetPrimaryColors).forEach(function (key) {
+  presetPalettes[key] = generate(presetPrimaryColors[key]);
+  presetPalettes[key].primary = presetPalettes[key][5]; // dark presetPalettes
+
+  presetDarkPalettes[key] = generate(presetPrimaryColors[key], {
+    theme: 'dark',
+    backgroundColor: '#141414'
+  });
+  presetDarkPalettes[key].primary = presetDarkPalettes[key][5];
+});
+
+/* eslint-disable no-console */
+var warned = {};
+function warning(valid, message) {
+  // Support uglify
+  if (process.env.NODE_ENV !== 'production' && !valid && console !== undefined) {
+    console.error("Warning: ".concat(message));
+  }
+}
+function call(method, valid, message) {
+  if (!valid && !warned[message]) {
+    method(false, message);
+    warned[message] = true;
+  }
+}
+function warningOnce(valid, message) {
+  call(warning, valid, message);
+}
+/* eslint-enable */
+
+function canUseDom() {
+  return !!(typeof window !== 'undefined' && window.document && window.document.createElement);
+}
+
+var MARK_KEY = "rc-util-key";
+
+function getMark() {
+  var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      mark = _ref.mark;
+
+  if (mark) {
+    return mark.startsWith('data-') ? mark : "data-".concat(mark);
+  }
+
+  return MARK_KEY;
+}
+
+function getContainer(option) {
+  if (option.attachTo) {
+    return option.attachTo;
+  }
+
+  var head = document.querySelector('head');
+  return head || document.body;
+}
+
+function injectCSS(css) {
+  var _option$csp;
+
+  var option = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  if (!canUseDom()) {
+    return null;
+  }
+
+  var styleNode = document.createElement('style');
+
+  if ((_option$csp = option.csp) === null || _option$csp === void 0 ? void 0 : _option$csp.nonce) {
+    var _option$csp2;
+
+    styleNode.nonce = (_option$csp2 = option.csp) === null || _option$csp2 === void 0 ? void 0 : _option$csp2.nonce;
+  }
+
+  styleNode.innerHTML = css;
+  var container = getContainer(option);
+  var firstChild = container.firstChild;
+
+  if (option.prepend && container.prepend) {
+    // Use `prepend` first
+    container.prepend(styleNode);
+  } else if (option.prepend && firstChild) {
+    // Fallback to `insertBefore` like IE not support `prepend`
+    container.insertBefore(styleNode, firstChild);
+  } else {
+    container.appendChild(styleNode);
+  }
+
+  return styleNode;
+}
+var containerCache = new Map();
+
+function findExistNode(key) {
+  var option = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  var container = getContainer(option);
+  return Array.from(containerCache.get(container).children).find(function (node) {
+    return node.tagName === 'STYLE' && node.getAttribute(getMark(option)) === key;
+  });
+}
+function updateCSS(css, key) {
+  var option = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+  var container = getContainer(option); // Get real parent
+
+  if (!containerCache.has(container)) {
+    var placeholderStyle = injectCSS('', option);
+    var parentNode = placeholderStyle.parentNode;
+    containerCache.set(container, parentNode);
+    parentNode.removeChild(placeholderStyle);
+  }
+
+  var existNode = findExistNode(key, option);
+
+  if (existNode) {
+    var _option$csp3, _option$csp4;
+
+    if (((_option$csp3 = option.csp) === null || _option$csp3 === void 0 ? void 0 : _option$csp3.nonce) && existNode.nonce !== ((_option$csp4 = option.csp) === null || _option$csp4 === void 0 ? void 0 : _option$csp4.nonce)) {
+      var _option$csp5;
+
+      existNode.nonce = (_option$csp5 = option.csp) === null || _option$csp5 === void 0 ? void 0 : _option$csp5.nonce;
+    }
+
+    if (existNode.innerHTML !== css) {
+      existNode.innerHTML = css;
+    }
+
+    return existNode;
+  }
+
+  var newNode = injectCSS(css, option);
+  newNode.setAttribute(getMark(option), key);
+  return newNode;
+}
+
+function warning$1(valid, message) {
+  warningOnce(valid, "[@ant-design/icons] ".concat(message));
+}
+function isIconDefinition(target) {
+  return _typeof(target) === 'object' && typeof target.name === 'string' && typeof target.theme === 'string' && (_typeof(target.icon) === 'object' || typeof target.icon === 'function');
+}
+function normalizeAttrs() {
+  var attrs = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  return Object.keys(attrs).reduce(function (acc, key) {
+    var val = attrs[key];
+
+    switch (key) {
+      case 'class':
+        acc.className = val;
+        delete acc.class;
+        break;
+
+      default:
+        acc[key] = val;
+    }
+
+    return acc;
+  }, {});
+}
+function generate$1(node, key, rootProps) {
+  if (!rootProps) {
+    return /*#__PURE__*/React__default.createElement(node.tag, _objectSpread2({
+      key: key
+    }, normalizeAttrs(node.attrs)), (node.children || []).map(function (child, index) {
+      return generate$1(child, "".concat(key, "-").concat(node.tag, "-").concat(index));
+    }));
+  }
+
+  return /*#__PURE__*/React__default.createElement(node.tag, _objectSpread2(_objectSpread2({
+    key: key
+  }, normalizeAttrs(node.attrs)), rootProps), (node.children || []).map(function (child, index) {
+    return generate$1(child, "".concat(key, "-").concat(node.tag, "-").concat(index));
+  }));
+}
+function getSecondaryColor(primaryColor) {
+  // choose the second color
+  return generate(primaryColor)[0];
+}
+function normalizeTwoToneColors(twoToneColor) {
+  if (!twoToneColor) {
+    return [];
+  }
+
+  return Array.isArray(twoToneColor) ? twoToneColor : [twoToneColor];
+} // These props make sure that the SVG behaviours like general text.
+var iconStyles = "\n.anticon {\n  display: inline-block;\n  color: inherit;\n  font-style: normal;\n  line-height: 0;\n  text-align: center;\n  text-transform: none;\n  vertical-align: -0.125em;\n  text-rendering: optimizeLegibility;\n  -webkit-font-smoothing: antialiased;\n  -moz-osx-font-smoothing: grayscale;\n}\n\n.anticon > * {\n  line-height: 1;\n}\n\n.anticon svg {\n  display: inline-block;\n}\n\n.anticon::before {\n  display: none;\n}\n\n.anticon .anticon-icon {\n  display: block;\n}\n\n.anticon[tabindex] {\n  cursor: pointer;\n}\n\n.anticon-spin::before,\n.anticon-spin {\n  display: inline-block;\n  -webkit-animation: loadingCircle 1s infinite linear;\n  animation: loadingCircle 1s infinite linear;\n}\n\n@-webkit-keyframes loadingCircle {\n  100% {\n    -webkit-transform: rotate(360deg);\n    transform: rotate(360deg);\n  }\n}\n\n@keyframes loadingCircle {\n  100% {\n    -webkit-transform: rotate(360deg);\n    transform: rotate(360deg);\n  }\n}\n";
+var useInsertStyles = function useInsertStyles() {
+  var styleStr = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : iconStyles;
+
+  var _useContext = useContext(IconContext),
+      csp = _useContext.csp;
+
+  useEffect(function () {
+    updateCSS(styleStr, '@ant-design-icons', {
+      prepend: true,
+      csp: csp
+    });
+  }, []);
+};
+
+var _excluded = ["icon", "className", "onClick", "style", "primaryColor", "secondaryColor"];
+var twoToneColorPalette = {
+  primaryColor: '#333',
+  secondaryColor: '#E6E6E6',
+  calculated: false
+};
+
+function setTwoToneColors(_ref) {
+  var primaryColor = _ref.primaryColor,
+      secondaryColor = _ref.secondaryColor;
+  twoToneColorPalette.primaryColor = primaryColor;
+  twoToneColorPalette.secondaryColor = secondaryColor || getSecondaryColor(primaryColor);
+  twoToneColorPalette.calculated = !!secondaryColor;
+}
+
+function getTwoToneColors() {
+  return _objectSpread2({}, twoToneColorPalette);
+}
+
+var IconBase = function IconBase(props) {
+  var icon = props.icon,
+      className = props.className,
+      onClick = props.onClick,
+      style = props.style,
+      primaryColor = props.primaryColor,
+      secondaryColor = props.secondaryColor,
+      restProps = _objectWithoutProperties(props, _excluded);
+
+  var colors = twoToneColorPalette;
+
+  if (primaryColor) {
+    colors = {
+      primaryColor: primaryColor,
+      secondaryColor: secondaryColor || getSecondaryColor(primaryColor)
+    };
+  }
+
+  useInsertStyles();
+  warning$1(isIconDefinition(icon), "icon should be icon definiton, but got ".concat(icon));
+
+  if (!isIconDefinition(icon)) {
+    return null;
+  }
+
+  var target = icon;
+
+  if (target && typeof target.icon === 'function') {
+    target = _objectSpread2(_objectSpread2({}, target), {}, {
+      icon: target.icon(colors.primaryColor, colors.secondaryColor)
+    });
+  }
+
+  return generate$1(target.icon, "svg-".concat(target.name), _objectSpread2({
+    className: className,
+    onClick: onClick,
+    style: style,
+    'data-icon': target.name,
+    width: '1em',
+    height: '1em',
+    fill: 'currentColor',
+    'aria-hidden': 'true'
+  }, restProps));
+};
+
+IconBase.displayName = 'IconReact';
+IconBase.getTwoToneColors = getTwoToneColors;
+IconBase.setTwoToneColors = setTwoToneColors;
+
+function setTwoToneColor(twoToneColor) {
+  var _normalizeTwoToneColo = normalizeTwoToneColors(twoToneColor),
+      _normalizeTwoToneColo2 = _slicedToArray(_normalizeTwoToneColo, 2),
+      primaryColor = _normalizeTwoToneColo2[0],
+      secondaryColor = _normalizeTwoToneColo2[1];
+
+  return IconBase.setTwoToneColors({
+    primaryColor: primaryColor,
+    secondaryColor: secondaryColor
+  });
+}
+function getTwoToneColor() {
+  var colors = IconBase.getTwoToneColors();
+
+  if (!colors.calculated) {
+    return colors.primaryColor;
+  }
+
+  return [colors.primaryColor, colors.secondaryColor];
+}
+
+var _excluded$1 = ["className", "icon", "spin", "rotate", "tabIndex", "onClick", "twoToneColor"];
+// should move it to antd main repo?
+
+setTwoToneColor('#1890ff');
+var Icon = /*#__PURE__*/forwardRef(function (props, ref) {
+  var _classNames;
+
+  var className = props.className,
+      icon = props.icon,
+      spin = props.spin,
+      rotate = props.rotate,
+      tabIndex = props.tabIndex,
+      onClick = props.onClick,
+      twoToneColor = props.twoToneColor,
+      restProps = _objectWithoutProperties(props, _excluded$1);
+
+  var _React$useContext = useContext(IconContext),
+      _React$useContext$pre = _React$useContext.prefixCls,
+      prefixCls = _React$useContext$pre === void 0 ? 'anticon' : _React$useContext$pre;
+
+  var classString = classnames(prefixCls, (_classNames = {}, _defineProperty(_classNames, "".concat(prefixCls, "-").concat(icon.name), !!icon.name), _defineProperty(_classNames, "".concat(prefixCls, "-spin"), !!spin || icon.name === 'loading'), _classNames), className);
+  var iconTabIndex = tabIndex;
+
+  if (iconTabIndex === undefined && onClick) {
+    iconTabIndex = -1;
+  }
+
+  var svgStyle = rotate ? {
+    msTransform: "rotate(".concat(rotate, "deg)"),
+    transform: "rotate(".concat(rotate, "deg)")
+  } : undefined;
+
+  var _normalizeTwoToneColo = normalizeTwoToneColors(twoToneColor),
+      _normalizeTwoToneColo2 = _slicedToArray(_normalizeTwoToneColo, 2),
+      primaryColor = _normalizeTwoToneColo2[0],
+      secondaryColor = _normalizeTwoToneColo2[1];
+
+  return /*#__PURE__*/createElement("span", _objectSpread2(_objectSpread2({
+    role: "img",
+    "aria-label": icon.name
+  }, restProps), {}, {
+    ref: ref,
+    tabIndex: iconTabIndex,
+    onClick: onClick,
+    className: classString
+  }), /*#__PURE__*/createElement(IconBase, {
+    icon: icon,
+    primaryColor: primaryColor,
+    secondaryColor: secondaryColor,
+    style: svgStyle
+  }));
+});
+Icon.displayName = 'AntdIcon';
+Icon.getTwoToneColor = getTwoToneColor;
+Icon.setTwoToneColor = setTwoToneColor;
+
+// This icon file is generated automatically.
+var CaretRightOutlined = { "icon": { "tag": "svg", "attrs": { "viewBox": "0 0 1024 1024", "focusable": "false" }, "children": [{ "tag": "path", "attrs": { "d": "M715.8 493.5L335 165.1c-14.2-12.2-35-1.2-35 18.5v656.8c0 19.7 20.8 30.7 35 18.5l380.8-328.4c10.9-9.4 10.9-27.6 0-37z" } }] }, "name": "caret-right", "theme": "outlined" };
+
+var CaretRightOutlined$1 = function CaretRightOutlined$1(props, ref) {
+  return /*#__PURE__*/createElement(Icon, _objectSpread2(_objectSpread2({}, props), {}, {
+    ref: ref,
+    icon: CaretRightOutlined
+  }));
+};
+
+CaretRightOutlined$1.displayName = 'CaretRightOutlined';
+var CaretRightOutlined$2 = /*#__PURE__*/forwardRef(CaretRightOutlined$1);
+
+// This icon file is generated automatically.
+var PlusOutlined = { "icon": { "tag": "svg", "attrs": { "viewBox": "64 64 896 896", "focusable": "false" }, "children": [{ "tag": "defs", "attrs": {}, "children": [{ "tag": "style", "attrs": {} }] }, { "tag": "path", "attrs": { "d": "M482 152h60q8 0 8 8v704q0 8-8 8h-60q-8 0-8-8V160q0-8 8-8z" } }, { "tag": "path", "attrs": { "d": "M176 474h672q8 0 8 8v60q0 8-8 8H176q-8 0-8-8v-60q0-8 8-8z" } }] }, "name": "plus", "theme": "outlined" };
+
+var PlusOutlined$1 = function PlusOutlined$1(props, ref) {
+  return /*#__PURE__*/createElement(Icon, _objectSpread2(_objectSpread2({}, props), {}, {
+    ref: ref,
+    icon: PlusOutlined
+  }));
+};
+
+PlusOutlined$1.displayName = 'PlusOutlined';
+var PlusOutlined$2 = /*#__PURE__*/forwardRef(PlusOutlined$1);
+
+const AddMoveButton = ({
+  text,
+  className,
+  movingItem: _movingItem = null,
+  handleCancelMove: _handleCancelMove = () => {},
+  disabled: _disabled = false,
+  handleOnAdd: _handleOnAdd = () => {},
+  handleOnMove: _handleOnMove = () => {}
+}) => {
+  const {
+    buttonCancelText
+  } = UIStore.useState(s => s.UIText);
+  return /*#__PURE__*/React__default.createElement(Row, {
+    align: "middle",
+    justify: "start",
+    className: `arfe-reorder-wrapper ${className}`
+  }, /*#__PURE__*/React__default.createElement(Col, {
+    span: _movingItem ? 12 : 24,
+    align: "left"
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    type: "dashed",
+    className: "arfe-reorder-button",
+    size: "small",
+    onClick: _movingItem ? _handleOnMove : _handleOnAdd,
+    disabled: _disabled,
+    icon: _movingItem ? /*#__PURE__*/React__default.createElement(CaretRightOutlined$2, null) : /*#__PURE__*/React__default.createElement(PlusOutlined$2, null)
+  }, text)), _movingItem && /*#__PURE__*/React__default.createElement(Col, {
+    span: 12,
+    align: "right"
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    type: "danger",
+    className: "reorder-button",
+    size: "small",
+    onClick: _handleCancelMove
+  }, buttonCancelText)));
+};
+
+const CardExtraButton = ({
+  type: _type = 'delete-button',
+  isExpand: _isExpand = false,
+  onClick: _onClick = () => {},
+  onCancel: _onCancel = () => {},
+  disabled: _disabled = false
+}) => {
+  switch (_type) {
+    case 'show-button':
+      if (_isExpand) {
+        return /*#__PURE__*/React__default.createElement(Button, {
+          type: "link",
+          className: styles['button-icon'],
+          onClick: _onCancel,
+          icon: /*#__PURE__*/React__default.createElement(TbEditOff, null),
+          disabled: _disabled
+        });
+      }
+
+      return /*#__PURE__*/React__default.createElement(Button, {
+        type: "link",
+        className: styles['button-icon'],
+        onClick: _onClick,
+        icon: /*#__PURE__*/React__default.createElement(TbEdit, null),
+        disabled: _disabled
+      });
+
+    case 'move-button':
+      return /*#__PURE__*/React__default.createElement(Button, {
+        type: "link",
+        className: styles['button-icon'],
+        onClick: _onClick,
+        disabled: _disabled,
+        icon: /*#__PURE__*/React__default.createElement(BiMove, null)
+      });
+
+    case 'edit-button':
+      if (_isExpand) {
+        return /*#__PURE__*/React__default.createElement(Button, {
+          type: "link",
+          className: styles['button-icon'],
+          onClick: _onCancel,
+          icon: /*#__PURE__*/React__default.createElement(RiSettings5Fill, null),
+          disabled: _disabled
+        });
+      }
+
+      return /*#__PURE__*/React__default.createElement(Button, {
+        type: "link",
+        className: styles['button-icon'],
+        onClick: _onClick,
+        icon: /*#__PURE__*/React__default.createElement(RiSettings5Line, null),
+        disabled: _disabled
+      });
+
+    case 'add-button':
+      return /*#__PURE__*/React__default.createElement(Button, {
+        type: "link",
+        className: styles['button-icon'],
+        onClick: _onClick,
+        icon: /*#__PURE__*/React__default.createElement(MdOutlineAddCircleOutline, null),
+        disabled: _disabled
+      });
+
+    case 'save-button':
+      return /*#__PURE__*/React__default.createElement(Button, {
+        type: "link",
+        className: styles['button-icon'],
+        onClick: _onClick,
+        icon: /*#__PURE__*/React__default.createElement(RiSave3Fill, null)
+      });
+
+    default:
+      return /*#__PURE__*/React__default.createElement(Button, {
+        type: "link",
+        className: styles['button-icon'],
+        onClick: _onClick,
+        icon: /*#__PURE__*/React__default.createElement(RiDeleteBin2Line, null),
+        disabled: _disabled
+      });
+  }
+};
+
+const CardTitle = ({
+  id,
+  title,
+  buttons,
+  dependency: _dependency = []
+}) => {
+  return /*#__PURE__*/React__default.createElement(Space, null, !!_dependency.length && /*#__PURE__*/React__default.createElement(Tag, {
+    style: {
+      margin: 'auto'
+    }
+  }, _dependency.length, " Dependenc", _dependency.length > 1 ? 'ies' : 'y'), buttons === null || buttons === void 0 ? void 0 : buttons.map(cfg => /*#__PURE__*/React__default.createElement(CardExtraButton, {
+    key: `${cfg.type}-${id}`,
+    type: cfg.type,
+    isExpand: cfg.isExpand,
+    onClick: () => cfg.onClick(),
+    onCancel: () => cfg.onCancel(),
+    disabled: cfg === null || cfg === void 0 ? void 0 : cfg.disabled
+  })), title && /*#__PURE__*/React__default.createElement("div", {
+    className: "arfe-question-group-title"
+  }, title));
+};
+
+const dependencyTypes = [{
   type: [questionType.option, questionType.multiple_option],
   logicDropdowns: [{
     label: 'contains',
@@ -7247,7 +8451,7 @@ var dependencyTypes = [{
   }]
 }];
 
-var defaultSkipLogic = function defaultSkipLogic() {
+const defaultSkipLogic = () => {
   return [{
     id: generateId(),
     dependentTo: null,
@@ -7259,53 +8463,39 @@ var defaultSkipLogic = function defaultSkipLogic() {
   }];
 };
 
-var fetchDependencyLogicDropdown = function fetchDependencyLogicDropdown(question) {
+const fetchDependencyLogicDropdown = question => {
   var _dependencyTypes$find;
 
-  var value = (_dependencyTypes$find = dependencyTypes.find(function (dt) {
-    return dt.type.includes(question.type);
-  })) === null || _dependencyTypes$find === void 0 ? void 0 : _dependencyTypes$find.logicDropdowns;
+  const value = (_dependencyTypes$find = dependencyTypes.find(dt => dt.type.includes(question.type))) === null || _dependencyTypes$find === void 0 ? void 0 : _dependencyTypes$find.logicDropdowns;
   return value || [];
 };
 
-var fetchDependencyAnswerDropdown = function fetchDependencyAnswerDropdown(question) {
+const fetchDependencyAnswerDropdown = question => {
   if (question !== null && question !== void 0 && question.options) {
-    return question.options.map(function (opt) {
-      return {
-        label: opt.name,
-        value: opt.name
-      };
-    });
+    return question.options.map(opt => ({
+      label: opt.name,
+      value: opt.name
+    }));
   }
 
   return [];
 };
 
-var transformDependencyValue = function transformDependencyValue(dependency, questionGroups) {
-  var questions = questionGroups.flatMap(function (qg) {
-    return qg.questions;
-  });
-  var logicDropdowns = dependencyTypes.flatMap(function (d) {
-    return d.logicDropdowns;
-  }).map(function (x) {
-    return x.value;
-  });
-  var value = dependency.map(function (d) {
+const transformDependencyValue = (dependency, questionGroups) => {
+  const questions = questionGroups.flatMap(qg => qg.questions);
+  const logicDropdowns = dependencyTypes.flatMap(d => d.logicDropdowns).map(x => x.value);
+  const value = dependency.map(d => {
     var _logicDropdowns$map$f;
 
-    var dependentLogic = null;
-    var dependentAnswer = (_logicDropdowns$map$f = logicDropdowns.map(function (lg) {
+    let dependentLogic = null;
+    const dependentAnswer = (_logicDropdowns$map$f = logicDropdowns.map(lg => {
       if (d !== null && d !== void 0 && d[lg]) {
         dependentLogic = lg;
       }
 
       return d === null || d === void 0 ? void 0 : d[lg];
-    }).filter(function (x) {
-      return x;
-    })) === null || _logicDropdowns$map$f === void 0 ? void 0 : _logicDropdowns$map$f[0];
-    var findQ = questions.find(function (q) {
-      return q.id === d.id;
-    });
+    }).filter(x => x)) === null || _logicDropdowns$map$f === void 0 ? void 0 : _logicDropdowns$map$f[0];
+    const findQ = questions.find(q => q.id === d.id);
     return {
       id: generateId(),
       dependentTo: d.id,
@@ -7319,43 +8509,37 @@ var transformDependencyValue = function transformDependencyValue(dependency, que
   return value;
 };
 
-var SettingSkipLogic = function SettingSkipLogic(_ref) {
-  var question = _ref.question,
-      questions = _ref.questions,
-      dependency = _ref.dependency,
-      dependencies = _ref.dependencies,
-      setDependencies = _ref.setDependencies,
-      dependentToQuestions = _ref.dependentToQuestions;
-  var id = question.id,
-      questionGroupId = question.questionGroupId,
-      savedDependency = question.dependency;
-  var namePreffix = "question-" + id;
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
-  var form = Form.useFormInstance();
-  var updateGlobalStore = useCallback(function (dependencyValue, isDelete) {
-    if (isDelete === void 0) {
-      isDelete = false;
-    }
-
-    var transformDependencies = dependencyValue.map(function (dp) {
-      var _ref2;
-
-      return _ref2 = {
-        id: dp.dependentTo
-      }, _ref2[dp.dependentLogic] = dp.dependentAnswer, _ref2;
-    }).filter(function (d) {
-      return d.id;
-    });
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (qg) {
+const SettingSkipLogic = ({
+  question,
+  questions,
+  dependency,
+  dependencies,
+  setDependencies,
+  dependentToQuestions
+}) => {
+  const {
+    id,
+    questionGroupId,
+    dependency: savedDependency
+  } = question;
+  const namePreffix = `question-${id}`;
+  const UIText = UIStore.useState(s => s.UIText);
+  const form = Form.useFormInstance();
+  const updateGlobalStore = useCallback((dependencyValue, isDelete = false) => {
+    const transformDependencies = dependencyValue.map(dp => {
+      return {
+        id: dp.dependentTo,
+        [dp.dependentLogic]: dp.dependentAnswer
+      };
+    }).filter(d => d.id);
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(qg => {
         if (qg.id === questionGroupId) {
-          var _questions = qg.questions.map(function (q) {
+          const questions = qg.questions.map(q => {
             if (q.id === id && !isDelete) {
-              return _extends({}, q, {
+              return { ...q,
                 dependency: transformDependencies
-              });
+              };
             }
 
             if (q.id === id && !isDelete && !transformDependencies.length) {
@@ -7364,9 +8548,9 @@ var SettingSkipLogic = function SettingSkipLogic(_ref) {
             }
 
             if (q.id === id && isDelete && transformDependencies.length) {
-              return _extends({}, q, {
+              return { ...q,
                 dependency: transformDependencies
-              });
+              };
             }
 
             if (q.id === id && isDelete && !transformDependencies.length) {
@@ -7376,18 +8560,17 @@ var SettingSkipLogic = function SettingSkipLogic(_ref) {
 
             return q;
           });
-
-          return _extends({}, qg, {
-            questions: _questions
-          });
+          return { ...qg,
+            questions: questions
+          };
         }
 
         return qg;
       });
     });
   }, [id, questionGroupId]);
-  useEffect(function () {
-    var checkDependencies = dependencies.filter(function (dp) {
+  useEffect(() => {
+    const checkDependencies = dependencies.filter(dp => {
       if (dp.dependentTo && dp.dependentLogic && Array.isArray(dp.dependentAnswer) && dp.dependentAnswer.length) {
         return dp;
       }
@@ -7401,63 +8584,49 @@ var SettingSkipLogic = function SettingSkipLogic(_ref) {
       updateGlobalStore(checkDependencies);
     }
   }, [dependencies, id, questionGroupId, updateGlobalStore]);
-  var updateLocalState = useCallback(function (dependencyId, values) {
-    if (values === void 0) {
-      values = {};
-    }
-
-    var updatedDependencies = dependencies.map(function (d) {
+  const updateLocalState = useCallback((dependencyId, values = {}) => {
+    const updatedDependencies = dependencies.map(d => {
       if (d.id === dependencyId) {
-        return _extends({}, d, values);
+        return { ...d,
+          ...values
+        };
       }
 
       return d;
-    }).filter(function (d) {
-      return dependencyTypes.flatMap(function (dt) {
-        return dt.type;
-      }).includes(d.dependentToType);
-    });
+    }).filter(d => dependencyTypes.flatMap(dt => dt.type).includes(d.dependentToType));
     setDependencies(updatedDependencies);
   }, [dependencies, setDependencies]);
-  useEffect(function () {
-    setTimeout(function () {
-      var checkChangedType = dependencies.map(function (d) {
-        var findQ = questions.find(function (q) {
-          return q.id === d.dependentTo;
-        });
+  useEffect(() => {
+    setTimeout(() => {
+      const checkChangedType = dependencies.map(d => {
+        const findQ = questions.find(q => q.id === d.dependentTo);
 
         if (findQ !== null && findQ !== void 0 && findQ.id && findQ.type !== d.dependentToType) {
           return findQ;
         }
 
         return false;
-      }).filter(function (x) {
-        return x;
-      });
+      }).filter(x => x);
 
       if (dependencies.length && checkChangedType.length) {
-        checkChangedType.forEach(function (q) {
-          var _form$setFieldsValue;
-
-          var updatedDependency = dependencies.find(function (d) {
-            return d.dependentTo === q.id;
-          });
-          updateLocalState(updatedDependency.id, _extends({}, updatedDependency, {
+        checkChangedType.forEach(q => {
+          const updatedDependency = dependencies.find(d => d.dependentTo === q.id);
+          updateLocalState(updatedDependency.id, { ...updatedDependency,
             dependentToType: q.type,
             dependencyLogicDropdownValue: fetchDependencyLogicDropdown(q),
             dependencyAnswerDropdownValue: fetchDependencyAnswerDropdown(q)
-          }));
-          form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[namePreffix + "-dependent_logic-" + updatedDependency.id] = null, _form$setFieldsValue));
+          });
+          form.setFieldsValue({
+            [`${namePreffix}-dependent_logic-${updatedDependency.id}`]: null
+          });
         });
       }
     }, 500);
   }, [dependencies, questions, form, namePreffix, updateLocalState]);
 
-  var handleChangeDependentTo = function handleChangeDependentTo(dependencyId, e) {
-    var question = questions.find(function (q) {
-      return q.id === e;
-    });
-    var values = {
+  const handleChangeDependentTo = (dependencyId, e) => {
+    const question = questions.find(q => q.id === e);
+    const values = {
       dependentTo: e,
       dependentToType: question.type,
       dependencyLogicDropdownValue: fetchDependencyLogicDropdown(question),
@@ -7466,21 +8635,19 @@ var SettingSkipLogic = function SettingSkipLogic(_ref) {
     updateLocalState(dependencyId, values);
   };
 
-  var handleChangeDependentLogic = function handleChangeDependentLogic(dependencyId, e) {
+  const handleChangeDependentLogic = (dependencyId, e) => {
     updateLocalState(dependencyId, {
       dependentLogic: e
     });
   };
 
-  var handleChangeDependentAnswer = function handleChangeDependentAnswer(dependencyId, val) {
+  const handleChangeDependentAnswer = (dependencyId, val) => {
     updateLocalState(dependencyId, {
       dependentAnswer: val
     });
 
     if (savedDependency !== null && savedDependency !== void 0 && savedDependency.length) {
-      var updatedDependencies = savedDependency.filter(function (d) {
-        return d.id !== dependencyId;
-      });
+      const updatedDependencies = savedDependency.filter(d => d.id !== dependencyId);
 
       if (Array.isArray(val) && !val.length) {
         updateGlobalStore(updatedDependencies, true);
@@ -7494,18 +8661,16 @@ var SettingSkipLogic = function SettingSkipLogic(_ref) {
     }
   };
 
-  var handleAddMoreDependency = function handleAddMoreDependency() {
-    var newDependencies = [].concat(dependencies, defaultSkipLogic());
+  const handleAddMoreDependency = () => {
+    const newDependencies = [...dependencies, ...defaultSkipLogic()];
     setDependencies(newDependencies);
   };
 
-  var handleDeleteDependentTo = function handleDeleteDependentTo(dependencyId) {
-    var _form$setFieldsValue2;
-
-    form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[namePreffix + "-dependent_logic-" + dependencyId] = null, _form$setFieldsValue2));
-    var updatedDependencies = dependencies.filter(function (dependency) {
-      return dependency.id !== dependencyId;
+  const handleDeleteDependentTo = dependencyId => {
+    form.setFieldsValue({
+      [`${namePreffix}-dependent_logic-${dependencyId}`]: null
     });
+    const updatedDependencies = dependencies.filter(dependency => dependency.id !== dependencyId);
 
     if (updatedDependencies.length) {
       setDependencies(updatedDependencies);
@@ -7515,110 +8680,84 @@ var SettingSkipLogic = function SettingSkipLogic(_ref) {
     }
   };
 
-  var dropdown = map(groupBy(dependentToQuestions, 'group'), function (i, l) {
-    return {
-      label: l,
-      item: i
-    };
-  }).map(function (g, gi) {
-    return _extends({}, g, {
-      key: gi
-    });
-  });
-  return /*#__PURE__*/React.createElement(Col, {
-    key: "dependency-" + id + "-" + dependency.id,
+  const dropdown = map(groupBy(dependentToQuestions, 'group'), (i, l) => ({
+    label: l,
+    item: i
+  })).map((g, gi) => ({ ...g,
+    key: gi
+  }));
+  return /*#__PURE__*/React__default.createElement(Col, {
+    key: `dependency-${id}-${dependency.id}`,
     span: 24
-  }, /*#__PURE__*/React.createElement(Form.Item, {
+  }, /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionDependentToLabel,
-    name: namePreffix + "-dependent_to-" + dependency.id
-  }, /*#__PURE__*/React.createElement(Row, {
+    name: `${namePreffix}-dependent_to-${dependency.id}`
+  }, /*#__PURE__*/React__default.createElement(Row, {
     align: "middle",
     justify: "space-between",
     gutter: [12, 12]
-  }, /*#__PURE__*/React.createElement(Col, {
+  }, /*#__PURE__*/React__default.createElement(Col, {
     span: 22
-  }, /*#__PURE__*/React.createElement(Select, {
+  }, /*#__PURE__*/React__default.createElement(Select, {
     showSearch: true,
     className: styles['select-dropdown'],
-    getPopupContainer: function getPopupContainer(triggerNode) {
-      return triggerNode.parentElement;
-    },
-    onChange: function onChange(e) {
-      return handleChangeDependentTo(dependency.id, e);
-    },
+    getPopupContainer: triggerNode => triggerNode.parentElement,
+    onChange: e => handleChangeDependentTo(dependency.id, e),
     value: dependency.dependentTo || [],
     optionFilterProp: "children"
-  }, dropdown.map(function (g) {
-    return /*#__PURE__*/React.createElement(Select.OptGroup, {
-      key: g.key,
-      label: g.label
-    }, g.item.map(function (dq) {
-      return /*#__PURE__*/React.createElement(Select.Option, {
-        key: dq.value + "-dq",
-        value: dq.value,
-        disabled: dependencies.map(function (d) {
-          return d.dependentTo;
-        }).includes(dq.value)
-      }, dq.label);
-    }));
-  }))), /*#__PURE__*/React.createElement(Col, {
+  }, dropdown.map(g => /*#__PURE__*/React__default.createElement(Select.OptGroup, {
+    key: g.key,
+    label: g.label
+  }, g.item.map(dq => /*#__PURE__*/React__default.createElement(Select.Option, {
+    key: `${dq.value}-dq`,
+    value: dq.value,
+    disabled: dependencies.map(d => d.dependentTo).includes(dq.value)
+  }, dq.label)))))), /*#__PURE__*/React__default.createElement(Col, {
     span: 2,
     align: "end"
-  }, /*#__PURE__*/React.createElement(Space, null, /*#__PURE__*/React.createElement(CardExtraButton, {
+  }, /*#__PURE__*/React__default.createElement(Space, null, /*#__PURE__*/React__default.createElement(CardExtraButton, {
     type: "add-button",
     disabled: !(dependentToQuestions !== null && dependentToQuestions !== void 0 && dependentToQuestions.length) || dependentToQuestions.length === dependencies.length,
     onClick: handleAddMoreDependency
-  }), /*#__PURE__*/React.createElement(CardExtraButton, {
+  }), /*#__PURE__*/React__default.createElement(CardExtraButton, {
     type: "delete-button",
     disabled: !dependency.dependentTo,
-    onClick: function onClick() {
-      return handleDeleteDependentTo(dependency.id);
-    }
-  }))))), /*#__PURE__*/React.createElement(Row, {
+    onClick: () => handleDeleteDependentTo(dependency.id)
+  }))))), /*#__PURE__*/React__default.createElement(Row, {
     align: "middle",
     justify: "space-between",
     gutter: [12, 12]
-  }, /*#__PURE__*/React.createElement(Col, {
+  }, /*#__PURE__*/React__default.createElement(Col, {
     span: 8
-  }, /*#__PURE__*/React.createElement(Form.Item, {
+  }, /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionDependentLogicLabel,
     initialValue: dependency.dependentLogic || [],
-    name: namePreffix + "-dependent_logic-" + dependency.id
-  }, /*#__PURE__*/React.createElement(Select, {
+    name: `${namePreffix}-dependent_logic-${dependency.id}`
+  }, /*#__PURE__*/React__default.createElement(Select, {
     className: styles['select-dropdown'],
     options: dependency.dependencyLogicDropdownValue,
-    getPopupContainer: function getPopupContainer(triggerNode) {
-      return triggerNode.parentElement;
-    },
-    onChange: function onChange(e) {
-      return handleChangeDependentLogic(dependency.id, e);
-    }
-  }))), /*#__PURE__*/React.createElement(Col, {
+    getPopupContainer: triggerNode => triggerNode.parentElement,
+    onChange: e => handleChangeDependentLogic(dependency.id, e)
+  }))), /*#__PURE__*/React__default.createElement(Col, {
     span: 16
-  }, /*#__PURE__*/React.createElement(Form.Item, {
+  }, /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionDependentAnswerLabel,
-    name: namePreffix + "-dependent_answer-" + dependency.id
-  }, !dependency.dependentTo && /*#__PURE__*/React.createElement(Input, {
+    name: `${namePreffix}-dependent_answer-${dependency.id}`
+  }, !dependency.dependentTo && /*#__PURE__*/React__default.createElement(Input, {
     disabled: true
-  }), dependency.dependentToType === questionType.number && /*#__PURE__*/React.createElement(InputNumber, {
+  }), dependency.dependentToType === questionType.number && /*#__PURE__*/React__default.createElement(InputNumber, {
     style: {
       width: '100%'
     },
     controls: false,
     keyboard: false,
-    onChange: function onChange(e) {
-      return handleChangeDependentAnswer(dependency.id, e);
-    },
+    onChange: e => handleChangeDependentAnswer(dependency.id, e),
     value: dependency.dependentAnswer || null
-  }), [questionType.option, questionType.multiple_option].includes(dependency.dependentToType) && /*#__PURE__*/React.createElement(Select, {
+  }), [questionType.option, questionType.multiple_option].includes(dependency.dependentToType) && /*#__PURE__*/React__default.createElement(Select, {
     className: styles['select-dropdown'],
     options: dependency.dependencyAnswerDropdownValue,
-    getPopupContainer: function getPopupContainer(triggerNode) {
-      return triggerNode.parentElement;
-    },
-    onChange: function onChange(e) {
-      return handleChangeDependentAnswer(dependency.id, e);
-    },
+    getPopupContainer: triggerNode => triggerNode.parentElement,
+    onChange: e => handleChangeDependentAnswer(dependency.id, e),
     mode: "multiple",
     showSearch: true,
     allowClear: true,
@@ -7627,62 +8766,43 @@ var SettingSkipLogic = function SettingSkipLogic(_ref) {
   })))));
 };
 
-var QuestionSkipLogic = function QuestionSkipLogic(_ref3) {
+const QuestionSkipLogic = ({
+  question
+}) => {
   var _dependencies$;
 
-  var question = _ref3.question;
-  var id = question.id,
-      questionGroupId = question.questionGroupId,
-      dependency = question.dependency,
-      currentQuestionOrder = question.order;
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
-
-  var _questionGroupFn$stor = questionGroupFn.store.useState(function (s) {
-    return s;
-  }),
-      questionGroups = _questionGroupFn$stor.questionGroups;
-
-  var _useState = useState(dependency !== null && dependency !== void 0 && dependency.length ? transformDependencyValue(dependency, questionGroups) : defaultSkipLogic()),
-      dependencies = _useState[0],
-      setDependencies = _useState[1];
-
-  var currentQuestionGroupOrder = useMemo(function () {
+  const {
+    id,
+    questionGroupId,
+    dependency,
+    order: currentQuestionOrder
+  } = question;
+  const UIText = UIStore.useState(s => s.UIText);
+  const {
+    questionGroups
+  } = questionGroupFn.store.useState(s => s);
+  const [dependencies, setDependencies] = useState(dependency !== null && dependency !== void 0 && dependency.length ? transformDependencyValue(dependency, questionGroups) : defaultSkipLogic());
+  const currentQuestionGroupOrder = useMemo(() => {
     var _questionGroups$find;
 
-    return (_questionGroups$find = questionGroups.find(function (qg) {
-      return qg.id === questionGroupId;
-    })) === null || _questionGroups$find === void 0 ? void 0 : _questionGroups$find.order;
+    return (_questionGroups$find = questionGroups.find(qg => qg.id === questionGroupId)) === null || _questionGroups$find === void 0 ? void 0 : _questionGroups$find.order;
   }, [questionGroups, questionGroupId]);
-  var questions = useMemo(function () {
-    return questionGroups.filter(function (qg) {
-      return qg.order <= currentQuestionGroupOrder;
-    }).flatMap(function (qg) {
-      return qg.questions;
-    }).filter(function (q) {
-      return q.questionGroupId === questionGroupId && q.order < currentQuestionOrder || q.questionGroupId !== questionGroupId;
-    });
+  const questions = useMemo(() => {
+    return questionGroups.filter(qg => qg.order <= currentQuestionGroupOrder).flatMap(qg => qg.questions).filter(q => q.questionGroupId === questionGroupId && q.order < currentQuestionOrder || q.questionGroupId !== questionGroupId);
   }, [questionGroups, currentQuestionGroupOrder, currentQuestionOrder, questionGroupId]);
-  var dependentToQuestions = useMemo(function () {
-    return questions.filter(function (q) {
-      return dependencyTypes.flatMap(function (dt) {
-        return dt.type;
-      }).includes(q.type);
-    }).map(function (q) {
-      var group = questionGroups.find(function (g) {
-        return g.id === q.questionGroupId;
-      });
+  const dependentToQuestions = useMemo(() => {
+    return questions.filter(q => dependencyTypes.flatMap(dt => dt.type).includes(q.type)).map(q => {
+      const group = questionGroups.find(g => g.id === q.questionGroupId);
       return {
-        label: q.order + ". " + q.name,
+        label: `${q.order}. ${q.name}`,
         value: q.id,
-        group: group.order + ". " + group.name
+        group: `${group.order}. ${group.name}`
       };
     });
   }, [questions, questionGroups]);
 
   if (!(dependencies !== null && dependencies !== void 0 && (_dependencies$ = dependencies[0]) !== null && _dependencies$ !== void 0 && _dependencies$.dependentTo) && !(dependentToQuestions !== null && dependentToQuestions !== void 0 && dependentToQuestions.length)) {
-    return /*#__PURE__*/React.createElement(Alert, {
+    return /*#__PURE__*/React__default.createElement(Alert, {
       message: UIText.infoNoDependentQuestionText,
       type: "info",
       showIcon: true,
@@ -7692,113 +8812,89 @@ var QuestionSkipLogic = function QuestionSkipLogic(_ref3) {
     });
   }
 
-  return /*#__PURE__*/React.createElement(Row, {
+  return /*#__PURE__*/React__default.createElement(Row, {
     gutter: [24, 24]
-  }, dependencies === null || dependencies === void 0 ? void 0 : dependencies.map(function (dependency, di) {
-    return /*#__PURE__*/React.createElement(SettingSkipLogic, {
-      key: "dependency-" + id + "-" + di,
-      dependency: dependency,
-      question: question,
-      questions: questions,
-      dependencies: dependencies,
-      setDependencies: setDependencies,
-      dependentToQuestions: dependentToQuestions
-    });
-  }));
+  }, dependencies === null || dependencies === void 0 ? void 0 : dependencies.map((dependency, di) => /*#__PURE__*/React__default.createElement(SettingSkipLogic, {
+    key: `dependency-${id}-${di}`,
+    dependency: dependency,
+    question: question,
+    questions: questions,
+    dependencies: dependencies,
+    setDependencies: setDependencies,
+    dependentToQuestions: dependentToQuestions
+  })));
 };
 
-var QuestionDefinition = function QuestionDefinition(_ref) {
-  var index = _ref.index,
-      question = _ref.question,
-      questionGroup = _ref.questionGroup,
-      isLastItem = _ref.isLastItem;
-
-  var _questionGroupFn$stor = questionGroupFn.store.useState(function (s) {
-    return s;
-  }),
-      questionGroups = _questionGroupFn$stor.questionGroups;
-
-  var questions = questionGroup.questions;
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
-  var buttonAddNewQuestionText = UIText.buttonAddNewQuestionText,
-      buttonMoveQuestionText = UIText.buttonMoveQuestionText;
-  var movingQ = UIStore.useState(function (s) {
-    return s.activeMoveQuestion;
-  });
-  var activeEditQuestions = UIStore.useState(function (s) {
-    return s.activeEditQuestions;
-  });
-
-  var _useState = useState('setting'),
-      activeTab = _useState[0],
-      setActiveTab = _useState[1];
-
-  var id = question.id,
-      questionGroupId = question.questionGroupId,
-      order = question.order,
-      name = question.name,
-      dependency = question.dependency;
-  var allQuestions = questionGroups.map(function (qg) {
-    return qg.questions;
-  }).flatMap(function (x) {
-    return x;
-  }).map(function (q) {
-    return _extends({}, q, {
-      questionGroup: questionGroups.find(function (qg) {
-        return q.questionGroupId === qg.id;
-      })
-    });
-  });
-  var dependant = useMemo(function () {
+const QuestionDefinition = ({
+  index,
+  question,
+  questionGroup,
+  isLastItem
+}) => {
+  const {
+    questionGroups
+  } = questionGroupFn.store.useState(s => s);
+  const {
+    questions
+  } = questionGroup;
+  const UIText = UIStore.useState(s => s.UIText);
+  const {
+    buttonAddNewQuestionText,
+    buttonMoveQuestionText
+  } = UIText;
+  const movingQ = UIStore.useState(s => s.activeMoveQuestion);
+  const activeEditQuestions = UIStore.useState(s => s.activeEditQuestions);
+  const [activeTab, setActiveTab] = useState('setting');
+  const {
+    id,
+    questionGroupId,
+    order,
+    name,
+    dependency
+  } = question;
+  const allQuestions = questionGroups.map(qg => qg.questions).flatMap(x => x).map(q => ({ ...q,
+    questionGroup: questionGroups.find(qg => q.questionGroupId === qg.id)
+  }));
+  const dependant = useMemo(() => {
     var _movingQ$dependency, _movingQDependency$qu, _movingQDependant$que;
 
-    var dependant = allQuestions.filter(function (q) {
+    const dependant = allQuestions.filter(q => {
       var _q$dependency;
 
-      return (q === null || q === void 0 ? void 0 : (_q$dependency = q.dependency) === null || _q$dependency === void 0 ? void 0 : _q$dependency.filter(function (d) {
-        return d.id === id;
-      }).length) || false;
+      return (q === null || q === void 0 ? void 0 : (_q$dependency = q.dependency) === null || _q$dependency === void 0 ? void 0 : _q$dependency.filter(d => d.id === id).length) || false;
     });
-    var disabled = {
+    let disabled = {
       current: false,
       last: false
     };
-    var movingQDependency = maxBy(movingQ === null || movingQ === void 0 ? void 0 : (_movingQ$dependency = movingQ.dependency) === null || _movingQ$dependency === void 0 ? void 0 : _movingQ$dependency.map(function (q) {
-      return allQuestions.find(function (a) {
-        return a.id === q.id;
-      });
-    }), 'questionGroup.order');
+    const movingQDependency = maxBy(movingQ === null || movingQ === void 0 ? void 0 : (_movingQ$dependency = movingQ.dependency) === null || _movingQ$dependency === void 0 ? void 0 : _movingQ$dependency.map(q => allQuestions.find(a => a.id === q.id)), 'questionGroup.order');
 
     if ((movingQDependency === null || movingQDependency === void 0 ? void 0 : (_movingQDependency$qu = movingQDependency.questionGroup) === null || _movingQDependency$qu === void 0 ? void 0 : _movingQDependency$qu.order) >= (questionGroup === null || questionGroup === void 0 ? void 0 : questionGroup.order)) {
       var _movingQDependency$qu2, _movingQDependency$qu3;
 
-      disabled = _extends({}, disabled, {
+      disabled = { ...disabled,
         current: (movingQDependency === null || movingQDependency === void 0 ? void 0 : (_movingQDependency$qu2 = movingQDependency.questionGroup) === null || _movingQDependency$qu2 === void 0 ? void 0 : _movingQDependency$qu2.order) === questionGroup.order ? movingQDependency.order >= order : true
-      });
-      disabled = _extends({}, disabled, {
+      };
+      disabled = { ...disabled,
         last: (movingQDependency === null || movingQDependency === void 0 ? void 0 : (_movingQDependency$qu3 = movingQDependency.questionGroup) === null || _movingQDependency$qu3 === void 0 ? void 0 : _movingQDependency$qu3.order) === questionGroup.order ? movingQDependency.order >= order + 1 : true
-      });
+      };
     }
 
-    var movingQDependant = minBy(allQuestions.filter(function (q) {
+    const movingQDependant = minBy(allQuestions.filter(q => {
       var _q$dependency2;
 
-      return (q === null || q === void 0 ? void 0 : (_q$dependency2 = q.dependency) === null || _q$dependency2 === void 0 ? void 0 : _q$dependency2.filter(function (d) {
-        return d.id === (movingQ === null || movingQ === void 0 ? void 0 : movingQ.id);
-      }).length) || false;
+      return (q === null || q === void 0 ? void 0 : (_q$dependency2 = q.dependency) === null || _q$dependency2 === void 0 ? void 0 : _q$dependency2.filter(d => d.id === (movingQ === null || movingQ === void 0 ? void 0 : movingQ.id)).length) || false;
     }), 'questionGroup.order');
 
     if ((movingQDependant === null || movingQDependant === void 0 ? void 0 : (_movingQDependant$que = movingQDependant.questionGroup) === null || _movingQDependant$que === void 0 ? void 0 : _movingQDependant$que.order) <= (questionGroup === null || questionGroup === void 0 ? void 0 : questionGroup.order)) {
       var _movingQDependant$que2, _movingQDependant$que3;
 
-      disabled = _extends({}, disabled, {
+      disabled = { ...disabled,
         current: (movingQDependant === null || movingQDependant === void 0 ? void 0 : (_movingQDependant$que2 = movingQDependant.questionGroup) === null || _movingQDependant$que2 === void 0 ? void 0 : _movingQDependant$que2.order) === questionGroup.order ? movingQDependant.order <= order - 1 : true
-      });
-      disabled = _extends({}, disabled, {
+      };
+      disabled = { ...disabled,
         last: (movingQDependant === null || movingQDependant === void 0 ? void 0 : (_movingQDependant$que3 = movingQDependant.questionGroup) === null || _movingQDependant$que3 === void 0 ? void 0 : _movingQDependant$que3.order) === questionGroup.order ? movingQDependant.order <= order : true
-      });
+      };
     }
 
     return {
@@ -7806,54 +8902,50 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
       dependant: dependant
     };
   }, [id, order, questionGroup, allQuestions, movingQ]);
-  var isEditQuestion = useMemo(function () {
+  const isEditQuestion = useMemo(() => {
     return activeEditQuestions.includes(id);
   }, [activeEditQuestions, id]);
 
-  var handleEdit = function handleEdit() {
-    UIStore.update(function (s) {
-      s.activeEditQuestions = [].concat(activeEditQuestions, [id]);
+  const handleEdit = () => {
+    UIStore.update(s => {
+      s.activeEditQuestions = [...activeEditQuestions, id];
     });
   };
 
-  var handleCancelEdit = function handleCancelEdit() {
-    UIStore.update(function (s) {
-      s.activeEditQuestions = activeEditQuestions.filter(function (qId) {
-        return qId !== id;
-      });
+  const handleCancelEdit = () => {
+    UIStore.update(s => {
+      s.activeEditQuestions = activeEditQuestions.filter(qId => qId !== id);
     });
   };
 
-  var handleCancelMove = function handleCancelMove() {
-    UIStore.update(function (s) {
+  const handleCancelMove = () => {
+    UIStore.update(s => {
       s.activeMoveQuestion = null;
     });
   };
 
-  var handleMove = function handleMove() {
-    UIStore.update(function (s) {
+  const handleMove = () => {
+    UIStore.update(s => {
       s.activeMoveQuestion = movingQ === question ? null : question;
     });
   };
 
-  var handleDelete = function handleDelete() {
-    var newQuestions = questions.filter(function (q) {
-      return q.id !== id;
-    }).map(function (q) {
+  const handleDelete = () => {
+    const newQuestions = questions.filter(q => q.id !== id).map(q => {
       if (q.order > order) {
-        return _extends({}, q, {
+        return { ...q,
           order: q.order - 1
-        });
+        };
       }
 
       return q;
     });
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (qg) {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(qg => {
         if (qg.id === questionGroupId) {
-          return _extends({}, qg, {
+          return { ...qg,
             questions: newQuestions
-          });
+          };
         }
 
         return qg;
@@ -7861,27 +8953,21 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
     });
   };
 
-  var _handleOnAdd = function handleOnAdd(prevOrder) {
-    var prevQ = questions.filter(function (q) {
-      return q.order <= prevOrder;
-    });
-    var nextQ = questions.filter(function (q) {
-      return q.order > prevOrder;
-    }).map(function (q) {
-      return _extends({}, q, {
-        order: q.order + 1
-      });
-    });
-    var newQuestions = [].concat(prevQ, [questionFn.add({
+  const handleOnAdd = prevOrder => {
+    const prevQ = questions.filter(q => q.order <= prevOrder);
+    const nextQ = questions.filter(q => q.order > prevOrder).map(q => ({ ...q,
+      order: q.order + 1
+    }));
+    const newQuestions = [...prevQ, questionFn.add({
       questionGroup: questionGroup,
       prevOrder: prevOrder
-    })], nextQ);
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (qg) {
+    }), ...nextQ];
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(qg => {
         if (qg.id === questionGroupId) {
-          return _extends({}, qg, {
+          return { ...qg,
             questions: orderBy(newQuestions, 'order')
-          });
+          };
         }
 
         return qg;
@@ -7889,42 +8975,31 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
     });
   };
 
-  var _handleOnMove = function handleOnMove(prevOrder, lastItem) {
-    if (lastItem === void 0) {
-      lastItem = false;
-    }
-
-    var currentQ = _extends({}, movingQ, {
+  const handleOnMove = (prevOrder, lastItem = false) => {
+    const currentQ = { ...movingQ,
       questionGroupId: questionGroupId,
       order: questionGroupId !== movingQ.questionGroupId ? prevOrder + 1 : movingQ.order < prevOrder ? prevOrder : prevOrder + 1
-    });
-
-    var changedQg = questionGroups.filter(function (qg) {
-      return qg.id === movingQ.questionGroupId || qg.id === questionGroupId;
-    }).map(function (qg) {
-      var addedQ = qg.id === questionGroupId ? currentQ : false;
-      var newQuestions = qg.questions.filter(function (q) {
-        return q.id !== movingQ.id;
-      });
+    };
+    const changedQg = questionGroups.filter(qg => qg.id === movingQ.questionGroupId || qg.id === questionGroupId).map(qg => {
+      const addedQ = qg.id === questionGroupId ? currentQ : false;
+      let newQuestions = qg.questions.filter(q => q.id !== movingQ.id);
 
       if (questionGroupId !== movingQ.questionGroupId && newQuestions.length < qg.questions.length) {
-        newQuestions = newQuestions.map(function (q, qi) {
-          return _extends({}, q, {
-            order: qi + 1
-          });
-        });
+        newQuestions = newQuestions.map((q, qi) => ({ ...q,
+          order: qi + 1
+        }));
       }
 
       if (questionGroupId !== movingQ.questionGroupId && qg.id === questionGroupId) {
-        newQuestions = newQuestions.map(function (x) {
+        newQuestions = newQuestions.map(x => {
           if (lastItem) {
             return x;
           }
 
           if (x.order >= prevOrder + 1) {
-            return _extends({}, x, {
+            return { ...x,
               order: x.order + 1
-            });
+            };
           }
 
           return x;
@@ -7932,58 +9007,54 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
       }
 
       if (questionGroupId === movingQ.questionGroupId) {
-        newQuestions = newQuestions.map(function (x) {
+        newQuestions = newQuestions.map(x => {
           if (lastItem) {
             if (x.order > movingQ.order) {
-              return _extends({}, x, {
+              return { ...x,
                 order: x.order - 1
-              });
+              };
             }
 
             return x;
           }
 
           if (prevOrder > movingQ.order && x.order > movingQ.order && x.order <= prevOrder) {
-            return _extends({}, x, {
+            return { ...x,
               order: x.order - 1
-            });
+            };
           }
 
           if (prevOrder < movingQ.order && x.order < movingQ.order && x.order >= prevOrder + 1) {
-            return _extends({}, x, {
+            return { ...x,
               order: x.order + 1
-            });
+            };
           }
 
           return x;
         });
       }
 
-      newQuestions = addedQ ? [].concat(newQuestions, [addedQ]) : newQuestions;
-      return _extends({}, qg, {
+      newQuestions = addedQ ? [...newQuestions, addedQ] : newQuestions;
+      return { ...qg,
         questions: orderBy(newQuestions, 'order')
-      });
+      };
     });
-    var oldQg = questionGroups.filter(function (qg) {
-      return qg.id !== movingQ.questionGroupId;
+    let oldQg = questionGroups.filter(qg => qg.id !== movingQ.questionGroupId);
+    oldQg = movingQ.questionGroupId !== questionGroupId ? oldQg.filter(qg => qg.id !== questionGroupId) : oldQg;
+    questionGroupFn.store.update(s => {
+      s.questionGroups = orderBy([...oldQg, ...changedQg], 'order');
     });
-    oldQg = movingQ.questionGroupId !== questionGroupId ? oldQg.filter(function (qg) {
-      return qg.id !== questionGroupId;
-    }) : oldQg;
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = orderBy([].concat(oldQg, changedQg), 'order');
-    });
-    UIStore.update(function (s) {
+    UIStore.update(s => {
       s.activeMoveQuestion = null;
     });
   };
 
-  var rightButtons = [{
+  const rightButtons = [{
     type: 'delete-button',
     onClick: handleDelete,
     disabled: !index && isLastItem || dependant.dependant.length
   }];
-  var leftButtons = [{
+  const leftButtons = [{
     type: 'move-button',
     onClick: handleMove,
     disabled: !index && isLastItem
@@ -7993,21 +9064,17 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
     onClick: handleEdit,
     onCancel: handleCancelEdit
   }];
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(AddMoveButton, {
+  return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(AddMoveButton, {
     text: movingQ ? buttonMoveQuestionText : buttonAddNewQuestionText,
     disabled: movingQ === question || (movingQ === null || movingQ === void 0 ? void 0 : movingQ.order) + 1 === order && (movingQ === null || movingQ === void 0 ? void 0 : movingQ.questionGroupId) === questionGroupId || dependant.disabled.current,
     handleCancelMove: handleCancelMove,
     movingItem: movingQ,
-    handleOnAdd: function handleOnAdd() {
-      return _handleOnAdd(order - 1);
-    },
-    handleOnMove: function handleOnMove() {
-      return _handleOnMove(order - 1);
-    }
-  }), /*#__PURE__*/React.createElement(Card, {
-    key: index + "-" + id,
-    title: /*#__PURE__*/React.createElement(CardTitle, {
-      title: order + ". " + name,
+    handleOnAdd: () => handleOnAdd(order - 1),
+    handleOnMove: () => handleOnMove(order - 1)
+  }), /*#__PURE__*/React__default.createElement(Card, {
+    key: `${index}-${id}`,
+    title: /*#__PURE__*/React__default.createElement(CardTitle, {
+      title: `${order}. ${name}`,
       buttons: leftButtons
     }),
     headStyle: {
@@ -8021,257 +9088,195 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
       padding: isEditQuestion ? 24 : 0
     },
     loading: false,
-    extra: /*#__PURE__*/React.createElement(CardTitle, {
+    extra: /*#__PURE__*/React__default.createElement(CardTitle, {
       buttons: rightButtons,
-      dependency: allQuestions.filter(function (q) {
-        return dependency === null || dependency === void 0 ? void 0 : dependency.find(function (d) {
-          return d.id === q.id;
-        });
-      })
+      dependency: allQuestions.filter(q => dependency === null || dependency === void 0 ? void 0 : dependency.find(d => d.id === q.id))
     })
-  }, isEditQuestion && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Tabs, {
+  }, isEditQuestion && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(Tabs, {
     defaultActiveKey: activeTab,
-    onChange: function onChange(key) {
-      return setActiveTab(key);
-    },
+    onChange: key => setActiveTab(key),
     tabBarGutter: 24,
     className: styles['tabs-wrapper']
-  }, /*#__PURE__*/React.createElement(Tabs.TabPane, {
+  }, /*#__PURE__*/React__default.createElement(Tabs.TabPane, {
     tab: UIText.questionSettingTabPane,
     key: "setting"
-  }), /*#__PURE__*/React.createElement(Tabs.TabPane, {
+  }), /*#__PURE__*/React__default.createElement(Tabs.TabPane, {
     tab: UIText.questionSkipLogicTabPane,
     key: "skip-logic"
-  })), activeTab === 'setting' && /*#__PURE__*/React.createElement(QuestionSetting, {
+  })), activeTab === 'setting' && /*#__PURE__*/React__default.createElement(QuestionSetting, {
     question: question,
     dependant: dependant.dependant
-  }), activeTab === 'skip-logic' && /*#__PURE__*/React.createElement(QuestionSkipLogic, {
+  }), activeTab === 'skip-logic' && /*#__PURE__*/React__default.createElement(QuestionSkipLogic, {
     question: question
-  }))), isLastItem && /*#__PURE__*/React.createElement(AddMoveButton, {
+  }))), isLastItem && /*#__PURE__*/React__default.createElement(AddMoveButton, {
     text: movingQ ? buttonMoveQuestionText : buttonAddNewQuestionText,
     disabled: movingQ === question || dependant.disabled.last,
     movingItem: movingQ,
     handleCancelMove: handleCancelMove,
-    handleOnAdd: function handleOnAdd() {
-      return _handleOnAdd(order);
-    },
-    handleOnMove: function handleOnMove() {
-      return _handleOnMove(order, true);
-    }
+    handleOnAdd: () => handleOnAdd(order),
+    handleOnMove: () => handleOnMove(order, true)
   }));
 };
 
-var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
-  var index = _ref.index,
-      questionGroup = _ref.questionGroup,
-      isLastItem = _ref.isLastItem;
-
-  var _questionGroupFn$stor = questionGroupFn.store.useState(function (s) {
-    return s;
-  }),
-      questionGroups = _questionGroupFn$stor.questionGroups;
-
-  var movingQg = UIStore.useState(function (s) {
-    return s.activeMoveQuestionGroup;
-  });
-  var activeQuestionGroups = UIStore.useState(function (s) {
-    return s.activeQuestionGroups;
-  });
-  var activeEditQuestionGroups = UIStore.useState(function (s) {
-    return s.activeEditQuestionGroups;
-  });
-  var id = questionGroup.id,
-      name = questionGroup.name,
-      questions = questionGroup.questions,
-      order = questionGroup.order;
-  var questionIds = questions.map(function (q) {
-    return q.id;
-  });
-
-  var _UIStore$useState = UIStore.useState(function (s) {
-    return s.UIText;
-  }),
-      buttonAddNewQuestionGroupText = _UIStore$useState.buttonAddNewQuestionGroupText,
-      buttonMoveQuestionGroupText = _UIStore$useState.buttonMoveQuestionGroupText;
-
-  var showQuestion = useMemo(function () {
+const QuestionGroupDefinition = ({
+  index,
+  questionGroup,
+  isLastItem
+}) => {
+  const {
+    questionGroups
+  } = questionGroupFn.store.useState(s => s);
+  const movingQg = UIStore.useState(s => s.activeMoveQuestionGroup);
+  const activeQuestionGroups = UIStore.useState(s => s.activeQuestionGroups);
+  const activeEditQuestionGroups = UIStore.useState(s => s.activeEditQuestionGroups);
+  const {
+    id,
+    name,
+    questions,
+    order
+  } = questionGroup;
+  const questionIds = questions.map(q => q.id);
+  const {
+    buttonAddNewQuestionGroupText,
+    buttonMoveQuestionGroupText
+  } = UIStore.useState(s => s.UIText);
+  const showQuestion = useMemo(() => {
     return activeQuestionGroups.includes(id);
   }, [activeQuestionGroups, id]);
-  var isEditQuestionGroup = useMemo(function () {
+  const isEditQuestionGroup = useMemo(() => {
     return activeEditQuestionGroups.includes(id);
   }, [activeEditQuestionGroups, id]);
 
-  var handleHideQuestions = function handleHideQuestions() {
-    UIStore.update(function (s) {
-      s.activeQuestionGroups = activeQuestionGroups.filter(function (qgId) {
-        return qgId !== id;
-      });
+  const handleHideQuestions = () => {
+    UIStore.update(s => {
+      s.activeQuestionGroups = activeQuestionGroups.filter(qgId => qgId !== id);
     });
   };
 
-  var handleCancelEditGroup = function handleCancelEditGroup() {
-    UIStore.update(function (s) {
-      s.activeEditQuestionGroups = activeEditQuestionGroups.filter(function (qgId) {
-        return qgId !== id;
-      });
+  const handleCancelEditGroup = () => {
+    UIStore.update(s => {
+      s.activeEditQuestionGroups = activeEditQuestionGroups.filter(qgId => qgId !== id);
     });
   };
 
-  var handleShowQuestions = function handleShowQuestions() {
-    UIStore.update(function (s) {
-      s.activeQuestionGroups = [].concat(activeQuestionGroups, [id]);
+  const handleShowQuestions = () => {
+    UIStore.update(s => {
+      s.activeQuestionGroups = [...activeQuestionGroups, id];
     });
     handleCancelEditGroup();
   };
 
-  var handleEditGroup = function handleEditGroup() {
-    UIStore.update(function (s) {
-      s.activeEditQuestionGroups = [].concat(activeEditQuestionGroups, [id]);
+  const handleEditGroup = () => {
+    UIStore.update(s => {
+      s.activeEditQuestionGroups = [...activeEditQuestionGroups, id];
     });
     handleHideQuestions();
   };
 
-  var handleCancelMove = function handleCancelMove() {
-    UIStore.update(function (s) {
+  const handleCancelMove = () => {
+    UIStore.update(s => {
       s.activeMoveQuestionGroup = null;
     });
   };
 
-  var handleMove = function handleMove() {
-    UIStore.update(function (s) {
+  const handleMove = () => {
+    UIStore.update(s => {
       s.activeMoveQuestionGroup = movingQg === questionGroup ? null : questionGroup;
     });
   };
 
-  var handleDelete = function handleDelete() {
-    var newQuestionGroups = questionGroups.filter(function (qg) {
-      return id !== qg.id;
-    }).map(function (qg) {
+  const handleDelete = () => {
+    const newQuestionGroups = questionGroups.filter(qg => id !== qg.id).map(qg => {
       if (qg.order > order) {
-        return _extends({}, qg, {
+        return { ...qg,
           order: qg.order - 1
-        });
+        };
       }
 
       return qg;
     });
-    questionGroupFn.store.update(function (s) {
+    questionGroupFn.store.update(s => {
       s.questionGroups = newQuestionGroups;
     });
   };
 
-  var _handleOnAdd = function handleOnAdd(prevOrder) {
-    var prevQg = questionGroups.filter(function (qg) {
-      return qg.order <= prevOrder;
-    });
-    var nextQg = questionGroups.filter(function (qg) {
-      return qg.order > prevOrder;
-    }).map(function (qg) {
-      return _extends({}, qg, {
-        order: qg.order + 1
-      });
-    });
-    var newQuestionGroups = [].concat(prevQg, [questionGroupFn.add({
+  const handleOnAdd = prevOrder => {
+    const prevQg = questionGroups.filter(qg => qg.order <= prevOrder);
+    const nextQg = questionGroups.filter(qg => qg.order > prevOrder).map(qg => ({ ...qg,
+      order: qg.order + 1
+    }));
+    const newQuestionGroups = [...prevQg, questionGroupFn.add({
       prevOrder: prevOrder
-    })], nextQg);
-    questionGroupFn.store.update(function (s) {
+    }), ...nextQg];
+    questionGroupFn.store.update(s => {
       s.questionGroups = newQuestionGroups;
     });
   };
 
-  var _handleOnMove = function handleOnMove(prevOrder, lastItem) {
-    if (lastItem === void 0) {
-      lastItem = false;
-    }
-
-    var currentQg = _extends({}, movingQg, {
+  const handleOnMove = (prevOrder, lastItem = false) => {
+    const currentQg = { ...movingQg,
       order: movingQg.order < prevOrder ? prevOrder : prevOrder + 1
-    });
-
-    var orderedQg = questionGroups.filter(function (qg) {
-      return qg.order !== movingQg.order;
-    }).map(function (x) {
+    };
+    const orderedQg = questionGroups.filter(qg => qg.order !== movingQg.order).map(x => {
       if (lastItem) {
         if (x.order > movingQg.order) {
-          return _extends({}, x, {
+          return { ...x,
             order: x.order - 1
-          });
+          };
         }
 
         return x;
       }
 
       if (prevOrder > movingQg.order && x.order > movingQg.order && x.order <= prevOrder) {
-        return _extends({}, x, {
+        return { ...x,
           order: x.order - 1
-        });
+        };
       }
 
       if (prevOrder < movingQg.order && x.order < movingQg.order && x.order >= prevOrder + 1) {
-        return _extends({}, x, {
+        return { ...x,
           order: x.order + 1
-        });
+        };
       }
 
       return x;
     });
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = orderBy([].concat(orderedQg, [currentQg]), 'order');
+    questionGroupFn.store.update(s => {
+      s.questionGroups = orderBy([...orderedQg, currentQg], 'order');
     });
-    UIStore.update(function (s) {
+    UIStore.update(s => {
       s.activeMoveQuestionGroup = null;
     });
   };
 
-  var dependant = useMemo(function () {
+  const dependant = useMemo(() => {
     var _movingQg$questions, _movingQg$questions2, _movingQ$map, _movingQDependency$qu, _movingQDependant$que;
 
-    var allQ = questionGroups.map(function (qg) {
-      return qg.questions;
-    }).flatMap(function (x) {
-      return x;
-    }).map(function (q) {
-      return _extends({}, q, {
-        questionGroup: questionGroups.find(function (qg) {
-          return q.questionGroupId === qg.id;
-        })
-      });
-    });
-    var dependencies = allQ.filter(function (q) {
+    const allQ = questionGroups.map(qg => qg.questions).flatMap(x => x).map(q => ({ ...q,
+      questionGroup: questionGroups.find(qg => q.questionGroupId === qg.id)
+    }));
+    const dependencies = allQ.filter(q => {
       var _q$dependency;
 
-      return (q === null || q === void 0 ? void 0 : (_q$dependency = q.dependency) === null || _q$dependency === void 0 ? void 0 : _q$dependency.filter(function (d) {
-        return questionIds.find(function (qid) {
-          return qid === d.id;
-        });
-      }).length) || false;
+      return (q === null || q === void 0 ? void 0 : (_q$dependency = q.dependency) === null || _q$dependency === void 0 ? void 0 : _q$dependency.filter(d => questionIds.find(qid => qid === d.id)).length) || false;
     });
-    var movingQids = (movingQg === null || movingQg === void 0 ? void 0 : (_movingQg$questions = movingQg.questions) === null || _movingQg$questions === void 0 ? void 0 : _movingQg$questions.map(function (q) {
-      return q.id;
-    })) || [];
-    var movingQ = movingQg === null || movingQg === void 0 ? void 0 : (_movingQg$questions2 = movingQg.questions) === null || _movingQg$questions2 === void 0 ? void 0 : _movingQg$questions2.filter(function (q) {
+    const movingQids = (movingQg === null || movingQg === void 0 ? void 0 : (_movingQg$questions = movingQg.questions) === null || _movingQg$questions === void 0 ? void 0 : _movingQg$questions.map(q => q.id)) || [];
+    const movingQ = movingQg === null || movingQg === void 0 ? void 0 : (_movingQg$questions2 = movingQg.questions) === null || _movingQg$questions2 === void 0 ? void 0 : _movingQg$questions2.filter(q => {
       var _q$dependency2, _q$dependency2$filter;
 
-      var selfDependency = (q === null || q === void 0 ? void 0 : (_q$dependency2 = q.dependency) === null || _q$dependency2 === void 0 ? void 0 : (_q$dependency2$filter = _q$dependency2.filter(function (d) {
-        return movingQids.includes(d.id);
-      })) === null || _q$dependency2$filter === void 0 ? void 0 : _q$dependency2$filter.length) || 0;
+      const selfDependency = (q === null || q === void 0 ? void 0 : (_q$dependency2 = q.dependency) === null || _q$dependency2 === void 0 ? void 0 : (_q$dependency2$filter = _q$dependency2.filter(d => movingQids.includes(d.id))) === null || _q$dependency2$filter === void 0 ? void 0 : _q$dependency2$filter.length) || 0;
       return selfDependency;
     });
-    var disabled = {
+    let disabled = {
       current: false,
       last: false
     };
-    var movingQDependency = maxBy((movingQ === null || movingQ === void 0 ? void 0 : (_movingQ$map = movingQ.map(function (q) {
+    const movingQDependency = maxBy((movingQ === null || movingQ === void 0 ? void 0 : (_movingQ$map = movingQ.map(q => {
       var _q$dependency3;
 
-      return (q === null || q === void 0 ? void 0 : (_q$dependency3 = q.dependency) === null || _q$dependency3 === void 0 ? void 0 : _q$dependency3.map(function (q) {
-        return allQ.find(function (a) {
-          return a.id === q.id;
-        });
-      })) || [];
-    })) === null || _movingQ$map === void 0 ? void 0 : _movingQ$map.flatMap(function (q) {
-      return q;
-    })) || [], 'questionGroup.order');
+      return (q === null || q === void 0 ? void 0 : (_q$dependency3 = q.dependency) === null || _q$dependency3 === void 0 ? void 0 : _q$dependency3.map(q => allQ.find(a => a.id === q.id))) || [];
+    })) === null || _movingQ$map === void 0 ? void 0 : _movingQ$map.flatMap(q => q)) || [], 'questionGroup.order');
 
     if ((movingQDependency === null || movingQDependency === void 0 ? void 0 : (_movingQDependency$qu = movingQDependency.questionGroup) === null || _movingQDependency$qu === void 0 ? void 0 : _movingQDependency$qu.order) >= order) {
       disabled = {
@@ -8280,14 +9285,10 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
       };
     }
 
-    var movingQDependant = minBy(allQ.filter(function (q) {
+    const movingQDependant = minBy(allQ.filter(q => {
       var _q$dependency4;
 
-      return (q === null || q === void 0 ? void 0 : (_q$dependency4 = q.dependency) === null || _q$dependency4 === void 0 ? void 0 : _q$dependency4.filter(function (d) {
-        return movingQ === null || movingQ === void 0 ? void 0 : movingQ.find(function (qs) {
-          return qs.id === d.id;
-        });
-      }).length) || false;
+      return (q === null || q === void 0 ? void 0 : (_q$dependency4 = q.dependency) === null || _q$dependency4 === void 0 ? void 0 : _q$dependency4.filter(d => movingQ === null || movingQ === void 0 ? void 0 : movingQ.find(qs => qs.id === d.id)).length) || false;
     }), 'questionGroup.order');
 
     if ((movingQDependant === null || movingQDependant === void 0 ? void 0 : (_movingQDependant$que = movingQDependant.questionGroup) === null || _movingQDependant$que === void 0 ? void 0 : _movingQDependant$que.order) < order) {
@@ -8302,7 +9303,7 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
       dependant: dependencies
     };
   }, [questionGroups, questionIds, movingQg, order]);
-  var leftButtons = [{
+  const leftButtons = [{
     type: 'delete-button',
     onClick: handleDelete,
     disabled: !index && isLastItem
@@ -8312,7 +9313,7 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
     onClick: handleEditGroup,
     onCancel: handleCancelEditGroup
   }];
-  var rightButtons = [{
+  const rightButtons = [{
     type: 'move-button',
     onClick: handleMove,
     onCancel: handleHideQuestions,
@@ -8323,22 +9324,18 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
     onClick: handleShowQuestions,
     onCancel: handleHideQuestions
   }];
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(AddMoveButton, {
+  return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(AddMoveButton, {
     text: movingQg ? buttonMoveQuestionGroupText : buttonAddNewQuestionGroupText,
     disabled: movingQg === questionGroup || (movingQg === null || movingQg === void 0 ? void 0 : movingQg.order) + 1 === order || dependant.disabled.current,
     movingItem: movingQg,
     handleCancelMove: handleCancelMove,
-    handleOnAdd: function handleOnAdd() {
-      return _handleOnAdd(order - 1);
-    },
-    handleOnMove: function handleOnMove() {
-      return _handleOnMove(order - 1);
-    }
-  }), /*#__PURE__*/React.createElement(Card, {
-    key: index + "-" + id,
-    title: /*#__PURE__*/React.createElement(CardTitle, {
+    handleOnAdd: () => handleOnAdd(order - 1),
+    handleOnMove: () => handleOnMove(order - 1)
+  }), /*#__PURE__*/React__default.createElement(Card, {
+    key: `${index}-${id}`,
+    title: /*#__PURE__*/React__default.createElement(CardTitle, {
       buttons: rightButtons,
-      title: order + ". " + name
+      title: `${order}. ${name}`
     }),
     headStyle: {
       textAlign: 'left',
@@ -8351,82 +9348,117 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
       borderTop: isEditQuestionGroup || showQuestion ? '1px solid #f3f3f3' : 'none'
     },
     loading: false,
-    extra: /*#__PURE__*/React.createElement(CardTitle, {
+    extra: /*#__PURE__*/React__default.createElement(CardTitle, {
       buttons: leftButtons
     })
-  }, isEditQuestionGroup && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(QuestionGroupSetting, questionGroup)), showQuestion && questions.map(function (q, qi) {
-    return /*#__PURE__*/React.createElement(QuestionDefinition, {
-      key: "question-definition-" + qi,
-      index: qi,
-      question: q,
-      questionGroup: questionGroup,
-      isLastItem: qi === questions.length - 1
-    });
-  })), isLastItem && /*#__PURE__*/React.createElement(AddMoveButton, {
+  }, isEditQuestionGroup && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(QuestionGroupSetting, questionGroup)), showQuestion && questions.map((q, qi) => /*#__PURE__*/React__default.createElement(QuestionDefinition, {
+    key: `question-definition-${qi}`,
+    index: qi,
+    question: q,
+    questionGroup: questionGroup,
+    isLastItem: qi === questions.length - 1
+  }))), isLastItem && /*#__PURE__*/React__default.createElement(AddMoveButton, {
     text: movingQg ? buttonMoveQuestionGroupText : buttonAddNewQuestionGroupText,
     disabled: movingQg === questionGroup || dependant.disabled.last,
     movingItem: movingQg,
     handleCancelMove: handleCancelMove,
-    handleOnAdd: function handleOnAdd() {
-      return _handleOnAdd(order);
-    },
-    handleOnMove: function handleOnMove() {
-      return _handleOnMove(order, true);
-    }
+    handleOnAdd: () => handleOnAdd(order),
+    handleOnMove: () => handleOnMove(order, true)
   }));
 };
 
-var WebformEditor = function WebformEditor(_ref) {
-  var _ref$onSave = _ref.onSave,
-      onSave = _ref$onSave === void 0 ? false : _ref$onSave;
-  var current = UIStore.useState(function (s) {
-    return s.current;
-  });
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
-  var questionGroups = questionGroupFn.store.useState(function (s) {
-    return s.questionGroups;
-  });
-  var currentTab = current.tab;
-  var formTabPane = UIText.formTabPane,
-      previewTabPane = UIText.previewTabPane,
-      mandatoryQuestionCount = UIText.mandatoryQuestionCount,
-      version = UIText.version;
+const WebformEditor = ({
+  onSave: _onSave = false
+}) => {
+  const formStore = FormStore.useState(s => s);
+  const current = UIStore.useState(s => s.current);
+  const UIText = UIStore.useState(s => s.UIText);
+  const questionGroups = questionGroupFn.store.useState(s => s.questionGroups);
+  const activeEditFormSetting = UIStore.useState(s => s.activeEditFormSetting);
+  const {
+    tab: currentTab
+  } = current;
+  const {
+    formTabPane,
+    previewTabPane,
+    questionCount,
+    questionGroupCount,
+    mandatoryQuestionCount,
+    version
+  } = UIText;
 
-  var handleTabsOnChange = function handleTabsOnChange(e) {
-    UIStore.update(function (s) {
-      s.current = _extends({}, current, {
+  const handleTabsOnChange = e => {
+    UIStore.update(s => {
+      s.current = { ...current,
         tab: e
-      });
+      };
     });
   };
 
-  return /*#__PURE__*/React.createElement("div", {
+  const handleShowFormSetting = e => {
+    e.preventDefault();
+    UIStore.update(s => {
+      s.activeEditFormSetting = activeEditFormSetting ? false : true;
+    });
+  };
+
+  const handleSave = () => {
+    if (_onSave) {
+      _onSave(data.toWebform(formStore, questionGroups));
+    }
+  };
+
+  const questions = questionGroups.reduce((curr, qg) => [...curr, ...qg.questions], []);
+  const mandatory = questions.filter(q => q === null || q === void 0 ? void 0 : q.required);
+  return /*#__PURE__*/React__default.createElement("div", {
     key: "container",
     className: styles.container
-  }, /*#__PURE__*/React.createElement(Card, null, /*#__PURE__*/React.createElement(Tabs, {
+  }, /*#__PURE__*/React__default.createElement(Card, null, /*#__PURE__*/React__default.createElement(Tabs, {
     defaultActiveKey: current.tab,
     onChange: handleTabsOnChange,
-    tabBarExtraContent: /*#__PURE__*/React.createElement("span", null, "1 / 10 " + mandatoryQuestionCount + " | " + version + " : 1"),
+    tabBarExtraContent: /*#__PURE__*/React__default.createElement("div", {
+      className: styles['right-tabs']
+    }, /*#__PURE__*/React__default.createElement(Space, null, /*#__PURE__*/React__default.createElement(Tag, {
+      style: {
+        margin: 0
+      }
+    }, questions.length, " ", questionCount), /*#__PURE__*/React__default.createElement(Tag, {
+      style: {
+        margin: 0
+      }
+    }, mandatory.length, " ", mandatoryQuestionCount), /*#__PURE__*/React__default.createElement(Tag, {
+      style: {
+        margin: 0
+      }
+    }, questionGroups.length, " ", questionGroupCount), /*#__PURE__*/React__default.createElement(Tag, {
+      style: {
+        margin: 0
+      }
+    }, version, " 1"), /*#__PURE__*/React__default.createElement(CardExtraButton, {
+      type: "edit-button",
+      isExpand: activeEditFormSetting,
+      onClick: handleShowFormSetting,
+      onCancel: handleShowFormSetting
+    }), /*#__PURE__*/React__default.createElement(CardExtraButton, {
+      type: "save-button",
+      onClick: handleSave
+    }))),
     tabBarGutter: 24,
     className: styles['tabs-wrapper']
-  }, /*#__PURE__*/React.createElement(Tabs.TabPane, {
+  }, /*#__PURE__*/React__default.createElement(Tabs.TabPane, {
     tab: formTabPane,
-    key: "form"
-  }), /*#__PURE__*/React.createElement(Tabs.TabPane, {
+    key: "edit-form"
+  }), /*#__PURE__*/React__default.createElement(Tabs.TabPane, {
     tab: previewTabPane,
     key: "preview"
-  })), currentTab === 'form' && /*#__PURE__*/React.createElement(FormWrapper, null, /*#__PURE__*/React.createElement(FormDefinition, {
-    onSave: onSave
-  }), questionGroups.map(function (qg, qgi) {
-    return /*#__PURE__*/React.createElement(QuestionGroupDefinition, {
-      key: "question-group-definition-" + qgi,
+  })), currentTab === 'edit-form' && /*#__PURE__*/React__default.createElement(FormWrapper, null, activeEditFormSetting && /*#__PURE__*/React__default.createElement(FormDefinition, formStore), questionGroups.map((qg, qgi) => {
+    return /*#__PURE__*/React__default.createElement(QuestionGroupDefinition, {
+      key: `question-group-definition-${qgi}`,
       index: qgi,
       questionGroup: qg,
       isLastItem: qgi === questionGroups.length - 1
     });
-  })), currentTab === 'preview' && /*#__PURE__*/React.createElement(FormPreview, null)));
+  })), currentTab === 'preview' && /*#__PURE__*/React__default.createElement(FormPreview, null)));
 };
 
 export default WebformEditor;
