@@ -12,8 +12,27 @@ Survey Editor for generating `akvo-react form <https://github.com/akvo/akvo-reac
 
 .. toctree::
    :maxdepth: 2
+   :caption: Getting Started
 
    install
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Form Features
+
+   form
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Question Group
+
+   questionGroup
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Questions
+
+   questions
 
 .. |Build Status| image:: https://akvo.semaphoreci.com/badges/akvo-react-form-editor/branches/main.svg?style=shields
    :target: https://akvo.semaphoreci.com/projects/akvo-react-form-editor
