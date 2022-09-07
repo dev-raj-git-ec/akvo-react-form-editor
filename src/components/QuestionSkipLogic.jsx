@@ -8,6 +8,7 @@ import {
   generateId,
   questionType,
 } from '../lib/store';
+import { groupBy, map } from 'lodash';
 
 const dependencyTypes = [
   {
@@ -290,6 +291,11 @@ const SettingSkipLogic = ({
     }
   };
 
+  const dropdown = map(groupBy(dependentToQuestions, 'group'), (i, l) => ({
+    label: l,
+    item: i,
+  })).map((g, gi) => ({ ...g, key: gi }));
+
   return (
     <Col
       key={`dependency-${id}-${dependency.id}`}
@@ -313,16 +319,23 @@ const SettingSkipLogic = ({
               value={dependency.dependentTo || []}
               optionFilterProp="children"
             >
-              {dependentToQuestions.map((dq) => (
-                <Select.Option
-                  key={`${dq.value}-dq`}
-                  value={dq.value}
-                  disabled={dependencies
-                    .map((d) => d.dependentTo)
-                    .includes(dq.value)}
+              {dropdown.map((g) => (
+                <Select.OptGroup
+                  key={g.key}
+                  label={g.label}
                 >
-                  {dq.label}
-                </Select.Option>
+                  {g.item.map((dq) => (
+                    <Select.Option
+                      key={`${dq.value}-dq`}
+                      value={dq.value}
+                      disabled={dependencies
+                        .map((d) => d.dependentTo)
+                        .includes(dq.value)}
+                    >
+                      {dq.label}
+                    </Select.Option>
+                  ))}
+                </Select.OptGroup>
               ))}
             </Select>
           </Col>
@@ -450,11 +463,15 @@ const QuestionSkipLogic = ({ question }) => {
   const dependentToQuestions = useMemo(() => {
     return questions
       .filter((q) => dependencyTypes.flatMap((dt) => dt.type).includes(q.type))
-      .map((q) => ({
-        label: q.name,
-        value: q.id,
-      }));
-  }, [questions]);
+      .map((q) => {
+        const group = questionGroups.find((g) => g.id === q.questionGroupId);
+        return {
+          label: `${q.order}. ${q.name}`,
+          value: q.id,
+          group: `${group.order}. ${group.name}`,
+        };
+      });
+  }, [questions, questionGroups]);
 
   if (!dependencies?.[0]?.dependentTo && !dependentToQuestions?.length) {
     return (

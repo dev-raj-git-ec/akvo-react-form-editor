@@ -8,6 +8,7 @@ import {
   SettingNumber,
   SettingOption,
   SettingCascade,
+  SettingDate,
 } from './question-type';
 
 const QuestionSetting = ({ question, dependant }) => {
@@ -118,11 +119,13 @@ const QuestionSetting = ({ question, dependant }) => {
         <Input.TextArea onChange={handleChangeTooltip} />
       </Form.Item>
       <Form.Item
-        initialValue={required}
         name={`${namePreffix}-required`}
         className={styles['input-checkbox-wrapper']}
       >
-        <Checkbox onChange={handleChangeRequired}>
+        <Checkbox
+          onChange={handleChangeRequired}
+          checked={required}
+        >
           {' '}
           {UIText.inputQuestionRequiredCheckbox}
         </Checkbox>
@@ -134,6 +137,7 @@ const QuestionSetting = ({ question, dependant }) => {
       )}
       {qType === questionType.tree && <SettingTree {...question} />}
       {qType === questionType.cascade && <SettingCascade {...question} />}
+      {qType === questionType.date && <SettingDate {...question} />}
     </div>
   );
 };

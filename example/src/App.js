@@ -17,7 +17,7 @@ const App = () => {
         <div className="btn-group-toggle">
           <img
             alt="github"
-            src="https://img.shields.io/badge/Akvo-React Form-009688?logo=github&style=flat-square"
+            src="https://img.shields.io/badge/Akvo-React Form Editor-009688?logo=github&style=flat-square"
           />
           <img
             alt="npm"

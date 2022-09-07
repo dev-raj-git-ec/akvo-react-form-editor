@@ -6,18 +6,35 @@ import { UIStore, questionGroupFn } from '../../lib/store';
 const SettingNumber = ({
   id,
   questionGroupId,
-  allowDecimal,
-  min,
-  max,
-  equal,
+  rule = {
+    allowDecimal: false,
+    min: null,
+    max: null,
+  },
 }) => {
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
+  const { allowDecimal, min, max } = rule;
 
   const moreNumberSettings = [
-    { label: UIText.inputQuestionMinimumValueLabel, value: min, key: 'min' },
-    { label: UIText.inputQuestionMaximumValueLabel, value: max, key: 'max' },
-    { label: UIText.inputQuestionEqualValueLabel, value: equal, key: 'equal' },
+    {
+      label: UIText.inputQuestionMinimumValueLabel,
+      value: min,
+      key: 'min',
+      rules: {
+        max: max - 1,
+        message: `${UIText.inputQuestionMinimumValidationText} ${max}`,
+      },
+    },
+    {
+      label: UIText.inputQuestionMaximumValueLabel,
+      value: max,
+      key: 'max',
+      rules: {
+        min: min + 1,
+        message: `${UIText.inputQuestionMaximumValidationText} ${min}`,
+      },
+    },
   ];
 
   const updateState = (name, value) => {
@@ -28,7 +45,10 @@ const SettingNumber = ({
             if (q.id === id) {
               return {
                 ...q,
-                [name]: value,
+                rule: {
+                  ...q?.rule,
+                  [name]: value,
+                },
               };
             }
             return q;
@@ -47,7 +67,7 @@ const SettingNumber = ({
     updateState('allowDecimal', e?.target?.checked);
   };
 
-  const handleChangeMinMaxEqual = (key, e) => {
+  const handleChangeMinMax = (key, e) => {
     updateState(key, e);
   };
 
@@ -57,11 +77,11 @@ const SettingNumber = ({
         {UIText.questionMoreInputNumberSettingText}
       </p>
       <Space className={styles['space-align-left']}>
-        <Form.Item
-          initialValue={allowDecimal}
-          name={`${namePreffix}-allow_decimal`}
-        >
-          <Checkbox onChange={handleChangeAllowDecimal}>
+        <Form.Item name={`${namePreffix}-allow_decimal`}>
+          <Checkbox
+            onChange={handleChangeAllowDecimal}
+            checked={allowDecimal}
+          >
             {' '}
             {UIText.inputQuestionAllowDecimalCheckbox}
           </Checkbox>
@@ -69,8 +89,7 @@ const SettingNumber = ({
       </Space>
       <Row
         align="middle"
-        justify="space-between"
-        gutter={[12, 12]}
+        gutter={[24, 24]}
       >
         {moreNumberSettings.map((x) => (
           <Col
@@ -81,12 +100,13 @@ const SettingNumber = ({
               label={x.label}
               initialValue={x.value}
               name={`${namePreffix}-${x.key}`}
+              rules={[{ type: 'number', ...x.rules }]}
             >
               <InputNumber
                 style={{ width: '100%' }}
                 controls={false}
                 keyboard={false}
-                onChange={(e) => handleChangeMinMaxEqual(x.key, e)}
+                onChange={(e) => handleChangeMinMax(x.key, e)}
               />
             </Form.Item>
           </Col>

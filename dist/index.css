@@ -5,7 +5,6 @@
 .arfe-container {
   font-size: 2em;
   font-family: 'Roboto Condensed', sans-serif;
-  text-align: center;
 }
 
 .arfe-form-definition {
@@ -31,6 +30,7 @@
 
 .arfe-select-dropdown {
   text-align: left;
+  width: 100%;
 }
 
 .arfe-tabs-wrapper {
@@ -53,7 +53,7 @@
 }
 
 .arfe-space-align-left {
-  width: 100%;
+  width: 100% !important;
   justify-content: start;
 }
 
