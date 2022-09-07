@@ -98,12 +98,14 @@ const SettingSkipLogic = ({
 
   const updateGlobalStore = useCallback(
     (dependencyValue, isDelete = false) => {
-      const transformDependencies = dependencyValue.map((dp) => {
-        return {
-          id: dp.dependentTo,
-          [dp.dependentLogic]: dp.dependentAnswer,
-        };
-      });
+      const transformDependencies = dependencyValue
+        .map((dp) => {
+          return {
+            id: dp.dependentTo,
+            [dp.dependentLogic]: dp.dependentAnswer,
+          };
+        })
+        .filter((d) => d.id);
       questionGroupFn.store.update((s) => {
         s.questionGroups = s.questionGroups.map((qg) => {
           if (qg.id === questionGroupId) {
@@ -114,15 +116,19 @@ const SettingSkipLogic = ({
                   dependency: transformDependencies,
                 };
               }
-              if (q.id === id && isDelete) {
-                if (!transformDependencies.length) {
-                  q.dependency && delete q.dependency;
-                  return q;
-                }
+              if (q.id === id && !isDelete && !transformDependencies.length) {
+                q.dependency && delete q.dependency;
+                return q;
+              }
+              if (q.id === id && isDelete && transformDependencies.length) {
                 return {
                   ...q,
                   dependency: transformDependencies,
                 };
+              }
+              if (q.id === id && isDelete && !transformDependencies.length) {
+                q.dependency && delete q.dependency;
+                return q;
               }
               return q;
             });
@@ -140,16 +146,26 @@ const SettingSkipLogic = ({
 
   useEffect(() => {
     // add dependency to global store if all dependency value defined
-    const check = dependencies.filter(
-      (dp) =>
+    const checkDependencies = dependencies.filter((dp) => {
+      if (
         dp.dependentTo &&
         dp.dependentLogic &&
-        (Array.isArray(dp.dependentAnswer)
-          ? dp.dependentAnswer.length
-          : dp.dependentAnswer)
-    );
-    if (check.length) {
-      updateGlobalStore(dependencies);
+        Array.isArray(dp.dependentAnswer) &&
+        dp.dependentAnswer.length
+      ) {
+        return dp;
+      }
+      if (
+        dp.dependentTo &&
+        dp.dependentLogic &&
+        !Array.isArray(dp.dependentAnswer) &&
+        dp.dependentAnswer
+      ) {
+        return dp;
+      }
+    });
+    if (checkDependencies.length) {
+      updateGlobalStore(checkDependencies);
     }
   }, [dependencies, id, questionGroupId, updateGlobalStore]);
 
@@ -230,12 +246,19 @@ const SettingSkipLogic = ({
   const handleChangeDependentAnswer = (dependencyId, val) => {
     updateLocalState(dependencyId, 'dependentAnswer', val);
     // handle when answer value empty
-    if (savedDependency?.length && (!val || !val?.length)) {
+    if (savedDependency?.length) {
       // delete dependency from global store
-      const updatedDependencies = dependencies.filter(
+      const updatedDependencies = savedDependency.filter(
         (d) => d.id !== dependencyId
       );
-      updateGlobalStore(updatedDependencies, true);
+      if (Array.isArray(val) && !val.length) {
+        updateGlobalStore(updatedDependencies, true);
+        return;
+      }
+      if (!Array.isArray(val) && !val) {
+        updateGlobalStore(updatedDependencies, true);
+        return;
+      }
     }
   };
 
@@ -253,7 +276,6 @@ const SettingSkipLogic = ({
     );
     if (updatedDependencies.length) {
       setDependencies(updatedDependencies);
-      updateGlobalStore(updatedDependencies, true);
     } else {
       setDependentTo(null);
       setDependencies(defaultSkipLogic());
