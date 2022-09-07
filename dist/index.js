@@ -640,6 +640,8 @@ var FormDefinition = function FormDefinition(_ref) {
   });
   var inputFormNameLabel = UIText.inputFormNameLabel,
       inputFormDescriptionLabel = UIText.inputFormDescriptionLabel;
+  var name = formStore.name,
+      description = formStore.description;
 
   var handleSave = function handleSave() {
     if (onSave) {
@@ -652,7 +654,8 @@ var FormDefinition = function FormDefinition(_ref) {
     className: "arfe-form-definition"
   }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     label: inputFormNameLabel,
-    name: "form-name"
+    name: "form-name",
+    initialValue: name
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
     onChange: function onChange(e) {
       return FormStore.update(function (u) {
@@ -663,7 +666,8 @@ var FormDefinition = function FormDefinition(_ref) {
     }
   })), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     label: inputFormDescriptionLabel,
-    name: "form-description"
+    name: "form-description",
+    initialValue: description
   }, /*#__PURE__*/React__default.createElement(antd.Input.TextArea, {
     rows: 5,
     onChange: function onChange(e) {
