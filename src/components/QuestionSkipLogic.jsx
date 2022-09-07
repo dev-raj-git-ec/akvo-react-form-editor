@@ -463,11 +463,14 @@ const QuestionSkipLogic = ({ question }) => {
   const dependentToQuestions = useMemo(() => {
     return questions
       .filter((q) => dependencyTypes.flatMap((dt) => dt.type).includes(q.type))
-      .map((q) => ({
-        label: q.name,
-        value: q.id,
-        group: questionGroups.find((g) => g.id === q.questionGroupId).name,
-      }));
+      .map((q) => {
+        const group = questionGroups.find((g) => g.id === q.questionGroupId);
+        return {
+          label: q.name,
+          value: q.id,
+          group: `${group.order}. ${group.name}`,
+        };
+      });
   }, [questions, questionGroups]);
 
   if (!dependencies?.[0]?.dependentTo && !dependentToQuestions?.length) {
