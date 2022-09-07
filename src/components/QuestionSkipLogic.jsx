@@ -324,7 +324,7 @@ const SettingSkipLogic = ({
                   key={g.key}
                   label={g.label}
                 >
-                  {g.item.map((dq, dqi) => (
+                  {g.item.map((dq) => (
                     <Select.Option
                       key={`${dq.value}-dq`}
                       value={dq.value}
@@ -332,7 +332,7 @@ const SettingSkipLogic = ({
                         .map((d) => d.dependentTo)
                         .includes(dq.value)}
                     >
-                      {dqi + 1}. {dq.label}
+                      {dq.label}
                     </Select.Option>
                   ))}
                 </Select.OptGroup>
@@ -466,7 +466,7 @@ const QuestionSkipLogic = ({ question }) => {
       .map((q) => {
         const group = questionGroups.find((g) => g.id === q.questionGroupId);
         return {
-          label: q.name,
+          label: `${q.order}. ${q.name}`,
           value: q.id,
           group: `${group.order}. ${group.name}`,
         };
