@@ -1,7 +1,7 @@
 import React from 'react';
 import 'antd/dist/antd.min.css';
 import styles from './styles.module.css';
-import { Card, Tabs } from 'antd';
+import { Card, Tabs, Tag } from 'antd';
 import {
   FormWrapper,
   FormDefinition,
@@ -18,8 +18,14 @@ const WebformEditor = ({ onSave = false }) => {
   );
 
   const { tab: currentTab } = current;
-  const { formTabPane, previewTabPane, mandatoryQuestionCount, version } =
-    UIText;
+  const {
+    formTabPane,
+    previewTabPane,
+    questionCount,
+    questionGroupCount,
+    mandatoryQuestionCount,
+    version,
+  } = UIText;
 
   const handleTabsOnChange = (e) => {
     UIStore.update((s) => {
@@ -29,6 +35,13 @@ const WebformEditor = ({ onSave = false }) => {
       };
     });
   };
+
+  const questions = questionGroups.reduce(
+    (curr, qg) => [...curr, ...qg.questions],
+    []
+  );
+
+  const mandatory = questions.filter((q) => q?.required);
 
   return (
     <div
@@ -40,7 +53,18 @@ const WebformEditor = ({ onSave = false }) => {
           defaultActiveKey={current.tab}
           onChange={handleTabsOnChange}
           tabBarExtraContent={
-            <span>{`1 / 10 ${mandatoryQuestionCount} | ${version} : 1`}</span>
+            <div className={styles['right-tabs']}>
+              <Tag>
+                {questions.length} {questionCount}
+              </Tag>
+              <Tag>
+                {mandatory.length} {mandatoryQuestionCount}
+              </Tag>
+              <Tag>
+                {questionGroups.length} {questionGroupCount}
+              </Tag>
+              <Tag>{version} 1</Tag>
+            </div>
           }
           tabBarGutter={24}
           className={styles['tabs-wrapper']}

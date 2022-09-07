@@ -39,6 +39,11 @@
   color: #6a6a6a;
 }
 
+.tabs-wrapper .right-tabs {
+  font-family: 'Roboto Condensed', sans-serif;
+  font-weight: normal;
+}
+
 .question-group-title {
   font-family: 'Assistant', sans-serif;
   font-weight: bold;

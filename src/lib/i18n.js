@@ -4,6 +4,8 @@ const UIStaticText = {
     inputFormDescriptionLabel: 'Form Description',
     formTabPane: 'Form',
     previewTabPane: 'Preview',
+    questionCount: 'Questions',
+    questionGroupCount: 'Question Groups',
     mandatoryQuestionCount: 'Mandatory Questions',
     version: 'Version',
     inputQuestionGroupNameLabel: 'Question Group Name',
