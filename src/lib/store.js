@@ -27,7 +27,7 @@ const defaultQuestion = ({
   const q = {
     id: id || generateId(),
     questionGroupId: questionGroup.id,
-    name: name || dummyName(),
+    name: name || dummyName(5),
     order: prevOrder + 1,
     type: type,
     required: false,
