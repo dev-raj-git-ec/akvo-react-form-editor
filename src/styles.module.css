@@ -78,3 +78,10 @@
 .more-question-setting-text {
   text-align: left;
 }
+
+.dependant-list-box {
+  font-size: 14px;
+  padding-inline-start: 0px;
+  margin-block-end: 0px;
+  list-style: none;
+}

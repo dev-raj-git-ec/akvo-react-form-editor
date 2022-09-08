@@ -66,17 +66,20 @@ const QuestionSetting = ({ question, dependant }) => {
     <div>
       {!!dependant.length && (
         <Alert
-          message="Dependent Questions:"
-          description={
-            <ul>
-              {dependant.map((d, di) => (
-                <li key={di}>{d.name}</li>
-              ))}
-            </ul>
+          message={
+            <div>
+              Dependant Questions:
+              <ul className="arfe-dependant-list-box">
+                {dependant.map((d, di) => (
+                  <li key={di}>
+                    {d.order}. {d.name}
+                  </li>
+                ))}
+              </ul>
+            </div>
           }
           type="info"
-          style={{ marginBottom: '20px' }}
-          showIcon
+          style={{ marginBottom: 24 }}
         />
       )}
       <Form.Item
