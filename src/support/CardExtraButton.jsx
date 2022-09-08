@@ -18,90 +18,67 @@ const CardExtraButton = ({
   onCancel = () => {},
   disabled = false,
 }) => {
+  let buttonProps = {};
   switch (type) {
     case 'show-button':
       if (isExpand) {
-        return (
-          <Button
-            type="link"
-            className={styles['button-icon']}
-            onClick={onCancel}
-            icon={<TbEditOff />}
-            disabled={disabled}
-          />
-        );
+        buttonProps = {
+          onClick: onCancel,
+          icon: <TbEditOff />,
+        };
+        break;
       }
-      return (
-        <Button
-          type="link"
-          className={styles['button-icon']}
-          onClick={onClick}
-          icon={<TbEdit />}
-          disabled={disabled}
-        />
-      );
+      buttonProps = {
+        onClick: onClick,
+        icon: <TbEdit />,
+      };
+      break;
     case 'move-button':
-      return (
-        <Button
-          type="link"
-          className={styles['button-icon']}
-          onClick={onClick}
-          disabled={disabled}
-          icon={<BiMove />}
-        />
-      );
+      buttonProps = {
+        onClick: onClick,
+        icon: <BiMove />,
+      };
+      break;
     case 'edit-button':
       if (isExpand) {
-        return (
-          <Button
-            type="link"
-            className={styles['button-icon']}
-            onClick={onCancel}
-            icon={<RiSettings5Fill />}
-            disabled={disabled}
-          />
-        );
+        buttonProps = {
+          onClick: onCancel,
+          icon: <RiSettings5Fill />,
+        };
+        break;
       }
-      return (
-        <Button
-          type="link"
-          className={styles['button-icon']}
-          onClick={onClick}
-          icon={<RiSettings5Line />}
-          disabled={disabled}
-        />
-      );
+      buttonProps = {
+        onClick: onClick,
+        icon: <RiSettings5Line />,
+      };
+      break;
     case 'add-button':
-      return (
-        <Button
-          type="link"
-          className={styles['button-icon']}
-          onClick={onClick}
-          icon={<MdOutlineAddCircleOutline />}
-          disabled={disabled}
-        />
-      );
+      buttonProps = {
+        onClick: onClick,
+        icon: <MdOutlineAddCircleOutline />,
+      };
+      break;
     case 'save-button':
-      return (
-        <Button
-          type="link"
-          className={styles['button-icon']}
-          onClick={onClick}
-          icon={<RiSave3Fill />}
-        />
-      );
-
+      buttonProps = {
+        onClick: onClick,
+        icon: <RiSave3Fill />,
+      };
+      break;
     default:
-      return (
-        <Button
-          type="link"
-          className={styles['button-icon']}
-          onClick={onClick}
-          icon={<RiDeleteBin2Line />}
-          disabled={disabled}
-        />
-      );
+      buttonProps = {
+        onClick: onClick,
+        icon: <RiDeleteBin2Line />,
+      };
+      break;
   }
+  return (
+    <Button
+      type="link"
+      className={styles['button-icon']}
+      disabled={disabled}
+      {...buttonProps}
+    />
+  );
 };
 
 export default CardExtraButton;
