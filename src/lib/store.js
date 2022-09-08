@@ -17,7 +17,6 @@ const questionType = {
 };
 
 const defaultQuestion = ({
-  id,
   questionGroup,
   name,
   prevOrder = 0,
@@ -25,14 +24,14 @@ const defaultQuestion = ({
   params = {},
 }) => {
   const q = {
-    id: id || generateId(),
+    id: generateId(),
     questionGroupId: questionGroup.id,
     name: name || dummyName(5),
-    order: prevOrder + 1,
     type: type,
     required: false,
     tooltip: null,
     ...params,
+    order: prevOrder + 1,
   };
   if (type === questionType.option || type === questionType.multiple_option) {
     return {
@@ -40,6 +39,7 @@ const defaultQuestion = ({
       options: [],
       allowOther: false,
       ...params,
+      order: prevOrder + 1,
     };
   }
   if (type === questionType.cascade) {
@@ -51,6 +51,7 @@ const defaultQuestion = ({
         list: false,
       },
       ...params,
+      order: prevOrder + 1,
     };
   }
   return q;
@@ -81,8 +82,10 @@ const UIStore = new Store({
   activeQuestionGroups: [],
   activeEditQuestionGroups: [],
   activeMoveQuestionGroup: null,
+  isCopyingQuestionGroup: false,
   activeEditQuestions: [],
   activeMoveQuestion: null,
+  isCopyingQuestion: false,
   UIText: UIStaticText.en,
 });
 

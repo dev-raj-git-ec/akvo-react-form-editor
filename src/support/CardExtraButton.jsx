@@ -8,7 +8,7 @@ import {
   RiDeleteBin2Line,
   RiSave3Fill,
 } from 'react-icons/ri';
-import { BiMove } from 'react-icons/bi';
+import { BiMove, BiCopy } from 'react-icons/bi';
 import { MdOutlineAddCircleOutline } from 'react-icons/md';
 
 const CardExtraButton = ({
@@ -31,6 +31,12 @@ const CardExtraButton = ({
       buttonProps = {
         onClick: onClick,
         icon: <TbEdit />,
+      };
+      break;
+    case 'copy-button':
+      buttonProps = {
+        onClick: onClick,
+        icon: <BiCopy />,
       };
       break;
     case 'move-button':

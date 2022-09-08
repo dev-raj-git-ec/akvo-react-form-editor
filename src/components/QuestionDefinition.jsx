@@ -5,14 +5,19 @@ import { UIStore, questionFn, questionGroupFn } from '../lib/store';
 import QuestionSetting from './QuestionSetting';
 import QuestionSkipLogic from './QuestionSkipLogic';
 import { AddMoveButton, CardTitle } from '../support';
-import { orderBy, maxBy, minBy } from 'lodash';
+import { orderBy, maxBy, minBy, unset } from 'lodash';
 
 const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
   const { questionGroups } = questionGroupFn.store.useState((s) => s);
   const { questions } = questionGroup;
   const UIText = UIStore.useState((s) => s.UIText);
-  const { buttonAddNewQuestionText, buttonMoveQuestionText } = UIText;
+  const {
+    buttonAddNewQuestionText,
+    buttonCopyQuestionText,
+    buttonMoveQuestionText,
+  } = UIText;
   const movingQ = UIStore.useState((s) => s.activeMoveQuestion);
+  const isCopying = UIStore.useState((s) => s.isCopyingQuestion);
   const activeEditQuestions = UIStore.useState((s) => s.activeEditQuestions);
   const [activeTab, setActiveTab] = useState('setting');
   const { id, questionGroupId, order, name, dependency } = question;
@@ -99,6 +104,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
 
   const handleCancelMove = () => {
     UIStore.update((s) => {
+      s.isCopyingQuestion = false;
       s.activeMoveQuestion = null;
       movingQ === question ? null : question;
     });
@@ -106,7 +112,17 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
 
   const handleMove = () => {
     UIStore.update((s) => {
-      s.activeMoveQuestion = movingQ === question ? null : question;
+      s.activeMoveQuestion =
+        movingQ === question && !s.isCopyingQuestion ? null : question;
+      s.isCopyingQuestion = false;
+    });
+  };
+
+  const handleCopy = () => {
+    UIStore.update((s) => {
+      s.activeMoveQuestion =
+        movingQ === question && s.isCopyingQuestion ? null : question;
+      s.isCopyingQuestion = !s.isCopyingQuestion;
     });
   };
 
@@ -137,11 +153,17 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
         ...q,
         order: q.order + 1,
       }));
-    const newQuestions = [
-      ...prevQ,
-      questionFn.add({ questionGroup: questionGroup, prevOrder: prevOrder }),
-      ...nextQ,
-    ];
+    const paramsQ = movingQ;
+    if (paramsQ) {
+      unset(paramsQ, 'id');
+      unset(paramsQ, 'order');
+    }
+    const newQ = {
+      questionGroup: questionGroup,
+      prevOrder: prevOrder,
+      params: paramsQ || {},
+    };
+    const newQuestions = [...prevQ, questionFn.add(newQ), ...nextQ];
     questionGroupFn.store.update((s) => {
       s.questionGroups = s.questionGroups.map((qg) => {
         if (qg.id === questionGroupId) {
@@ -149,6 +171,10 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
         }
         return qg;
       });
+    });
+    UIStore.update((s) => {
+      s.activeMoveQuestion = null;
+      s.isCopyingQuestion = false;
     });
   };
 
@@ -238,6 +264,10 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
 
   const rightButtons = [
     {
+      type: 'copy-button',
+      onClick: handleCopy,
+    },
+    {
       type: 'delete-button',
       onClick: handleDelete,
       disabled: (!index && isLastItem) || dependant.dependant.length,
@@ -261,17 +291,27 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
   return (
     <div>
       <AddMoveButton
-        text={movingQ ? buttonMoveQuestionText : buttonAddNewQuestionText}
+        text={
+          movingQ
+            ? isCopying
+              ? buttonCopyQuestionText
+              : buttonMoveQuestionText
+            : buttonAddNewQuestionText
+        }
         disabled={
-          movingQ === question ||
+          (movingQ === question && !isCopying) ||
           (movingQ?.order + 1 === order &&
-            movingQ?.questionGroupId === questionGroupId) ||
+            movingQ?.questionGroupId === questionGroupId &&
+            !isCopying) ||
           dependant.disabled.current
         }
         handleCancelMove={handleCancelMove}
         movingItem={movingQ}
-        handleOnAdd={() => handleOnAdd(order - 1, true)}
-        handleOnMove={() => handleOnMove(order - 1)}
+        isCopying={isCopying}
+        handleOnAdd={() => handleOnAdd(order - 1)}
+        handleOnMove={() =>
+          isCopying ? handleOnAdd(order - 1) : handleOnMove(order - 1)
+        }
       />
       <Card
         key={`${index}-${id}`}
@@ -340,12 +380,22 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
       </Card>
       {isLastItem && (
         <AddMoveButton
-          text={movingQ ? buttonMoveQuestionText : buttonAddNewQuestionText}
-          disabled={movingQ === question || dependant.disabled.last}
+          text={
+            movingQ
+              ? isCopying
+                ? buttonCopyQuestionText
+                : buttonMoveQuestionText
+              : buttonAddNewQuestionText
+          }
+          disabled={
+            (movingQ === question && !isCopying) || dependant.disabled.last
+          }
           movingItem={movingQ}
           handleCancelMove={handleCancelMove}
-          handleOnAdd={() => handleOnAdd(order, true)}
-          handleOnMove={() => handleOnMove(order, true)}
+          handleOnAdd={() => handleOnAdd(order)}
+          handleOnMove={() =>
+            isCopying ? handleOnAdd(order) : handleOnMove(order, true)
+          }
         />
       )}
     </div>
