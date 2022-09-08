@@ -1,8 +1,8 @@
 import React from 'react';
 import styles from '../styles.module.css';
-import { Row, Col, Card, Tag, Select, Form, Input } from 'antd';
+import { Row, Col, Card, Tag, Select, Form, Space } from 'antd';
 import { UIStore, FormStore, questionGroupFn } from '../lib/store';
-import { TranslationFormItem } from '../support';
+import FormDefinitionTranslation from './translations/FormDefinitionTranslation';
 
 const FormTranslations = () => {
   const [formTranslation] = Form.useForm();
@@ -11,10 +11,13 @@ const FormTranslations = () => {
   const { questionGroups } = questionGroupFn.store.useState((s) => s);
   const languages = formStore?.languages || [];
 
-  // console.log(formStore, questionGroups);
+  console.info(questionGroups);
 
   return (
-    <div>
+    <Space
+      direction="vertical"
+      style={{ width: '100%' }}
+    >
       <Card title="Select an existing translation or add a new one">
         <Row
           align="middle"
@@ -56,30 +59,15 @@ const FormTranslations = () => {
           </Col>
         </Row>
       </Card>
-      <Card>
-        <Form
-          form={formTranslation}
-          key="akvo-react-form-editor-translation"
-          name="akvo-react-form-editor-translation"
-          layout="vertical"
-        >
-          {formStore?.name && (
-            <TranslationFormItem
-              labelText={UIText.inputFormNameLabel}
-              currentValue={formStore.name}
-              children={<Input />}
-            />
-          )}
-          {formStore?.description && (
-            <TranslationFormItem
-              labelText={UIText.inputFormDescriptionLabel}
-              currentValue={formStore.description}
-              children={<Input.TextArea rows={5} />}
-            />
-          )}
-        </Form>
-      </Card>
-    </div>
+      <Form
+        form={formTranslation}
+        key="akvo-react-form-editor-translation"
+        name="akvo-react-form-editor-translation"
+        layout="vertical"
+      >
+        <FormDefinitionTranslation />
+      </Form>
+    </Space>
   );
 };
 
