@@ -1,6 +1,7 @@
 import { Store } from 'pullstate';
 import UIStaticText from './i18n';
 import { dummyName } from './debug';
+import data from './data';
 
 const generateId = () => new Date().getTime();
 
@@ -23,23 +24,21 @@ const defaultQuestion = ({
   type = questionType.input,
   params = {},
 }) => {
+  params = data.clear(['id', 'order', 'questionGroupId'], params);
   const q = {
     id: generateId(),
+    order: prevOrder + 1,
     questionGroupId: questionGroup.id,
     name: name || dummyName(5),
     type: type,
     required: false,
     tooltip: null,
-    ...params,
-    order: prevOrder + 1,
   };
   if (type === questionType.option || type === questionType.multiple_option) {
     return {
       ...q,
       options: [],
       allowOther: false,
-      ...params,
-      order: prevOrder + 1,
     };
   }
   if (type === questionType.cascade) {
@@ -50,11 +49,9 @@ const defaultQuestion = ({
         initial: 0,
         list: false,
       },
-      ...params,
-      order: prevOrder + 1,
     };
   }
-  return q;
+  return { ...q, ...params };
 };
 
 const defaultQuestionGroup = ({ name = dummyName(), prevOrder = 0 }) => {

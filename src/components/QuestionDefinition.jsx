@@ -5,7 +5,7 @@ import { UIStore, questionFn, questionGroupFn } from '../lib/store';
 import QuestionSetting from './QuestionSetting';
 import QuestionSkipLogic from './QuestionSkipLogic';
 import { AddMoveButton, CardTitle } from '../support';
-import { orderBy, maxBy, minBy, unset } from 'lodash';
+import { orderBy, maxBy, minBy } from 'lodash';
 
 const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
   const { questionGroups } = questionGroupFn.store.useState((s) => s);
@@ -154,10 +154,6 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
         order: q.order + 1,
       }));
     const paramsQ = movingQ;
-    if (paramsQ) {
-      unset(paramsQ, 'id');
-      unset(paramsQ, 'order');
-    }
     const newQ = {
       questionGroup: questionGroup,
       prevOrder: prevOrder,

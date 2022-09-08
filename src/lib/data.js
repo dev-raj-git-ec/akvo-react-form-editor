@@ -80,6 +80,7 @@ const toWebform = (formData, questionGroups) => {
 };
 
 const data = {
+  clear: clearQuestionObj,
   toWebform: toWebform,
 };
 
