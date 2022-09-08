@@ -1,15 +1,10 @@
 import React from 'react';
-import styles from '../styles.module.css';
-import { Form, Input, Select } from 'antd';
+import { Form, Input } from 'antd';
 import { UIStore, FormStore } from '../lib/store';
 
-const FormDefinition = ({ name, description, languages = [] }) => {
+const FormDefinition = ({ name, description }) => {
   const UIText = UIStore.useState((s) => s.UIText);
-  const {
-    inputFormNameLabel,
-    inputFormDescriptionLabel,
-    inputFormLanguagesLabel,
-  } = UIText;
+  const { inputFormNameLabel, inputFormDescriptionLabel } = UIText;
 
   return (
     <div

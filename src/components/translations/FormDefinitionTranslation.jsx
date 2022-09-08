@@ -13,15 +13,17 @@ const FormDefinitionTranslation = () => {
         <TranslationFormItem
           labelText={UIText.inputFormNameLabel}
           currentValue={formStore.name}
-          children={<Input />}
-        />
+        >
+          <Input />
+        </TranslationFormItem>
       )}
       {formStore?.description && (
         <TranslationFormItem
           labelText={UIText.inputFormDescriptionLabel}
           currentValue={formStore.description}
-          children={<Input.TextArea rows={5} />}
-        />
+        >
+          <Input.TextArea rows={5} />
+        </TranslationFormItem>
       )}
     </Card>
   );
