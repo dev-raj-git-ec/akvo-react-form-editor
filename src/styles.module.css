@@ -85,3 +85,15 @@
   margin-block-end: 0px;
   list-style: none;
 }
+
+.tags {
+  font-size: 14px !important;
+}
+
+.translation-form-item label {
+  width: 100% !important;
+}
+
+.translation-form-item-card {
+  margin-bottom: 10px;
+}

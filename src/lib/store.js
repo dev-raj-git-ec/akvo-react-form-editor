@@ -12,8 +12,8 @@ const questionType = {
   date: 'date',
   option: 'option',
   multiple_option: 'multiple_option',
-  tree: 'tree',
-  autofield: 'autofield',
+  // tree: 'tree',
+  // autofield: 'autofield',
 };
 
 const defaultQuestion = ({

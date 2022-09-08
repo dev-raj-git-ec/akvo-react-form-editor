@@ -7,6 +7,7 @@ import {
   FormDefinition,
   FormPreview,
   QuestionGroupDefinition,
+  FormTranslations,
 } from './components';
 import { CardExtraButton } from './support';
 import { FormStore, UIStore, questionGroupFn } from './lib/store';
@@ -26,6 +27,7 @@ const WebformEditor = ({ onSave = false }) => {
   const { tab: currentTab } = current;
   const {
     formTabPane,
+    formTranslationPane,
     previewTabPane,
     questionCount,
     questionGroupCount,
@@ -106,6 +108,10 @@ const WebformEditor = ({ onSave = false }) => {
             key="edit-form"
           />
           <Tabs.TabPane
+            tab={formTranslationPane}
+            key="translations"
+          />
+          <Tabs.TabPane
             tab={previewTabPane}
             key="preview"
           />
@@ -125,6 +131,7 @@ const WebformEditor = ({ onSave = false }) => {
             })}
           </FormWrapper>
         )}
+        {currentTab === 'translations' && <FormTranslations />}
         {currentTab === 'preview' && <FormPreview />}
       </Card>
     </div>

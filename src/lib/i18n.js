@@ -2,7 +2,11 @@ const UIStaticText = {
   en: {
     inputFormNameLabel: 'Form Name',
     inputFormDescriptionLabel: 'Form Description',
+    inputFormTranslationLabel: 'Add New Translation',
+    inputFormExistingTranslationsLabel: 'Existing Translations',
+    inputFormDefaultLanguageLabel: 'Default Language',
     formTabPane: 'Edit Form',
+    formTranslationPane: 'Translations',
     previewTabPane: 'Preview',
     questionCount: 'Questions',
     questionGroupCount: 'Question Groups',
