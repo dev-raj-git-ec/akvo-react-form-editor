@@ -1,7 +1,6 @@
 import { Store } from 'pullstate';
 import UIStaticText from './i18n';
 import { dummyName } from './debug';
-import data from './data';
 
 const generateId = () => new Date().getTime();
 
@@ -24,7 +23,6 @@ const defaultQuestion = ({
   type = questionType.input,
   params = {},
 }) => {
-  params = data.clear(['id', 'order', 'questionGroupId'], params);
   const q = {
     id: generateId(),
     order: prevOrder + 1,

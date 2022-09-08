@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Card, Tabs } from 'antd';
 import styles from '../styles.module.css';
 import { UIStore, questionFn, questionGroupFn } from '../lib/store';
+import data from '../lib/data';
 import QuestionSetting from './QuestionSetting';
 import QuestionSkipLogic from './QuestionSkipLogic';
 import { AddMoveButton, CardTitle } from '../support';
@@ -153,11 +154,10 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
         ...q,
         order: q.order + 1,
       }));
-    const paramsQ = movingQ;
     const newQ = {
       questionGroup: questionGroup,
       prevOrder: prevOrder,
-      params: paramsQ || {},
+      params: data.clear(['id', 'order', 'questionGroupId'], movingQ),
     };
     const newQuestions = [...prevQ, questionFn.add(newQ), ...nextQ];
     questionGroupFn.store.update((s) => {

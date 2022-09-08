@@ -1,15 +1,17 @@
 import { questionType } from './store';
 
-const clearQuestionObj = (keysToRemove, obj) => {
+const clearQuestionObj = (keysToRemove, obj = false) => {
   let clearedQuestion = {};
-  Object.keys(obj).forEach((key) => {
-    if (!keysToRemove.includes(key)) {
-      clearedQuestion = {
-        ...clearedQuestion,
-        [key]: obj[key],
-      };
-    }
-  });
+  if (obj) {
+    Object.keys(obj).forEach((key) => {
+      if (!keysToRemove.includes(key)) {
+        clearedQuestion = {
+          ...clearedQuestion,
+          [key]: obj[key],
+        };
+      }
+    });
+  }
   return clearedQuestion;
 };
 
