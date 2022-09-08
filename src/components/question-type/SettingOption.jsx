@@ -39,10 +39,18 @@ const defaultOptions = ({ init = false, order = 0 }) => {
   };
 };
 
-const SettingOption = ({ id, questionGroupId, allowOther, allowOtherText }) => {
+const SettingOption = ({
+  id,
+  questionGroupId,
+  allowOther,
+  allowOtherText,
+  options: currentOptions,
+}) => {
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
-  const [options, setOptions] = useState(defaultOptions({ init: true }));
+  const [options, setOptions] = useState(
+    currentOptions?.length ? currentOptions : defaultOptions({ init: true })
+  );
 
   const updateState = useCallback(
     (name, value) => {
