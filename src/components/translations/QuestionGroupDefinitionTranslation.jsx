@@ -115,23 +115,6 @@ const QuestionGroupDefinitionTranslation = ({ index, questionGroup }) => {
     return activeEditTranslationQuestionGroups.includes(id);
   }, [activeEditTranslationQuestionGroups, id]);
 
-  const handleCancelEditTranslationGroup = () => {
-    UIStore.update((s) => {
-      s.activeEditTranslationQuestionGroups =
-        activeEditTranslationQuestionGroups.filter((qgId) => qgId !== id);
-    });
-  };
-
-  const handleShowTranslationsQuestions = () => {
-    UIStore.update((s) => {
-      s.activeTranslationQuestionGroups = [
-        ...activeTranslationQuestionGroups,
-        id,
-      ];
-    });
-    handleCancelEditTranslationGroup();
-  };
-
   const handleHideTranslationQuestions = () => {
     UIStore.update((s) => {
       s.activeTranslationQuestionGroups =
@@ -139,28 +122,31 @@ const QuestionGroupDefinitionTranslation = ({ index, questionGroup }) => {
     });
   };
 
-  const handleEditTranslationGroup = () => {
+  const handleCancelEditTranslationGroup = () => {
     UIStore.update((s) => {
-      s.activeEditTranslationQuestionGroups = [
-        ...activeEditTranslationQuestionGroups,
-        id,
-      ];
+      s.activeEditTranslationQuestionGroups =
+        activeEditTranslationQuestionGroups.filter((qgId) => qgId !== id);
     });
     handleHideTranslationQuestions();
+  };
+
+  const handleEditTranslationGroup = () => {
+    UIStore.update((s) => {
+      if (!activeEditTranslationQuestionGroups.includes(id)) {
+        s.activeEditTranslationQuestionGroups = [
+          ...activeEditTranslationQuestionGroups,
+          id,
+        ];
+      } else {
+        s.activeEditTranslationQuestionGroups =
+          activeEditTranslationQuestionGroups.filter((a) => a !== id);
+      }
+    });
   };
 
   const cardTitleButton = [
     {
       type: 'show-button',
-      isExpand: showTranslationQuestion,
-      onClick: handleShowTranslationsQuestions,
-      onCancel: handleHideTranslationQuestions,
-    },
-  ];
-
-  const cardExtraButton = [
-    {
-      type: 'edit-button',
       isExpand: isEditTranslationQuestionGroup,
       onClick: handleEditTranslationGroup,
       onCancel: handleCancelEditTranslationGroup,
@@ -188,12 +174,11 @@ const QuestionGroupDefinitionTranslation = ({ index, questionGroup }) => {
             ? '1px solid #f3f3f3'
             : 'none',
       }}
-      extra={<CardTitle buttons={cardExtraButton} />}
     >
       {isEditTranslationQuestionGroup && (
         <QuestionGroupSettingTranslation {...questionGroup} />
       )}
-      {showTranslationQuestion &&
+      {isEditTranslationQuestionGroup &&
         questions.map((q, qi) => (
           <QuestionDefinitionTranslation
             key={`question-definition-translation-${qi}`}
