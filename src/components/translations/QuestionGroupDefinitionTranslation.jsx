@@ -3,6 +3,7 @@ import { Card, Input } from 'antd';
 import { UIStore, questionGroupFn } from '../../lib/store';
 import { CardTitle, TranslationFormItem } from '../../support';
 import findIndex from 'lodash/findIndex';
+import QuestionDefinitionTranslation from './QuestionDefinitionTranslation';
 
 const QuestionGroupSettingTranslation = ({
   id,
@@ -118,7 +119,7 @@ const QuestionGroupSettingTranslation = ({
 };
 
 const QuestionGroupDefinitionTranslation = ({ index, questionGroup }) => {
-  const { id, name, order } = questionGroup;
+  const { id, name, order, questions } = questionGroup;
   const {
     activeTranslationQuestionGroups,
     activeEditTranslationQuestionGroups,
@@ -210,6 +211,14 @@ const QuestionGroupDefinitionTranslation = ({ index, questionGroup }) => {
       {isEditTranslationQuestionGroup && (
         <QuestionGroupSettingTranslation {...questionGroup} />
       )}
+      {showTranslationQuestion &&
+        questions.map((q, qi) => (
+          <QuestionDefinitionTranslation
+            key={`question-definition-translation-${qi}`}
+            index={qi}
+            question={q}
+          />
+        ))}
     </Card>
   );
 };

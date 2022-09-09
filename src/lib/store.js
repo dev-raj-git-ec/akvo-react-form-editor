@@ -95,6 +95,7 @@ const UIStore = new Store({
   existingTranslation: null,
   activeTranslationQuestionGroups: [],
   activeEditTranslationQuestionGroups: [],
+  activeEditTranslationQuestions: [],
 });
 
 const FormStore = new Store({
