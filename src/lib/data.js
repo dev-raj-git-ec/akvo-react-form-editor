@@ -37,9 +37,7 @@ const toWebform = (formData, questionGroups) => {
       if (q.type !== questionType.cascade) {
         q = clearQuestionObj(['api'], q);
       }
-      if (q?.tooltip) {
-        q = { ...q, tooltip: { text: q.tooltip } };
-      } else {
+      if (!q?.tooltip) {
         q = clearQuestionObj(['tooltip'], q);
       }
       if (q?.dependency) {
