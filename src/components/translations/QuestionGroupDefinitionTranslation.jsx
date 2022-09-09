@@ -118,7 +118,7 @@ const QuestionGroupSettingTranslation = ({
 };
 
 const QuestionGroupDefinitionTranslation = ({ index, questionGroup }) => {
-  const { id, name, order, questions } = questionGroup;
+  const { id, name, order } = questionGroup;
   const {
     activeTranslationQuestionGroups,
     activeEditTranslationQuestionGroups,

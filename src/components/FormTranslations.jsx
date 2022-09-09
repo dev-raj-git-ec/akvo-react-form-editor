@@ -94,15 +94,24 @@ const FormTranslations = () => {
             <Select
               showSearch
               style={{ width: '70%' }}
-              options={localeDropdownValue}
-              optionFilterProp="label"
+              optionFilterProp="children"
               onChange={(e) =>
                 FormStore.update((u) => {
                   u.languages = [...languages, e];
                 })
               }
               value={[]}
-            />
+            >
+              {localeDropdownValue.map((ld, ldi) => (
+                <Select.Option
+                  key={`${ld.value}-${ldi}`}
+                  value={ld.value}
+                  disabled={languages.includes(ld.value)}
+                >
+                  {ld.label}
+                </Select.Option>
+              ))}
+            </Select>
           </Col>
           <Col span={12}>
             <h4>{UIText.inputFormExistingTranslationsLabel}</h4>
