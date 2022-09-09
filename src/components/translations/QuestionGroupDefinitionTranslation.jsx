@@ -9,6 +9,7 @@ const QuestionGroupSettingTranslation = ({
   id,
   name,
   description,
+  repeatable,
   repeatText,
   translations = [],
 }) => {
@@ -82,7 +83,7 @@ const QuestionGroupSettingTranslation = ({
           />
         </TranslationFormItem>
       )}
-      {repeatText && (
+      {repeatable && repeatText && (
         <TranslationFormItem
           labelText={UIText.inputRepeatTextLabel}
           currentValue={repeatText}

@@ -1,15 +1,20 @@
 import React, { useMemo } from 'react';
+import styles from '../../styles.module.css';
 import { Card, Input } from 'antd';
 import { CardTitle, TranslationFormItem } from '../../support';
-import { UIStore, questionGroupFn } from '../../lib/store';
+import { UIStore, questionGroupFn, questionType } from '../../lib/store';
 import data from '../../lib/data';
+import orderBy from 'lodash/orderBy';
 
 const QuestionSettingTranslation = ({
   id,
   questionGroupId,
   name,
+  type,
   tooltip = {},
-  // options = [],
+  allowOther,
+  allowOtherText,
+  options = [],
   translations = [],
 }) => {
   const { UIText, existingTranslation } = UIStore.useState((s) => s);
@@ -25,9 +30,7 @@ const QuestionSettingTranslation = ({
     );
   }, [tooltip, existingTranslation]);
 
-  const handleChangeName = (e) => {
-    const key = 'name';
-    const value = e?.target?.value;
+  const updateTranslation = (key, value) => {
     const { newTranslations, currentTranslations } = data.generateTranslations(
       key,
       value,
@@ -94,6 +97,61 @@ const QuestionSettingTranslation = ({
     });
   };
 
+  const handleChangeName = (e) => {
+    updateTranslation('name', e?.target?.value);
+  };
+
+  const handleChangeAllowOtherText = (e) => {
+    updateTranslation('allowOtherText', e?.target?.value);
+  };
+
+  const handleChangeOptionName = (e, optionTranslations, optionId) => {
+    const key = 'name';
+    const value = e?.target?.value;
+    const { newTranslations, currentTranslations } = data.generateTranslations(
+      key,
+      value,
+      optionTranslations,
+      existingTranslation
+    );
+    questionGroupFn.store.update((u) => {
+      u.questionGroups = u.questionGroups.map((qg) => {
+        if (qg.id === questionGroupId) {
+          const questions = qg.questions.map((q) => {
+            if (
+              q.id === id &&
+              [questionType.option, questionType.multiple_option].includes(
+                q.type
+              )
+            ) {
+              const options = q.options.map((opt) => {
+                if (opt.id === optionId) {
+                  return {
+                    ...opt,
+                    translations: !currentTranslations
+                      ? newTranslations
+                      : currentTranslations,
+                  };
+                }
+                return opt;
+              });
+              return {
+                ...q,
+                options: options,
+              };
+            }
+            return q;
+          });
+          return {
+            ...qg,
+            questions: questions,
+          };
+        }
+        return qg;
+      });
+    });
+  };
+
   return (
     <div>
       {name && (
@@ -121,6 +179,50 @@ const QuestionSettingTranslation = ({
             value={existingTooltipTranslationValues?.text}
           />
         </TranslationFormItem>
+      )}
+      {/* Option Translation */}
+      {[questionType.option, questionType.multiple_option].includes(type) && (
+        <div>
+          <p className={styles['more-question-setting-text']}>
+            {UIText.questionMoreOptionTranslationText}
+          </p>
+          {allowOther && allowOtherText && (
+            <TranslationFormItem
+              labelText={UIText.inputQuestionAllowOtherTextLabel}
+              currentValue={allowOtherText}
+              name={`${namePreffix}-allow_other_text`}
+            >
+              <Input
+                disabled={!existingTranslation}
+                onChange={handleChangeAllowOtherText}
+                value={existingTranslationValues?.allowOtherText}
+              />
+            </TranslationFormItem>
+          )}
+          {orderBy(options, 'order')
+            .filter((d) => d?.name)
+            .map((d, di) => {
+              const existingOptionTranslationValues = d?.translations?.find(
+                (tl) => tl.language === existingTranslation
+              );
+              return (
+                <TranslationFormItem
+                  key={`translation-option-${d.id}-${di}`}
+                  labelText={`${UIText.inputQuestionOptionNameLabel} ${d.order}`}
+                  currentValue={d.name}
+                  name={`${namePreffix}-option-name-${d.id}`}
+                >
+                  <Input
+                    disabled={!existingTranslation}
+                    onChange={(e) =>
+                      handleChangeOptionName(e, d?.translations, d.id)
+                    }
+                    value={existingOptionTranslationValues?.name}
+                  />
+                </TranslationFormItem>
+              );
+            })}
+        </div>
       )}
     </div>
   );
