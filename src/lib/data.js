@@ -76,6 +76,12 @@ const toWebform = (formData, questionGroups) => {
         description: qg.description,
       };
     }
+    if (qg?.translations && qg?.translations?.length) {
+      result = {
+        ...result,
+        translations: qg.translations,
+      };
+    }
     return result;
   });
   return { ...formData, question_group: output };

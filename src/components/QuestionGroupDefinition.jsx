@@ -9,9 +9,8 @@ import { orderBy, maxBy, minBy } from 'lodash';
 const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
   const { questionGroups } = questionGroupFn.store.useState((s) => s);
   const movingQg = UIStore.useState((s) => s.activeMoveQuestionGroup);
-  const activeQuestionGroups = UIStore.useState((s) => s.activeQuestionGroups);
-  const activeEditQuestionGroups = UIStore.useState(
-    (s) => s.activeEditQuestionGroups
+  const { activeQuestionGroups, activeEditQuestionGroups } = UIStore.useState(
+    (s) => s
   );
 
   const { id, name, questions, order } = questionGroup;
@@ -266,14 +265,9 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
           borderTop:
             isEditQuestionGroup || showQuestion ? '1px solid #f3f3f3' : 'none',
         }}
-        loading={false}
         extra={<CardTitle buttons={leftButtons} />}
       >
-        {isEditQuestionGroup && (
-          <div>
-            <QuestionGroupSetting {...questionGroup} />
-          </div>
-        )}
+        {isEditQuestionGroup && <QuestionGroupSetting {...questionGroup} />}
         {showQuestion &&
           questions.map((q, qi) => (
             <QuestionDefinition

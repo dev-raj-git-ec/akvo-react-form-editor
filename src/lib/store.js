@@ -93,6 +93,8 @@ const UIStore = new Store({
   UIText: UIStaticText.en,
   localeDropdownValue: localeDropdownValue,
   existingTranslation: null,
+  activeTranslationQuestionGroups: [],
+  activeEditTranslationQuestionGroups: [],
 });
 
 const FormStore = new Store({

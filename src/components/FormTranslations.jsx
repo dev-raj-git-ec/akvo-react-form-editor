@@ -2,7 +2,10 @@ import React from 'react';
 import styles from '../styles.module.css';
 import { Row, Col, Card, Tag, Select, Form, Space } from 'antd';
 import { UIStore, FormStore, questionGroupFn } from '../lib/store';
-import FormDefinitionTranslation from './translations/FormDefinitionTranslation';
+import {
+  FormDefinitionTranslation,
+  QuestionGroupDefinitionTranslation,
+} from './translations';
 
 const ExistingTranslation = () => {
   const { localeDropdownValue, existingTranslation } = UIStore.useState(
@@ -23,6 +26,17 @@ const ExistingTranslation = () => {
     FormStore.update((u) => {
       u.languages = languages.filter((ln) => ln !== lang);
       u.translations = translations;
+    });
+    questionGroupFn.store.update((u) => {
+      u.questionGroups = u.questionGroups.map((qg) => {
+        const qgTranslations = qg?.translations?.filter(
+          (tl) => tl.language !== lang
+        );
+        return {
+          ...qg,
+          translations: qgTranslations,
+        };
+      });
     });
   };
 
@@ -102,6 +116,15 @@ const FormTranslations = () => {
         name="akvo-react-form-editor-translation"
       >
         <FormDefinitionTranslation />
+        {questionGroups.map((qg, qgi) => {
+          return (
+            <QuestionGroupDefinitionTranslation
+              key={`translation-question-group-definition-${qgi}`}
+              index={qgi}
+              questionGroup={qg}
+            />
+          );
+        })}
       </Form>
     </Space>
   );

@@ -1,1 +1,2 @@
-export { default as FormDefinitionTranslation } from './FormDefinitionTranslations';
+export { default as FormDefinitionTranslation } from './FormDefinitionTranslation';
+export { default as QuestionGroupDefinitionTranslation } from './QuestionGroupDefinitionTranslation';

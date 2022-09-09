@@ -23,7 +23,7 @@ const FormDefinitionTranslation = () => {
       },
     ];
     let currentTranslations = null;
-    if (formStore?.translations) {
+    if (formStore?.translations && formStore?.translations?.length) {
       currentTranslations = formStore.translations.map((tl) => {
         if (tl.language === existingTranslation) {
           return {
