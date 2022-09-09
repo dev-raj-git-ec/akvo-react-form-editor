@@ -92,6 +92,7 @@ const UIStore = new Store({
   isCopyingQuestion: false,
   UIText: UIStaticText.en,
   localeDropdownValue: localeDropdownValue,
+  existingTranslation: null,
 });
 
 const FormStore = new Store({
