@@ -1,6 +1,8 @@
 import React from 'react';
 import styles from '../styles.module.css';
-import { Form, Card, Space } from 'antd';
+import { Form, Row, Col, Space, Typography } from 'antd';
+
+const { Text } = Typography;
 
 const TranslationFormItem = ({
   labelText = '',
@@ -9,26 +11,30 @@ const TranslationFormItem = ({
   children = '',
 }) => {
   return (
-    <Form.Item
-      label={
+    <Row
+      align="middle"
+      justify="space-between"
+      gutter={[24, 24]}
+      style={{ marginBottom: 24 }}
+    >
+      <Col span={12}>
         <Space
           direction="vertical"
           style={{ width: '100%' }}
         >
-          {labelText}
-          <Card
-            className={styles['translation-form-item-card']}
-            bodyStyle={{ padding: '10px 12px', background: '#f3f3f3' }}
-          >
-            {currentValue}
-          </Card>
+          <b>{labelText}</b>
+          <Text>{currentValue}</Text>
         </Space>
-      }
-      name={name}
-      className={styles['translation-form-item']}
-    >
-      {children}
-    </Form.Item>
+      </Col>
+      <Col span={12}>
+        <Form.Item
+          name={name}
+          className={styles['translation-form-item']}
+        >
+          {children}
+        </Form.Item>
+      </Col>
+    </Row>
   );
 };
 

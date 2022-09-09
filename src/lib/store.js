@@ -1,6 +1,15 @@
 import { Store } from 'pullstate';
 import UIStaticText from './i18n';
 import { dummyName } from './debug';
+import * as locale from 'locale-codes';
+import uniqBy from 'lodash/uniqBy';
+
+const localeDropdownValue = uniqBy(
+  locale.all
+    .filter((x) => x.location)
+    .map((x) => ({ label: x.name, value: x['iso639-1'] })),
+  'value'
+);
 
 const generateId = () => new Date().getTime();
 
@@ -82,6 +91,7 @@ const UIStore = new Store({
   activeMoveQuestion: null,
   isCopyingQuestion: false,
   UIText: UIStaticText.en,
+  localeDropdownValue: localeDropdownValue,
 });
 
 const FormStore = new Store({

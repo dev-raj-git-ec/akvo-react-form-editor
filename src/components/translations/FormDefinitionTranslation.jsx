@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Input } from 'antd';
+import { Input } from 'antd';
 import { UIStore, FormStore } from '../../lib/store';
 import { TranslationFormItem } from '../../support';
 
@@ -8,7 +8,7 @@ const FormDefinitionTranslation = () => {
   const formStore = FormStore.useState((s) => s);
 
   return (
-    <Card>
+    <div>
       {formStore?.name && (
         <TranslationFormItem
           labelText={UIText.inputFormNameLabel}
@@ -25,7 +25,7 @@ const FormDefinitionTranslation = () => {
           <Input.TextArea rows={5} />
         </TranslationFormItem>
       )}
-    </Card>
+    </div>
   );
 };
 

@@ -90,6 +90,10 @@
   font-size: 14px !important;
 }
 
+.translation-form-item {
+  margin: 0 !important;
+}
+
 .translation-form-item label {
   width: 100% !important;
 }

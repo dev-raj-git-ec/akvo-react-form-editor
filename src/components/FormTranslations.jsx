@@ -6,7 +6,7 @@ import FormDefinitionTranslation from './translations/FormDefinitionTranslation'
 
 const FormTranslations = () => {
   const [formTranslation] = Form.useForm();
-  const UIText = UIStore.useState((s) => s.UIText);
+  const { UIText, localeDropdownValue } = UIStore.useState((s) => s);
   const formStore = FormStore.useState((s) => s);
   const { questionGroups } = questionGroupFn.store.useState((s) => s);
   const languages = formStore?.languages || [];
@@ -17,8 +17,9 @@ const FormTranslations = () => {
     <Space
       direction="vertical"
       style={{ width: '100%' }}
+      size={24}
     >
-      <Card title="Select an existing translation or add a new one">
+      <Card>
         <Row
           align="middle"
           justify="space-between"
@@ -34,7 +35,8 @@ const FormTranslations = () => {
               showSearch
               allowClear
               style={{ width: '70%' }}
-              options={[]}
+              options={localeDropdownValue}
+              optionFilterProp="label"
               onChange={(e) =>
                 FormStore.update((u) => {
                   u.languages = [...languages, e];
@@ -63,7 +65,6 @@ const FormTranslations = () => {
         form={formTranslation}
         key="akvo-react-form-editor-translation"
         name="akvo-react-form-editor-translation"
-        layout="vertical"
       >
         <FormDefinitionTranslation />
       </Form>
