@@ -12,10 +12,18 @@ const ExistingTranslation = () => {
   const languages = formStore?.languages || [];
 
   const handleCloseTag = (lang) => {
-    FormStore.update((u) => {
-      u.languages = languages.filter((ln) => ln !== lang);
+    UIStore.update((u) => {
+      u.existingTranslation =
+        existingTranslation === lang ? null : existingTranslation;
     });
     // TODO:: remove deleted translation from translations obj
+    const translations = formStore?.translations?.filter(
+      (tl) => tl.language !== lang
+    );
+    FormStore.update((u) => {
+      u.languages = languages.filter((ln) => ln !== lang);
+      u.translations = translations;
+    });
   };
 
   return languages.map((lang) => {
@@ -50,8 +58,6 @@ const FormTranslations = () => {
   const formStore = FormStore.useState((s) => s);
   const { questionGroups } = questionGroupFn.store.useState((s) => s);
   const languages = formStore?.languages || [];
-
-  console.info(questionGroups);
 
   return (
     <Space
