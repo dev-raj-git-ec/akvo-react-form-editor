@@ -2,14 +2,14 @@ import React, { useMemo } from 'react';
 import { Card, Input } from 'antd';
 import { CardTitle, TranslationFormItem } from '../../support';
 import { UIStore, questionGroupFn } from '../../lib/store';
-import findIndex from 'lodash/findIndex';
+import data from '../../lib/data';
 
 const QuestionSettingTranslation = ({
   id,
   questionGroupId,
   name,
   tooltip = {},
-  options = [],
+  // options = [],
   translations = [],
 }) => {
   const { UIText, existingTranslation } = UIStore.useState((s) => s);
@@ -25,32 +25,15 @@ const QuestionSettingTranslation = ({
     );
   }, [tooltip, existingTranslation]);
 
-  const updateTranslation = (key, value) => {
-    const newTranslations = [
-      {
-        language: existingTranslation,
-        [key]: value,
-      },
-    ];
-    let currentTranslations = null;
-    if (translations && translations?.length) {
-      currentTranslations = translations.map((tl) => {
-        if (tl.language === existingTranslation) {
-          return {
-            ...tl,
-            [key]: value,
-          };
-        }
-        return tl;
-      });
-      const isExistingExist = findIndex(
-        translations,
-        (tr) => tr.language === existingTranslation
-      );
-      if (isExistingExist === -1) {
-        currentTranslations = [...currentTranslations, ...newTranslations];
-      }
-    }
+  const handleChangeName = (e) => {
+    const key = 'name';
+    const value = e?.target?.value;
+    const { newTranslations, currentTranslations } = data.generateTranslations(
+      key,
+      value,
+      translations,
+      existingTranslation
+    );
     questionGroupFn.store.update((u) => {
       u.questionGroups = u.questionGroups.map((qg) => {
         if (qg.id === questionGroupId) {
@@ -75,38 +58,15 @@ const QuestionSettingTranslation = ({
     });
   };
 
-  const handleChangeName = (e) => {
-    updateTranslation('name', e?.target?.value);
-  };
-
   const handleChangeTooltip = (e) => {
     const key = 'text';
     const value = e?.target?.value;
-    const newTranslations = [
-      {
-        language: existingTranslation,
-        [key]: value,
-      },
-    ];
-    let currentTranslations = null;
-    if (tooltip?.translations && tooltip?.translations?.length) {
-      currentTranslations = tooltip?.translations.map((tl) => {
-        if (tl.language === existingTranslation) {
-          return {
-            ...tl,
-            [key]: value,
-          };
-        }
-        return tl;
-      });
-      const isExistingExist = findIndex(
-        tooltip?.translations,
-        (tr) => tr.language === existingTranslation
-      );
-      if (isExistingExist === -1) {
-        currentTranslations = [...currentTranslations, ...newTranslations];
-      }
-    }
+    const { newTranslations, currentTranslations } = data.generateTranslations(
+      key,
+      value,
+      tooltip?.translations,
+      existingTranslation
+    );
     questionGroupFn.store.update((u) => {
       u.questionGroups = u.questionGroups.map((qg) => {
         if (qg.id === questionGroupId) {

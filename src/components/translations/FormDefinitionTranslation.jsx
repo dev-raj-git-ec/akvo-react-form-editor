@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { Input } from 'antd';
 import { UIStore, FormStore } from '../../lib/store';
 import { TranslationFormItem } from '../../support';
-import findIndex from 'lodash/findIndex';
+import data from '../../lib/data';
 
 const FormDefinitionTranslation = () => {
   const { UIText, existingTranslation } = UIStore.useState((s) => s);
@@ -16,31 +16,12 @@ const FormDefinitionTranslation = () => {
   }, [formStore, existingTranslation]);
 
   const updateTranslation = (key, value) => {
-    const newTranslations = [
-      {
-        language: existingTranslation,
-        [key]: value,
-      },
-    ];
-    let currentTranslations = null;
-    if (formStore?.translations && formStore?.translations?.length) {
-      currentTranslations = formStore.translations.map((tl) => {
-        if (tl.language === existingTranslation) {
-          return {
-            ...tl,
-            [key]: value,
-          };
-        }
-        return tl;
-      });
-      const isExistingExist = findIndex(
-        formStore.translations,
-        (tr) => tr.language === existingTranslation
-      );
-      if (isExistingExist === -1) {
-        currentTranslations = [...currentTranslations, ...newTranslations];
-      }
-    }
+    const { newTranslations, currentTranslations } = data.generateTranslations(
+      key,
+      value,
+      formStore?.translations,
+      existingTranslation
+    );
     FormStore.update((u) => {
       u.translations = !currentTranslations
         ? newTranslations

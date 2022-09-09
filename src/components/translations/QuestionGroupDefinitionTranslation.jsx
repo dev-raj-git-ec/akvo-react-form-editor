@@ -2,8 +2,8 @@ import React, { useMemo } from 'react';
 import { Card, Input } from 'antd';
 import { UIStore, questionGroupFn } from '../../lib/store';
 import { CardTitle, TranslationFormItem } from '../../support';
-import findIndex from 'lodash/findIndex';
 import QuestionDefinitionTranslation from './QuestionDefinitionTranslation';
+import data from '../../lib/data';
 
 const QuestionGroupSettingTranslation = ({
   id,
@@ -20,31 +20,12 @@ const QuestionGroupSettingTranslation = ({
   }, [translations, existingTranslation]);
 
   const updateTranslation = (key, value) => {
-    const newTranslations = [
-      {
-        language: existingTranslation,
-        [key]: value,
-      },
-    ];
-    let currentTranslations = null;
-    if (translations && translations?.length) {
-      currentTranslations = translations.map((tl) => {
-        if (tl.language === existingTranslation) {
-          return {
-            ...tl,
-            [key]: value,
-          };
-        }
-        return tl;
-      });
-      const isExistingExist = findIndex(
-        translations,
-        (tr) => tr.language === existingTranslation
-      );
-      if (isExistingExist === -1) {
-        currentTranslations = [...currentTranslations, ...newTranslations];
-      }
-    }
+    const { newTranslations, currentTranslations } = data.generateTranslations(
+      key,
+      value,
+      translations,
+      existingTranslation
+    );
     questionGroupFn.store.update((u) => {
       u.questionGroups = u.questionGroups.map((qg) => {
         if (qg.id === id) {
