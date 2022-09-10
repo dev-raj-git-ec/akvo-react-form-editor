@@ -87,12 +87,14 @@ const WebformEditor = ({ onSave = false }) => {
                   {questionGroups.length} {questionGroupCount}
                 </Tag>
                 <Tag style={{ margin: 0 }}>{version} 1</Tag>
-                <CardExtraButton
-                  type="edit-button"
-                  isExpand={activeEditFormSetting}
-                  onClick={handleShowFormSetting}
-                  onCancel={handleShowFormSetting}
-                />
+                {currentTab === 'edit-form' && (
+                  <CardExtraButton
+                    type="edit-button"
+                    isExpand={activeEditFormSetting}
+                    onClick={handleShowFormSetting}
+                    onCancel={handleShowFormSetting}
+                  />
+                )}
                 <CardExtraButton
                   type="save-button"
                   onClick={handleSave}

@@ -12,7 +12,7 @@ const TranslationFormItem = ({
 }) => {
   return (
     <Row
-      align="middle"
+      align="top"
       justify="space-between"
       gutter={[24, 24]}
       style={{ marginBottom: 24 }}
@@ -29,6 +29,7 @@ const TranslationFormItem = ({
       <Col span={12}>
         <Form.Item
           name={name}
+          label={<b>{labelText}</b>}
           className={styles['translation-form-item']}
         >
           {children}

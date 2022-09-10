@@ -122,6 +122,7 @@ const FormTranslations = () => {
         form={formTranslation}
         key="akvo-react-form-editor-translation"
         name="akvo-react-form-editor-translation"
+        layout="vertical"
       >
         <FormDefinitionTranslation />
         {questionGroups.map((qg, qgi) => {
