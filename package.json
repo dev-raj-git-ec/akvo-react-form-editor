@@ -1,7 +1,7 @@
 {
   "name": "akvo-react-form-editor",
   "version": "1.0.0",
-  "description": "akvo-react-form survey editor",
+  "description": "survey editor for akvo-react-form",
   "author": "akvo",
   "license": "AGPL-3.0",
   "repository": "akvo/akvo-react-form-editor",
@@ -85,9 +85,6 @@
     "react-scripts": "^5.0.1",
     "react-test-renderer": "^18.2.0"
   },
-  "files": [
-    "dist"
-  ],
   "dependencies": {
     "akvo-react-form": "^2.0.0",
     "antd": "^4.20.0",
@@ -95,5 +92,8 @@
     "lodash": "^4.17.21",
     "pullstate": "^1.24.0",
     "react-icons": "^4.4.0"
-  }
+  },
+  "files": [
+    "dist"
+  ]
 }
