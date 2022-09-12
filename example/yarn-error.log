@@ -1,0 +1,53 @@
+Arguments: 
+  /home/developer/.nvm/versions/node/v18.1.0/bin/node /home/developer/.nvm/versions/node/v18.1.0/bin/yarn
+
+PATH: 
+  /home/developer/.nvm/versions/node/v18.1.0/bin:/home/developer/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin:/home/developer/Android/Sdk/emulator:/home/developer/Android/Sdk/platform-tools
+
+Yarn version: 
+  1.22.18
+
+Node version: 
+  18.1.0
+
+Platform: 
+  linux x64
+
+Trace: 
+  Error: EACCES: permission denied, unlink '/home/developer/Program/akvo-react-form-editor/example/node_modules/react-scripts/node_modules/fs-extra/LICENSE'
+
+npm manifest: 
+  {
+    "name": "akvo-react-form-editor-example",
+    "homepage": ".",
+    "version": "0.0.0",
+    "private": true,
+    "scripts": {
+      "start": "node ../node_modules/react-scripts/bin/react-scripts.js start",
+      "build": "node ../node_modules/react-scripts/bin/react-scripts.js build",
+      "test": "node ../node_modules/react-scripts/bin/react-scripts.js test",
+      "eject": "node ../node_modules/react-scripts/bin/react-scripts.js eject"
+    },
+    "dependencies": {
+      "akvo-react-form-editor": "link:..",
+      "react": "link:../node_modules/react",
+      "react-dom": "link:../node_modules/react-dom",
+      "react-scripts": "link:../node_modules/react-scripts",
+      "react-json-view": "^1.21.3"
+    },
+    "devDependencies": {
+      "@babel/plugin-syntax-object-rest-spread": "^7.8.3"
+    },
+    "browserslist": [
+      ">0.2%",
+      "not dead",
+      "not ie <= 11",
+      "not op_mini all"
+    ]
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
