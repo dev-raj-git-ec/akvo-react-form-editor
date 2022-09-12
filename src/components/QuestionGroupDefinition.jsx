@@ -4,14 +4,16 @@ import { UIStore, questionGroupFn } from '../lib/store';
 import QuestionGroupSetting from './QuestionGroupSetting';
 import QuestionDefinition from './QuestionDefinition';
 import { ButtonAddMove, CardTitle } from '../support';
-import { orderBy, maxBy, minBy } from 'lodash';
+import { orderBy, maxBy, minBy, uniq, difference, intersection } from 'lodash';
 
 const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
   const { questionGroups } = questionGroupFn.store.useState((s) => s);
   const movingQg = UIStore.useState((s) => s.activeMoveQuestionGroup);
-  const { activeQuestionGroups, activeEditQuestionGroups } = UIStore.useState(
-    (s) => s
-  );
+  const {
+    activeQuestionGroups,
+    activeEditQuestionGroups,
+    activeEditQuestions,
+  } = UIStore.useState((s) => s);
 
   const { id, name, questions, order } = questionGroup;
   const questionIds = questions.map((q) => q.id);
@@ -66,6 +68,20 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
     UIStore.update((s) => {
       s.activeMoveQuestionGroup =
         movingQg === questionGroup ? null : questionGroup;
+    });
+  };
+
+  const handleExpandAll = () => {
+    handleShowQuestions();
+    UIStore.update((s) => {
+      s.activeEditQuestions = uniq([...s.activeEditQuestions, ...questionIds]);
+    });
+  };
+
+  const handleCancelExpandAll = () => {
+    handleHideQuestions();
+    UIStore.update((s) => {
+      s.activeEditQuestions = difference(s.activeEditQuestions, questionIds);
     });
   };
 
@@ -201,7 +217,14 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
     };
   }, [questionGroups, questionIds, movingQg, order]);
 
-  const leftButtons = [
+  const rightButtons = [
+    {
+      type: 'expand-all-button',
+      isExpand:
+        showQuestion && intersection(activeEditQuestions, questionIds).length,
+      onClick: handleExpandAll,
+      onCancel: handleCancelExpandAll,
+    },
     {
       type: 'delete-button',
       onClick: handleDelete,
@@ -215,7 +238,7 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
     },
   ];
 
-  const rightButtons = [
+  const leftButtons = [
     {
       type: 'move-button',
       onClick: handleMove,
@@ -250,7 +273,7 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
         key={`${index}-${id}`}
         title={
           <CardTitle
-            buttons={rightButtons}
+            buttons={leftButtons}
             title={`${order}. ${name}`}
           />
         }
@@ -265,7 +288,7 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
           borderTop:
             isEditQuestionGroup || showQuestion ? '1px solid #f3f3f3' : 'none',
         }}
-        extra={<CardTitle buttons={leftButtons} />}
+        extra={<CardTitle buttons={rightButtons} />}
       >
         {isEditQuestionGroup && <QuestionGroupSetting {...questionGroup} />}
         {showQuestion &&

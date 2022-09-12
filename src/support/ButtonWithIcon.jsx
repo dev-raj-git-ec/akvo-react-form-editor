@@ -10,6 +10,7 @@ import {
 } from 'react-icons/ri';
 import { BiMove, BiCopy } from 'react-icons/bi';
 import { MdOutlineAddCircleOutline } from 'react-icons/md';
+import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 
 const ButtonWithIcon = ({
   type = 'delete-button',
@@ -68,6 +69,19 @@ const ButtonWithIcon = ({
       buttonProps = {
         onClick: onClick,
         icon: <RiSave3Fill />,
+      };
+      break;
+    case 'expand-all-button':
+      if (isExpand) {
+        buttonProps = {
+          onClick: onCancel,
+          icon: <AiOutlineEyeInvisible />,
+        };
+        break;
+      }
+      buttonProps = {
+        onClick: onClick,
+        icon: <AiOutlineEye />,
       };
       break;
     default:
