@@ -10,6 +10,7 @@ import {
   SettingCascade,
   SettingDate,
 } from './question-type';
+import { map, groupBy, orderBy } from 'lodash';
 
 const QuestionSetting = ({ question, dependant }) => {
   const { id, name, type, variable, tooltip, required, questionGroupId } =
@@ -67,17 +68,36 @@ const QuestionSetting = ({ question, dependant }) => {
     updateState('required', e?.target?.checked);
   };
 
+  const dependantGroup = map(
+    groupBy(
+      dependant.map((x) => ({
+        name: `${x.order}. ${x.name}`,
+        group: `${x.questionGroup.order}. ${x.questionGroup.name}`,
+      })),
+      'group'
+    ),
+    (i, g) => ({
+      items: orderBy(i, 'name'),
+      group: g,
+    })
+  );
+
   return (
     <div>
       {!!dependant.length && (
         <Alert
           message={
             <div>
-              Dependant Questions:
               <ul className="arfe-dependant-list-box">
-                {dependant.map((d, di) => (
+                Dependant Questions:
+                {dependantGroup.map((d, di) => (
                   <li key={di}>
-                    {d.order}. {d.name}
+                    {d.group}
+                    <ul>
+                      {d.items.map((i, ii) => (
+                        <li key={ii}>{i.name}</li>
+                      ))}
+                    </ul>
                   </li>
                 ))}
               </ul>

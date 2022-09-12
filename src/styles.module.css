@@ -79,11 +79,15 @@
   text-align: left;
 }
 
+.dependant-list-box ul,
 .dependant-list-box {
   font-size: 14px;
   padding-inline-start: 0px;
   margin-block-end: 0px;
   list-style: none;
+}
+.dependant-list-box ul {
+  padding-inline-start: 5px;
 }
 
 .tags {
