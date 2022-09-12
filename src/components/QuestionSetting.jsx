@@ -71,7 +71,7 @@ const QuestionSetting = ({ question, dependant }) => {
   const dependantGroup = map(
     groupBy(
       dependant.map((x) => ({
-        name: `${x.order}. ${x.name}`,
+        name: `${x.questionGroup.order}.${x.order}. ${x.name}`,
         group: `${x.questionGroup.order}. ${x.questionGroup.name}`,
       })),
       'group'
