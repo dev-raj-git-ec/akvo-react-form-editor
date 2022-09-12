@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Card, Tabs, Alert, Space, Button } from 'antd';
+import { Card, Tabs } from 'antd';
 import styles from '../styles.module.css';
 import { UIStore, questionFn, questionGroupFn } from '../lib/store';
 import data from '../lib/data';
@@ -7,6 +7,7 @@ import QuestionSetting from './QuestionSetting';
 import QuestionSkipLogic from './QuestionSkipLogic';
 import { AddMoveButton, CardTitle } from '../support';
 import { orderBy, maxBy, minBy } from 'lodash';
+import Alert from './Alert';
 
 const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
   const { questionGroups } = questionGroupFn.store.useState((s) => s);
@@ -23,7 +24,8 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
   const activeEditQuestions = UIStore.useState((s) => s.activeEditQuestions);
   const [activeTab, setActiveTab] = useState('setting');
   const { id, questionGroupId, order, name, dependency } = question;
-  const [toBeDeleted, setToBeDeleted] = useState(false);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const allQuestions = questionGroups
     .map((qg) => qg.questions)
@@ -130,7 +132,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
   };
 
   const handleDelete = () => {
-    setToBeDeleted(true);
+    setIsModalOpen(true);
   };
 
   const handleConfirmDelete = () => {
@@ -150,10 +152,11 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
         return qg;
       });
     });
+    setIsModalOpen(false);
   };
 
   const handleCancelDelete = () => {
-    setToBeDeleted(false);
+    setIsModalOpen(false);
   };
 
   const handleOnAdd = (prevOrder) => {
@@ -296,121 +299,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
 
   return (
     <div>
-      <AddMoveButton
-        text={
-          movingQ
-            ? isCopying
-              ? buttonCopyQuestionText
-              : buttonMoveQuestionText
-            : buttonAddNewQuestionText
-        }
-        disabled={
-          (movingQ === question && !isCopying) ||
-          (movingQ?.order + 1 === order &&
-            movingQ?.questionGroupId === questionGroupId &&
-            !isCopying) ||
-          dependant.disabled.current
-        }
-        handleCancelMove={handleCancelMove}
-        movingItem={movingQ}
-        isCopying={isCopying}
-        handleOnAdd={() => handleOnAdd(order - 1)}
-        handleOnMove={() =>
-          isCopying ? handleOnAdd(order - 1) : handleOnMove(order - 1)
-        }
-      />
-      <Card
-        key={`${index}-${id}`}
-        title={
-          <CardTitle
-            title={`${order}. ${name}`}
-            buttons={leftButtons}
-          />
-        }
-        headStyle={{
-          textAlign: 'left',
-          padding: '0 12px',
-          backgroundColor: movingQ?.id === id ? '#FFF2CA' : '#FFF',
-          border: movingQ?.id === id ? '1px dashed #ffc107' : 'none',
-        }}
-        bodyStyle={{
-          borderTop: isEditQuestion ? '1px solid #f3f3f3' : 'none',
-          padding: isEditQuestion ? 24 : 0,
-        }}
-        loading={false}
-        extra={
-          <CardTitle
-            buttons={rightButtons}
-            dependency={allQuestions.filter((q) =>
-              dependency?.find((d) => d.id === q.id)
-            )}
-          />
-        }
-      >
-        {toBeDeleted && (
-          <Alert
-            message={alertDeleteQuestion}
-            type="warning"
-            action={
-              <Space direction="horizontal">
-                <Button
-                  size="small"
-                  type="primary"
-                  onClick={handleConfirmDelete}
-                >
-                  Delete
-                </Button>
-                <Button
-                  size="small"
-                  danger
-                  type="ghost"
-                  onClick={handleCancelDelete}
-                >
-                  Cancel
-                </Button>
-              </Space>
-            }
-            closable
-          />
-        )}
-        {isEditQuestion && (
-          <div>
-            <Tabs
-              defaultActiveKey={activeTab}
-              onChange={(key) => setActiveTab(key)}
-              tabBarGutter={24}
-              className={styles['tabs-wrapper']}
-            >
-              <Tabs.TabPane
-                tab={UIText.questionSettingTabPane}
-                key="setting"
-              />
-              <Tabs.TabPane
-                tab={UIText.questionSkipLogicTabPane}
-                key="skip-logic"
-              />
-              {/* <Tabs.TabPane
-                tab={UIText.questionExtraTabPane}
-                key="extra"
-              />
-              <Tabs.TabPane
-                tab={UIText.questionTranslationTabPane}
-                key="translation"
-              /> */}
-            </Tabs>
-            {activeTab === 'setting' && (
-              <QuestionSetting
-                question={question}
-                dependant={dependant.dependant}
-              />
-            )}
-            {activeTab === 'skip-logic' && (
-              <QuestionSkipLogic question={question} />
-            )}
-          </div>
-        )}
-      </Card>
-      {isLastItem && (
+      <div>
         <AddMoveButton
           text={
             movingQ
@@ -420,16 +309,113 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
               : buttonAddNewQuestionText
           }
           disabled={
-            (movingQ === question && !isCopying) || dependant.disabled.last
+            (movingQ === question && !isCopying) ||
+            (movingQ?.order + 1 === order &&
+              movingQ?.questionGroupId === questionGroupId &&
+              !isCopying) ||
+            dependant.disabled.current
           }
-          movingItem={movingQ}
           handleCancelMove={handleCancelMove}
-          handleOnAdd={() => handleOnAdd(order)}
+          movingItem={movingQ}
+          isCopying={isCopying}
+          handleOnAdd={() => handleOnAdd(order - 1)}
           handleOnMove={() =>
-            isCopying ? handleOnAdd(order) : handleOnMove(order, true)
+            isCopying ? handleOnAdd(order - 1) : handleOnMove(order - 1)
           }
         />
-      )}
+        <Card
+          key={`${index}-${id}`}
+          title={
+            <CardTitle
+              title={`${order}. ${name}`}
+              buttons={leftButtons}
+            />
+          }
+          headStyle={{
+            textAlign: 'left',
+            padding: '0 12px',
+            backgroundColor: movingQ?.id === id ? '#FFF2CA' : '#FFF',
+            border: movingQ?.id === id ? '1px dashed #ffc107' : 'none',
+          }}
+          bodyStyle={{
+            borderTop: isEditQuestion ? '1px solid #f3f3f3' : 'none',
+            padding: isEditQuestion ? 24 : 0,
+          }}
+          loading={false}
+          extra={
+            <CardTitle
+              buttons={rightButtons}
+              dependency={allQuestions.filter((q) =>
+                dependency?.find((d) => d.id === q.id)
+              )}
+            />
+          }
+        >
+          {isEditQuestion && (
+            <div>
+              <Tabs
+                defaultActiveKey={activeTab}
+                onChange={(key) => setActiveTab(key)}
+                tabBarGutter={24}
+                className={styles['tabs-wrapper']}
+              >
+                <Tabs.TabPane
+                  tab={UIText.questionSettingTabPane}
+                  key="setting"
+                />
+                <Tabs.TabPane
+                  tab={UIText.questionSkipLogicTabPane}
+                  key="skip-logic"
+                />
+                {/* <Tabs.TabPane
+                  tab={UIText.questionExtraTabPane}
+                  key="extra"
+                />
+                <Tabs.TabPane
+                  tab={UIText.questionTranslationTabPane}
+                  key="translation"
+                /> */}
+              </Tabs>
+              {activeTab === 'setting' && (
+                <QuestionSetting
+                  question={question}
+                  dependant={dependant.dependant}
+                />
+              )}
+              {activeTab === 'skip-logic' && (
+                <QuestionSkipLogic question={question} />
+              )}
+            </div>
+          )}
+        </Card>
+        {isLastItem && (
+          <AddMoveButton
+            text={
+              movingQ
+                ? isCopying
+                  ? buttonCopyQuestionText
+                  : buttonMoveQuestionText
+                : buttonAddNewQuestionText
+            }
+            disabled={
+              (movingQ === question && !isCopying) || dependant.disabled.last
+            }
+            movingItem={movingQ}
+            handleCancelMove={handleCancelMove}
+            handleOnAdd={() => handleOnAdd(order)}
+            handleOnMove={() =>
+              isCopying ? handleOnAdd(order) : handleOnMove(order, true)
+            }
+          />
+        )}
+      </div>
+      <Alert
+        visible={isModalOpen}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      >
+        {alertDeleteQuestion}
+      </Alert>
     </div>
   );
 };

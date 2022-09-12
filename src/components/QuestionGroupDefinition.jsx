@@ -1,10 +1,11 @@
 import React, { useMemo, useState } from 'react';
-import { Card, Alert, Space, Button } from 'antd';
+import { Card } from 'antd';
 import { UIStore, questionGroupFn } from '../lib/store';
 import QuestionGroupSetting from './QuestionGroupSetting';
 import QuestionDefinition from './QuestionDefinition';
 import { AddMoveButton, CardTitle } from '../support';
 import { orderBy, maxBy, minBy } from 'lodash';
+import Alert from './Alert';
 
 const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
   const { questionGroups } = questionGroupFn.store.useState((s) => s);
@@ -12,7 +13,9 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
   const { activeQuestionGroups, activeEditQuestionGroups } = UIStore.useState(
     (s) => s
   );
-  const [toBeDeleted, setToBeDeleted] = useState(false);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const UIText = UIStore.useState((s) => s.UIText);
   const { alertDeleteQuestionGroup } = UIText;
 
@@ -73,7 +76,7 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
   };
 
   const handleDelete = () => {
-    setToBeDeleted(true)
+    setIsModalOpen(true);
   };
 
   const handleConfirmDelete = () => {
@@ -88,10 +91,11 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
     questionGroupFn.store.update((s) => {
       s.questionGroups = newQuestionGroups;
     });
+    setIsModalOpen(false);
   };
 
   const handleCancelDelete = () => {
-    setToBeDeleted(false);
+    setIsModalOpen(false);
   };
 
   const handleOnAdd = (prevOrder) => {
@@ -243,93 +247,80 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
 
   return (
     <div>
-      <AddMoveButton
-        text={
-          movingQg ? buttonMoveQuestionGroupText : buttonAddNewQuestionGroupText
-        }
-        disabled={
-          movingQg === questionGroup ||
-          movingQg?.order + 1 === order ||
-          dependant.disabled.current
-        }
-        movingItem={movingQg}
-        handleCancelMove={handleCancelMove}
-        handleOnAdd={() => handleOnAdd(order - 1)}
-        handleOnMove={() => handleOnMove(order - 1)}
-      />
-      <Card
-        key={`${index}-${id}`}
-        title={
-          <CardTitle
-            buttons={rightButtons}
-            title={`${order}. ${name}`}
-          />
-        }
-        headStyle={{
-          textAlign: 'left',
-          padding: '0 12px',
-          backgroundColor: movingQg?.id === id ? '#FFF2CA' : '#FFF',
-          border: movingQg?.id === id ? '1px dashed #ffc107' : 'none',
-        }}
-        bodyStyle={{
-          padding: isEditQuestionGroup || showQuestion ? 24 : 0,
-          borderTop:
-            isEditQuestionGroup || showQuestion ? '1px solid #f3f3f3' : 'none',
-        }}
-        extra={<CardTitle buttons={leftButtons} />}
-      >
-        {toBeDeleted && (
-          <Alert
-            message={alertDeleteQuestionGroup}
-            type="warning"
-            action={
-              <Space direction="horizontal">
-                <Button
-                  size="small"
-                  type="primary"
-                  onClick={handleConfirmDelete}
-                >
-                  Delete
-                </Button>
-                <Button
-                  size="small"
-                  danger
-                  type="ghost"
-                  onClick={handleCancelDelete}
-                >
-                  Cancel
-                </Button>
-              </Space>
-            }
-            closable
-          />
-        )}
-        {isEditQuestionGroup && <QuestionGroupSetting {...questionGroup} />}
-        {showQuestion &&
-          questions.map((q, qi) => (
-            <QuestionDefinition
-              key={`question-definition-${qi}`}
-              index={qi}
-              question={q}
-              questionGroup={questionGroup}
-              isLastItem={qi === questions.length - 1}
-            />
-          ))}
-      </Card>
-      {isLastItem && (
+      <div>
         <AddMoveButton
           text={
             movingQg
               ? buttonMoveQuestionGroupText
               : buttonAddNewQuestionGroupText
           }
-          disabled={movingQg === questionGroup || dependant.disabled.last}
+          disabled={
+            movingQg === questionGroup ||
+            movingQg?.order + 1 === order ||
+            dependant.disabled.current
+          }
           movingItem={movingQg}
           handleCancelMove={handleCancelMove}
-          handleOnAdd={() => handleOnAdd(order)}
-          handleOnMove={() => handleOnMove(order, true)}
+          handleOnAdd={() => handleOnAdd(order - 1)}
+          handleOnMove={() => handleOnMove(order - 1)}
         />
-      )}
+        <Card
+          key={`${index}-${id}`}
+          title={
+            <CardTitle
+              buttons={rightButtons}
+              title={`${order}. ${name}`}
+            />
+          }
+          headStyle={{
+            textAlign: 'left',
+            padding: '0 12px',
+            backgroundColor: movingQg?.id === id ? '#FFF2CA' : '#FFF',
+            border: movingQg?.id === id ? '1px dashed #ffc107' : 'none',
+          }}
+          bodyStyle={{
+            padding: isEditQuestionGroup || showQuestion ? 24 : 0,
+            borderTop:
+              isEditQuestionGroup || showQuestion
+                ? '1px solid #f3f3f3'
+                : 'none',
+          }}
+          extra={<CardTitle buttons={leftButtons} />}
+        >
+          {isEditQuestionGroup && <QuestionGroupSetting {...questionGroup} />}
+          {showQuestion &&
+            questions.map((q, qi) => (
+              <QuestionDefinition
+                key={`question-definition-${qi}`}
+                index={qi}
+                question={q}
+                questionGroup={questionGroup}
+                isLastItem={qi === questions.length - 1}
+              />
+            ))}
+        </Card>
+        {isLastItem && (
+          <AddMoveButton
+            text={
+              movingQg
+                ? buttonMoveQuestionGroupText
+                : buttonAddNewQuestionGroupText
+            }
+            disabled={movingQg === questionGroup || dependant.disabled.last}
+            movingItem={movingQg}
+            handleCancelMove={handleCancelMove}
+            handleOnAdd={() => handleOnAdd(order)}
+            handleOnMove={() => handleOnMove(order, true)}
+          />
+        )}
+      </div>
+      <Alert
+        visible={isModalOpen}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      >
+        {alertDeleteQuestionGroup}
+      </Alert>
     </div>
   );
 };
