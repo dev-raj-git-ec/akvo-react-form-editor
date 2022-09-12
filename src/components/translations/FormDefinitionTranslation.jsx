@@ -16,7 +16,6 @@ const FormDefinitionTranslation = () => {
   }, [formStore, existingTranslation]);
 
   const updateTranslation = (key, value) => {
-    console.log(value);
     const { newTranslations, currentTranslations } = data.generateTranslations(
       key,
       value,
