@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import 'antd/dist/antd.min.css';
 import styles from './styles.module.css';
 import { Card, Tabs, Tag, Space } from 'antd';
@@ -13,7 +13,10 @@ import { CardExtraButton } from './support';
 import { FormStore, UIStore, questionGroupFn } from './lib/store';
 import data from './lib/data';
 
-const WebformEditor = ({ onSave = false }) => {
+const WebformEditor = ({
+  onSave = false,
+  settingTreeDropdownValue = [{ label: null, value: null }],
+}) => {
   const formStore = FormStore.useState((s) => s);
   const current = UIStore.useState((s) => s.current);
   const UIText = UIStore.useState((s) => s.UIText);
@@ -34,6 +37,18 @@ const WebformEditor = ({ onSave = false }) => {
     mandatoryQuestionCount,
     version,
   } = UIText;
+
+  useEffect(() => {
+    // store params from host to global store
+    UIStore.update((s) => {
+      s.hostParams = {
+        ...s.hostParams,
+        settingTreeDropdownValue: settingTreeDropdownValue.filter(
+          (x) => x?.label && x?.value
+        ),
+      };
+    });
+  }, [settingTreeDropdownValue]);
 
   const handleTabsOnChange = (e) => {
     UIStore.update((s) => {

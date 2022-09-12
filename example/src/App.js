@@ -28,7 +28,13 @@ const App = () => {
           </button>
         </div>
 
-        <WebformEditor onSave={setSource} />
+        <WebformEditor
+          onSave={setSource}
+          settingTreeDropdownValue={[
+            { label: 'Example First Tree Label', value: 'ex1' },
+            { label: 'Example Second Tree Label', value: 'ex2' },
+          ]}
+        />
       </div>
       <div className={'half-width json-source' + (!showJson ? ' shrink' : '')}>
         <ReactJson
