@@ -1,18 +1,30 @@
 import { questionType } from './store';
 import { findIndex, isEmpty } from 'lodash';
 
-const clearQuestionObj = (keysToRemove = [], obj = false) => {
+const clearQuestionObj = (
+  keysToRemove = [],
+  obj = false,
+  checkEmpty = false
+) => {
   let clearedQuestion = {};
   if (obj) {
     Object.keys(obj).forEach((key) => {
       // filter obj by key to remove
       if (!keysToRemove.includes(key)) {
-        // clear or remove empty obj value
-        if (!isEmpty(obj?.[key])) {
+        if (!checkEmpty) {
           clearedQuestion = {
             ...clearedQuestion,
             [key]: obj[key],
           };
+          return key;
+        }
+        // clear or remove empty obj value
+        if (checkEmpty && !isEmpty(obj?.[key])) {
+          clearedQuestion = {
+            ...clearedQuestion,
+            [key]: obj[key],
+          };
+          return key;
         }
       }
     });
@@ -26,7 +38,7 @@ const clearTranslations = (obj, translations) => {
   };
   const clearedTranslations = translations
     .map((tl) => {
-      const clearedObj = clearQuestionObj([], tl);
+      const clearedObj = clearQuestionObj([], tl, true);
       // remove translation if only has language property
       if (Object.keys(clearedObj).length === 1 && clearedObj?.language) {
         return false;
@@ -89,6 +101,9 @@ const toWebform = (formData, questionGroups) => {
       }
       if (q.type !== questionType.cascade) {
         q = clearQuestionObj(['api'], q);
+      }
+      if (q.type !== questionType.tree) {
+        q = clearQuestionObj(['option'], q);
       }
       if (!q?.tooltip) {
         q = clearQuestionObj(['tooltip'], q);
