@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { Form, Select, Row, Col, InputNumber, Input, Alert, Space } from 'antd';
 import styles from '../styles.module.css';
-import { CardExtraButton } from '../support';
+import { ButtonWithIcon } from '../support';
 import {
   UIStore,
   questionGroupFn,
@@ -344,7 +344,7 @@ const SettingSkipLogic = ({
             align="end"
           >
             <Space>
-              <CardExtraButton
+              <ButtonWithIcon
                 type="add-button"
                 disabled={
                   !dependentToQuestions?.length ||
@@ -352,7 +352,7 @@ const SettingSkipLogic = ({
                 }
                 onClick={handleAddMoreDependency}
               />
-              <CardExtraButton
+              <ButtonWithIcon
                 type="delete-button"
                 disabled={!dependency.dependentTo}
                 onClick={() => handleDeleteDependentTo(dependency.id)}

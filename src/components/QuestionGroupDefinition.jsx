@@ -3,7 +3,7 @@ import { Card } from 'antd';
 import { UIStore, questionGroupFn } from '../lib/store';
 import QuestionGroupSetting from './QuestionGroupSetting';
 import QuestionDefinition from './QuestionDefinition';
-import { AddMoveButton, CardTitle } from '../support';
+import { ButtonAddMove, CardTitle } from '../support';
 import { orderBy, maxBy, minBy } from 'lodash';
 
 const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
@@ -232,7 +232,7 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
 
   return (
     <div>
-      <AddMoveButton
+      <ButtonAddMove
         text={
           movingQg ? buttonMoveQuestionGroupText : buttonAddNewQuestionGroupText
         }
@@ -280,7 +280,7 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
           ))}
       </Card>
       {isLastItem && (
-        <AddMoveButton
+        <ButtonAddMove
           text={
             movingQg
               ? buttonMoveQuestionGroupText

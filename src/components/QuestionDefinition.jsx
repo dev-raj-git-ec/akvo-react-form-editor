@@ -5,7 +5,7 @@ import { UIStore, questionFn, questionGroupFn } from '../lib/store';
 import data from '../lib/data';
 import QuestionSetting from './QuestionSetting';
 import QuestionSkipLogic from './QuestionSkipLogic';
-import { AddMoveButton, CardTitle } from '../support';
+import { ButtonAddMove, CardTitle } from '../support';
 import { orderBy, maxBy, minBy } from 'lodash';
 
 const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
@@ -286,7 +286,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
 
   return (
     <div>
-      <AddMoveButton
+      <ButtonAddMove
         text={
           movingQ
             ? isCopying
@@ -375,7 +375,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
         )}
       </Card>
       {isLastItem && (
-        <AddMoveButton
+        <ButtonAddMove
           text={
             movingQ
               ? isCopying

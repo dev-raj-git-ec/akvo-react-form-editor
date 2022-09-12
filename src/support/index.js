@@ -1,5 +1,5 @@
-export { default as AddMoveButton } from './AddMoveButton';
+export { default as ButtonAddMove } from './ButtonAddMove';
+export { default as ButtonSave } from './ButtonSave';
 export { default as CardTitle } from './CardTitle';
-export { default as CardExtraButton } from './CardExtraButton';
-export { default as SaveButton } from './SaveButton';
+export { default as ButtonWithIcon } from './ButtonWithIcon';
 export { default as TranslationFormItem } from './TranslationFormItem';

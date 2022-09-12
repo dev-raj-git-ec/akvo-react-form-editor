@@ -9,7 +9,7 @@ import {
   QuestionGroupDefinition,
   FormTranslations,
 } from './components';
-import { CardExtraButton } from './support';
+import { ButtonWithIcon } from './support';
 import { FormStore, UIStore, questionGroupFn } from './lib/store';
 import data from './lib/data';
 
@@ -103,14 +103,14 @@ const WebformEditor = ({
                 </Tag>
                 <Tag style={{ margin: 0 }}>{version} 1</Tag>
                 {currentTab === 'edit-form' && (
-                  <CardExtraButton
+                  <ButtonWithIcon
                     type="edit-button"
                     isExpand={activeEditFormSetting}
                     onClick={handleShowFormSetting}
                     onCancel={handleShowFormSetting}
                   />
                 )}
-                <CardExtraButton
+                <ButtonWithIcon
                   type="save-button"
                   onClick={handleSave}
                 />

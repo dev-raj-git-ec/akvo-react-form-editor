@@ -3,7 +3,7 @@ import { Button, Row, Col } from 'antd';
 import { UIStore } from '../lib/store';
 import { PlusOutlined, CaretRightOutlined } from '@ant-design/icons';
 
-const AddMoveButton = ({
+const ButtonAddMove = ({
   text,
   className,
   movingItem = null,
@@ -54,4 +54,4 @@ const AddMoveButton = ({
   );
 };
 
-export default AddMoveButton;
+export default ButtonAddMove;

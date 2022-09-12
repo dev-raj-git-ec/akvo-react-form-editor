@@ -11,7 +11,7 @@ import {
 import { BiMove, BiCopy } from 'react-icons/bi';
 import { MdOutlineAddCircleOutline } from 'react-icons/md';
 
-const CardExtraButton = ({
+const ButtonWithIcon = ({
   type = 'delete-button',
   isExpand = false,
   onClick = () => {},
@@ -87,4 +87,4 @@ const CardExtraButton = ({
   );
 };
 
-export default CardExtraButton;
+export default ButtonWithIcon;

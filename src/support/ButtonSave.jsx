@@ -3,7 +3,7 @@ import { Space, Button } from 'antd';
 import styles from '../styles.module.css';
 import { UIStore } from '../lib/store';
 
-const SaveButton = ({
+const ButtonSave = ({
   onClickSave = () => {},
   cancelButton = true,
   onClickCancel = () => {},
@@ -24,4 +24,4 @@ const SaveButton = ({
   );
 };
 
-export default SaveButton;
+export default ButtonSave;
