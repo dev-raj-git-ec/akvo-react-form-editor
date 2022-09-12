@@ -56,7 +56,7 @@ const toWebform = (formData, questionGroups) => {
     webformData = {
       ...webformData,
       languages: ['en', ...formData.languages],
-      defaultLanguage: 'en',
+      defaultLanguage: formData?.defaultLanguage || 'en',
     };
   }
   if (formData?.translations) {

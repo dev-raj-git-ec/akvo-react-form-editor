@@ -7,7 +7,8 @@ import uniqBy from 'lodash/uniqBy';
 const localeDropdownValue = uniqBy(
   locale.all
     .filter((x) => x.location)
-    .map((x) => ({ label: x.name, value: x['iso639-1'] })),
+    .map((x) => ({ label: x.name, value: x['iso639-1'] }))
+    .filter((x) => x.value),
   'value'
 );
 

@@ -95,7 +95,13 @@
 }
 
 .tags-active {
-  border: 2px solid #3590ff !important;
+  border-color: #3590ff !important;
+  background: #3590ff;
+  color: #fff;
+}
+.tags-active svg {
+  color: #fff;
+  font-weight: bold;
 }
 
 .translation-form-item {

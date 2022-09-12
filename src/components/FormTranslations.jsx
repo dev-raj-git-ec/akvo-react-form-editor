@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import styles from '../styles.module.css';
 import { Row, Col, Divider, Tag, Select, Form, Space } from 'antd';
 import { UIStore, FormStore, questionGroupFn } from '../lib/store';
@@ -6,6 +6,8 @@ import {
   FormDefinitionTranslation,
   QuestionGroupDefinitionTranslation,
 } from './translations';
+
+const staticDefaultLang = 'en';
 
 const ExistingTranslation = () => {
   const { localeDropdownValue, existingTranslation } = UIStore.useState(
@@ -87,7 +89,16 @@ const FormTranslations = () => {
   const { UIText, localeDropdownValue } = UIStore.useState((s) => s);
   const formStore = FormStore.useState((s) => s);
   const { questionGroups } = questionGroupFn.store.useState((s) => s);
-  const languages = formStore?.languages || [];
+
+  const languages = useMemo(() => {
+    return formStore?.languages || [];
+  }, [formStore?.languages]);
+
+  const defaultLangDropdownValue = useMemo(() => {
+    return localeDropdownValue.filter((ld) =>
+      [staticDefaultLang, ...languages].includes(ld.value)
+    );
+  }, [localeDropdownValue, languages]);
 
   return (
     <Space
@@ -100,15 +111,35 @@ const FormTranslations = () => {
         justify="space-between"
         gutter={[24, 24]}
       >
-        <Col span={4}>
+        <Col
+          sm={24}
+          md={6}
+          lg={4}
+        >
           <h4>{UIText.inputFormDefaultLanguageLabel}</h4>
-          <Tag className={styles.tags}>English</Tag>
+          <Select
+            showSearch
+            className={styles['select-dropdown']}
+            optionFilterProp="label"
+            options={defaultLangDropdownValue}
+            onChange={(e) =>
+              FormStore.update((u) => {
+                u.defaultLanguage = e;
+              })
+            }
+            value={formStore?.defaultLanguage || staticDefaultLang}
+            disabled={defaultLangDropdownValue.length === 1}
+          />
         </Col>
-        <Col span={8}>
+        <Col
+          sm={24}
+          md={8}
+          lg={8}
+        >
           <h4>{UIText.inputFormTranslationLabel}</h4>
           <Select
             showSearch
-            style={{ width: '70%' }}
+            className={styles['select-dropdown']}
             optionFilterProp="children"
             onChange={(e) =>
               FormStore.update((u) => {
@@ -121,16 +152,27 @@ const FormTranslations = () => {
               <Select.Option
                 key={`${ld.value}-${ldi}`}
                 value={ld.value}
-                disabled={languages.includes(ld.value) || ld.value === 'en'}
+                disabled={
+                  languages.includes(ld.value) || ld.value === staticDefaultLang
+                }
               >
                 {ld.label}
               </Select.Option>
             ))}
           </Select>
         </Col>
-        <Col span={12}>
+        <Col
+          sm={24}
+          md={10}
+          lg={12}
+        >
           <h4>{UIText.inputFormExistingTranslationsLabel}</h4>
-          <ExistingTranslation />
+          <Row
+            align="middle"
+            gutter={[12, 12]}
+          >
+            <ExistingTranslation />
+          </Row>
         </Col>
       </Row>
       <Divider />
