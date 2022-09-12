@@ -1,19 +1,49 @@
 import { questionType } from './store';
-import findIndex from 'lodash/findIndex';
+import { findIndex, isEmpty } from 'lodash';
 
-const clearQuestionObj = (keysToRemove, obj = false) => {
+const clearQuestionObj = (keysToRemove = [], obj = false) => {
   let clearedQuestion = {};
   if (obj) {
     Object.keys(obj).forEach((key) => {
+      // filter obj by key to remove
       if (!keysToRemove.includes(key)) {
-        clearedQuestion = {
-          ...clearedQuestion,
-          [key]: obj[key],
-        };
+        // clear or remove empty obj value
+        if (!isEmpty(obj?.[key])) {
+          clearedQuestion = {
+            ...clearedQuestion,
+            [key]: obj[key],
+          };
+        }
       }
     });
   }
   return clearedQuestion;
+};
+
+const clearTranslations = (obj, translations) => {
+  let newObj = {
+    ...obj,
+  };
+  const clearedTranslations = translations
+    .map((tl) => {
+      const clearedObj = clearQuestionObj([], tl);
+      // remove translation if only has language property
+      if (Object.keys(newObj).length === 1 && newObj?.language) {
+        return false;
+      }
+      return clearedObj;
+    })
+    .filter((x) => x);
+  if (clearedTranslations.length) {
+    newObj = {
+      ...newObj,
+      translations: clearedTranslations,
+    };
+  } else {
+    // remove translation
+    delete newObj?.translations;
+  }
+  return newObj;
 };
 
 const toWebform = (formData, questionGroups) => {
@@ -30,10 +60,7 @@ const toWebform = (formData, questionGroups) => {
     };
   }
   if (formData?.translations && formData?.translations?.length) {
-    webformData = {
-      ...webformData,
-      translations: formData.translations,
-    };
+    webformData = clearTranslations(webformData, formData.translations);
   }
   // Question Group & Question Definition
   const output = questionGroups.map((qg) => {
@@ -47,7 +74,13 @@ const toWebform = (formData, questionGroups) => {
       if (
         [questionType.option, questionType.multiple_option].includes(q.type)
       ) {
-        q = { ...q, option: q.options };
+        const options = q.options.map((op) => {
+          if (op?.translations && op?.translations?.length) {
+            return clearTranslations(op, op.translations);
+          }
+          return op;
+        });
+        q = { ...q, option: options };
       }
       if (
         ![questionType.option, questionType.multiple_option].includes(q.type)
@@ -72,6 +105,9 @@ const toWebform = (formData, questionGroups) => {
         });
         q = { ...q, dependency: dependency };
       }
+      if (q?.translations && q?.translations?.length) {
+        q = clearTranslations(q, q.translations);
+      }
       q = clearQuestionObj(['options'], q);
       return q;
     });
@@ -95,10 +131,7 @@ const toWebform = (formData, questionGroups) => {
       };
     }
     if (qg?.translations && qg?.translations?.length) {
-      result = {
-        ...result,
-        translations: qg.translations,
-      };
+      result = clearTranslations(result, qg.translations);
     }
     return result;
   });
