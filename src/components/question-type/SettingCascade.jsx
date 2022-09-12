@@ -1,5 +1,5 @@
-import React from 'react';
-import { Form, Checkbox, Row, Col, Input, InputNumber } from 'antd';
+import React, { useMemo } from 'react';
+import { Form, Checkbox, Row, Col, Input, InputNumber, Select } from 'antd';
 import styles from '../../styles.module.css';
 import { UIStore, questionGroupFn } from '../../lib/store';
 
@@ -13,7 +13,13 @@ const SettingCascade = ({
   },
 }) => {
   const namePreffix = `question-${id}`;
-  const UIText = UIStore.useState((s) => s.UIText);
+  const { UIText, hostParams } = UIStore.useState((s) => s);
+  const { settingCascadeURL } = hostParams;
+  const form = Form.useFormInstance();
+
+  const cascadeURLDropdownValue = useMemo(() => {
+    return settingCascadeURL.map((x) => ({ label: x.name, value: x.id }));
+  }, [settingCascadeURL]);
 
   const updateGlobalState = (values = {}) => {
     questionGroupFn.store.update((s) => {
@@ -42,10 +48,18 @@ const SettingCascade = ({
   };
 
   const handleChangeEndpoint = (e) => {
-    updateGlobalState({
-      endpoint: e?.target?.value,
-      initial: api?.initial || 0,
-    });
+    const findURL = settingCascadeURL.find((x) => x.id === e);
+    if (findURL) {
+      form.setFieldsValue({
+        [`${namePreffix}-api-initial`]: findURL.initial,
+        [`${namePreffix}-api-list`]: findURL.list,
+      });
+      updateGlobalState({
+        endpoint: findURL.url,
+        initial: findURL.initial || 0,
+        list: findURL.list || false,
+      });
+    }
   };
 
   const handleChangeInitial = (e) => {
@@ -53,7 +67,9 @@ const SettingCascade = ({
   };
 
   const handleChangeList = (value) => {
-    updateGlobalState({ list: value, initial: api?.initial || 0 });
+    updateGlobalState({
+      list: value,
+    });
   };
 
   return (
@@ -63,13 +79,17 @@ const SettingCascade = ({
       </p>
       <Form.Item
         label={UIText.inputQuestionEndpointLabel}
-        initialValue={api?.endpoint}
         name={`${namePreffix}-api-endpoint`}
-        rules={[
-          { type: 'url', message: UIText.inputQuestionEndpointValidationText },
-        ]}
       >
-        <Input onChange={handleChangeEndpoint} />
+        <Select
+          showSearch
+          className={styles['select-dropdown']}
+          optionFilterProp="label"
+          options={cascadeURLDropdownValue}
+          getPopupContainer={(triggerNode) => triggerNode.parentElement}
+          value={api?.endpoint}
+          onChange={handleChangeEndpoint}
+        />
       </Form.Item>
       <Row
         align="bottom"

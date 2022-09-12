@@ -34,6 +34,22 @@ const App = () => {
             { label: 'Example First Tree Label', value: 'ex1' },
             { label: 'Example Second Tree Label', value: 'ex2' },
           ]}
+          settingCascadeURL={[
+            {
+              id: 1,
+              name: 'County',
+              url: 'https://rtmis.akvotest.org/api/v1/administration',
+              initial: 1,
+              list: 'children',
+            },
+            {
+              id: 2,
+              name: 'Sub-County Baringo',
+              url: 'https://rtmis.akvotest.org/api/v1/administration',
+              initial: 2,
+              list: 'children',
+            },
+          ]}
         />
       </div>
       <div className={'half-width json-source' + (!showJson ? ' shrink' : '')}>

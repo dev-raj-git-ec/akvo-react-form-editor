@@ -16,6 +16,7 @@ import data from './lib/data';
 const WebformEditor = ({
   onSave = false,
   settingTreeDropdownValue = [{ label: null, value: null }],
+  settingCascadeURL = [{ name: null, url: null, initial: 0, list: false }],
 }) => {
   const formStore = FormStore.useState((s) => s);
   const current = UIStore.useState((s) => s.current);
@@ -46,9 +47,10 @@ const WebformEditor = ({
         settingTreeDropdownValue: settingTreeDropdownValue.filter(
           (x) => x?.label && x?.value
         ),
+        settingCascadeURL: settingCascadeURL.filter((x) => x?.name && x?.url),
       };
     });
-  }, [settingTreeDropdownValue]);
+  }, [settingTreeDropdownValue, settingCascadeURL]);
 
   const handleTabsOnChange = (e) => {
     UIStore.update((s) => {
