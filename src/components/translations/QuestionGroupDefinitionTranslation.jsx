@@ -183,7 +183,7 @@ const QuestionGroupDefinitionTranslation = ({ index, questionGroup }) => {
           <QuestionDefinitionTranslation
             key={`question-definition-translation-${qi}`}
             index={qi}
-            question={q}
+            question={{ ...q, questionGroupOrder: order }}
           />
         ))}
     </Card>

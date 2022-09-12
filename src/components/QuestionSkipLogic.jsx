@@ -466,7 +466,7 @@ const QuestionSkipLogic = ({ question }) => {
       .map((q) => {
         const group = questionGroups.find((g) => g.id === q.questionGroupId);
         return {
-          label: `${q.order}. ${q.name}`,
+          label: `${group.order}.${q.order}. ${q.name}`,
           value: q.id,
           group: `${group.order}. ${group.name}`,
         };

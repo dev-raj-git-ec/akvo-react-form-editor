@@ -313,7 +313,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
         key={`${index}-${id}`}
         title={
           <CardTitle
-            title={`${order}. ${name}`}
+            title={`${questionGroup.order}.${order}. ${name}`}
             buttons={leftButtons}
           />
         }
