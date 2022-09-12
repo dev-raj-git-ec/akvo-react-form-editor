@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Card, Tabs } from 'antd';
+import { Card, Tabs, Alert, Space, Button } from 'antd';
 import styles from '../styles.module.css';
 import { UIStore, questionFn, questionGroupFn } from '../lib/store';
 import data from '../lib/data';
@@ -16,12 +16,14 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
     buttonAddNewQuestionText,
     buttonCopyQuestionText,
     buttonMoveQuestionText,
+    alertDeleteQuestion,
   } = UIText;
   const movingQ = UIStore.useState((s) => s.activeMoveQuestion);
   const isCopying = UIStore.useState((s) => s.isCopyingQuestion);
   const activeEditQuestions = UIStore.useState((s) => s.activeEditQuestions);
   const [activeTab, setActiveTab] = useState('setting');
   const { id, questionGroupId, order, name, dependency } = question;
+  const [toBeDeleted, setToBeDeleted] = useState(false);
 
   const allQuestions = questionGroups
     .map((qg) => qg.questions)
@@ -128,6 +130,10 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
   };
 
   const handleDelete = () => {
+    setToBeDeleted(true);
+  };
+
+  const handleConfirmDelete = () => {
     const newQuestions = questions
       .filter((q) => q.id !== id)
       .map((q) => {
@@ -144,6 +150,10 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
         return qg;
       });
     });
+  };
+
+  const handleCancelDelete = () => {
+    setToBeDeleted(false);
   };
 
   const handleOnAdd = (prevOrder) => {
@@ -337,6 +347,32 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
           />
         }
       >
+        {toBeDeleted && (
+          <Alert
+            message={alertDeleteQuestion}
+            type="warning"
+            action={
+              <Space direction="horizontal">
+                <Button
+                  size="small"
+                  type="primary"
+                  onClick={handleConfirmDelete}
+                >
+                  Delete
+                </Button>
+                <Button
+                  size="small"
+                  danger
+                  type="ghost"
+                  onClick={handleCancelDelete}
+                >
+                  Cancel
+                </Button>
+              </Space>
+            }
+            closable
+          />
+        )}
         {isEditQuestion && (
           <div>
             <Tabs
