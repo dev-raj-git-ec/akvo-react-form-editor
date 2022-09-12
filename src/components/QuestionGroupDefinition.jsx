@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { Card } from 'antd';
+import React, { useMemo, useState } from 'react';
+import { Card, Alert, Space, Button } from 'antd';
 import { UIStore, questionGroupFn } from '../lib/store';
 import QuestionGroupSetting from './QuestionGroupSetting';
 import QuestionDefinition from './QuestionDefinition';
@@ -12,6 +12,9 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
   const { activeQuestionGroups, activeEditQuestionGroups } = UIStore.useState(
     (s) => s
   );
+  const [toBeDeleted, setToBeDeleted] = useState(false);
+  const UIText = UIStore.useState((s) => s.UIText);
+  const { alertDeleteQuestionGroup } = UIText;
 
   const { id, name, questions, order } = questionGroup;
   const questionIds = questions.map((q) => q.id);
@@ -70,6 +73,10 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
   };
 
   const handleDelete = () => {
+    setToBeDeleted(true)
+  };
+
+  const handleConfirmDelete = () => {
     const newQuestionGroups = questionGroups
       .filter((qg) => id !== qg.id)
       .map((qg) => {
@@ -81,6 +88,10 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
     questionGroupFn.store.update((s) => {
       s.questionGroups = newQuestionGroups;
     });
+  };
+
+  const handleCancelDelete = () => {
+    setToBeDeleted(false);
   };
 
   const handleOnAdd = (prevOrder) => {
@@ -267,6 +278,32 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
         }}
         extra={<CardTitle buttons={leftButtons} />}
       >
+        {toBeDeleted && (
+          <Alert
+            message={alertDeleteQuestionGroup}
+            type="warning"
+            action={
+              <Space direction="horizontal">
+                <Button
+                  size="small"
+                  type="primary"
+                  onClick={handleConfirmDelete}
+                >
+                  Delete
+                </Button>
+                <Button
+                  size="small"
+                  danger
+                  type="ghost"
+                  onClick={handleCancelDelete}
+                >
+                  Cancel
+                </Button>
+              </Space>
+            }
+            closable
+          />
+        )}
         {isEditQuestionGroup && <QuestionGroupSetting {...questionGroup} />}
         {showQuestion &&
           questions.map((q, qi) => (
