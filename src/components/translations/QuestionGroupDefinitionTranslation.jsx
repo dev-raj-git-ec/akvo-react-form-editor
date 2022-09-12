@@ -4,6 +4,7 @@ import { UIStore, questionGroupFn } from '../../lib/store';
 import { CardTitle, TranslationFormItem } from '../../support';
 import QuestionDefinitionTranslation from './QuestionDefinitionTranslation';
 import data from '../../lib/data';
+import { uniq, difference, intersection } from 'lodash';
 
 const QuestionGroupSettingTranslation = ({
   id,
@@ -105,7 +106,9 @@ const QuestionGroupDefinitionTranslation = ({ index, questionGroup }) => {
   const {
     activeTranslationQuestionGroups,
     activeEditTranslationQuestionGroups,
+    activeEditTranslationQuestions,
   } = UIStore.useState((s) => s);
+  const questionIds = questions.map((q) => q.id);
 
   const showTranslationQuestion = useMemo(() => {
     return activeTranslationQuestionGroups.includes(id);
@@ -144,12 +147,45 @@ const QuestionGroupDefinitionTranslation = ({ index, questionGroup }) => {
     });
   };
 
+  const handleExpandAll = () => {
+    UIStore.update((s) => {
+      s.activeEditTranslationQuestionGroups = uniq([
+        ...activeEditTranslationQuestionGroups,
+        id,
+      ]);
+      s.activeEditTranslationQuestions = uniq([
+        ...s.activeEditTranslationQuestions,
+        ...questionIds,
+      ]);
+    });
+  };
+
+  const handleCancelExpandAll = () => {
+    handleCancelEditTranslationGroup();
+    UIStore.update((s) => {
+      s.activeEditTranslationQuestions = difference(
+        s.activeEditTranslationQuestions,
+        questionIds
+      );
+    });
+  };
+
   const cardTitleButton = [
     {
       type: 'show-button',
       isExpand: isEditTranslationQuestionGroup,
       onClick: handleEditTranslationGroup,
       onCancel: handleCancelEditTranslationGroup,
+    },
+  ];
+
+  const cardExtraButton = [
+    {
+      type: 'expand-all-button',
+      isExpand: intersection(activeEditTranslationQuestions, questionIds)
+        .length,
+      onClick: handleExpandAll,
+      onCancel: handleCancelExpandAll,
     },
   ];
 
@@ -174,6 +210,7 @@ const QuestionGroupDefinitionTranslation = ({ index, questionGroup }) => {
             ? '1px solid #f3f3f3'
             : 'none',
       }}
+      extra={<CardTitle buttons={cardExtraButton} />}
     >
       {isEditTranslationQuestionGroup && (
         <QuestionGroupSettingTranslation {...questionGroup} />
