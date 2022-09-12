@@ -11,6 +11,7 @@ var tb = require('react-icons/tb');
 var ri = require('react-icons/ri');
 var bi = require('react-icons/bi');
 var md = require('react-icons/md');
+var ai = require('react-icons/ai');
 var lodash = require('lodash');
 var orderBy = _interopDefault(require('lodash/orderBy'));
 require('akvo-react-form/dist/index.css');
@@ -1826,6 +1827,21 @@ var ButtonWithIcon = function ButtonWithIcon(_ref) {
       };
       break;
 
+    case 'expand-all-button':
+      if (isExpand) {
+        buttonProps = {
+          onClick: onCancel,
+          icon: /*#__PURE__*/React__default.createElement(ai.AiOutlineEyeInvisible, null)
+        };
+        break;
+      }
+
+      buttonProps = {
+        onClick: onClick,
+        icon: /*#__PURE__*/React__default.createElement(ai.AiOutlineEye, null)
+      };
+      break;
+
     default:
       buttonProps = {
         onClick: onClick,
@@ -2397,7 +2413,8 @@ var QuestionDefinitionTranslation = function QuestionDefinitionTranslation(_ref2
       question = _ref2.question;
   var id = question.id,
       name = question.name,
-      order = question.order;
+      order = question.order,
+      questionGroupOrder = question.questionGroupOrder;
 
   var _UIStore$useState2 = UIStore.useState(function (s) {
     return s;
@@ -2431,7 +2448,7 @@ var QuestionDefinitionTranslation = function QuestionDefinitionTranslation(_ref2
   return /*#__PURE__*/React__default.createElement(antd.Card, {
     key: "translation-question-" + index + "-" + id,
     title: /*#__PURE__*/React__default.createElement(CardTitle, {
-      title: order + ". " + name,
+      title: questionGroupOrder + "." + order + ". " + name,
       buttons: cardTitleButton
     }),
     headStyle: {
@@ -2543,8 +2560,12 @@ var QuestionGroupDefinitionTranslation = function QuestionGroupDefinitionTransla
     return s;
   }),
       activeTranslationQuestionGroups = _UIStore$useState2.activeTranslationQuestionGroups,
-      activeEditTranslationQuestionGroups = _UIStore$useState2.activeEditTranslationQuestionGroups;
+      activeEditTranslationQuestionGroups = _UIStore$useState2.activeEditTranslationQuestionGroups,
+      activeEditTranslationQuestions = _UIStore$useState2.activeEditTranslationQuestions;
 
+  var questionIds = questions.map(function (q) {
+    return q.id;
+  });
   var showTranslationQuestion = React.useMemo(function () {
     return activeTranslationQuestionGroups.includes(id);
   }, [activeTranslationQuestionGroups, id]);
@@ -2581,11 +2602,31 @@ var QuestionGroupDefinitionTranslation = function QuestionGroupDefinitionTransla
     });
   };
 
+  var handleExpandAll = function handleExpandAll() {
+    UIStore.update(function (s) {
+      s.activeEditTranslationQuestionGroups = lodash.uniq([].concat(activeEditTranslationQuestionGroups, [id]));
+      s.activeEditTranslationQuestions = lodash.uniq([].concat(s.activeEditTranslationQuestions, questionIds));
+    });
+  };
+
+  var handleCancelExpandAll = function handleCancelExpandAll() {
+    handleCancelEditTranslationGroup();
+    UIStore.update(function (s) {
+      s.activeEditTranslationQuestions = lodash.difference(s.activeEditTranslationQuestions, questionIds);
+    });
+  };
+
   var cardTitleButton = [{
     type: 'show-button',
     isExpand: isEditTranslationQuestionGroup,
     onClick: handleEditTranslationGroup,
     onCancel: handleCancelEditTranslationGroup
+  }];
+  var cardExtraButton = [{
+    type: 'expand-all-button',
+    isExpand: lodash.intersection(activeEditTranslationQuestions, questionIds).length,
+    onClick: handleExpandAll,
+    onCancel: handleCancelExpandAll
   }];
   return /*#__PURE__*/React__default.createElement(antd.Card, {
     key: "translation-" + index + "-" + id,
@@ -2600,12 +2641,17 @@ var QuestionGroupDefinitionTranslation = function QuestionGroupDefinitionTransla
     bodyStyle: {
       padding: isEditTranslationQuestionGroup || showTranslationQuestion ? 24 : 0,
       borderTop: isEditTranslationQuestionGroup || showTranslationQuestion ? '1px solid #f3f3f3' : 'none'
-    }
+    },
+    extra: /*#__PURE__*/React__default.createElement(CardTitle, {
+      buttons: cardExtraButton
+    })
   }, isEditTranslationQuestionGroup && /*#__PURE__*/React__default.createElement(QuestionGroupSettingTranslation, questionGroup), isEditTranslationQuestionGroup && questions.map(function (q, qi) {
     return /*#__PURE__*/React__default.createElement(QuestionDefinitionTranslation, {
       key: "question-definition-translation-" + qi,
       index: qi,
-      question: q
+      question: _extends({}, q, {
+        questionGroupOrder: order
+      })
     });
   }));
 };
@@ -3432,9 +3478,23 @@ var SettingCascade = function SettingCascade(_ref) {
     list: false
   } : _ref$api;
   var namePreffix = "question-" + id;
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
+
+  var _UIStore$useState = UIStore.useState(function (s) {
+    return s;
+  }),
+      UIText = _UIStore$useState.UIText,
+      hostParams = _UIStore$useState.hostParams;
+
+  var settingCascadeURL = hostParams.settingCascadeURL;
+  var form = antd.Form.useFormInstance();
+  var cascadeURLDropdownValue = React.useMemo(function () {
+    return settingCascadeURL.map(function (x) {
+      return {
+        label: x.name,
+        value: x.id
+      };
+    });
+  }, [settingCascadeURL]);
 
   var updateGlobalState = function updateGlobalState(values) {
     if (values === void 0) {
@@ -3464,12 +3524,20 @@ var SettingCascade = function SettingCascade(_ref) {
   };
 
   var handleChangeEndpoint = function handleChangeEndpoint(e) {
-    var _e$target;
-
-    updateGlobalState({
-      endpoint: e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.value,
-      initial: (api === null || api === void 0 ? void 0 : api.initial) || 0
+    var findURL = settingCascadeURL.find(function (x) {
+      return x.id === e;
     });
+
+    if (findURL) {
+      var _form$setFieldsValue;
+
+      form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[namePreffix + "-api-initial"] = findURL.initial, _form$setFieldsValue[namePreffix + "-api-list"] = findURL.list, _form$setFieldsValue));
+      updateGlobalState({
+        endpoint: findURL.url,
+        initial: findURL.initial || 0,
+        list: findURL.list || false
+      });
+    }
   };
 
   var handleChangeInitial = function handleChangeInitial(e) {
@@ -3480,8 +3548,7 @@ var SettingCascade = function SettingCascade(_ref) {
 
   var handleChangeList = function handleChangeList(value) {
     updateGlobalState({
-      list: value,
-      initial: (api === null || api === void 0 ? void 0 : api.initial) || 0
+      list: value
     });
   };
 
@@ -3489,13 +3556,16 @@ var SettingCascade = function SettingCascade(_ref) {
     className: styles['more-question-setting-text']
   }, UIText.questionMoreCascadeSettingText), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     label: UIText.inputQuestionEndpointLabel,
-    initialValue: api === null || api === void 0 ? void 0 : api.endpoint,
-    name: namePreffix + "-api-endpoint",
-    rules: [{
-      type: 'url',
-      message: UIText.inputQuestionEndpointValidationText
-    }]
-  }, /*#__PURE__*/React__default.createElement(antd.Input, {
+    name: namePreffix + "-api-endpoint"
+  }, /*#__PURE__*/React__default.createElement(antd.Select, {
+    showSearch: true,
+    className: styles['select-dropdown'],
+    optionFilterProp: "label",
+    options: cascadeURLDropdownValue,
+    getPopupContainer: function getPopupContainer(triggerNode) {
+      return triggerNode.parentElement;
+    },
+    value: api === null || api === void 0 ? void 0 : api.endpoint,
     onChange: handleChangeEndpoint
   })), /*#__PURE__*/React__default.createElement(antd.Row, {
     align: "bottom",
@@ -3517,9 +3587,9 @@ var SettingCascade = function SettingCascade(_ref) {
     name: namePreffix + "-api-list-checkbox"
   }, /*#__PURE__*/React__default.createElement(antd.Checkbox, {
     onChange: function onChange(e) {
-      var _e$target2;
+      var _e$target;
 
-      return handleChangeList(e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.checked);
+      return handleChangeList(e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.checked);
     },
     checked: api !== null && api !== void 0 && api.list ? true : false
   }, ' ', UIText.inputQuestionListCheckbox))), (api === null || api === void 0 ? void 0 : api.list) && /*#__PURE__*/React__default.createElement(antd.Col, {
@@ -3530,9 +3600,9 @@ var SettingCascade = function SettingCascade(_ref) {
     name: namePreffix + "-api-list"
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
     onChange: function onChange(e) {
-      var _e$target3;
+      var _e$target2;
 
-      return handleChangeList(e === null || e === void 0 ? void 0 : (_e$target3 = e.target) === null || _e$target3 === void 0 ? void 0 : _e$target3.value);
+      return handleChangeList(e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.value);
     }
   })))));
 };
@@ -9367,7 +9437,7 @@ var QuestionSetting = function QuestionSetting(_ref) {
 
   var dependantGroup = lodash.map(lodash.groupBy(dependant.map(function (x) {
     return {
-      name: x.order + ". " + x.name,
+      name: x.questionGroup.order + "." + x.order + ". " + x.name,
       group: x.questionGroup.order + ". " + x.questionGroup.name
     };
   }), 'group'), function (i, g) {
@@ -9887,7 +9957,7 @@ var QuestionSkipLogic = function QuestionSkipLogic(_ref3) {
         return g.id === q.questionGroupId;
       });
       return {
-        label: q.order + ". " + q.name,
+        label: group.order + "." + q.order + ". " + q.name,
         value: q.id,
         group: group.order + ". " + group.name
       };
@@ -10243,7 +10313,7 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
   }), /*#__PURE__*/React__default.createElement(antd.Card, {
     key: index + "-" + id,
     title: /*#__PURE__*/React__default.createElement(CardTitle, {
-      title: order + ". " + name,
+      title: questionGroup.order + "." + order + ". " + name,
       buttons: leftButtons
     }),
     headStyle: {
@@ -10315,7 +10385,8 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
     return s;
   }),
       activeQuestionGroups = _UIStore$useState.activeQuestionGroups,
-      activeEditQuestionGroups = _UIStore$useState.activeEditQuestionGroups;
+      activeEditQuestionGroups = _UIStore$useState.activeEditQuestionGroups,
+      activeEditQuestions = _UIStore$useState.activeEditQuestions;
 
   var id = questionGroup.id,
       name = questionGroup.name,
@@ -10377,6 +10448,20 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
   var handleMove = function handleMove() {
     UIStore.update(function (s) {
       s.activeMoveQuestionGroup = movingQg === questionGroup ? null : questionGroup;
+    });
+  };
+
+  var handleExpandAll = function handleExpandAll() {
+    handleShowQuestions();
+    UIStore.update(function (s) {
+      s.activeEditQuestions = lodash.uniq([].concat(s.activeEditQuestions, questionIds));
+    });
+  };
+
+  var handleCancelExpandAll = function handleCancelExpandAll() {
+    handleHideQuestions();
+    UIStore.update(function (s) {
+      s.activeEditQuestions = lodash.difference(s.activeEditQuestions, questionIds);
     });
   };
 
@@ -10539,7 +10624,12 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
       dependant: dependencies
     };
   }, [questionGroups, questionIds, movingQg, order]);
-  var leftButtons = [{
+  var rightButtons = [{
+    type: 'expand-all-button',
+    isExpand: showQuestion && lodash.intersection(activeEditQuestions, questionIds).length,
+    onClick: handleExpandAll,
+    onCancel: handleCancelExpandAll
+  }, {
     type: 'delete-button',
     onClick: handleDelete,
     disabled: !index && isLastItem
@@ -10549,7 +10639,7 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
     onClick: handleEditGroup,
     onCancel: handleCancelEditGroup
   }];
-  var rightButtons = [{
+  var leftButtons = [{
     type: 'move-button',
     onClick: handleMove,
     onCancel: handleHideQuestions,
@@ -10574,7 +10664,7 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
   }), /*#__PURE__*/React__default.createElement(antd.Card, {
     key: index + "-" + id,
     title: /*#__PURE__*/React__default.createElement(CardTitle, {
-      buttons: rightButtons,
+      buttons: leftButtons,
       title: order + ". " + name
     }),
     headStyle: {
@@ -10588,7 +10678,7 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
       borderTop: isEditQuestionGroup || showQuestion ? '1px solid #f3f3f3' : 'none'
     },
     extra: /*#__PURE__*/React__default.createElement(CardTitle, {
-      buttons: leftButtons
+      buttons: rightButtons
     })
   }, isEditQuestionGroup && /*#__PURE__*/React__default.createElement(QuestionGroupSetting, questionGroup), showQuestion && questions.map(function (q, qi) {
     return /*#__PURE__*/React__default.createElement(QuestionDefinition, {
@@ -10619,7 +10709,14 @@ var WebformEditor = function WebformEditor(_ref) {
       settingTreeDropdownValue = _ref$settingTreeDropd === void 0 ? [{
     label: null,
     value: null
-  }] : _ref$settingTreeDropd;
+  }] : _ref$settingTreeDropd,
+      _ref$settingCascadeUR = _ref.settingCascadeURL,
+      settingCascadeURL = _ref$settingCascadeUR === void 0 ? [{
+    name: null,
+    url: null,
+    initial: 0,
+    list: false
+  }] : _ref$settingCascadeUR;
   var formStore = FormStore.useState(function (s) {
     return s;
   });
@@ -10648,10 +10745,13 @@ var WebformEditor = function WebformEditor(_ref) {
       s.hostParams = _extends({}, s.hostParams, {
         settingTreeDropdownValue: settingTreeDropdownValue.filter(function (x) {
           return (x === null || x === void 0 ? void 0 : x.label) && (x === null || x === void 0 ? void 0 : x.value);
+        }),
+        settingCascadeURL: settingCascadeURL.filter(function (x) {
+          return (x === null || x === void 0 ? void 0 : x.name) && (x === null || x === void 0 ? void 0 : x.url);
         })
       });
     });
-  }, [settingTreeDropdownValue]);
+  }, [settingTreeDropdownValue, settingCascadeURL]);
 
   var handleTabsOnChange = function handleTabsOnChange(e) {
     UIStore.update(function (s) {
