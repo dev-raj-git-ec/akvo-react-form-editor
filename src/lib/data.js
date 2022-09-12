@@ -28,7 +28,7 @@ const clearTranslations = (obj, translations) => {
     .map((tl) => {
       const clearedObj = clearQuestionObj([], tl);
       // remove translation if only has language property
-      if (Object.keys(newObj).length === 1 && newObj?.language) {
+      if (Object.keys(clearedObj).length === 1 && clearedObj?.language) {
         return false;
       }
       return clearedObj;
@@ -59,7 +59,7 @@ const toWebform = (formData, questionGroups) => {
       defaultLanguage: 'en',
     };
   }
-  if (formData?.translations && formData?.translations?.length) {
+  if (formData?.translations) {
     webformData = clearTranslations(webformData, formData.translations);
   }
   // Question Group & Question Definition
@@ -75,7 +75,7 @@ const toWebform = (formData, questionGroups) => {
         [questionType.option, questionType.multiple_option].includes(q.type)
       ) {
         const options = q.options.map((op) => {
-          if (op?.translations && op?.translations?.length) {
+          if (op?.translations) {
             return clearTranslations(op, op.translations);
           }
           return op;
@@ -105,7 +105,7 @@ const toWebform = (formData, questionGroups) => {
         });
         q = { ...q, dependency: dependency };
       }
-      if (q?.translations && q?.translations?.length) {
+      if (q?.translations) {
         q = clearTranslations(q, q.translations);
       }
       q = clearQuestionObj(['options'], q);
@@ -130,7 +130,7 @@ const toWebform = (formData, questionGroups) => {
         description: qg.description,
       };
     }
-    if (qg?.translations && qg?.translations?.length) {
+    if (qg?.translations) {
       result = clearTranslations(result, qg.translations);
     }
     return result;

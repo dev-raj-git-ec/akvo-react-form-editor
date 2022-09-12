@@ -19,22 +19,38 @@ const ExistingTranslation = () => {
       u.existingTranslation =
         existingTranslation === lang ? null : existingTranslation;
     });
-    // TODO:: remove deleted translation from translations obj
-    const translations = formStore?.translations?.filter(
-      (tl) => tl.language !== lang
-    );
+    // remove deleted translation from translations list
     FormStore.update((u) => {
       u.languages = languages.filter((ln) => ln !== lang);
-      u.translations = translations;
+      u.translations = formStore?.translations?.filter(
+        (tl) => tl.language !== lang
+      );
     });
     questionGroupFn.store.update((u) => {
       u.questionGroups = u.questionGroups.map((qg) => {
-        const qgTranslations = qg?.translations?.filter(
-          (tl) => tl.language !== lang
-        );
+        const questions = qg.questions.map((q) => {
+          let newObj = q;
+          if (q?.options && q?.options?.length) {
+            const options = q.options.map((op) => ({
+              ...op,
+              translations: op?.translations?.filter(
+                (tl) => tl.language !== lang
+              ),
+            }));
+            newObj = {
+              ...newObj,
+              options: options,
+            };
+          }
+          return {
+            ...newObj,
+            translations: q?.translations?.filter((tl) => tl.language !== lang),
+          };
+        });
         return {
           ...qg,
-          translations: qgTranslations,
+          questions: questions,
+          translations: qg?.translations?.filter((tl) => tl.language !== lang),
         };
       });
     });
