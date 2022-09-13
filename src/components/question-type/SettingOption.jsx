@@ -53,7 +53,7 @@ const SettingOption = ({
       ? currentOptions.map((x, xi) => ({
           ...x,
           code: x?.code || null,
-          id: x?.id || generateId(),
+          id: x?.id || generateId() + xi,
           order: x?.order || xi + 1,
         }))
       : defaultOptions({ init: true })

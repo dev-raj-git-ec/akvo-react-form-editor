@@ -65,7 +65,7 @@ const toEditor = (webFormData) => {
   webFormData = {
     ...webFormData,
     questionGroups: webFormData.questionGroups.map((qg, qgi) => {
-      const gid = qg?.id || generateId();
+      const gid = qg?.id || generateId() + qgi;
       qg = mapKeys(qg, (_, k) => (k === 'question' ? 'questions' : k));
       qg = {
         ...qg,

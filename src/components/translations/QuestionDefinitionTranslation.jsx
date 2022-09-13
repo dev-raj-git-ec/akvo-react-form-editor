@@ -210,7 +210,7 @@ const QuestionSettingTranslation = ({
                   key={`translation-option-${d.id}-${di}`}
                   labelText={`${UIText.inputQuestionOptionNameLabel} ${d.order}`}
                   currentValue={d.name}
-                  name={`${namePreffix}-option-name-${d.id}`}
+                  name={`${namePreffix}-option-name-${d?.id || d.name}`}
                   initialValue={existingOptionTranslationValues?.name}
                 >
                   <Input
