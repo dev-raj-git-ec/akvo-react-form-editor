@@ -1,5 +1,15 @@
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
-import { Form, Select, Row, Col, InputNumber, Input, Alert, Space } from 'antd';
+import {
+  Form,
+  Select,
+  Row,
+  Col,
+  InputNumber,
+  Input,
+  Alert,
+  Space,
+  DatePicker,
+} from 'antd';
 import styles from '../styles.module.css';
 import { ButtonWithIcon } from '../support';
 import {
@@ -9,6 +19,7 @@ import {
   questionType,
 } from '../lib/store';
 import { groupBy, map } from 'lodash';
+import moment from 'moment';
 
 const dependencyTypes = [
   {
@@ -34,6 +45,19 @@ const dependencyTypes = [
       {
         label: 'greater than',
         value: 'min',
+      },
+    ],
+  },
+  {
+    type: [questionType.date],
+    logicDropdowns: [
+      {
+        label: 'before',
+        value: 'before',
+      },
+      {
+        label: 'after',
+        value: 'after',
       },
     ],
   },
@@ -386,6 +410,7 @@ const SettingSkipLogic = ({
             name={`${namePreffix}-dependent_answer-${dependency.id}`}
           >
             {!dependency.dependentTo && <Input disabled />}
+            {/* Number */}
             {dependency.dependentToType === questionType.number && (
               <InputNumber
                 style={{ width: '100%' }}
@@ -395,6 +420,7 @@ const SettingSkipLogic = ({
                 value={dependency.dependentAnswer || null}
               />
             )}
+            {/* Option / Multiple */}
             {[questionType.option, questionType.multiple_option].includes(
               dependency.dependentToType
             ) && (
@@ -413,6 +439,18 @@ const SettingSkipLogic = ({
                     : dependency.dependentAnswer
                     ? [dependency.dependentAnswer]
                     : []
+                }
+              />
+            )}
+            {/* Date */}
+            {dependency.dependentToType === questionType.date && (
+              <DatePicker
+                style={{ width: '100%' }}
+                onChange={(e) =>
+                  handleChangeDependentAnswer(
+                    dependency.id,
+                    moment(e).format('YYYY-MM-DD')
+                  )
                 }
               />
             )}
