@@ -4,9 +4,14 @@ import styles from '../../styles.module.css';
 import { UIStore, questionGroupFn } from '../../lib/store';
 import moment from 'moment';
 
-const SettingDate = ({ id, questionGroupId, minDate, maxDate }) => {
+const SettingDate = ({
+  id,
+  questionGroupId,
+  rule = { minDate: null, maxDate: null },
+}) => {
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
+  const { minDate, maxDate } = rule;
 
   const moreDateSettings = [
     {
@@ -33,7 +38,10 @@ const SettingDate = ({ id, questionGroupId, minDate, maxDate }) => {
             if (q.id === id) {
               return {
                 ...q,
-                [name]: moment(value).format('YYYY-MM-DD'),
+                rule: {
+                  ...q?.rule,
+                  [name]: moment(value).format('YYYY-MM-DD'),
+                },
               };
             }
             return q;

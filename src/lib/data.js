@@ -80,7 +80,7 @@ const toWebform = (formData, questionGroups) => {
       if (q.type !== questionType.input) {
         q = clearQuestionObj(['requiredDoubleEntry', 'hiddenString'], q);
       }
-      if (q.type !== questionType.number) {
+      if (q.type !== questionType.number && q.type !== questionType.date) {
         q = clearQuestionObj(['rule'], q);
       }
       if (
