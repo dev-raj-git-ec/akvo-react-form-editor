@@ -49,7 +49,14 @@ const SettingOption = ({
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
   const [options, setOptions] = useState(
-    currentOptions?.length ? currentOptions : defaultOptions({ init: true })
+    currentOptions?.length
+      ? currentOptions.map((x, xi) => ({
+          ...x,
+          code: x?.code || null,
+          id: x?.id || generateId(),
+          order: x?.order || xi + 1,
+        }))
+      : defaultOptions({ init: true })
   );
 
   const updateState = useCallback(
