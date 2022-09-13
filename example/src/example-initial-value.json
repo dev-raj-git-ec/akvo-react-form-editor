@@ -1,0 +1,785 @@
+{
+  "name": "Community Culinary Survey 2021",
+  "languages": ["en", "id"],
+  "defaultLanguage": "en",
+  "translations": [
+    {
+      "name": "Komunitas Kuliner Survey 2021",
+      "language": "id"
+    }
+  ],
+  "question_group": [
+    {
+      "name": "Registration",
+      "order": 1,
+      "translations": [
+        {
+          "name": "Registrasi",
+          "language": "id"
+        }
+      ],
+      "question": [
+        {
+          "id": 1,
+          "name": "Geolocation",
+          "order": 1,
+          "type": "geo",
+          "center": {
+            "lat": 9.145,
+            "lng": 40.4897
+          },
+          "required": true,
+          "tooltip": {
+            "text": "Please allow browser to access your <a href=\"https://google.com\">test</a>",
+            "translations": [
+              {
+                "text": "Mohon izinkan peramban untuk mengakses lokasi saat ini",
+                "language": "id"
+              }
+            ]
+          },
+          "extra": [
+            {
+              "placement": "after",
+              "content": "Please click on the maps or type it manually",
+              "translations": [
+                {
+                  "content": "Silakan Klik peta atau ketik secara manual",
+                  "language": "id"
+                }
+              ]
+            }
+          ],
+          "translations": [
+            {
+              "name": "Geolokasi",
+              "language": "id"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "name": "Name",
+          "order": 2,
+          "type": "input",
+          "required": true,
+          "tooltip": {
+            "text": "Fullname or Nickname",
+            "translations": [
+              {
+                "text": "Nama",
+                "language": "id"
+              }
+            ]
+          }
+        },
+        {
+          "id": 3,
+          "name": "Phone Number",
+          "order": 3,
+          "type": "number",
+          "required": true,
+          "translations": [
+            {
+              "name": "Nomor Telepon",
+              "language": "id"
+            }
+          ],
+          "addonBefore": "+62",
+          "extra": [
+            {
+              "placement": "before",
+              "content": "We will not share your phone number to public",
+              "translations": [
+                {
+                  "content": "Kita tidak akan mempublikasikan nomor anda",
+                  "language": "id"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "name": "Location (Using API)",
+          "order": 4,
+          "type": "cascade",
+          "api": {
+            "endpoint": "https://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/cascade-296940912-v1.sqlite",
+            "initial": 0,
+            "list": false
+          },
+          "required": true,
+          "translations": [
+            {
+              "name": "Lokasi (Menggunakan API)",
+              "language": "id"
+            }
+          ],
+          "extra": [
+            {
+              "placement": "before",
+              "content": "Please select your current origin administration",
+              "translations": [
+                {
+                  "content": "Silakan pilih Kecamatan anda sekarang",
+                  "language": "id"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "name": "Birthdate",
+          "order": 5,
+          "type": "date",
+          "required": true,
+          "translations": [
+            {
+              "name": "Tanggal Lahir",
+              "language": "id"
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "name": "Gender",
+          "order": 6,
+          "type": "option",
+          "option": [
+            {
+              "name": "Male",
+              "order": 1,
+              "translations": [
+                {
+                  "name": "Laki-Laki",
+                  "language": "id"
+                }
+              ]
+            },
+            {
+              "name": "Female",
+              "order": 2,
+              "translations": [
+                {
+                  "name": "Perempuan",
+                  "language": "id"
+                }
+              ]
+            },
+            {
+              "name": "Other",
+              "order": 3,
+              "translations": [
+                {
+                  "name": "Lainnya",
+                  "language": "id"
+                }
+              ]
+            }
+          ],
+          "required": true,
+          "translations": [
+            {
+              "name": "Jenis Kelamin",
+              "language": "id"
+            }
+          ]
+        },
+        {
+          "id": 7,
+          "name": "Marital Status",
+          "dependency": [
+            {
+              "id": 6,
+              "options": ["Female", "Male"]
+            }
+          ],
+          "order": 7,
+          "type": "option",
+          "option": [
+            {
+              "name": "Single",
+              "order": 1,
+              "translations": [
+                {
+                  "name": "Jomblo",
+                  "language": "id"
+                }
+              ]
+            },
+            {
+              "name": "Maried",
+              "order": 2,
+              "translations": [
+                {
+                  "name": "Menikah",
+                  "language": "id"
+                }
+              ]
+            },
+            {
+              "name": "Widowed",
+              "order": 3,
+              "translations": [
+                {
+                  "name": "Janda / Duda",
+                  "language": "id"
+                }
+              ]
+            }
+          ],
+          "required": true,
+          "translations": [
+            {
+              "name": "Status Keluarga",
+              "language": "id"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Culinary Group",
+      "description": "Example placeholder description text for <b>Culinary Question Group</b>. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus imperdiet orci in feugiat tincidunt. Donec tempor suscipit accumsan. Vestibulum orci risus, mattis vitae ex et, consectetur consequat augue. Nunc et ante vel massa sollicitudin posuere vel ornare ligula. Ut a mattis massa. Mauris pulvinar congue sem, et venenatis orci vulputate id. Praesent odio purus, ultricies non eros at, iaculis imperdiet turpis. Donec non massa ligula.",
+      "order": 2,
+      "translations": [
+        {
+          "name": "Pertanyaan Tentang Kuliner",
+          "description": "Contoh teks pengganti deskripsi untuk <b>Grup Pertanyaan Kuliner</b>. Demikian pula, tidak adakah orang yang mencintai atau mengejar atau ingin mengalami penderitaan, bukan semata-mata karena penderitaan itu sendiri, tetapi karena sesekali terjadi keadaan di mana susah-payah dan penderitaan dapat memberikan kepadanya kesenangan yang besar.",
+          "language": "id"
+        }
+      ],
+      "question": [
+        {
+          "id": 8,
+          "name": "How much do you spent for meals a day?",
+          "order": 1,
+          "type": "number",
+          "required": false,
+          "translations": [
+            {
+              "name": "Berapa biasanya uang yang anda habiskan per hari untuk makanan",
+              "language": "id"
+            }
+          ]
+        },
+        {
+          "id": 9,
+          "name": "How many times do you usually eat in a day?",
+          "order": 2,
+          "type": "number",
+          "required": false,
+          "translations": [
+            {
+              "name": "Berapa kali anda biasanya makan dalam sehari",
+              "language": "id"
+            }
+          ]
+        },
+        {
+          "id": 10,
+          "name": "Average meal cost",
+          "order": 3,
+          "type": "autofield",
+          "required": false,
+          "translations": [
+            {
+              "name": "Berapa kali anda biasanya makan dalam sehari",
+              "language": "id"
+            }
+          ],
+          "rule": null,
+          "fn": {
+            "multiline": false,
+            "fnString": "function(){ return #9 / #10}"
+          }
+        },
+        {
+          "id": 11,
+          "name": "Favorite Food",
+          "order": 4,
+          "type": "multiple_option",
+          "allowOther": true,
+          "allowOtherText": "Please input other food if any",
+          "option": [
+            {
+              "name": "Asian",
+              "order": 1,
+              "translations": [
+                {
+                  "name": "Asia",
+                  "language": "id"
+                }
+              ]
+            },
+            {
+              "name": "Western",
+              "order": 2,
+              "translations": [
+                {
+                  "name": "Barat",
+                  "language": "id"
+                }
+              ]
+            },
+            {
+              "name": "Vegetarian",
+              "order": 3
+            }
+          ],
+          "required": false,
+          "tooltip": {
+            "text": "Please mention the available options",
+            "translations": [
+              {
+                "text": "Tolong pilih contoh yang ada",
+                "language": "id"
+              }
+            ]
+          },
+          "translations": [
+            {
+              "name": "Makanan Favorit",
+              "allowOtherText": "Silahkan menambahkan menu lain jika ada",
+              "language": "id"
+            }
+          ]
+        },
+        {
+          "id": 12,
+          "name": "Please specify",
+          "order": 5,
+          "type": "input",
+          "required": true,
+          "dependency": [
+            {
+              "id": 11,
+              "options": ["Asian", "Western"]
+            }
+          ],
+          "tooltip": {
+            "text": "Desert or snacks are allowed too",
+            "translations": [
+              {
+                "text": "Makanan Penutup dan Makanan Ringan juga diperbolehkan",
+                "language": "id"
+              }
+            ]
+          },
+          "translations": [
+            {
+              "name": "Tolong sebutkan",
+              "language": "id"
+            }
+          ]
+        },
+        {
+          "id": 13,
+          "name": "Do you know <b>beef rendang</b>?",
+          "order": 6,
+          "type": "option",
+          "allowOtherText": "Other Option",
+          "allowOther": true,
+          "option": [
+            {
+              "name": "Yes",
+              "order": 1,
+              "translations": [
+                {
+                  "name": "Ya",
+                  "language": "id"
+                }
+              ]
+            },
+            {
+              "name": "No",
+              "order": 2,
+              "translations": [
+                {
+                  "name": "Tidak",
+                  "language": "id"
+                }
+              ]
+            }
+          ],
+          "required": false,
+          "translations": [
+            {
+              "name": "Apakah anda tahu <b>Rendang Daging</b>?",
+              "allowOtherText": "Jawaban Lain",
+              "language": "id"
+            }
+          ]
+        },
+        {
+          "id": 14,
+          "name": "Weight",
+          "order": 7,
+          "type": "number",
+          "required": true,
+          "rule": {
+            "min": 5,
+            "max": 10
+          },
+          "translations": [
+            {
+              "name": "Berat Badan",
+              "language": "id"
+            }
+          ],
+          "addonAfter": "Kilograms"
+        },
+        {
+          "id": 15,
+          "name": "Where do you usually order Rendang from ?",
+          "dependency": [
+            {
+              "id": 13,
+              "options": ["Yes"]
+            },
+            {
+              "id": 14,
+              "min": 8
+            }
+          ],
+          "order": 8,
+          "type": "option",
+          "option": [
+            {
+              "name": "Pagi Sore",
+              "order": 1
+            },
+            {
+              "name": "Any Rendang Restaurant",
+              "order": 2,
+              "translations": [
+                {
+                  "name": "Restoran Rendang Manapun",
+                  "language": "id"
+                }
+              ]
+            }
+          ],
+          "required": true,
+          "translations": [
+            {
+              "name": "Dimana anda biasanya membeli Rendang?",
+              "language": "id"
+            }
+          ]
+        },
+        {
+          "id": 16,
+          "name": "Do you want to order Rendang from Pagi Sore now?",
+          "dependency": [
+            {
+              "id": 15,
+              "options": ["Pagi Sore"]
+            }
+          ],
+          "order": 9,
+          "type": "option",
+          "option": [
+            {
+              "name": "Yes",
+              "order": 1,
+              "translations": [
+                {
+                  "name": "Ya",
+                  "language": "id"
+                }
+              ]
+            },
+            {
+              "name": "No",
+              "order": 2,
+              "translations": [
+                {
+                  "name": "Tidak",
+                  "language": "id"
+                }
+              ]
+            }
+          ],
+          "required": true,
+          "translations": [
+            {
+              "name": "Apakah anda ingin memesan Rendang dari Pagi Sore?",
+              "language": "id"
+            }
+          ]
+        },
+        {
+          "id": 17,
+          "name": "Order List",
+          "dependency": [
+            {
+              "id": 16,
+              "options": ["Yes"]
+            }
+          ],
+          "order": 10,
+          "type": "multiple_option",
+          "option": [
+            {
+              "name": "Rendang",
+              "order": 1
+            },
+            {
+              "name": "Ayam Pop",
+              "order": 2
+            },
+            {
+              "name": "Paru Goreng",
+              "order": 3
+            },
+            {
+              "name": "Baluik Goreng",
+              "order": 4
+            }
+          ],
+          "required": true,
+          "translations": [
+            {
+              "name": "Daftar Pesanan",
+              "language": "id"
+            }
+          ],
+          "extra": [
+            {
+              "placement": "before",
+              "content": "Price: Rendang (IDR 5000), Ayam Pop (IDR 8000)",
+              "translations": [
+                {
+                  "content": "Harga: Rendang (Rp 5000), Ayam Pop (Rp 8000)",
+                  "language": "id"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Other Questions",
+      "description": "This is an example of repeat group question",
+      "order": 3,
+      "repeatable": true,
+      "repeatText": "Repeat text",
+      "translations": [
+        {
+          "name": "Pertanyaan Lain",
+          "repeat_text": "Isi lagi",
+          "description": "Ini contoh dari pertanyaan berulang",
+          "language": "id"
+        }
+      ],
+      "question": [
+        {
+          "id": 18,
+          "name": "Comment",
+          "order": 1,
+          "type": "text",
+          "required": true,
+          "translations": [
+            {
+              "name": "Komentar",
+              "language": "id"
+            }
+          ],
+          "extra": [
+            {
+              "placement": "after",
+              "content": "Please write at least 10 words",
+              "translations": [
+                {
+                  "content": "Tolong tulis minimal 10 kata",
+                  "language": "id"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 19,
+          "name": "Job title",
+          "order": 2,
+          "type": "option",
+          "option": [
+            {
+              "name": "Director",
+              "order": 1,
+              "translations": [
+                {
+                  "name": "Direktur",
+                  "language": "id"
+                }
+              ]
+            },
+            {
+              "name": "Manager",
+              "order": 2,
+              "translations": [
+                {
+                  "name": "Manajer",
+                  "language": "id"
+                }
+              ]
+            },
+            {
+              "name": "Staff",
+              "order": 3,
+              "translations": [
+                {
+                  "name": "Staf",
+                  "language": "id"
+                }
+              ]
+            }
+          ],
+          "required": true,
+          "translations": [
+            {
+              "name": "Titel Pekerjaan",
+              "language": "id"
+            }
+          ]
+        },
+        {
+          "id": 20,
+          "name": "Dependency on Gender Male/Female",
+          "dependency": [
+            {
+              "id": 6,
+              "options": ["Female", "Male"]
+            }
+          ],
+          "order": 3,
+          "type": "input",
+          "required": true
+        },
+        {
+          "id": 21,
+          "name": "Dependency on Job Title Staff",
+          "dependency": [
+            {
+              "id": 19,
+              "options": ["Staff"]
+            }
+          ],
+          "order": 4,
+          "type": "option",
+          "option": [
+            {
+              "name": "Contract",
+              "order": 1
+            },
+            {
+              "name": "Internship",
+              "order": 2
+            }
+          ],
+          "required": true
+        },
+        {
+          "id": 22,
+          "name": "Tree Select",
+          "order": 5,
+          "type": "tree",
+          "option": "administration",
+          "checkStrategy": "children",
+          "expandAll": true,
+          "required": true
+        },
+        {
+          "id": 23,
+          "name": "Please input any number start from 0 (no decimal)",
+          "order": 6,
+          "type": "number",
+          "required": true,
+          "translations": [
+            {
+              "name": "Masukkan angka berapapun, dimulai dari 0 (selain decimal)",
+              "language": "id"
+            }
+          ]
+        },
+        {
+          "id": 24,
+          "name": "Please input any number start from 0 to 10 (allow decimal)",
+          "order": 7,
+          "type": "number",
+          "required": true,
+          "rule": {
+            "min": 0,
+            "max": 10,
+            "allowDecimal": true
+          },
+          "translations": [
+            {
+              "name": "Masukkan angka berapapun, dimulai dari 1 sampai 10 (boleh decimal)",
+              "language": "id"
+            }
+          ]
+        },
+        {
+          "id": 25,
+          "name": "Please input any number start from 0 to 5 (allow decimal)",
+          "order": 8,
+          "type": "number",
+          "required": false,
+          "rule": {
+            "min": 0,
+            "max": 5,
+            "allowDecimal": true
+          },
+          "translations": [
+            {
+              "name": "Masukkan angka berapapun, dimulai dari 0 sampai 5 (boleh decimal)",
+              "language": "id"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Repeat Question",
+      "description": "This is an example of repeat group question",
+      "order": 4,
+      "repeatable": true,
+      "repeatText": "Add another Repeat Question",
+      "repeatButtonPlacement": "bottom",
+      "translations": [
+        {
+          "name": "Pertanyaan Berulang",
+          "repeatText": "Tambahkan Pertanyaan Berulang",
+          "description": "Ini contoh dari pertanyaan berulang",
+          "language": "id"
+        }
+      ],
+      "question": [
+        {
+          "id": 26,
+          "name": "Comment for Pagi Sore",
+          "order": 1,
+          "type": "text",
+          "required": false,
+          "translations": [
+            {
+              "name": "Komentar",
+              "language": "id"
+            }
+          ],
+          "dependency": [
+            {
+              "id": 15,
+              "options": ["Pagi Sore"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
