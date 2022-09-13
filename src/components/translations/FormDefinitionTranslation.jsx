@@ -44,11 +44,11 @@ const FormDefinitionTranslation = () => {
           labelText={UIText.inputFormNameLabel}
           currentValue={formStore.name}
           name={`${namePreffix}-form-name`}
+          initialValue={existingTranslationValues?.name}
         >
           <Input
             disabled={!existingTranslation}
             onChange={handleChangeName}
-            value={existingTranslationValues?.name}
           />
         </TranslationFormItem>
       )}
@@ -57,12 +57,12 @@ const FormDefinitionTranslation = () => {
           labelText={UIText.inputFormDescriptionLabel}
           currentValue={formStore.description}
           name={`${namePreffix}-form-description`}
+          initialValue={existingTranslationValues?.description}
         >
           <Input.TextArea
             rows={5}
             disabled={!existingTranslation}
             onChange={handleChangeDescription}
-            value={existingTranslationValues?.description}
           />
         </TranslationFormItem>
       )}

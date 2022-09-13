@@ -9,6 +9,7 @@ const TranslationFormItem = ({
   name = '',
   currentValue = '',
   children = '',
+  initialValue = '',
 }) => {
   return (
     <Row
@@ -31,6 +32,7 @@ const TranslationFormItem = ({
           name={name}
           label={<b>{labelText}</b>}
           className={styles['translation-form-item']}
+          initialValue={initialValue}
         >
           {children}
         </Form.Item>

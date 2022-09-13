@@ -62,11 +62,11 @@ const QuestionGroupSettingTranslation = ({
           labelText={UIText.inputQuestionGroupNameLabel}
           currentValue={name}
           name={`${namePreffix}-name`}
+          initialValue={existingTranslationValues?.name}
         >
           <Input
             disabled={!existingTranslation}
             onChange={handleChangeName}
-            value={existingTranslationValues?.name}
           />
         </TranslationFormItem>
       )}
@@ -75,12 +75,12 @@ const QuestionGroupSettingTranslation = ({
           labelText={UIText.inputQuestionGroupDescriptionLabel}
           currentValue={description}
           name={`${namePreffix}-description`}
+          initialValue={existingTranslationValues?.description}
         >
           <Input.TextArea
             rows={5}
             disabled={!existingTranslation}
             onChange={handleChangeDescription}
-            value={existingTranslationValues?.description}
           />
         </TranslationFormItem>
       )}
@@ -89,11 +89,11 @@ const QuestionGroupSettingTranslation = ({
           labelText={UIText.inputRepeatTextLabel}
           currentValue={repeatText}
           name={`${namePreffix}-repeat_text`}
+          initialValue={existingTranslationValues?.repeatText}
         >
           <Input
             disabled={!existingTranslation}
             onChange={handleChangeRepeatText}
-            value={existingTranslationValues?.repeatText}
           />
         </TranslationFormItem>
       )}

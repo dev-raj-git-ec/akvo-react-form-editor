@@ -62,6 +62,8 @@ const WebformEditor = ({
         s.version = initialData?.version || 1;
         s.name = initialData?.name || 'Unknown Form';
         s.description = initialData?.description || 'Unknown Description';
+        s.languages = initialData?.languages?.filter((x) => x !== 'en') || [];
+        s.defaultLanguage = initialData?.defaultLanguage || 'en';
       });
       questionGroupFn.store.update((s) => {
         s.questionGroups = initialData.questionGroups;

@@ -159,11 +159,11 @@ const QuestionSettingTranslation = ({
           labelText={UIText.inputQuestionNameLabel}
           currentValue={name}
           name={`${namePreffix}-name`}
+          initialValue={existingTranslationValues?.name}
         >
           <Input
             disabled={!existingTranslation}
             onChange={handleChangeName}
-            value={existingTranslationValues?.name}
           />
         </TranslationFormItem>
       )}
@@ -172,11 +172,11 @@ const QuestionSettingTranslation = ({
           labelText={UIText.inputQuestionTooltipLabel}
           currentValue={tooltip.text}
           name={`${namePreffix}-tooltip`}
+          initialValue={existingTooltipTranslationValues?.text}
         >
           <Input.TextArea
             disabled={!existingTranslation}
             onChange={handleChangeTooltip}
-            value={existingTooltipTranslationValues?.text}
           />
         </TranslationFormItem>
       )}
@@ -191,11 +191,11 @@ const QuestionSettingTranslation = ({
               labelText={UIText.inputQuestionAllowOtherTextLabel}
               currentValue={allowOtherText}
               name={`${namePreffix}-allow_other_text`}
+              initialValue={existingTranslationValues?.allowOtherText}
             >
               <Input
                 disabled={!existingTranslation}
                 onChange={handleChangeAllowOtherText}
-                value={existingTranslationValues?.allowOtherText}
               />
             </TranslationFormItem>
           )}
@@ -211,13 +211,13 @@ const QuestionSettingTranslation = ({
                   labelText={`${UIText.inputQuestionOptionNameLabel} ${d.order}`}
                   currentValue={d.name}
                   name={`${namePreffix}-option-name-${d.id}`}
+                  initialValue={existingOptionTranslationValues?.name}
                 >
                   <Input
                     disabled={!existingTranslation}
                     onChange={(e) =>
                       handleChangeOptionName(e, d?.translations, d.id)
                     }
-                    value={existingOptionTranslationValues?.name}
                   />
                 </TranslationFormItem>
               );
