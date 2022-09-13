@@ -22,7 +22,7 @@ const questionType = {
   date: 'date',
   option: 'option',
   multiple_option: 'multiple_option',
-  // tree: 'tree',
+  tree: 'tree',
   // autofield: 'autofield',
 };
 
@@ -97,6 +97,7 @@ const UIStore = new Store({
   activeTranslationQuestionGroups: [],
   activeEditTranslationQuestionGroups: [],
   activeEditTranslationQuestions: [],
+  hostParams: {},
 });
 
 const FormStore = new Store({

@@ -229,7 +229,7 @@ const QuestionSettingTranslation = ({
 };
 
 const QuestionDefinitionTranslation = ({ index, question }) => {
-  const { id, name, order } = question;
+  const { id, name, order, questionGroupOrder } = question;
   const { activeEditTranslationQuestions } = UIStore.useState((s) => s);
 
   const isEditTranslationQuestion = useMemo(() => {
@@ -267,7 +267,7 @@ const QuestionDefinitionTranslation = ({ index, question }) => {
       key={`translation-question-${index}-${id}`}
       title={
         <CardTitle
-          title={`${order}. ${name}`}
+          title={`${questionGroupOrder}.${order}. ${name}`}
           buttons={cardTitleButton}
         />
       }

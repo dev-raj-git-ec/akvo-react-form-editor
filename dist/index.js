@@ -11,6 +11,7 @@ var tb = require('react-icons/tb');
 var ri = require('react-icons/ri');
 var bi = require('react-icons/bi');
 var md = require('react-icons/md');
+var ai = require('react-icons/ai');
 var lodash = require('lodash');
 var orderBy = _interopDefault(require('lodash/orderBy'));
 require('akvo-react-form/dist/index.css');
@@ -129,9 +130,7 @@ var UIStaticText = {
     inputQuestionListLabel: 'Object Name',
     questionMoreInputDateSettingText: 'More Date Question Setting',
     inputQuestionAfterDateValueLabel: 'After Date',
-    inputQuestionBeforeDateValueLabel: 'Before Date',
-    alertDeleteQuestion: 'Do you want to delete this question?',
-    alertDeleteQuestionGroup: 'Do you want to delete this question group and all the questions?'
+    inputQuestionBeforeDateValueLabel: 'Before Date'
   }
 };
 
@@ -252,7 +251,8 @@ var questionType = {
   text: 'text',
   date: 'date',
   option: 'option',
-  multiple_option: 'multiple_option'
+  multiple_option: 'multiple_option',
+  tree: 'tree'
 };
 
 var defaultQuestion = function defaultQuestion(_ref) {
@@ -333,7 +333,8 @@ var UIStore = new pullstate.Store({
   existingTranslation: null,
   activeTranslationQuestionGroups: [],
   activeEditTranslationQuestionGroups: [],
-  activeEditTranslationQuestions: []
+  activeEditTranslationQuestions: [],
+  hostParams: {}
 });
 var FormStore = new pullstate.Store({
   id: generateId(),
@@ -1710,7 +1711,7 @@ var PlusOutlined$1 = function PlusOutlined$1(props, ref) {
 PlusOutlined$1.displayName = 'PlusOutlined';
 var PlusOutlined$2 = /*#__PURE__*/React.forwardRef(PlusOutlined$1);
 
-var AddMoveButton = function AddMoveButton(_ref) {
+var ButtonAddMove = function ButtonAddMove(_ref) {
   var text = _ref.text,
       className = _ref.className,
       _ref$movingItem = _ref.movingItem,
@@ -1754,7 +1755,7 @@ var AddMoveButton = function AddMoveButton(_ref) {
   }, buttonCancelText)));
 };
 
-var CardExtraButton = function CardExtraButton(_ref) {
+var ButtonWithIcon = function ButtonWithIcon(_ref) {
   var _ref$type = _ref.type,
       type = _ref$type === void 0 ? 'delete-button' : _ref$type,
       _ref$isExpand = _ref.isExpand,
@@ -1826,6 +1827,21 @@ var CardExtraButton = function CardExtraButton(_ref) {
       };
       break;
 
+    case 'expand-all-button':
+      if (isExpand) {
+        buttonProps = {
+          onClick: onCancel,
+          icon: /*#__PURE__*/React__default.createElement(ai.AiOutlineEyeInvisible, null)
+        };
+        break;
+      }
+
+      buttonProps = {
+        onClick: onClick,
+        icon: /*#__PURE__*/React__default.createElement(ai.AiOutlineEye, null)
+      };
+      break;
+
     default:
       buttonProps = {
         onClick: onClick,
@@ -1852,7 +1868,7 @@ var CardTitle = function CardTitle(_ref) {
       margin: 'auto'
     }
   }, dependency.length, " Dependenc", dependency.length > 1 ? 'ies' : 'y'), buttons === null || buttons === void 0 ? void 0 : buttons.map(function (cfg) {
-    return /*#__PURE__*/React__default.createElement(CardExtraButton, {
+    return /*#__PURE__*/React__default.createElement(ButtonWithIcon, {
       key: cfg.type + "-" + id,
       type: cfg.type,
       isExpand: cfg.isExpand,
@@ -2397,7 +2413,8 @@ var QuestionDefinitionTranslation = function QuestionDefinitionTranslation(_ref2
       question = _ref2.question;
   var id = question.id,
       name = question.name,
-      order = question.order;
+      order = question.order,
+      questionGroupOrder = question.questionGroupOrder;
 
   var _UIStore$useState2 = UIStore.useState(function (s) {
     return s;
@@ -2431,7 +2448,7 @@ var QuestionDefinitionTranslation = function QuestionDefinitionTranslation(_ref2
   return /*#__PURE__*/React__default.createElement(antd.Card, {
     key: "translation-question-" + index + "-" + id,
     title: /*#__PURE__*/React__default.createElement(CardTitle, {
-      title: order + ". " + name,
+      title: questionGroupOrder + "." + order + ". " + name,
       buttons: cardTitleButton
     }),
     headStyle: {
@@ -2543,8 +2560,12 @@ var QuestionGroupDefinitionTranslation = function QuestionGroupDefinitionTransla
     return s;
   }),
       activeTranslationQuestionGroups = _UIStore$useState2.activeTranslationQuestionGroups,
-      activeEditTranslationQuestionGroups = _UIStore$useState2.activeEditTranslationQuestionGroups;
+      activeEditTranslationQuestionGroups = _UIStore$useState2.activeEditTranslationQuestionGroups,
+      activeEditTranslationQuestions = _UIStore$useState2.activeEditTranslationQuestions;
 
+  var questionIds = questions.map(function (q) {
+    return q.id;
+  });
   var showTranslationQuestion = React.useMemo(function () {
     return activeTranslationQuestionGroups.includes(id);
   }, [activeTranslationQuestionGroups, id]);
@@ -2581,11 +2602,31 @@ var QuestionGroupDefinitionTranslation = function QuestionGroupDefinitionTransla
     });
   };
 
+  var handleExpandAll = function handleExpandAll() {
+    UIStore.update(function (s) {
+      s.activeEditTranslationQuestionGroups = lodash.uniq([].concat(activeEditTranslationQuestionGroups, [id]));
+      s.activeEditTranslationQuestions = lodash.uniq([].concat(s.activeEditTranslationQuestions, questionIds));
+    });
+  };
+
+  var handleCancelExpandAll = function handleCancelExpandAll() {
+    handleCancelEditTranslationGroup();
+    UIStore.update(function (s) {
+      s.activeEditTranslationQuestions = lodash.difference(s.activeEditTranslationQuestions, questionIds);
+    });
+  };
+
   var cardTitleButton = [{
     type: 'show-button',
     isExpand: isEditTranslationQuestionGroup,
     onClick: handleEditTranslationGroup,
     onCancel: handleCancelEditTranslationGroup
+  }];
+  var cardExtraButton = [{
+    type: 'expand-all-button',
+    isExpand: lodash.intersection(activeEditTranslationQuestions, questionIds).length,
+    onClick: handleExpandAll,
+    onCancel: handleCancelExpandAll
   }];
   return /*#__PURE__*/React__default.createElement(antd.Card, {
     key: "translation-" + index + "-" + id,
@@ -2600,12 +2641,17 @@ var QuestionGroupDefinitionTranslation = function QuestionGroupDefinitionTransla
     bodyStyle: {
       padding: isEditTranslationQuestionGroup || showTranslationQuestion ? 24 : 0,
       borderTop: isEditTranslationQuestionGroup || showTranslationQuestion ? '1px solid #f3f3f3' : 'none'
-    }
+    },
+    extra: /*#__PURE__*/React__default.createElement(CardTitle, {
+      buttons: cardExtraButton
+    })
   }, isEditTranslationQuestionGroup && /*#__PURE__*/React__default.createElement(QuestionGroupSettingTranslation, questionGroup), isEditTranslationQuestionGroup && questions.map(function (q, qi) {
     return /*#__PURE__*/React__default.createElement(QuestionDefinitionTranslation, {
       key: "question-definition-translation-" + qi,
       index: qi,
-      question: q
+      question: _extends({}, q, {
+        questionGroupOrder: order
+      })
     });
   }));
 };
@@ -3369,24 +3415,56 @@ var SettingOption = function SettingOption(_ref2) {
 
 var SettingTree = function SettingTree(_ref) {
   var id = _ref.id,
-      _ref$dropdownValues = _ref.dropdownValues,
-      dropdownValues = _ref$dropdownValues === void 0 ? [] : _ref$dropdownValues;
+      questionGroupId = _ref.questionGroupId,
+      option = _ref.option;
   var namePreffix = "question-" + id;
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
+
+  var _UIStore$useState = UIStore.useState(function (s) {
+    return s;
+  }),
+      UIText = _UIStore$useState.UIText,
+      hostParams = _UIStore$useState.hostParams;
+
+  var settingTreeDropdownValue = hostParams.settingTreeDropdownValue;
+
+  var handleChangeTreeDropdown = function handleChangeTreeDropdown(e) {
+    questionGroupFn.store.update(function (s) {
+      s.questionGroups = s.questionGroups.map(function (qg) {
+        if (qg.id === questionGroupId) {
+          var questions = qg.questions.map(function (q) {
+            if (q.id === id) {
+              return _extends({}, q, {
+                option: e
+              });
+            }
+
+            return q;
+          });
+          return _extends({}, qg, {
+            questions: questions
+          });
+        }
+
+        return qg;
+      });
+    });
+  };
+
   return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("p", {
     className: styles['more-question-setting-text']
   }, UIText.questionMoreTreeSettingText), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     label: UIText.inputSelectTreeDropdownValueLabel,
-    initialValue: false,
     name: namePreffix + "-tree-options"
   }, /*#__PURE__*/React__default.createElement(antd.Select, {
+    showSearch: true,
     className: styles['select-dropdown'],
-    options: dropdownValues,
+    optionFilterProp: "label",
+    options: settingTreeDropdownValue,
     getPopupContainer: function getPopupContainer(triggerNode) {
       return triggerNode.parentElement;
-    }
+    },
+    value: option,
+    onChange: handleChangeTreeDropdown
   })));
 };
 
@@ -3400,9 +3478,23 @@ var SettingCascade = function SettingCascade(_ref) {
     list: false
   } : _ref$api;
   var namePreffix = "question-" + id;
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
+
+  var _UIStore$useState = UIStore.useState(function (s) {
+    return s;
+  }),
+      UIText = _UIStore$useState.UIText,
+      hostParams = _UIStore$useState.hostParams;
+
+  var settingCascadeURL = hostParams.settingCascadeURL;
+  var form = antd.Form.useFormInstance();
+  var cascadeURLDropdownValue = React.useMemo(function () {
+    return settingCascadeURL.map(function (x) {
+      return {
+        label: x.name,
+        value: x.id
+      };
+    });
+  }, [settingCascadeURL]);
 
   var updateGlobalState = function updateGlobalState(values) {
     if (values === void 0) {
@@ -3432,12 +3524,20 @@ var SettingCascade = function SettingCascade(_ref) {
   };
 
   var handleChangeEndpoint = function handleChangeEndpoint(e) {
-    var _e$target;
-
-    updateGlobalState({
-      endpoint: e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.value,
-      initial: (api === null || api === void 0 ? void 0 : api.initial) || 0
+    var findURL = settingCascadeURL.find(function (x) {
+      return x.id === e;
     });
+
+    if (findURL) {
+      var _form$setFieldsValue;
+
+      form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[namePreffix + "-api-initial"] = findURL.initial, _form$setFieldsValue[namePreffix + "-api-list"] = findURL.list, _form$setFieldsValue));
+      updateGlobalState({
+        endpoint: findURL.url,
+        initial: findURL.initial || 0,
+        list: findURL.list || false
+      });
+    }
   };
 
   var handleChangeInitial = function handleChangeInitial(e) {
@@ -3448,8 +3548,7 @@ var SettingCascade = function SettingCascade(_ref) {
 
   var handleChangeList = function handleChangeList(value) {
     updateGlobalState({
-      list: value,
-      initial: (api === null || api === void 0 ? void 0 : api.initial) || 0
+      list: value
     });
   };
 
@@ -3457,13 +3556,16 @@ var SettingCascade = function SettingCascade(_ref) {
     className: styles['more-question-setting-text']
   }, UIText.questionMoreCascadeSettingText), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     label: UIText.inputQuestionEndpointLabel,
-    initialValue: api === null || api === void 0 ? void 0 : api.endpoint,
-    name: namePreffix + "-api-endpoint",
-    rules: [{
-      type: 'url',
-      message: UIText.inputQuestionEndpointValidationText
-    }]
-  }, /*#__PURE__*/React__default.createElement(antd.Input, {
+    name: namePreffix + "-api-endpoint"
+  }, /*#__PURE__*/React__default.createElement(antd.Select, {
+    showSearch: true,
+    className: styles['select-dropdown'],
+    optionFilterProp: "label",
+    options: cascadeURLDropdownValue,
+    getPopupContainer: function getPopupContainer(triggerNode) {
+      return triggerNode.parentElement;
+    },
+    value: api === null || api === void 0 ? void 0 : api.endpoint,
     onChange: handleChangeEndpoint
   })), /*#__PURE__*/React__default.createElement(antd.Row, {
     align: "bottom",
@@ -3485,9 +3587,9 @@ var SettingCascade = function SettingCascade(_ref) {
     name: namePreffix + "-api-list-checkbox"
   }, /*#__PURE__*/React__default.createElement(antd.Checkbox, {
     onChange: function onChange(e) {
-      var _e$target2;
+      var _e$target;
 
-      return handleChangeList(e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.checked);
+      return handleChangeList(e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.checked);
     },
     checked: api !== null && api !== void 0 && api.list ? true : false
   }, ' ', UIText.inputQuestionListCheckbox))), (api === null || api === void 0 ? void 0 : api.list) && /*#__PURE__*/React__default.createElement(antd.Col, {
@@ -3498,9 +3600,9 @@ var SettingCascade = function SettingCascade(_ref) {
     name: namePreffix + "-api-list"
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
     onChange: function onChange(e) {
-      var _e$target3;
+      var _e$target2;
 
-      return handleChangeList(e === null || e === void 0 ? void 0 : (_e$target3 = e.target) === null || _e$target3 === void 0 ? void 0 : _e$target3.value);
+      return handleChangeList(e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.value);
     }
   })))));
 };
@@ -9335,7 +9437,7 @@ var QuestionSetting = function QuestionSetting(_ref) {
 
   var dependantGroup = lodash.map(lodash.groupBy(dependant.map(function (x) {
     return {
-      name: x.order + ". " + x.name,
+      name: x.questionGroup.order + "." + x.order + ". " + x.name,
       group: x.questionGroup.order + ". " + x.questionGroup.name
     };
   }), 'group'), function (i, g) {
@@ -9745,11 +9847,11 @@ var SettingSkipLogic = function SettingSkipLogic(_ref) {
   }))), /*#__PURE__*/React__default.createElement(antd.Col, {
     span: 2,
     align: "end"
-  }, /*#__PURE__*/React__default.createElement(antd.Space, null, /*#__PURE__*/React__default.createElement(CardExtraButton, {
+  }, /*#__PURE__*/React__default.createElement(antd.Space, null, /*#__PURE__*/React__default.createElement(ButtonWithIcon, {
     type: "add-button",
     disabled: !(dependentToQuestions !== null && dependentToQuestions !== void 0 && dependentToQuestions.length) || dependentToQuestions.length === dependencies.length,
     onClick: handleAddMoreDependency
-  }), /*#__PURE__*/React__default.createElement(CardExtraButton, {
+  }), /*#__PURE__*/React__default.createElement(ButtonWithIcon, {
     type: "delete-button",
     disabled: !dependency.dependentTo,
     onClick: function onClick() {
@@ -9855,7 +9957,7 @@ var QuestionSkipLogic = function QuestionSkipLogic(_ref3) {
         return g.id === q.questionGroupId;
       });
       return {
-        label: q.order + ". " + q.name,
+        label: group.order + "." + q.order + ". " + q.name,
         value: q.id,
         group: group.order + ". " + group.name
       };
@@ -9888,21 +9990,6 @@ var QuestionSkipLogic = function QuestionSkipLogic(_ref3) {
   }));
 };
 
-var Alert = function Alert(_ref) {
-  var onConfirm = _ref.onConfirm,
-      onCancel = _ref.onCancel,
-      visible = _ref.visible,
-      children = _ref.children;
-  return /*#__PURE__*/React__default.createElement(antd.Modal, {
-    visible: visible,
-    onOk: onConfirm,
-    onCancel: onCancel,
-    style: {
-      top: '338px'
-    }
-  }, children);
-};
-
 var QuestionDefinition = function QuestionDefinition(_ref) {
   var index = _ref.index,
       question = _ref.question,
@@ -9920,8 +10007,7 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
   });
   var buttonAddNewQuestionText = UIText.buttonAddNewQuestionText,
       buttonCopyQuestionText = UIText.buttonCopyQuestionText,
-      buttonMoveQuestionText = UIText.buttonMoveQuestionText,
-      alertDeleteQuestion = UIText.alertDeleteQuestion;
+      buttonMoveQuestionText = UIText.buttonMoveQuestionText;
   var movingQ = UIStore.useState(function (s) {
     return s.activeMoveQuestion;
   });
@@ -9941,11 +10027,6 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
       order = question.order,
       name = question.name,
       dependency = question.dependency;
-
-  var _useState2 = React.useState(false),
-      isModalOpen = _useState2[0],
-      setIsModalOpen = _useState2[1];
-
   var allQuestions = questionGroups.map(function (qg) {
     return qg.questions;
   }).flatMap(function (x) {
@@ -10052,10 +10133,6 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
   };
 
   var handleDelete = function handleDelete() {
-    setIsModalOpen(true);
-  };
-
-  var handleConfirmDelete = function handleConfirmDelete() {
     var newQuestions = questions.filter(function (q) {
       return q.id !== id;
     }).map(function (q) {
@@ -10078,11 +10155,6 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
         return qg;
       });
     });
-    setIsModalOpen(false);
-  };
-
-  var handleCancelDelete = function handleCancelDelete() {
-    setIsModalOpen(false);
   };
 
   var _handleOnAdd = function handleOnAdd(prevOrder) {
@@ -10226,7 +10298,7 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
     onClick: handleEdit,
     onCancel: handleCancelEdit
   }];
-  return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(AddMoveButton, {
+  return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(ButtonAddMove, {
     text: movingQ ? isCopying ? buttonCopyQuestionText : buttonMoveQuestionText : buttonAddNewQuestionText,
     disabled: movingQ === question && !isCopying || (movingQ === null || movingQ === void 0 ? void 0 : movingQ.order) + 1 === order && (movingQ === null || movingQ === void 0 ? void 0 : movingQ.questionGroupId) === questionGroupId && !isCopying || dependant.disabled.current,
     handleCancelMove: handleCancelMove,
@@ -10241,7 +10313,7 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
   }), /*#__PURE__*/React__default.createElement(antd.Card, {
     key: index + "-" + id,
     title: /*#__PURE__*/React__default.createElement(CardTitle, {
-      title: order + ". " + name,
+      title: questionGroup.order + "." + order + ". " + name,
       buttons: leftButtons
     }),
     headStyle: {
@@ -10281,7 +10353,7 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
     dependant: dependant.dependant
   }), activeTab === 'skip-logic' && /*#__PURE__*/React__default.createElement(QuestionSkipLogic, {
     question: question
-  }))), isLastItem && /*#__PURE__*/React__default.createElement(AddMoveButton, {
+  }))), isLastItem && /*#__PURE__*/React__default.createElement(ButtonAddMove, {
     text: movingQ ? isCopying ? buttonCopyQuestionText : buttonMoveQuestionText : buttonAddNewQuestionText,
     disabled: movingQ === question && !isCopying || dependant.disabled.last,
     movingItem: movingQ,
@@ -10292,11 +10364,7 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
     handleOnMove: function handleOnMove() {
       return isCopying ? _handleOnAdd(order) : _handleOnMove(order, true);
     }
-  })), /*#__PURE__*/React__default.createElement(Alert, {
-    visible: isModalOpen,
-    onConfirm: handleConfirmDelete,
-    onCancel: handleCancelDelete
-  }, alertDeleteQuestion));
+  }));
 };
 
 var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
@@ -10317,16 +10385,9 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
     return s;
   }),
       activeQuestionGroups = _UIStore$useState.activeQuestionGroups,
-      activeEditQuestionGroups = _UIStore$useState.activeEditQuestionGroups;
+      activeEditQuestionGroups = _UIStore$useState.activeEditQuestionGroups,
+      activeEditQuestions = _UIStore$useState.activeEditQuestions;
 
-  var _useState = React.useState(false),
-      isModalOpen = _useState[0],
-      setIsModalOpen = _useState[1];
-
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
-  var alertDeleteQuestionGroup = UIText.alertDeleteQuestionGroup;
   var id = questionGroup.id,
       name = questionGroup.name,
       questions = questionGroup.questions,
@@ -10390,11 +10451,21 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
     });
   };
 
-  var handleDelete = function handleDelete() {
-    setIsModalOpen(true);
+  var handleExpandAll = function handleExpandAll() {
+    handleShowQuestions();
+    UIStore.update(function (s) {
+      s.activeEditQuestions = lodash.uniq([].concat(s.activeEditQuestions, questionIds));
+    });
   };
 
-  var handleConfirmDelete = function handleConfirmDelete() {
+  var handleCancelExpandAll = function handleCancelExpandAll() {
+    handleHideQuestions();
+    UIStore.update(function (s) {
+      s.activeEditQuestions = lodash.difference(s.activeEditQuestions, questionIds);
+    });
+  };
+
+  var handleDelete = function handleDelete() {
     var newQuestionGroups = questionGroups.filter(function (qg) {
       return id !== qg.id;
     }).map(function (qg) {
@@ -10409,11 +10480,6 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
     questionGroupFn.store.update(function (s) {
       s.questionGroups = newQuestionGroups;
     });
-    setIsModalOpen(false);
-  };
-
-  var handleCancelDelete = function handleCancelDelete() {
-    setIsModalOpen(false);
   };
 
   var _handleOnAdd = function handleOnAdd(prevOrder) {
@@ -10558,7 +10624,12 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
       dependant: dependencies
     };
   }, [questionGroups, questionIds, movingQg, order]);
-  var leftButtons = [{
+  var rightButtons = [{
+    type: 'expand-all-button',
+    isExpand: showQuestion && lodash.intersection(activeEditQuestions, questionIds).length,
+    onClick: handleExpandAll,
+    onCancel: handleCancelExpandAll
+  }, {
     type: 'delete-button',
     onClick: handleDelete,
     disabled: !index && isLastItem
@@ -10568,7 +10639,7 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
     onClick: handleEditGroup,
     onCancel: handleCancelEditGroup
   }];
-  var rightButtons = [{
+  var leftButtons = [{
     type: 'move-button',
     onClick: handleMove,
     onCancel: handleHideQuestions,
@@ -10579,7 +10650,7 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
     onClick: handleShowQuestions,
     onCancel: handleHideQuestions
   }];
-  return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(AddMoveButton, {
+  return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(ButtonAddMove, {
     text: movingQg ? buttonMoveQuestionGroupText : buttonAddNewQuestionGroupText,
     disabled: movingQg === questionGroup || (movingQg === null || movingQg === void 0 ? void 0 : movingQg.order) + 1 === order || dependant.disabled.current,
     movingItem: movingQg,
@@ -10593,7 +10664,7 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
   }), /*#__PURE__*/React__default.createElement(antd.Card, {
     key: index + "-" + id,
     title: /*#__PURE__*/React__default.createElement(CardTitle, {
-      buttons: rightButtons,
+      buttons: leftButtons,
       title: order + ". " + name
     }),
     headStyle: {
@@ -10607,7 +10678,7 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
       borderTop: isEditQuestionGroup || showQuestion ? '1px solid #f3f3f3' : 'none'
     },
     extra: /*#__PURE__*/React__default.createElement(CardTitle, {
-      buttons: leftButtons
+      buttons: rightButtons
     })
   }, isEditQuestionGroup && /*#__PURE__*/React__default.createElement(QuestionGroupSetting, questionGroup), showQuestion && questions.map(function (q, qi) {
     return /*#__PURE__*/React__default.createElement(QuestionDefinition, {
@@ -10617,7 +10688,7 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
       questionGroup: questionGroup,
       isLastItem: qi === questions.length - 1
     });
-  })), isLastItem && /*#__PURE__*/React__default.createElement(AddMoveButton, {
+  })), isLastItem && /*#__PURE__*/React__default.createElement(ButtonAddMove, {
     text: movingQg ? buttonMoveQuestionGroupText : buttonAddNewQuestionGroupText,
     disabled: movingQg === questionGroup || dependant.disabled.last,
     movingItem: movingQg,
@@ -10628,16 +10699,24 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
     handleOnMove: function handleOnMove() {
       return _handleOnMove(order, true);
     }
-  })), /*#__PURE__*/React__default.createElement(Alert, {
-    visible: isModalOpen,
-    onConfirm: handleConfirmDelete,
-    onCancel: handleCancelDelete
-  }, alertDeleteQuestionGroup));
+  }));
 };
 
 var WebformEditor = function WebformEditor(_ref) {
   var _ref$onSave = _ref.onSave,
-      onSave = _ref$onSave === void 0 ? false : _ref$onSave;
+      onSave = _ref$onSave === void 0 ? false : _ref$onSave,
+      _ref$settingTreeDropd = _ref.settingTreeDropdownValue,
+      settingTreeDropdownValue = _ref$settingTreeDropd === void 0 ? [{
+    label: null,
+    value: null
+  }] : _ref$settingTreeDropd,
+      _ref$settingCascadeUR = _ref.settingCascadeURL,
+      settingCascadeURL = _ref$settingCascadeUR === void 0 ? [{
+    name: null,
+    url: null,
+    initial: 0,
+    list: false
+  }] : _ref$settingCascadeUR;
   var formStore = FormStore.useState(function (s) {
     return s;
   });
@@ -10661,6 +10740,18 @@ var WebformEditor = function WebformEditor(_ref) {
       questionGroupCount = UIText.questionGroupCount,
       mandatoryQuestionCount = UIText.mandatoryQuestionCount,
       version = UIText.version;
+  React.useEffect(function () {
+    UIStore.update(function (s) {
+      s.hostParams = _extends({}, s.hostParams, {
+        settingTreeDropdownValue: settingTreeDropdownValue.filter(function (x) {
+          return (x === null || x === void 0 ? void 0 : x.label) && (x === null || x === void 0 ? void 0 : x.value);
+        }),
+        settingCascadeURL: settingCascadeURL.filter(function (x) {
+          return (x === null || x === void 0 ? void 0 : x.name) && (x === null || x === void 0 ? void 0 : x.url);
+        })
+      });
+    });
+  }, [settingTreeDropdownValue, settingCascadeURL]);
 
   var handleTabsOnChange = function handleTabsOnChange(e) {
     UIStore.update(function (s) {
@@ -10713,12 +10804,12 @@ var WebformEditor = function WebformEditor(_ref) {
       style: {
         margin: 0
       }
-    }, version, " 1"), currentTab === 'edit-form' && /*#__PURE__*/React__default.createElement(CardExtraButton, {
+    }, version, " 1"), currentTab === 'edit-form' && /*#__PURE__*/React__default.createElement(ButtonWithIcon, {
       type: "edit-button",
       isExpand: activeEditFormSetting,
       onClick: handleShowFormSetting,
       onCancel: handleShowFormSetting
-    }), /*#__PURE__*/React__default.createElement(CardExtraButton, {
+    }), /*#__PURE__*/React__default.createElement(ButtonWithIcon, {
       type: "save-button",
       onClick: handleSave
     }))),

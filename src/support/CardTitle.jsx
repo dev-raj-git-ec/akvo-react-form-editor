@@ -1,6 +1,6 @@
 import React from 'react';
 import { Space, Tag } from 'antd';
-import CardExtraButton from './CardExtraButton';
+import ButtonWithIcon from './ButtonWithIcon';
 
 const CardTitle = ({ id, title, buttons, dependency = [] }) => {
   return (
@@ -11,7 +11,7 @@ const CardTitle = ({ id, title, buttons, dependency = [] }) => {
         </Tag>
       )}
       {buttons?.map((cfg) => (
-        <CardExtraButton
+        <ButtonWithIcon
           key={`${cfg.type}-${id}`}
           type={cfg.type}
           isExpand={cfg.isExpand}

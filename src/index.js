@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import 'antd/dist/antd.min.css';
 import styles from './styles.module.css';
 import { Card, Tabs, Tag, Space } from 'antd';
@@ -9,11 +9,15 @@ import {
   QuestionGroupDefinition,
   FormTranslations,
 } from './components';
-import { CardExtraButton } from './support';
+import { ButtonWithIcon } from './support';
 import { FormStore, UIStore, questionGroupFn } from './lib/store';
 import data from './lib/data';
 
-const WebformEditor = ({ onSave = false }) => {
+const WebformEditor = ({
+  onSave = false,
+  settingTreeDropdownValue = [{ label: null, value: null }],
+  settingCascadeURL = [{ name: null, url: null, initial: 0, list: false }],
+}) => {
   const formStore = FormStore.useState((s) => s);
   const current = UIStore.useState((s) => s.current);
   const UIText = UIStore.useState((s) => s.UIText);
@@ -34,6 +38,19 @@ const WebformEditor = ({ onSave = false }) => {
     mandatoryQuestionCount,
     version,
   } = UIText;
+
+  useEffect(() => {
+    // store params from host to global store
+    UIStore.update((s) => {
+      s.hostParams = {
+        ...s.hostParams,
+        settingTreeDropdownValue: settingTreeDropdownValue.filter(
+          (x) => x?.label && x?.value
+        ),
+        settingCascadeURL: settingCascadeURL.filter((x) => x?.name && x?.url),
+      };
+    });
+  }, [settingTreeDropdownValue, settingCascadeURL]);
 
   const handleTabsOnChange = (e) => {
     UIStore.update((s) => {
@@ -88,14 +105,14 @@ const WebformEditor = ({ onSave = false }) => {
                 </Tag>
                 <Tag style={{ margin: 0 }}>{version} 1</Tag>
                 {currentTab === 'edit-form' && (
-                  <CardExtraButton
+                  <ButtonWithIcon
                     type="edit-button"
                     isExpand={activeEditFormSetting}
                     onClick={handleShowFormSetting}
                     onCancel={handleShowFormSetting}
                   />
                 )}
-                <CardExtraButton
+                <ButtonWithIcon
                   type="save-button"
                   onClick={handleSave}
                 />
