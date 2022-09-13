@@ -72,7 +72,24 @@ const toEditor = (webFormData) => {
         id: gid,
         order: qg?.order || qgi + 1,
         questions: qg.questions.map((q, qi) => {
+          const isNotOption = ![
+            questionType.option,
+            questionType.multiple_option,
+          ].includes(q.type);
+          if (isNotOption) {
+            q = clearQuestionObj(['option'], q);
+          }
           q = mapKeys(q, (_, k) => (k === 'option' ? 'options' : k));
+          if (q?.options) {
+            q = {
+              ...q,
+              options: q.options.map((o, oi) => ({
+                id: o?.id || qi + 1 + (oi + 1),
+                ...o,
+                order: o?.order || oi + 1,
+              })),
+            };
+          }
           if (q?.dependency) {
             const dependency = q.dependency.map((d) => {
               if (d?.max) {
