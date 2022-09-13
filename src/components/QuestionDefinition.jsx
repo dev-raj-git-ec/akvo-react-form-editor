@@ -5,7 +5,7 @@ import { UIStore, questionFn, questionGroupFn } from '../lib/store';
 import data from '../lib/data';
 import QuestionSetting from './QuestionSetting';
 import QuestionSkipLogic from './QuestionSkipLogic';
-import { AddMoveButton, Alert, CardTitle } from '../support';
+import { AddMoveButton, AlertPopup, CardTitle } from '../support';
 import { orderBy, maxBy, minBy } from 'lodash';
 
 const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
@@ -408,13 +408,13 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
           />
         )}
       </div>
-      <Alert
+      <AlertPopup
         visible={isModalOpen}
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
       >
         {alertDeleteQuestion}
-      </Alert>
+      </AlertPopup>
     </div>
   );
 };

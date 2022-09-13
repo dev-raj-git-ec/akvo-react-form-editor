@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal } from 'antd';
 
-const Alert = ({ onConfirm, onCancel, visible, children }) => {
+const AlertPopup = ({ onConfirm, onCancel, visible, children }) => {
   return (
     <Modal
       visible={visible}
@@ -14,4 +14,4 @@ const Alert = ({ onConfirm, onCancel, visible, children }) => {
   );
 };
 
-export default Alert;
+export default AlertPopup;
