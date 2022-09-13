@@ -11,6 +11,10 @@ Each question group has an array of questions that has a:
 - tooltip
 - required: can be either true or false
 
+.. image:: ../assets/question/overview.png
+  :alt: Overview
+
+
 Add
 ---
 You can add a new question by clicking on the *ADD NEW QUESTION* button.
@@ -30,6 +34,9 @@ Setting
 - You are also allowed to choose either hide of show string/password.
 - Once editing is done, options are for you, cancelling or saving your updates.
 
+.. image:: ../assets/question/setting.png
+  :alt: Setting question
+
 Skip Logic
 ~~~~~~~~~~
 
@@ -41,7 +48,29 @@ Skip Logic
 - There is input that you can fill to add a value.
 - Then, you can choose to either **Save** or **Cancle** or updates.
 
+.. image:: ../assets/question/skipLogic.png
+  :alt: Skip Logic
+
+Dependent questions
+-------------------
+
+Once a dependent question is added, a list of dependencies are shown.
+
+.. image:: ../assets/question/dependant-question.png
+  :alt: Dependant questions
+
+Copy
+----
+
+A question can be copied by clikin on the **COPY QUESTION HERE**
+
+.. image:: ../assets/question/copy.png
+  :alt: Setting question
+
 Delete
 ------
 
 A question is deletable by clickon on the **Trash** icon.
+
+.. image:: ../assets/question/delete.png
+  :alt: Delete questions
