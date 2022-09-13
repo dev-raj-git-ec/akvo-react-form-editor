@@ -72,6 +72,7 @@ const toEditor = (webFormData) => {
         id: gid,
         order: qg?.order || qgi + 1,
         questions: qg.questions.map((q, qi) => {
+          q = mapKeys(q, (_, k) => (k === 'option' ? 'options' : k));
           if (q?.dependency) {
             const dependency = q.dependency.map((d) => {
               if (d?.max) {
