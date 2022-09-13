@@ -77,6 +77,10 @@ const toWebform = (formData, questionGroups) => {
   // Question Group & Question Definition
   const output = questionGroups.map((qg) => {
     const questions = qg.questions.map((q) => {
+      const isNotOption = ![
+        questionType.option,
+        questionType.multiple_option,
+      ].includes(q.type);
       if (q.type !== questionType.input) {
         q = clearQuestionObj(['requiredDoubleEntry', 'hiddenString'], q);
       }
@@ -94,15 +98,13 @@ const toWebform = (formData, questionGroups) => {
         });
         q = { ...q, option: options };
       }
-      if (
-        ![questionType.option, questionType.multiple_option].includes(q.type)
-      ) {
+      if (isNotOption) {
         q = clearQuestionObj(['allowOther'], q);
       }
       if (q.type !== questionType.cascade) {
         q = clearQuestionObj(['api'], q);
       }
-      if (q.type !== questionType.tree) {
+      if (q.type !== questionType.tree && isNotOption) {
         q = clearQuestionObj(['option'], q);
       }
       if (!q?.tooltip) {
