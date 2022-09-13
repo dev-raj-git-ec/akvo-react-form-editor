@@ -76,7 +76,7 @@ const toEditor = (webFormData) => {
             questionType.option,
             questionType.multiple_option,
           ].includes(q.type);
-          if (isNotOption) {
+          if (isNotOption && q.type !== questionType.tree) {
             q = clearQuestionObj(['option'], q);
           }
           q = mapKeys(q, (_, k) => (k === 'option' ? 'options' : k));
