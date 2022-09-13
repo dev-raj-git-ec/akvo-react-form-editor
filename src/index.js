@@ -10,11 +10,13 @@ import {
   FormTranslations,
 } from './components';
 import { ButtonWithIcon } from './support';
-import { FormStore, UIStore, questionGroupFn } from './lib/store';
+import { FormStore, UIStore, questionGroupFn, generateId } from './lib/store';
 import data from './lib/data';
+import { isEmpty } from 'lodash';
 
 const WebformEditor = ({
   onSave = false,
+  initialValue = {},
   settingTreeDropdownValue = [{ label: null, value: null }],
   settingCascadeURL = [{ name: null, url: null, initial: 0, list: false }],
 }) => {
@@ -51,6 +53,21 @@ const WebformEditor = ({
       };
     });
   }, [settingTreeDropdownValue, settingCascadeURL]);
+
+  useEffect(() => {
+    if (!isEmpty(initialValue)) {
+      const initialData = data.toEditor(initialValue);
+      FormStore.update((s) => {
+        s.id = initialData?.id || generateId();
+        s.version = initialData?.version || 1;
+        s.name = initialData?.name || 'Unknown Form';
+        s.description = initialData?.description || 'Unknown Description';
+      });
+      questionGroupFn.store.update((s) => {
+        s.questionGroups = initialData.questionGroups;
+      });
+    }
+  }, [initialValue]);
 
   const handleTabsOnChange = (e) => {
     UIStore.update((s) => {

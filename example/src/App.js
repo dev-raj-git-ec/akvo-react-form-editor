@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import ReactJson from 'react-json-view';
 import WebformEditor from 'akvo-react-form-editor';
+import * as initial_value from './example-initial-value.json';
+
 import 'akvo-react-form-editor/dist/index.css';
 
 const App = () => {
   const [source, setSource] = useState({});
   const [showJson, setShowJson] = useState(false);
+  const [initialValue, setInitialValue] = useState(false);
 
   const onJsonEdit = ({ updated_src }) => {
     setSource(updated_src);
@@ -23,6 +26,9 @@ const App = () => {
             alt="npm"
             src="https://img.shields.io/npm/v/akvo-react-form?logo=npm&style=flat-square"
           />
+          <button onClick={() => setInitialValue(!initialValue)}>
+            {initialValue ? '☑' : '☒'} Initial Value
+          </button>
           <button onClick={() => setShowJson(!showJson)}>
             {showJson ? '☑' : '☒'} JSON
           </button>
@@ -30,6 +36,7 @@ const App = () => {
 
         <WebformEditor
           onSave={setSource}
+          initialValue={initialValue ? initial_value.default : source}
           settingTreeDropdownValue={[
             { label: 'Example First Tree Label', value: 'ex1' },
             { label: 'Example Second Tree Label', value: 'ex2' },
@@ -54,7 +61,7 @@ const App = () => {
       </div>
       <div className={'half-width json-source' + (!showJson ? ' shrink' : '')}>
         <ReactJson
-          src={source}
+          src={initialValue ? initial_value.default : source}
           theme="monokai"
           displayDataTypes={false}
           onEdit={onJsonEdit}

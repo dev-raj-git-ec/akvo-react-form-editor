@@ -1,5 +1,5 @@
-import { questionType } from './store';
-import { findIndex, isEmpty } from 'lodash';
+import { questionType, generateId } from './store';
+import { findIndex, isEmpty, mapKeys } from 'lodash';
 
 const clearQuestionObj = (
   keysToRemove = [],
@@ -52,14 +52,48 @@ const clearTranslations = (obj, translations) => {
       translations: clearedTranslations,
     };
   } else {
-    // remove translation
     delete newObj?.translations;
+    // remove translation
   }
   return newObj;
 };
 
+const toEditor = (webFormData) => {
+  webFormData = mapKeys(webFormData, (_, k) =>
+    k === 'question_group' ? 'questionGroups' : k
+  );
+  webFormData = {
+    ...webFormData,
+    questionGroups: webFormData.questionGroups.map((qg, qgi) => {
+      const gid = qg?.id || generateId();
+      qg = mapKeys(qg, (_, k) => (k === 'question' ? 'questions' : k));
+      qg = {
+        ...qg,
+        id: gid,
+        order: qg?.order || qgi + 1,
+        questions: qg.questions.map((q, qi) => {
+          if (q?.dependency) {
+            const dependency = q.dependency.map((d) => {
+              if (d?.max) {
+                d = { ...d, max: d.max + 1 };
+              }
+              if (d?.min) {
+                d = { ...d, min: d.min - 1 };
+              }
+              return d;
+            });
+            q = { ...q, dependency: dependency };
+          }
+          return { ...q, order: q?.order || qi + 1, questionGroupId: gid };
+        }),
+      };
+      return qg;
+    }),
+  };
+  return webFormData;
+};
+
 const toWebform = (formData, questionGroups) => {
-  // Form Definition
   let webformData = {
     name: formData.name,
     description: formData.description,
@@ -195,6 +229,7 @@ const generateTranslations = (
 const data = {
   clear: clearQuestionObj,
   toWebform: toWebform,
+  toEditor: toEditor,
   generateTranslations: generateTranslations,
 };
 
