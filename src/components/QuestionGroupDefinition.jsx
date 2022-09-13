@@ -1,12 +1,13 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Card } from 'antd';
 import { UIStore, questionGroupFn } from '../lib/store';
 import QuestionGroupSetting from './QuestionGroupSetting';
 import QuestionDefinition from './QuestionDefinition';
-import { ButtonAddMove, CardTitle } from '../support';
+import { ButtonAddMove, CardTitle, AlertPopup } from '../support';
 import { orderBy, maxBy, minBy, uniq, difference, intersection } from 'lodash';
 
 const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { questionGroups } = questionGroupFn.store.useState((s) => s);
   const movingQg = UIStore.useState((s) => s.activeMoveQuestionGroup);
   const {
@@ -17,8 +18,11 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
 
   const { id, name, questions, order } = questionGroup;
   const questionIds = questions.map((q) => q.id);
-  const { buttonAddNewQuestionGroupText, buttonMoveQuestionGroupText } =
-    UIStore.useState((s) => s.UIText);
+  const {
+    buttonAddNewQuestionGroupText,
+    buttonMoveQuestionGroupText,
+    alertDeleteQuestionGroup,
+  } = UIStore.useState((s) => s.UIText);
 
   const showQuestion = useMemo(() => {
     return activeQuestionGroups.includes(id);
@@ -227,7 +231,7 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
     },
     {
       type: 'delete-button',
-      onClick: handleDelete,
+      onClick: () => setIsModalOpen(true),
       disabled: !index && isLastItem,
     },
     {
@@ -316,6 +320,13 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
           handleOnMove={() => handleOnMove(order, true)}
         />
       )}
+      <AlertPopup
+        visible={isModalOpen}
+        onConfirm={handleDelete}
+        onCancel={() => setIsModalOpen(false)}
+      >
+        {alertDeleteQuestionGroup}
+      </AlertPopup>
     </div>
   );
 };

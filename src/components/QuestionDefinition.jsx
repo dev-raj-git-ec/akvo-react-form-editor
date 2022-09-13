@@ -5,7 +5,7 @@ import { UIStore, questionFn, questionGroupFn } from '../lib/store';
 import data from '../lib/data';
 import QuestionSetting from './QuestionSetting';
 import QuestionSkipLogic from './QuestionSkipLogic';
-import { ButtonAddMove, CardTitle } from '../support';
+import { ButtonAddMove, CardTitle, AlertPopup } from '../support';
 import { orderBy, maxBy, minBy } from 'lodash';
 
 const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
@@ -21,6 +21,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
   const isCopying = UIStore.useState((s) => s.isCopyingQuestion);
   const activeEditQuestions = UIStore.useState((s) => s.activeEditQuestions);
   const [activeTab, setActiveTab] = useState('setting');
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { id, questionGroupId, order, name, dependency } = question;
 
   const allQuestions = questionGroups
@@ -265,7 +266,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
     },
     {
       type: 'delete-button',
-      onClick: handleDelete,
+      onClick: () => setIsModalOpen(true),
       disabled: (!index && isLastItem) || dependant.dependant.length,
     },
   ];
@@ -394,6 +395,13 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
           }
         />
       )}
+      <AlertPopup
+        visible={isModalOpen}
+        onConfirm={handleDelete}
+        onCancel={() => setIsModalOpen(false)}
+      >
+        {UIText.alertDeleteQuestion}
+      </AlertPopup>
     </div>
   );
 };
