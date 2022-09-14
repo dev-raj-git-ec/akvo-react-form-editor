@@ -47,6 +47,11 @@
   font-weight: normal;
 }
 
+.tab-pane-name-icon svg {
+  margin-bottom: -2px;
+  font-size: 16px;
+}
+
 .question-group-title {
   font-family: 'Assistant', sans-serif;
   font-weight: bold;

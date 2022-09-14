@@ -13,6 +13,9 @@ import { ButtonWithIcon } from './support';
 import { FormStore, UIStore, questionGroupFn, generateId } from './lib/store';
 import data from './lib/data';
 import { isEmpty } from 'lodash';
+import { TbEdit } from 'react-icons/tb';
+import { MdOutlineLanguage } from 'react-icons/md';
+import { VscPreview } from 'react-icons/vsc';
 
 const WebformEditor = ({
   onSave = false,
@@ -102,6 +105,24 @@ const WebformEditor = ({
 
   const mandatory = questions.filter((q) => q?.required);
 
+  const tabProps = [
+    {
+      icon: TbEdit,
+      tab: formTabPane,
+      key: 'edit-form',
+    },
+    {
+      icon: MdOutlineLanguage,
+      tab: formTranslationPane,
+      key: 'translations',
+    },
+    {
+      icon: VscPreview,
+      tab: previewTabPane,
+      key: 'preview',
+    },
+  ];
+
   return (
     <div
       key="container"
@@ -142,18 +163,19 @@ const WebformEditor = ({
           tabBarGutter={24}
           className={styles['tabs-wrapper']}
         >
-          <Tabs.TabPane
-            tab={formTabPane}
-            key="edit-form"
-          />
-          <Tabs.TabPane
-            tab={formTranslationPane}
-            key="translations"
-          />
-          <Tabs.TabPane
-            tab={previewTabPane}
-            key="preview"
-          />
+          {tabProps.map((prop) => (
+            <Tabs.TabPane
+              tab={
+                <Space
+                  size={2}
+                  className={styles['tab-pane-name-icon']}
+                >
+                  <prop.icon /> {prop.tab}
+                </Space>
+              }
+              key={prop.key}
+            />
+          ))}
         </Tabs>
         {currentTab === 'edit-form' && (
           <FormWrapper>
