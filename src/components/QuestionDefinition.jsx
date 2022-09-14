@@ -13,9 +13,12 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
   const { questions } = questionGroup;
   const { UIText, hostParams } = UIStore.useState((s) => s);
   const {
+    alertDeleteQuestionTitle,
+    alertDeleteQuestion,
     buttonAddNewQuestionText,
     buttonCopyQuestionText,
     buttonMoveQuestionText,
+    buttonDeleteText,
   } = UIText;
   const movingQ = UIStore.useState((s) => s.activeMoveQuestion);
   const isCopying = UIStore.useState((s) => s.isCopyingQuestion);
@@ -402,8 +405,11 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
         visible={isModalOpen}
         onConfirm={handleDelete}
         onCancel={() => setIsModalOpen(false)}
+        okButtonProps={{ danger: true }}
+        title={alertDeleteQuestionTitle}
+        okText={buttonDeleteText}
       >
-        {UIText.alertDeleteQuestion}
+        {alertDeleteQuestion}
       </AlertPopup>
     </div>
   );

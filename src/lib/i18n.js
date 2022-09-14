@@ -70,7 +70,9 @@ const UIStaticText = {
     questionMoreInputDateSettingText: 'More Date Question Setting',
     inputQuestionAfterDateValueLabel: 'After Date',
     inputQuestionBeforeDateValueLabel: 'Before Date',
+    alertDeleteQuestionTitle: 'Delete Question',
     alertDeleteQuestion: 'Do you want to delete this question?',
+    alertDeleteQuestionGroupTitle: 'Delete Question Group',
     alertDeleteQuestionGroup:
       'Do you want to delete this question group and all the questions?',
   },

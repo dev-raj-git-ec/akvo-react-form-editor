@@ -23,7 +23,9 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
   const {
     buttonAddNewQuestionGroupText,
     buttonMoveQuestionGroupText,
+    alertDeleteQuestionGroupTitle,
     alertDeleteQuestionGroup,
+    buttonDeleteText,
   } = UIStore.useState((s) => s.UIText);
 
   const showQuestion = useMemo(() => {
@@ -125,7 +127,6 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
     questionGroupFn.store.update((s) => {
       s.questionGroups = newQuestionGroups;
     });
-    setIsModalOpen(false);
   };
 
   const handleOnMove = (prevOrder, lastItem = false) => {
@@ -331,6 +332,9 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
         visible={isModalOpen}
         onConfirm={handleDelete}
         onCancel={() => setIsModalOpen(false)}
+        okButtonProps={{ danger: true }}
+        title={alertDeleteQuestionGroupTitle}
+        okText={buttonDeleteText}
       >
         {alertDeleteQuestionGroup}
       </AlertPopup>
