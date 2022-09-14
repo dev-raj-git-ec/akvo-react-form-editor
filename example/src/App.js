@@ -57,6 +57,11 @@ const App = () => {
               list: 'children',
             },
           ]}
+          defaultQuestion={{
+            type: 'text',
+            name: 'New Question',
+            required: true,
+          }}
         />
       </div>
       <div className={'half-width json-source' + (!showJson ? ' shrink' : '')}>

@@ -10,7 +10,13 @@ import {
   FormTranslations,
 } from './components';
 import { ButtonWithIcon } from './support';
-import { FormStore, UIStore, questionGroupFn, generateId } from './lib/store';
+import {
+  FormStore,
+  UIStore,
+  questionGroupFn,
+  generateId,
+  questionType,
+} from './lib/store';
 import data from './lib/data';
 import { isEmpty } from 'lodash';
 import { TbEdit } from 'react-icons/tb';
@@ -22,6 +28,7 @@ const WebformEditor = ({
   initialValue = {},
   settingTreeDropdownValue = [{ label: null, value: null }],
   settingCascadeURL = [{ name: null, url: null, initial: 0, list: false }],
+  defaultQuestion = { type: null, name: null, required: null },
 }) => {
   const formStore = FormStore.useState((s) => s);
   const current = UIStore.useState((s) => s.current);
@@ -46,6 +53,15 @@ const WebformEditor = ({
 
   useEffect(() => {
     // store params from host to global store
+    const checkDefaultQuestion = Object.values(defaultQuestion).filter(
+      (x) => x
+    ).length;
+    const sanitizeDefaultQuestion = {
+      type: defaultQuestion?.type || questionType.input,
+      name: defaultQuestion?.name,
+      required: defaultQuestion?.required || false,
+    };
+    // update UIStore
     UIStore.update((s) => {
       s.hostParams = {
         ...s.hostParams,
@@ -55,9 +71,20 @@ const WebformEditor = ({
         settingCascadeURL: settingCascadeURL
           .filter((x) => x?.name && x?.endpoint)
           .map((x, xi) => ({ ...x, id: x?.id || xi + 1 })),
+        defaultQuestionParam: sanitizeDefaultQuestion,
       };
     });
-  }, [settingTreeDropdownValue, settingCascadeURL]);
+    if (checkDefaultQuestion) {
+      // replase questionGroup store with defaultQuestion value
+      questionGroupFn.store.update((s) => {
+        s.questionGroups = [
+          questionGroupFn.add({
+            defaultQuestionParam: sanitizeDefaultQuestion,
+          }),
+        ];
+      });
+    }
+  }, [settingTreeDropdownValue, settingCascadeURL, defaultQuestion]);
 
   useEffect(() => {
     if (!isEmpty(initialValue)) {

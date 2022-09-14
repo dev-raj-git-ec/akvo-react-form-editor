@@ -14,7 +14,9 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
     activeQuestionGroups,
     activeEditQuestionGroups,
     activeEditQuestions,
+    hostParams,
   } = UIStore.useState((s) => s);
+  const { defaultQuestionParam } = hostParams;
 
   const { id, name, questions, order } = questionGroup;
   const questionIds = questions.map((q) => q.id);
@@ -113,7 +115,10 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
       }));
     const newQuestionGroups = [
       ...prevQg,
-      questionGroupFn.add({ prevOrder: prevOrder }),
+      questionGroupFn.add({
+        prevOrder: prevOrder,
+        defaultQuestionParam: defaultQuestionParam,
+      }),
       ...nextQg,
     ];
     questionGroupFn.store.update((s) => {

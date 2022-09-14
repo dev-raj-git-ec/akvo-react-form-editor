@@ -32,6 +32,7 @@ const defaultQuestion = ({
   name,
   prevOrder = 0,
   type = questionType.input,
+  required = false,
   params = {},
 }) => {
   const q = {
@@ -40,7 +41,7 @@ const defaultQuestion = ({
     questionGroupId: questionGroup.id,
     name: name || dummyName(5),
     type: type,
-    required: false,
+    required: required,
     tooltip: null,
   };
   if (type === questionType.option || type === questionType.multiple_option) {
@@ -63,7 +64,11 @@ const defaultQuestion = ({
   return { ...q, ...params };
 };
 
-const defaultQuestionGroup = ({ name = dummyName(), prevOrder = 0 }) => {
+const defaultQuestionGroup = ({
+  name = dummyName(),
+  prevOrder = 0,
+  defaultQuestionParam = {},
+}) => {
   const qg = {
     id: generateId(),
     name: name,
@@ -73,7 +78,9 @@ const defaultQuestionGroup = ({ name = dummyName(), prevOrder = 0 }) => {
   };
   return {
     ...qg,
-    questions: [defaultQuestion({ questionGroup: qg })],
+    questions: [
+      defaultQuestion({ questionGroup: qg, ...defaultQuestionParam }),
+    ],
   };
 };
 

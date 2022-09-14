@@ -11,7 +11,7 @@ import { orderBy, maxBy, minBy } from 'lodash';
 const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
   const { questionGroups } = questionGroupFn.store.useState((s) => s);
   const { questions } = questionGroup;
-  const UIText = UIStore.useState((s) => s.UIText);
+  const { UIText, hostParams } = UIStore.useState((s) => s);
   const {
     buttonAddNewQuestionText,
     buttonCopyQuestionText,
@@ -23,6 +23,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
   const [activeTab, setActiveTab] = useState('setting');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { id, questionGroupId, order, name, dependency } = question;
+  const { defaultQuestionParam } = hostParams;
 
   const allQuestions = questionGroups
     .map((qg) => qg.questions)
@@ -156,6 +157,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
         order: q.order + 1,
       }));
     const newQ = {
+      ...defaultQuestionParam,
       questionGroup: questionGroup,
       prevOrder: prevOrder,
       params: data.clear(['id', 'order', 'questionGroupId'], movingQ),
