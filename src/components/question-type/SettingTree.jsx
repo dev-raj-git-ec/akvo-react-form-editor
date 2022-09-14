@@ -39,6 +39,7 @@ const SettingTree = ({ id, questionGroupId, option }) => {
       <Form.Item
         label={UIText.inputSelectTreeDropdownValueLabel}
         name={`${namePreffix}-tree-options`}
+        initialValue={option}
       >
         <Select
           showSearch
@@ -46,7 +47,6 @@ const SettingTree = ({ id, questionGroupId, option }) => {
           optionFilterProp="label"
           options={settingTreeDropdownValue}
           getPopupContainer={(triggerNode) => triggerNode.parentElement}
-          value={option}
           onChange={handleChangeTreeDropdown}
         />
       </Form.Item>
