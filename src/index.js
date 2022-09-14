@@ -190,7 +190,7 @@ const WebformEditor = ({
             </div>
           }
           tabBarGutter={24}
-          className={styles['tabs-wrapper']}
+          className={`${styles['tabs-wrapper']} ${styles['tabs-wrapper-sticky']}`}
         >
           {tabProps.map((prop) => (
             <Tabs.TabPane

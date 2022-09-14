@@ -41,6 +41,12 @@
   font-weight: bold;
   color: #6a6a6a;
 }
+.tabs-wrapper-sticky {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 2;
+}
 
 .tabs-wrapper .right-tabs {
   font-family: 'Roboto Condensed', sans-serif;
