@@ -103,6 +103,7 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
     questionGroupFn.store.update((s) => {
       s.questionGroups = newQuestionGroups;
     });
+    setIsModalOpen(false);
   };
 
   const handleOnAdd = (prevOrder) => {

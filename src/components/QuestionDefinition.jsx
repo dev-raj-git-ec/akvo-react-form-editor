@@ -146,6 +146,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
         return qg;
       });
     });
+    setIsModalOpen(false);
   };
 
   const handleOnAdd = (prevOrder) => {
