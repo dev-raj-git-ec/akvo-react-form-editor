@@ -105,9 +105,9 @@
           "order": 4,
           "type": "cascade",
           "api": {
-            "endpoint": "https://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/cascade-296940912-v1.sqlite",
-            "initial": 0,
-            "list": false
+            "endpoint": "https://rtmis.akvotest.org/api/v1/administration",
+            "initial": 1,
+            "list": "children"
           },
           "required": true,
           "translations": [

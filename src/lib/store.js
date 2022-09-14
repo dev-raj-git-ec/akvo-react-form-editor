@@ -18,6 +18,7 @@ const questionType = {
   input: 'input',
   number: 'number',
   cascade: 'cascade',
+  geo: 'geo',
   text: 'text',
   date: 'date',
   option: 'option',

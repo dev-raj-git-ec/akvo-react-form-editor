@@ -55,7 +55,7 @@ const SettingCascade = ({
         [`${namePreffix}-api-list`]: findURL.list,
       });
       updateGlobalState({
-        endpoint: findURL.url,
+        endpoint: findURL.endpoint,
         initial: findURL.initial || 0,
         list: findURL.list || false,
       });
@@ -81,15 +81,27 @@ const SettingCascade = ({
         label={UIText.inputQuestionEndpointLabel}
         name={`${namePreffix}-api-endpoint`}
       >
-        <Select
-          showSearch
-          className={styles['select-dropdown']}
-          optionFilterProp="label"
-          options={cascadeURLDropdownValue}
-          getPopupContainer={(triggerNode) => triggerNode.parentElement}
-          value={api?.endpoint}
-          onChange={handleChangeEndpoint}
-        />
+        <Row
+          align="middle"
+          gutter={[24, 24]}
+        >
+          <Col span={10}>
+            <Select
+              showSearch
+              className={styles['select-dropdown']}
+              optionFilterProp="label"
+              options={cascadeURLDropdownValue}
+              getPopupContainer={(triggerNode) => triggerNode.parentElement}
+              onChange={handleChangeEndpoint}
+            />
+          </Col>
+          <Col span={14}>
+            <Input
+              value={api?.endpoint}
+              disabled
+            />
+          </Col>
+        </Row>
       </Form.Item>
       <Row
         align="bottom"

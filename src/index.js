@@ -52,7 +52,9 @@ const WebformEditor = ({
         settingTreeDropdownValue: settingTreeDropdownValue.filter(
           (x) => x?.label && x?.value
         ),
-        settingCascadeURL: settingCascadeURL.filter((x) => x?.name && x?.url),
+        settingCascadeURL: settingCascadeURL
+          .filter((x) => x?.name && x?.endpoint)
+          .map((x, xi) => ({ ...x, id: x?.id || xi + 1 })),
       };
     });
   }, [settingTreeDropdownValue, settingCascadeURL]);

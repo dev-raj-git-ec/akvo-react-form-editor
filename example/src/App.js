@@ -38,21 +38,21 @@ const App = () => {
           onSave={setSource}
           initialValue={initialValue ? initial_value.default : source}
           settingTreeDropdownValue={[
-            { label: 'Example First Tree Label', value: 'ex1' },
-            { label: 'Example Second Tree Label', value: 'ex2' },
+            { label: 'Administration Tree', value: 'administration' },
+            { label: 'Example Tree', value: 'example' },
           ]}
           settingCascadeURL={[
             {
               id: 1,
               name: 'County',
-              url: 'https://rtmis.akvotest.org/api/v1/administration',
+              endpoint: 'https://rtmis.akvotest.org/api/v1/administration',
               initial: 1,
               list: 'children',
             },
             {
               id: 2,
               name: 'Sub-County Baringo',
-              url: 'https://rtmis.akvotest.org/api/v1/administration',
+              endpoint: 'https://rtmis.akvotest.org/api/v1/administration',
               initial: 2,
               list: 'children',
             },
