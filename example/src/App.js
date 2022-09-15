@@ -62,6 +62,13 @@ const App = () => {
             name: 'New Question',
             required: true,
           }}
+          // limitQuestionType={[
+          //   'text',
+          //   'number',
+          //   'option',
+          //   'multiple_option',
+          //   'date',
+          // ]}
         />
       </div>
       <div className={'half-width json-source' + (!showJson ? ' shrink' : '')}>

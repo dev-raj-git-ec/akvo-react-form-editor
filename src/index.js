@@ -29,6 +29,7 @@ const WebformEditor = ({
   settingTreeDropdownValue = [{ label: null, value: null }],
   settingCascadeURL = [{ name: null, url: null, initial: 0, list: false }],
   defaultQuestion = { type: null, name: null, required: null },
+  limitQuestionType = [],
 }) => {
   const formStore = FormStore.useState((s) => s);
   const current = UIStore.useState((s) => s.current);
@@ -72,6 +73,12 @@ const WebformEditor = ({
           .filter((x) => x?.name && x?.endpoint)
           .map((x, xi) => ({ ...x, id: x?.id || xi + 1 })),
         defaultQuestionParam: sanitizeDefaultQuestion,
+        limitQuestionType: Object.keys(questionType)
+          .map((key) => ({
+            label: questionType[key]?.split('_').join(' '),
+            value: questionType[key],
+          }))
+          .filter((x) => limitQuestionType.includes(x.value)),
       };
     });
     if (checkDefaultQuestion) {
@@ -84,7 +91,12 @@ const WebformEditor = ({
         ];
       });
     }
-  }, [settingTreeDropdownValue, settingCascadeURL, defaultQuestion]);
+  }, [
+    settingTreeDropdownValue,
+    settingCascadeURL,
+    defaultQuestion,
+    limitQuestionType,
+  ]);
 
   useEffect(() => {
     if (!isEmpty(initialValue)) {

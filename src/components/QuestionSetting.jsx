@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Form, Input, Select, Checkbox, Alert } from 'antd';
 import styles from '../styles.module.css';
 import { UIStore, questionType, questionGroupFn } from '../lib/store';
@@ -16,9 +16,20 @@ const QuestionSetting = ({ question, dependant }) => {
   const { id, name, type, variable, tooltip, required, questionGroupId } =
     question;
   const namePreffix = `question-${id}`;
-  const UIText = UIStore.useState((s) => s.UIText);
+  const { UIText, hostParams } = UIStore.useState((s) => s);
   const form = Form.useFormInstance();
   const qType = Form.useWatch(`${namePreffix}-type`, form);
+  const { limitQuestionType } = hostParams;
+
+  const questionTypeDropdownValue = useMemo(() => {
+    if (limitQuestionType.length) {
+      return limitQuestionType;
+    }
+    return Object.keys(questionType).map((key) => ({
+      label: questionType[key]?.split('_').join(' '),
+      value: questionType[key],
+    }));
+  }, [limitQuestionType]);
 
   const updateState = (name, value) => {
     questionGroupFn.store.update((s) => {
@@ -123,10 +134,7 @@ const QuestionSetting = ({ question, dependant }) => {
       >
         <Select
           className={styles['select-dropdown']}
-          options={Object.keys(questionType).map((key) => ({
-            label: questionType[key]?.split('_').join(' '),
-            value: questionType[key],
-          }))}
+          options={questionTypeDropdownValue}
           getPopupContainer={(triggerNode) => triggerNode.parentElement}
           onChange={handleChangeType}
           disabled={dependant.length}
