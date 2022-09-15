@@ -22,7 +22,7 @@ const QuestionSetting = ({ question, dependant }) => {
   const { limitQuestionType } = hostParams;
 
   const questionTypeDropdownValue = useMemo(() => {
-    if (limitQuestionType.length) {
+    if (limitQuestionType && limitQuestionType?.length) {
       return limitQuestionType;
     }
     return Object.keys(questionType).map((key) => ({

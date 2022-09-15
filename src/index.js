@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import 'antd/dist/antd.min.css';
 import styles from './styles.module.css';
 import { Card, Tabs, Tag, Space } from 'antd';
@@ -31,16 +31,17 @@ const WebformEditor = ({
   defaultQuestion = { type: null, name: null, required: null },
   limitQuestionType = [],
 }) => {
+  const [init, setInit] = useState(true);
   const formStore = FormStore.useState((s) => s);
   const current = UIStore.useState((s) => s.current);
-  const UIText = UIStore.useState((s) => s.UIText);
+  const { UIText, hostParams } = UIStore.useState((s) => s);
   const questionGroups = questionGroupFn.store.useState(
     (s) => s.questionGroups
   );
   const activeEditFormSetting = UIStore.useState(
     (s) => s.activeEditFormSetting
   );
-
+  const { defaultQuestionParam } = hostParams;
   const { tab: currentTab } = current;
   const {
     formTabPane,
@@ -57,6 +58,12 @@ const WebformEditor = ({
     const checkDefaultQuestion = Object.values(defaultQuestion).filter(
       (x) => x
     ).length;
+    const sanitizeSettingTreeDropdownValue = settingTreeDropdownValue.filter(
+      (x) => x?.label && x?.value
+    );
+    const sanitizeSettingCascadeURL = settingCascadeURL
+      .filter((x) => x?.name && x?.endpoint)
+      .map((x, xi) => ({ ...x, id: x?.id || xi + 1 }));
     const sanitizeDefaultQuestion = {
       type: defaultQuestion?.type || questionType.input,
       name: defaultQuestion?.name,
@@ -64,39 +71,56 @@ const WebformEditor = ({
     };
     // update UIStore
     UIStore.update((s) => {
-      s.hostParams = {
-        ...s.hostParams,
-        settingTreeDropdownValue: settingTreeDropdownValue.filter(
-          (x) => x?.label && x?.value
-        ),
-        settingCascadeURL: settingCascadeURL
-          .filter((x) => x?.name && x?.endpoint)
-          .map((x, xi) => ({ ...x, id: x?.id || xi + 1 })),
-        defaultQuestionParam: sanitizeDefaultQuestion,
-        limitQuestionType: Object.keys(questionType)
-          .map((key) => ({
-            label: questionType[key]?.split('_').join(' '),
-            value: questionType[key],
-          }))
-          .filter((x) => limitQuestionType.includes(x.value)),
-      };
+      if (sanitizeSettingTreeDropdownValue.length) {
+        s.hostParams = {
+          ...s.hostParams,
+          settingTreeDropdownValue: sanitizeSettingTreeDropdownValue,
+        };
+      }
+      if (sanitizeSettingCascadeURL.length) {
+        s.hostParams = {
+          ...s.hostParams,
+          settingTreeDropdownValue: sanitizeSettingCascadeURL,
+        };
+      }
+      if (checkDefaultQuestion) {
+        s.hostParams = {
+          ...s.hostParams,
+          defaultQuestionParam: sanitizeDefaultQuestion,
+        };
+      }
+      if (limitQuestionType.length) {
+        s.hostParams = {
+          ...s.hostParams,
+          limitQuestionType: Object.keys(questionType)
+            .map((key) => ({
+              label: questionType[key]?.split('_').join(' '),
+              value: questionType[key],
+            }))
+            .filter((x) => limitQuestionType.includes(x.value)),
+        };
+      }
     });
-    if (checkDefaultQuestion) {
-      // replase questionGroup store with defaultQuestion value
-      questionGroupFn.store.update((s) => {
-        s.questionGroups = [
-          questionGroupFn.add({
-            defaultQuestionParam: sanitizeDefaultQuestion,
-          }),
-        ];
-      });
-    }
   }, [
     settingTreeDropdownValue,
     settingCascadeURL,
     defaultQuestion,
     limitQuestionType,
   ]);
+
+  useEffect(() => {
+    if (defaultQuestionParam && init) {
+      // replace questionGroup store with defaultQuestion value
+      questionGroupFn.store.update((s) => {
+        s.questionGroups = [
+          questionGroupFn.add({
+            defaultQuestionParam: defaultQuestionParam,
+          }),
+        ];
+      });
+      setInit(false);
+    }
+  }, [defaultQuestionParam, init]);
 
   useEffect(() => {
     if (!isEmpty(initialValue)) {
