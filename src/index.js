@@ -55,9 +55,9 @@ const WebformEditor = ({
 
   useEffect(() => {
     // store params from host to global store
-    const checkDefaultQuestion = Object.values(defaultQuestion).filter(
-      (x) => x
-    ).length;
+    const checkDefaultQuestion = defaultQuestion
+      ? Object.values(defaultQuestion).filter((x) => x).length
+      : false;
     const sanitizeSettingTreeDropdownValue = settingTreeDropdownValue.filter(
       (x) => x?.label && x?.value
     );

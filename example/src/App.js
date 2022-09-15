@@ -5,10 +5,17 @@ import * as initial_value from './example-initial-value.json';
 
 import 'akvo-react-form-editor/dist/index.css';
 
+const defaultQuestion = {
+  type: 'text',
+  name: 'New Question',
+  required: true,
+};
+
 const App = () => {
   const [source, setSource] = useState({});
   const [showJson, setShowJson] = useState(false);
   const [initialValue, setInitialValue] = useState(false);
+  const [defaultQuestionValue, setDefaultQuestionValue] = useState(false);
 
   const onJsonEdit = ({ updated_src }) => {
     setSource(updated_src);
@@ -26,6 +33,11 @@ const App = () => {
             alt="npm"
             src="https://img.shields.io/npm/v/akvo-react-form?logo=npm&style=flat-square"
           />
+          <button
+            onClick={() => setDefaultQuestionValue(!defaultQuestionValue)}
+          >
+            {defaultQuestionValue ? '☑' : '☒'} Default Question
+          </button>
           <button onClick={() => setInitialValue(!initialValue)}>
             {initialValue ? '☑' : '☒'} Initial Value
           </button>
@@ -57,11 +69,7 @@ const App = () => {
               list: 'children',
             },
           ]}
-          defaultQuestion={{
-            type: 'text',
-            name: 'New Question',
-            required: true,
-          }}
+          defaultQuestion={defaultQuestionValue ? defaultQuestion : null}
           // limitQuestionType={[
           //   'text',
           //   'number',
