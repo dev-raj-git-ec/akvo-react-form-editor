@@ -175,6 +175,7 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
         ...q,
         questionGroup: questionGroups.find((qg) => q.questionGroupId === qg.id),
       }));
+
     const dependencies = allQ.filter(
       (q) =>
         q?.dependency?.filter((d) => questionIds.find((qid) => qid === d.id))
@@ -185,7 +186,7 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
     const movingQ = movingQg?.questions?.filter((q) => {
       const selfDependency =
         q?.dependency?.filter((d) => movingQids.includes(d.id))?.length || 0;
-      return selfDependency;
+      return !selfDependency;
     });
 
     let disabled = { current: false, last: false };
