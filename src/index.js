@@ -31,7 +31,7 @@ const WebformEditor = ({
   defaultQuestion = { type: null, name: null, required: null },
   limitQuestionType = [],
 }) => {
-  const [init, setInit] = useState(true);
+  const [init, setInit] = useState(defaultQuestion);
   const formStore = FormStore.useState((s) => s);
   const current = UIStore.useState((s) => s.current);
   const { UIText, hostParams } = UIStore.useState((s) => s);
@@ -87,6 +87,11 @@ const WebformEditor = ({
         s.hostParams = {
           ...s.hostParams,
           defaultQuestionParam: sanitizeDefaultQuestion,
+        };
+      } else {
+        s.hostParams = {
+          ...s.hostParams,
+          defaultQuestionParam: {},
         };
       }
       if (limitQuestionType.length) {
