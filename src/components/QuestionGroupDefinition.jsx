@@ -217,7 +217,10 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
       'questionGroup.order'
     );
 
-    if (movingQDependant?.questionGroup?.order < order) {
+    const dependantIsLessThanOrder =
+      movingQDependant?.questionGroup?.order < (isLastItem ? order + 1 : order);
+
+    if (dependantIsLessThanOrder) {
       disabled = {
         current: true,
         last: true,
@@ -228,7 +231,7 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
       disabled: disabled,
       dependant: dependencies,
     };
-  }, [questionGroups, questionIds, movingQg, order]);
+  }, [questionGroups, questionIds, movingQg, order, isLastItem]);
 
   const rightButtons = [
     {
