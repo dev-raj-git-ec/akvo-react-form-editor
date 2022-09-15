@@ -16,6 +16,7 @@ var lodash = require('lodash');
 var orderBy = _interopDefault(require('lodash/orderBy'));
 require('akvo-react-form/dist/index.css');
 var akvoReactForm = require('akvo-react-form');
+var vsc = require('react-icons/vsc');
 
 function _extends() {
   _extends = Object.assign ? Object.assign.bind() : function (target) {
@@ -34,7 +35,7 @@ function _extends() {
   return _extends.apply(this, arguments);
 }
 
-var styles = {"container":"arfe-container","form-definition":"arfe-form-definition","input-checkbox-wrapper":"arfe-input-checkbox-wrapper","button-icon":"arfe-button-icon","reorder-wrapper":"arfe-reorder-wrapper","reorder-button":"arfe-reorder-button","select-dropdown":"arfe-select-dropdown","tabs-wrapper":"arfe-tabs-wrapper","right-tabs":"arfe-right-tabs","question-group-title":"arfe-question-group-title","space-align-right":"arfe-space-align-right","space-align-left":"arfe-space-align-left","space-vertical-align-left":"arfe-space-vertical-align-left","space-vertical-align-right":"arfe-space-vertical-align-right","more-question-setting-text":"arfe-more-question-setting-text","dependant-list-box":"arfe-dependant-list-box","tags":"arfe-tags","tags-active":"arfe-tags-active","translation-form-item":"arfe-translation-form-item","translation-form-item-card":"arfe-translation-form-item-card"};
+var styles = {"container":"arfe-container","form-definition":"arfe-form-definition","input-checkbox-wrapper":"arfe-input-checkbox-wrapper","button-icon":"arfe-button-icon","reorder-wrapper":"arfe-reorder-wrapper","reorder-button":"arfe-reorder-button","select-dropdown":"arfe-select-dropdown","tabs-wrapper":"arfe-tabs-wrapper","tabs-wrapper-sticky":"arfe-tabs-wrapper-sticky","right-tabs":"arfe-right-tabs","tab-pane-name-icon":"arfe-tab-pane-name-icon","question-group-title":"arfe-question-group-title","space-align-right":"arfe-space-align-right","space-align-left":"arfe-space-align-left","space-vertical-align-left":"arfe-space-vertical-align-left","space-vertical-align-right":"arfe-space-vertical-align-right","more-question-setting-text":"arfe-more-question-setting-text","dependant-list-box":"arfe-dependant-list-box","tags":"arfe-tags","tags-active":"arfe-tags-active","translation-form-item":"arfe-translation-form-item","translation-form-item-card":"arfe-translation-form-item-card"};
 
 var FormWrapper = function FormWrapper(_ref) {
   var children = _ref.children;
@@ -130,7 +131,11 @@ var UIStaticText = {
     inputQuestionListLabel: 'Object Name',
     questionMoreInputDateSettingText: 'More Date Question Setting',
     inputQuestionAfterDateValueLabel: 'After Date',
-    inputQuestionBeforeDateValueLabel: 'Before Date'
+    inputQuestionBeforeDateValueLabel: 'Before Date',
+    alertDeleteQuestionTitle: 'Delete Question',
+    alertDeleteQuestion: 'Do you want to delete this question?',
+    alertDeleteQuestionGroupTitle: 'Delete Question Group',
+    alertDeleteQuestionGroup: 'Do you want to delete this question group and all the questions?'
   }
 };
 
@@ -248,6 +253,7 @@ var questionType = {
   input: 'input',
   number: 'number',
   cascade: 'cascade',
+  geo: 'geo',
   text: 'text',
   date: 'date',
   option: 'option',
@@ -262,6 +268,8 @@ var defaultQuestion = function defaultQuestion(_ref) {
       prevOrder = _ref$prevOrder === void 0 ? 0 : _ref$prevOrder,
       _ref$type = _ref.type,
       type = _ref$type === void 0 ? questionType.input : _ref$type,
+      _ref$required = _ref.required,
+      required = _ref$required === void 0 ? false : _ref$required,
       _ref$params = _ref.params,
       params = _ref$params === void 0 ? {} : _ref$params;
   var q = {
@@ -270,7 +278,7 @@ var defaultQuestion = function defaultQuestion(_ref) {
     questionGroupId: questionGroup.id,
     name: name || dummyName(5),
     type: type,
-    required: false,
+    required: required,
     tooltip: null
   };
 
@@ -298,7 +306,9 @@ var defaultQuestionGroup = function defaultQuestionGroup(_ref2) {
   var _ref2$name = _ref2.name,
       name = _ref2$name === void 0 ? dummyName() : _ref2$name,
       _ref2$prevOrder = _ref2.prevOrder,
-      prevOrder = _ref2$prevOrder === void 0 ? 0 : _ref2$prevOrder;
+      prevOrder = _ref2$prevOrder === void 0 ? 0 : _ref2$prevOrder,
+      _ref2$defaultQuestion = _ref2.defaultQuestionParam,
+      defaultQuestionParam = _ref2$defaultQuestion === void 0 ? {} : _ref2$defaultQuestion;
   var qg = {
     id: generateId(),
     name: name,
@@ -307,9 +317,9 @@ var defaultQuestionGroup = function defaultQuestionGroup(_ref2) {
     repeatable: false
   };
   return _extends({}, qg, {
-    questions: [defaultQuestion({
+    questions: [defaultQuestion(_extends({
       questionGroup: qg
-    })]
+    }, defaultQuestionParam))]
   });
 };
 
@@ -1895,7 +1905,9 @@ var TranslationFormItem = function TranslationFormItem(_ref) {
       _ref$currentValue = _ref.currentValue,
       currentValue = _ref$currentValue === void 0 ? '' : _ref$currentValue,
       _ref$children = _ref.children,
-      children = _ref$children === void 0 ? '' : _ref$children;
+      children = _ref$children === void 0 ? '' : _ref$children,
+      _ref$initialValue = _ref.initialValue,
+      initialValue = _ref$initialValue === void 0 ? '' : _ref$initialValue;
   return /*#__PURE__*/React__default.createElement(antd.Row, {
     align: "top",
     justify: "space-between",
@@ -1915,8 +1927,31 @@ var TranslationFormItem = function TranslationFormItem(_ref) {
   }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     name: name,
     label: /*#__PURE__*/React__default.createElement("b", null, labelText),
-    className: styles['translation-form-item']
+    className: styles['translation-form-item'],
+    initialValue: initialValue
   }, children)));
+};
+
+var AlertPopup = function AlertPopup(_ref) {
+  var onConfirm = _ref.onConfirm,
+      onCancel = _ref.onCancel,
+      visible = _ref.visible,
+      children = _ref.children,
+      _ref$title = _ref.title,
+      title = _ref$title === void 0 ? 'Alert' : _ref$title,
+      _ref$okButtonProps = _ref.okButtonProps,
+      okButtonProps = _ref$okButtonProps === void 0 ? {} : _ref$okButtonProps,
+      _ref$okText = _ref.okText,
+      okText = _ref$okText === void 0 ? 'OK' : _ref$okText;
+  return /*#__PURE__*/React__default.createElement(antd.Modal, {
+    title: title,
+    visible: visible,
+    onOk: onConfirm,
+    onCancel: onCancel,
+    centered: true,
+    okButtonProps: okButtonProps,
+    okText: okText
+  }, children);
 };
 
 var clearQuestionObj = function clearQuestionObj(keysToRemove, obj, checkEmpty) {
@@ -1987,6 +2022,83 @@ var clearTranslations = function clearTranslations(obj, translations) {
   return newObj;
 };
 
+var toEditor = function toEditor(webFormData) {
+  webFormData = lodash.mapKeys(webFormData, function (_, k) {
+    return k === 'question_group' ? 'questionGroups' : k;
+  });
+  webFormData = _extends({}, webFormData, {
+    questionGroups: webFormData.questionGroups.map(function (qg, qgi) {
+      var _qg, _qg2;
+
+      var gid = ((_qg = qg) === null || _qg === void 0 ? void 0 : _qg.id) || generateId() + qgi;
+      qg = lodash.mapKeys(qg, function (_, k) {
+        return k === 'question' ? 'questions' : k;
+      });
+      qg = _extends({}, qg, {
+        id: gid,
+        order: ((_qg2 = qg) === null || _qg2 === void 0 ? void 0 : _qg2.order) || qgi + 1,
+        questions: qg.questions.map(function (q, qi) {
+          var _q, _q2, _q3;
+
+          var isNotOption = ![questionType.option, questionType.multiple_option].includes(q.type);
+
+          if (isNotOption && q.type !== questionType.tree) {
+            q = clearQuestionObj(['option'], q);
+          }
+
+          if ([questionType.option, questionType.multiple_option].includes(q.type)) {
+            q = lodash.mapKeys(q, function (_, k) {
+              return k === 'option' ? 'options' : k;
+            });
+          }
+
+          if ((_q = q) !== null && _q !== void 0 && _q.options) {
+            q = _extends({}, q, {
+              options: q.options.map(function (o, oi) {
+                return _extends({
+                  id: (o === null || o === void 0 ? void 0 : o.id) || qi + 1 + (oi + 1)
+                }, o, {
+                  order: (o === null || o === void 0 ? void 0 : o.order) || oi + 1
+                });
+              })
+            });
+          }
+
+          if ((_q2 = q) !== null && _q2 !== void 0 && _q2.dependency) {
+            var dependency = q.dependency.map(function (d) {
+              var _d, _d2;
+
+              if ((_d = d) !== null && _d !== void 0 && _d.max) {
+                d = _extends({}, d, {
+                  max: d.max + 1
+                });
+              }
+
+              if ((_d2 = d) !== null && _d2 !== void 0 && _d2.min) {
+                d = _extends({}, d, {
+                  min: d.min - 1
+                });
+              }
+
+              return d;
+            });
+            q = _extends({}, q, {
+              dependency: dependency
+            });
+          }
+
+          return _extends({}, q, {
+            order: ((_q3 = q) === null || _q3 === void 0 ? void 0 : _q3.order) || qi + 1,
+            questionGroupId: gid
+          });
+        })
+      });
+      return qg;
+    })
+  });
+  return webFormData;
+};
+
 var toWebform = function toWebform(formData, questionGroups) {
   var _formData$languages;
 
@@ -2008,13 +2120,15 @@ var toWebform = function toWebform(formData, questionGroups) {
 
   var output = questionGroups.map(function (qg) {
     var questions = qg.questions.map(function (q) {
-      var _q, _q2, _q3;
+      var _q4, _q5, _q6;
+
+      var isNotOption = ![questionType.option, questionType.multiple_option].includes(q.type);
 
       if (q.type !== questionType.input) {
         q = clearQuestionObj(['requiredDoubleEntry', 'hiddenString'], q);
       }
 
-      if (q.type !== questionType.number) {
+      if (q.type !== questionType.number && q.type !== questionType.date) {
         q = clearQuestionObj(['rule'], q);
       }
 
@@ -2031,7 +2145,7 @@ var toWebform = function toWebform(formData, questionGroups) {
         });
       }
 
-      if (![questionType.option, questionType.multiple_option].includes(q.type)) {
+      if (isNotOption) {
         q = clearQuestionObj(['allowOther'], q);
       }
 
@@ -2039,25 +2153,25 @@ var toWebform = function toWebform(formData, questionGroups) {
         q = clearQuestionObj(['api'], q);
       }
 
-      if (q.type !== questionType.tree) {
+      if (q.type !== questionType.tree && isNotOption) {
         q = clearQuestionObj(['option'], q);
       }
 
-      if (!((_q = q) !== null && _q !== void 0 && _q.tooltip)) {
+      if (!((_q4 = q) !== null && _q4 !== void 0 && _q4.tooltip)) {
         q = clearQuestionObj(['tooltip'], q);
       }
 
-      if ((_q2 = q) !== null && _q2 !== void 0 && _q2.dependency) {
+      if ((_q5 = q) !== null && _q5 !== void 0 && _q5.dependency) {
         var dependency = q.dependency.map(function (d) {
-          var _d, _d2;
+          var _d3, _d4;
 
-          if ((_d = d) !== null && _d !== void 0 && _d.max) {
+          if ((_d3 = d) !== null && _d3 !== void 0 && _d3.max) {
             d = _extends({}, d, {
               max: d.max - 1
             });
           }
 
-          if ((_d2 = d) !== null && _d2 !== void 0 && _d2.min) {
+          if ((_d4 = d) !== null && _d4 !== void 0 && _d4.min) {
             d = _extends({}, d, {
               min: d.min + 1
             });
@@ -2070,7 +2184,7 @@ var toWebform = function toWebform(formData, questionGroups) {
         });
       }
 
-      if ((_q3 = q) !== null && _q3 !== void 0 && _q3.translations) {
+      if ((_q6 = q) !== null && _q6 !== void 0 && _q6.translations) {
         q = clearTranslations(q, q.translations);
       }
 
@@ -2144,6 +2258,7 @@ var generateTranslations = function generateTranslations(key, value, savedTransl
 var data = {
   clear: clearQuestionObj,
   toWebform: toWebform,
+  toEditor: toEditor,
   generateTranslations: generateTranslations
 };
 
@@ -2191,20 +2306,20 @@ var FormDefinitionTranslation = function FormDefinitionTranslation() {
   return /*#__PURE__*/React__default.createElement("div", null, (formStore === null || formStore === void 0 ? void 0 : formStore.name) && /*#__PURE__*/React__default.createElement(TranslationFormItem, {
     labelText: UIText.inputFormNameLabel,
     currentValue: formStore.name,
-    name: namePreffix + "-form-name"
+    name: namePreffix + "-form-name",
+    initialValue: existingTranslationValues === null || existingTranslationValues === void 0 ? void 0 : existingTranslationValues.name
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
     disabled: !existingTranslation,
-    onChange: handleChangeName,
-    value: existingTranslationValues === null || existingTranslationValues === void 0 ? void 0 : existingTranslationValues.name
+    onChange: handleChangeName
   })), (formStore === null || formStore === void 0 ? void 0 : formStore.description) && /*#__PURE__*/React__default.createElement(TranslationFormItem, {
     labelText: UIText.inputFormDescriptionLabel,
     currentValue: formStore.description,
-    name: namePreffix + "-form-description"
+    name: namePreffix + "-form-description",
+    initialValue: existingTranslationValues === null || existingTranslationValues === void 0 ? void 0 : existingTranslationValues.description
   }, /*#__PURE__*/React__default.createElement(antd.Input.TextArea, {
     rows: 5,
     disabled: !existingTranslation,
-    onChange: handleChangeDescription,
-    value: existingTranslationValues === null || existingTranslationValues === void 0 ? void 0 : existingTranslationValues.description
+    onChange: handleChangeDescription
   })));
 };
 
@@ -2362,29 +2477,29 @@ var QuestionSettingTranslation = function QuestionSettingTranslation(_ref) {
   return /*#__PURE__*/React__default.createElement("div", null, name && /*#__PURE__*/React__default.createElement(TranslationFormItem, {
     labelText: UIText.inputQuestionNameLabel,
     currentValue: name,
-    name: namePreffix + "-name"
+    name: namePreffix + "-name",
+    initialValue: existingTranslationValues === null || existingTranslationValues === void 0 ? void 0 : existingTranslationValues.name
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
     disabled: !existingTranslation,
-    onChange: handleChangeName,
-    value: existingTranslationValues === null || existingTranslationValues === void 0 ? void 0 : existingTranslationValues.name
+    onChange: handleChangeName
   })), (tooltip === null || tooltip === void 0 ? void 0 : tooltip.text) && /*#__PURE__*/React__default.createElement(TranslationFormItem, {
     labelText: UIText.inputQuestionTooltipLabel,
     currentValue: tooltip.text,
-    name: namePreffix + "-tooltip"
+    name: namePreffix + "-tooltip",
+    initialValue: existingTooltipTranslationValues === null || existingTooltipTranslationValues === void 0 ? void 0 : existingTooltipTranslationValues.text
   }, /*#__PURE__*/React__default.createElement(antd.Input.TextArea, {
     disabled: !existingTranslation,
-    onChange: handleChangeTooltip,
-    value: existingTooltipTranslationValues === null || existingTooltipTranslationValues === void 0 ? void 0 : existingTooltipTranslationValues.text
+    onChange: handleChangeTooltip
   })), [questionType.option, questionType.multiple_option].includes(type) && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("p", {
     className: styles['more-question-setting-text']
   }, UIText.questionMoreOptionTranslationText), allowOther && allowOtherText && /*#__PURE__*/React__default.createElement(TranslationFormItem, {
     labelText: UIText.inputQuestionAllowOtherTextLabel,
     currentValue: allowOtherText,
-    name: namePreffix + "-allow_other_text"
+    name: namePreffix + "-allow_other_text",
+    initialValue: existingTranslationValues === null || existingTranslationValues === void 0 ? void 0 : existingTranslationValues.allowOtherText
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
     disabled: !existingTranslation,
-    onChange: handleChangeAllowOtherText,
-    value: existingTranslationValues === null || existingTranslationValues === void 0 ? void 0 : existingTranslationValues.allowOtherText
+    onChange: handleChangeAllowOtherText
   })), orderBy(options, 'order').filter(function (d) {
     return d === null || d === void 0 ? void 0 : d.name;
   }).map(function (d, di) {
@@ -2397,13 +2512,13 @@ var QuestionSettingTranslation = function QuestionSettingTranslation(_ref) {
       key: "translation-option-" + d.id + "-" + di,
       labelText: UIText.inputQuestionOptionNameLabel + " " + d.order,
       currentValue: d.name,
-      name: namePreffix + "-option-name-" + d.id
+      name: namePreffix + "-option-name-" + ((d === null || d === void 0 ? void 0 : d.id) || d.name),
+      initialValue: existingOptionTranslationValues === null || existingOptionTranslationValues === void 0 ? void 0 : existingOptionTranslationValues.name
     }, /*#__PURE__*/React__default.createElement(antd.Input, {
       disabled: !existingTranslation,
       onChange: function onChange(e) {
         return handleChangeOptionName(e, d === null || d === void 0 ? void 0 : d.translations, d.id);
-      },
-      value: existingOptionTranslationValues === null || existingOptionTranslationValues === void 0 ? void 0 : existingOptionTranslationValues.name
+      }
     }));
   })));
 };
@@ -2523,28 +2638,28 @@ var QuestionGroupSettingTranslation = function QuestionGroupSettingTranslation(_
   return /*#__PURE__*/React__default.createElement("div", null, name && /*#__PURE__*/React__default.createElement(TranslationFormItem, {
     labelText: UIText.inputQuestionGroupNameLabel,
     currentValue: name,
-    name: namePreffix + "-name"
+    name: namePreffix + "-name",
+    initialValue: existingTranslationValues === null || existingTranslationValues === void 0 ? void 0 : existingTranslationValues.name
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
     disabled: !existingTranslation,
-    onChange: handleChangeName,
-    value: existingTranslationValues === null || existingTranslationValues === void 0 ? void 0 : existingTranslationValues.name
+    onChange: handleChangeName
   })), description && /*#__PURE__*/React__default.createElement(TranslationFormItem, {
     labelText: UIText.inputQuestionGroupDescriptionLabel,
     currentValue: description,
-    name: namePreffix + "-description"
+    name: namePreffix + "-description",
+    initialValue: existingTranslationValues === null || existingTranslationValues === void 0 ? void 0 : existingTranslationValues.description
   }, /*#__PURE__*/React__default.createElement(antd.Input.TextArea, {
     rows: 5,
     disabled: !existingTranslation,
-    onChange: handleChangeDescription,
-    value: existingTranslationValues === null || existingTranslationValues === void 0 ? void 0 : existingTranslationValues.description
+    onChange: handleChangeDescription
   })), repeatable && repeatText && /*#__PURE__*/React__default.createElement(TranslationFormItem, {
     labelText: UIText.inputRepeatTextLabel,
     currentValue: repeatText,
-    name: namePreffix + "-repeat_text"
+    name: namePreffix + "-repeat_text",
+    initialValue: existingTranslationValues === null || existingTranslationValues === void 0 ? void 0 : existingTranslationValues.repeatText
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
     disabled: !existingTranslation,
-    onChange: handleChangeRepeatText,
-    value: existingTranslationValues === null || existingTranslationValues === void 0 ? void 0 : existingTranslationValues.repeatText
+    onChange: handleChangeRepeatText
   })));
 };
 
@@ -3209,7 +3324,13 @@ var SettingOption = function SettingOption(_ref2) {
     return s.UIText;
   });
 
-  var _useState = React.useState(currentOptions !== null && currentOptions !== void 0 && currentOptions.length ? currentOptions : defaultOptions({
+  var _useState = React.useState(currentOptions !== null && currentOptions !== void 0 && currentOptions.length ? currentOptions.map(function (x, xi) {
+    return _extends({}, x, {
+      code: (x === null || x === void 0 ? void 0 : x.code) || null,
+      id: (x === null || x === void 0 ? void 0 : x.id) || generateId() + xi,
+      order: (x === null || x === void 0 ? void 0 : x.order) || xi + 1
+    });
+  }) : defaultOptions({
     init: true
   })),
       options = _useState[0],
@@ -3454,7 +3575,8 @@ var SettingTree = function SettingTree(_ref) {
     className: styles['more-question-setting-text']
   }, UIText.questionMoreTreeSettingText), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     label: UIText.inputSelectTreeDropdownValueLabel,
-    name: namePreffix + "-tree-options"
+    name: namePreffix + "-tree-options",
+    initialValue: option
   }, /*#__PURE__*/React__default.createElement(antd.Select, {
     showSearch: true,
     className: styles['select-dropdown'],
@@ -3463,7 +3585,6 @@ var SettingTree = function SettingTree(_ref) {
     getPopupContainer: function getPopupContainer(triggerNode) {
       return triggerNode.parentElement;
     },
-    value: option,
     onChange: handleChangeTreeDropdown
   })));
 };
@@ -3533,7 +3654,7 @@ var SettingCascade = function SettingCascade(_ref) {
 
       form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[namePreffix + "-api-initial"] = findURL.initial, _form$setFieldsValue[namePreffix + "-api-list"] = findURL.list, _form$setFieldsValue));
       updateGlobalState({
-        endpoint: findURL.url,
+        endpoint: findURL.endpoint,
         initial: findURL.initial || 0,
         list: findURL.list || false
       });
@@ -3557,6 +3678,11 @@ var SettingCascade = function SettingCascade(_ref) {
   }, UIText.questionMoreCascadeSettingText), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     label: UIText.inputQuestionEndpointLabel,
     name: namePreffix + "-api-endpoint"
+  }, /*#__PURE__*/React__default.createElement(antd.Row, {
+    align: "middle",
+    gutter: [24, 24]
+  }, /*#__PURE__*/React__default.createElement(antd.Col, {
+    span: 10
   }, /*#__PURE__*/React__default.createElement(antd.Select, {
     showSearch: true,
     className: styles['select-dropdown'],
@@ -3565,9 +3691,13 @@ var SettingCascade = function SettingCascade(_ref) {
     getPopupContainer: function getPopupContainer(triggerNode) {
       return triggerNode.parentElement;
     },
-    value: api === null || api === void 0 ? void 0 : api.endpoint,
     onChange: handleChangeEndpoint
-  })), /*#__PURE__*/React__default.createElement(antd.Row, {
+  })), /*#__PURE__*/React__default.createElement(antd.Col, {
+    span: 14
+  }, /*#__PURE__*/React__default.createElement(antd.Input, {
+    value: api === null || api === void 0 ? void 0 : api.endpoint,
+    disabled: true
+  })))), /*#__PURE__*/React__default.createElement(antd.Row, {
     align: "bottom",
     gutter: [24, 24]
   }, /*#__PURE__*/React__default.createElement(antd.Col, {
@@ -9289,12 +9419,17 @@ var moment = createCommonjsModule(function (module, exports) {
 var SettingDate = function SettingDate(_ref) {
   var id = _ref.id,
       questionGroupId = _ref.questionGroupId,
-      minDate = _ref.minDate,
-      maxDate = _ref.maxDate;
+      _ref$rule = _ref.rule,
+      rule = _ref$rule === void 0 ? {
+    minDate: null,
+    maxDate: null
+  } : _ref$rule;
   var namePreffix = "question-" + id;
   var UIText = UIStore.useState(function (s) {
     return s.UIText;
   });
+  var minDate = rule.minDate,
+      maxDate = rule.maxDate;
   var moreDateSettings = [{
     label: UIText.inputQuestionAfterDateValueLabel,
     value: minDate,
@@ -9319,7 +9454,9 @@ var SettingDate = function SettingDate(_ref) {
             if (q.id === id) {
               var _extends2;
 
-              return _extends({}, q, (_extends2 = {}, _extends2[name] = moment(value).format('YYYY-MM-DD'), _extends2));
+              return _extends({}, q, {
+                rule: _extends({}, q === null || q === void 0 ? void 0 : q.rule, (_extends2 = {}, _extends2[name] = moment(value).format('YYYY-MM-DD'), _extends2))
+              });
             }
 
             return q;
@@ -9370,11 +9507,30 @@ var QuestionSetting = function QuestionSetting(_ref) {
       required = question.required,
       questionGroupId = question.questionGroupId;
   var namePreffix = "question-" + id;
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
+
+  var _UIStore$useState = UIStore.useState(function (s) {
+    return s;
+  }),
+      UIText = _UIStore$useState.UIText,
+      hostParams = _UIStore$useState.hostParams;
+
   var form = antd.Form.useFormInstance();
   var qType = antd.Form.useWatch(namePreffix + "-type", form);
+  var limitQuestionType = hostParams.limitQuestionType;
+  var questionTypeDropdownValue = React.useMemo(function () {
+    if (limitQuestionType && limitQuestionType !== null && limitQuestionType !== void 0 && limitQuestionType.length) {
+      return limitQuestionType;
+    }
+
+    return Object.keys(questionType).map(function (key) {
+      var _questionType$key;
+
+      return {
+        label: (_questionType$key = questionType[key]) === null || _questionType$key === void 0 ? void 0 : _questionType$key.split('_').join(' '),
+        value: questionType[key]
+      };
+    });
+  }, [limitQuestionType]);
 
   var updateState = function updateState(name, value) {
     questionGroupFn.store.update(function (s) {
@@ -9476,14 +9632,7 @@ var QuestionSetting = function QuestionSetting(_ref) {
     required: true
   }, /*#__PURE__*/React__default.createElement(antd.Select, {
     className: styles['select-dropdown'],
-    options: Object.keys(questionType).map(function (key) {
-      var _questionType$key;
-
-      return {
-        label: (_questionType$key = questionType[key]) === null || _questionType$key === void 0 ? void 0 : _questionType$key.split('_').join(' '),
-        value: questionType[key]
-      };
-    }),
+    options: questionTypeDropdownValue,
     getPopupContainer: function getPopupContainer(triggerNode) {
       return triggerNode.parentElement;
     },
@@ -9527,6 +9676,15 @@ var dependencyTypes = [{
   }, {
     label: 'greater than',
     value: 'min'
+  }]
+}, {
+  type: [questionType.date],
+  logicDropdowns: [{
+    label: 'before',
+    value: 'before'
+  }, {
+    label: 'after',
+    value: 'after'
   }]
 }];
 
@@ -9907,6 +10065,13 @@ var SettingSkipLogic = function SettingSkipLogic(_ref) {
     allowClear: true,
     showArrow: true,
     value: Array.isArray(dependency.dependentAnswer) ? dependency.dependentAnswer : dependency.dependentAnswer ? [dependency.dependentAnswer] : []
+  }), dependency.dependentToType === questionType.date && /*#__PURE__*/React__default.createElement(antd.DatePicker, {
+    style: {
+      width: '100%'
+    },
+    onChange: function onChange(e) {
+      return handleChangeDependentAnswer(dependency.id, moment(e).format('YYYY-MM-DD'));
+    }
   })))));
 };
 
@@ -10002,12 +10167,19 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
       questionGroups = _questionGroupFn$stor.questionGroups;
 
   var questions = questionGroup.questions;
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
-  var buttonAddNewQuestionText = UIText.buttonAddNewQuestionText,
+
+  var _UIStore$useState = UIStore.useState(function (s) {
+    return s;
+  }),
+      UIText = _UIStore$useState.UIText,
+      hostParams = _UIStore$useState.hostParams;
+
+  var alertDeleteQuestionTitle = UIText.alertDeleteQuestionTitle,
+      alertDeleteQuestion = UIText.alertDeleteQuestion,
+      buttonAddNewQuestionText = UIText.buttonAddNewQuestionText,
       buttonCopyQuestionText = UIText.buttonCopyQuestionText,
-      buttonMoveQuestionText = UIText.buttonMoveQuestionText;
+      buttonMoveQuestionText = UIText.buttonMoveQuestionText,
+      buttonDeleteText = UIText.buttonDeleteText;
   var movingQ = UIStore.useState(function (s) {
     return s.activeMoveQuestion;
   });
@@ -10022,11 +10194,16 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
       activeTab = _useState[0],
       setActiveTab = _useState[1];
 
+  var _useState2 = React.useState(false),
+      isModalOpen = _useState2[0],
+      setIsModalOpen = _useState2[1];
+
   var id = question.id,
       questionGroupId = question.questionGroupId,
       order = question.order,
       name = question.name,
       dependency = question.dependency;
+  var defaultQuestionParam = hostParams.defaultQuestionParam;
   var allQuestions = questionGroups.map(function (qg) {
     return qg.questions;
   }).flatMap(function (x) {
@@ -10155,6 +10332,7 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
         return qg;
       });
     });
+    setIsModalOpen(false);
   };
 
   var _handleOnAdd = function handleOnAdd(prevOrder) {
@@ -10168,11 +10346,13 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
         order: q.order + 1
       });
     });
-    var newQ = {
+
+    var newQ = _extends({}, defaultQuestionParam, {
       questionGroup: questionGroup,
       prevOrder: prevOrder,
       params: data.clear(['id', 'order', 'questionGroupId'], movingQ)
-    };
+    });
+
     var newQuestions = [].concat(prevQ, [questionFn.add(newQ)], nextQ);
     questionGroupFn.store.update(function (s) {
       s.questionGroups = s.questionGroups.map(function (qg) {
@@ -10285,7 +10465,9 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
     onClick: handleCopy
   }, {
     type: 'delete-button',
-    onClick: handleDelete,
+    onClick: function onClick() {
+      return setIsModalOpen(true);
+    },
     disabled: !index && isLastItem || dependant.dependant.length
   }];
   var leftButtons = [{
@@ -10364,13 +10546,28 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
     handleOnMove: function handleOnMove() {
       return isCopying ? _handleOnAdd(order) : _handleOnMove(order, true);
     }
-  }));
+  }), /*#__PURE__*/React__default.createElement(AlertPopup, {
+    visible: isModalOpen,
+    onConfirm: handleDelete,
+    onCancel: function onCancel() {
+      return setIsModalOpen(false);
+    },
+    okButtonProps: {
+      danger: true
+    },
+    title: alertDeleteQuestionTitle,
+    okText: buttonDeleteText
+  }, alertDeleteQuestion));
 };
 
 var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
   var index = _ref.index,
       questionGroup = _ref.questionGroup,
       isLastItem = _ref.isLastItem;
+
+  var _useState = React.useState(false),
+      isModalOpen = _useState[0],
+      setIsModalOpen = _useState[1];
 
   var _questionGroupFn$stor = questionGroupFn.store.useState(function (s) {
     return s;
@@ -10386,8 +10583,10 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
   }),
       activeQuestionGroups = _UIStore$useState.activeQuestionGroups,
       activeEditQuestionGroups = _UIStore$useState.activeEditQuestionGroups,
-      activeEditQuestions = _UIStore$useState.activeEditQuestions;
+      activeEditQuestions = _UIStore$useState.activeEditQuestions,
+      hostParams = _UIStore$useState.hostParams;
 
+  var defaultQuestionParam = hostParams.defaultQuestionParam;
   var id = questionGroup.id,
       name = questionGroup.name,
       questions = questionGroup.questions,
@@ -10400,7 +10599,10 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
     return s.UIText;
   }),
       buttonAddNewQuestionGroupText = _UIStore$useState2.buttonAddNewQuestionGroupText,
-      buttonMoveQuestionGroupText = _UIStore$useState2.buttonMoveQuestionGroupText;
+      buttonMoveQuestionGroupText = _UIStore$useState2.buttonMoveQuestionGroupText,
+      alertDeleteQuestionGroupTitle = _UIStore$useState2.alertDeleteQuestionGroupTitle,
+      alertDeleteQuestionGroup = _UIStore$useState2.alertDeleteQuestionGroup,
+      buttonDeleteText = _UIStore$useState2.buttonDeleteText;
 
   var showQuestion = React.useMemo(function () {
     return activeQuestionGroups.includes(id);
@@ -10480,6 +10682,7 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
     questionGroupFn.store.update(function (s) {
       s.questionGroups = newQuestionGroups;
     });
+    setIsModalOpen(false);
   };
 
   var _handleOnAdd = function handleOnAdd(prevOrder) {
@@ -10494,7 +10697,8 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
       });
     });
     var newQuestionGroups = [].concat(prevQg, [questionGroupFn.add({
-      prevOrder: prevOrder
+      prevOrder: prevOrder,
+      defaultQuestionParam: defaultQuestionParam
     })], nextQg);
     questionGroupFn.store.update(function (s) {
       s.questionGroups = newQuestionGroups;
@@ -10577,7 +10781,7 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
       var selfDependency = (q === null || q === void 0 ? void 0 : (_q$dependency2 = q.dependency) === null || _q$dependency2 === void 0 ? void 0 : (_q$dependency2$filter = _q$dependency2.filter(function (d) {
         return movingQids.includes(d.id);
       })) === null || _q$dependency2$filter === void 0 ? void 0 : _q$dependency2$filter.length) || 0;
-      return selfDependency;
+      return !selfDependency;
     });
     var disabled = {
       current: false,
@@ -10611,8 +10815,9 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
         });
       }).length) || false;
     }), 'questionGroup.order');
+    var dependantIsLessThanOrder = (movingQDependant === null || movingQDependant === void 0 ? void 0 : (_movingQDependant$que = movingQDependant.questionGroup) === null || _movingQDependant$que === void 0 ? void 0 : _movingQDependant$que.order) < (isLastItem ? order + 1 : order);
 
-    if ((movingQDependant === null || movingQDependant === void 0 ? void 0 : (_movingQDependant$que = movingQDependant.questionGroup) === null || _movingQDependant$que === void 0 ? void 0 : _movingQDependant$que.order) < order) {
+    if (dependantIsLessThanOrder) {
       disabled = {
         current: true,
         last: true
@@ -10623,7 +10828,7 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
       disabled: disabled,
       dependant: dependencies
     };
-  }, [questionGroups, questionIds, movingQg, order]);
+  }, [questionGroups, questionIds, movingQg, order, isLastItem]);
   var rightButtons = [{
     type: 'expand-all-button',
     isExpand: showQuestion && lodash.intersection(activeEditQuestions, questionIds).length,
@@ -10631,7 +10836,9 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
     onCancel: handleCancelExpandAll
   }, {
     type: 'delete-button',
-    onClick: handleDelete,
+    onClick: function onClick() {
+      return setIsModalOpen(true);
+    },
     disabled: !index && isLastItem
   }, {
     type: 'edit-button',
@@ -10699,12 +10906,25 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
     handleOnMove: function handleOnMove() {
       return _handleOnMove(order, true);
     }
-  }));
+  }), /*#__PURE__*/React__default.createElement(AlertPopup, {
+    visible: isModalOpen,
+    onConfirm: handleDelete,
+    onCancel: function onCancel() {
+      return setIsModalOpen(false);
+    },
+    okButtonProps: {
+      danger: true
+    },
+    title: alertDeleteQuestionGroupTitle,
+    okText: buttonDeleteText
+  }, alertDeleteQuestionGroup));
 };
 
 var WebformEditor = function WebformEditor(_ref) {
   var _ref$onSave = _ref.onSave,
       onSave = _ref$onSave === void 0 ? false : _ref$onSave,
+      _ref$initialValue = _ref.initialValue,
+      initialValue = _ref$initialValue === void 0 ? {} : _ref$initialValue,
       _ref$settingTreeDropd = _ref.settingTreeDropdownValue,
       settingTreeDropdownValue = _ref$settingTreeDropd === void 0 ? [{
     label: null,
@@ -10716,22 +10936,40 @@ var WebformEditor = function WebformEditor(_ref) {
     url: null,
     initial: 0,
     list: false
-  }] : _ref$settingCascadeUR;
+  }] : _ref$settingCascadeUR,
+      _ref$defaultQuestion = _ref.defaultQuestion,
+      defaultQuestion = _ref$defaultQuestion === void 0 ? {
+    type: null,
+    name: null,
+    required: null
+  } : _ref$defaultQuestion,
+      _ref$limitQuestionTyp = _ref.limitQuestionType,
+      limitQuestionType = _ref$limitQuestionTyp === void 0 ? [] : _ref$limitQuestionTyp;
+
+  var _useState = React.useState(defaultQuestion),
+      init = _useState[0],
+      setInit = _useState[1];
+
   var formStore = FormStore.useState(function (s) {
     return s;
   });
   var current = UIStore.useState(function (s) {
     return s.current;
   });
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
+
+  var _UIStore$useState = UIStore.useState(function (s) {
+    return s;
+  }),
+      UIText = _UIStore$useState.UIText,
+      hostParams = _UIStore$useState.hostParams;
+
   var questionGroups = questionGroupFn.store.useState(function (s) {
     return s.questionGroups;
   });
   var activeEditFormSetting = UIStore.useState(function (s) {
     return s.activeEditFormSetting;
   });
+  var defaultQuestionParam = hostParams.defaultQuestionParam;
   var currentTab = current.tab;
   var formTabPane = UIText.formTabPane,
       formTranslationPane = UIText.formTranslationPane,
@@ -10741,17 +10979,94 @@ var WebformEditor = function WebformEditor(_ref) {
       mandatoryQuestionCount = UIText.mandatoryQuestionCount,
       version = UIText.version;
   React.useEffect(function () {
-    UIStore.update(function (s) {
-      s.hostParams = _extends({}, s.hostParams, {
-        settingTreeDropdownValue: settingTreeDropdownValue.filter(function (x) {
-          return (x === null || x === void 0 ? void 0 : x.label) && (x === null || x === void 0 ? void 0 : x.value);
-        }),
-        settingCascadeURL: settingCascadeURL.filter(function (x) {
-          return (x === null || x === void 0 ? void 0 : x.name) && (x === null || x === void 0 ? void 0 : x.url);
-        })
+    var checkDefaultQuestion = defaultQuestion ? Object.values(defaultQuestion).filter(function (x) {
+      return x;
+    }).length : false;
+    var sanitizeSettingTreeDropdownValue = settingTreeDropdownValue.filter(function (x) {
+      return (x === null || x === void 0 ? void 0 : x.label) && (x === null || x === void 0 ? void 0 : x.value);
+    });
+    var sanitizeSettingCascadeURL = settingCascadeURL.filter(function (x) {
+      return (x === null || x === void 0 ? void 0 : x.name) && (x === null || x === void 0 ? void 0 : x.endpoint);
+    }).map(function (x, xi) {
+      return _extends({}, x, {
+        id: (x === null || x === void 0 ? void 0 : x.id) || xi + 1
       });
     });
-  }, [settingTreeDropdownValue, settingCascadeURL]);
+    var sanitizeDefaultQuestion = {
+      type: (defaultQuestion === null || defaultQuestion === void 0 ? void 0 : defaultQuestion.type) || questionType.input,
+      name: defaultQuestion === null || defaultQuestion === void 0 ? void 0 : defaultQuestion.name,
+      required: (defaultQuestion === null || defaultQuestion === void 0 ? void 0 : defaultQuestion.required) || false
+    };
+    UIStore.update(function (s) {
+      if (sanitizeSettingTreeDropdownValue.length) {
+        s.hostParams = _extends({}, s.hostParams, {
+          settingTreeDropdownValue: sanitizeSettingTreeDropdownValue
+        });
+      }
+
+      if (sanitizeSettingCascadeURL.length) {
+        s.hostParams = _extends({}, s.hostParams, {
+          settingTreeDropdownValue: sanitizeSettingCascadeURL
+        });
+      }
+
+      if (checkDefaultQuestion) {
+        s.hostParams = _extends({}, s.hostParams, {
+          defaultQuestionParam: sanitizeDefaultQuestion
+        });
+      } else {
+        s.hostParams = _extends({}, s.hostParams, {
+          defaultQuestionParam: {}
+        });
+      }
+
+      if (limitQuestionType.length) {
+        s.hostParams = _extends({}, s.hostParams, {
+          limitQuestionType: Object.keys(questionType).map(function (key) {
+            var _questionType$key;
+
+            return {
+              label: (_questionType$key = questionType[key]) === null || _questionType$key === void 0 ? void 0 : _questionType$key.split('_').join(' '),
+              value: questionType[key]
+            };
+          }).filter(function (x) {
+            return limitQuestionType.includes(x.value);
+          })
+        });
+      }
+    });
+  }, [settingTreeDropdownValue, settingCascadeURL, defaultQuestion, limitQuestionType]);
+  React.useEffect(function () {
+    if (defaultQuestionParam && init) {
+      questionGroupFn.store.update(function (s) {
+        s.questionGroups = [questionGroupFn.add({
+          defaultQuestionParam: defaultQuestionParam
+        })];
+      });
+      setInit(false);
+    }
+  }, [defaultQuestionParam, init]);
+  React.useEffect(function () {
+    if (!lodash.isEmpty(initialValue)) {
+      var initialData = data.toEditor(initialValue);
+      FormStore.update(function (s) {
+        var _initialData$language;
+
+        s.id = (initialData === null || initialData === void 0 ? void 0 : initialData.id) || generateId();
+        s.version = (initialData === null || initialData === void 0 ? void 0 : initialData.version) || 1;
+        s.name = (initialData === null || initialData === void 0 ? void 0 : initialData.name) || 'Unknown Form';
+        s.description = (initialData === null || initialData === void 0 ? void 0 : initialData.description) || 'Unknown Description';
+        s.languages = (initialData === null || initialData === void 0 ? void 0 : (_initialData$language = initialData.languages) === null || _initialData$language === void 0 ? void 0 : _initialData$language.filter(function (x) {
+          return x !== 'en';
+        })) || [];
+        s.defaultLanguage = (initialData === null || initialData === void 0 ? void 0 : initialData.defaultLanguage) || 'en';
+        s.translations = (initialData === null || initialData === void 0 ? void 0 : initialData.translations) || [];
+      });
+      questionGroupFn.store.update(function (s) {
+        s.questionGroups = initialData.questionGroups;
+      });
+    }
+  }, [initialValue]);
 
   var handleTabsOnChange = function handleTabsOnChange(e) {
     UIStore.update(function (s) {
@@ -10780,6 +11095,19 @@ var WebformEditor = function WebformEditor(_ref) {
   var mandatory = questions.filter(function (q) {
     return q === null || q === void 0 ? void 0 : q.required;
   });
+  var tabProps = [{
+    icon: tb.TbEdit,
+    tab: formTabPane,
+    key: 'edit-form'
+  }, {
+    icon: md.MdOutlineLanguage,
+    tab: formTranslationPane,
+    key: 'translations'
+  }, {
+    icon: vsc.VscPreview,
+    tab: previewTabPane,
+    key: 'preview'
+  }];
   return /*#__PURE__*/React__default.createElement("div", {
     key: "container",
     className: styles.container
@@ -10814,16 +11142,15 @@ var WebformEditor = function WebformEditor(_ref) {
       onClick: handleSave
     }))),
     tabBarGutter: 24,
-    className: styles['tabs-wrapper']
-  }, /*#__PURE__*/React__default.createElement(antd.Tabs.TabPane, {
-    tab: formTabPane,
-    key: "edit-form"
-  }), /*#__PURE__*/React__default.createElement(antd.Tabs.TabPane, {
-    tab: formTranslationPane,
-    key: "translations"
-  }), /*#__PURE__*/React__default.createElement(antd.Tabs.TabPane, {
-    tab: previewTabPane,
-    key: "preview"
+    className: styles['tabs-wrapper'] + " " + styles['tabs-wrapper-sticky']
+  }, tabProps.map(function (prop) {
+    return /*#__PURE__*/React__default.createElement(antd.Tabs.TabPane, {
+      tab: /*#__PURE__*/React__default.createElement(antd.Space, {
+        size: 2,
+        className: styles['tab-pane-name-icon']
+      }, /*#__PURE__*/React__default.createElement(prop.icon, null), " ", prop.tab),
+      key: prop.key
+    });
   })), currentTab === 'edit-form' && /*#__PURE__*/React__default.createElement(FormWrapper, null, activeEditFormSetting && /*#__PURE__*/React__default.createElement(FormDefinition, formStore), questionGroups.map(function (qg, qgi) {
     return /*#__PURE__*/React__default.createElement(QuestionGroupDefinition, {
       key: "question-group-definition-" + qgi,

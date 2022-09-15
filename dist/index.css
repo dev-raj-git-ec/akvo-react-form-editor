@@ -43,10 +43,22 @@
   font-weight: bold;
   color: #6a6a6a;
 }
+.arfe-tabs-wrapper-sticky {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 2;
+}
 
 .arfe-tabs-wrapper .arfe-right-tabs {
   font-family: 'Roboto Condensed', sans-serif;
   font-weight: normal;
+}
+
+.arfe-tab-pane-name-icon svg {
+  margin-bottom: -2px;
+  font-size: 16px;
 }
 
 .arfe-question-group-title {
@@ -98,8 +110,10 @@
 .arfe-tags {
   font-size: 14px !important;
   color: #000;
+  padding: 5px 10px;
 }
 .arfe-tags svg {
+  font-size: 11px;
   color: #000;
 }
 
