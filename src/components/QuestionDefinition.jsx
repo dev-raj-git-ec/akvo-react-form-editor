@@ -25,7 +25,8 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
   const activeEditQuestions = UIStore.useState((s) => s.activeEditQuestions);
   const [activeTab, setActiveTab] = useState('setting');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { id, questionGroupId, order, name, dependency } = question;
+  const { id, questionGroupId, order, name, dependency, disableDelete } =
+    question;
   const { defaultQuestionParam } = hostParams;
 
   const allQuestions = questionGroups
@@ -273,7 +274,8 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
     {
       type: 'delete-button',
       onClick: () => setIsModalOpen(true),
-      disabled: (!index && isLastItem) || dependant.dependant.length,
+      disabled:
+        (!index && isLastItem) || dependant.dependant.length || disableDelete,
     },
   ];
 

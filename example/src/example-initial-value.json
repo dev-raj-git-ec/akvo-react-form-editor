@@ -63,6 +63,7 @@
           "order": 2,
           "type": "input",
           "required": true,
+          "disableDelete": true,
           "tooltip": {
             "text": "Fullname or Nickname",
             "translations": [
@@ -79,6 +80,7 @@
           "order": 3,
           "type": "number",
           "required": true,
+          "disableDelete": true,
           "translations": [
             {
               "name": "Nomor Telepon",

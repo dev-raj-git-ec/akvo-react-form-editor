@@ -36,6 +36,10 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
     return activeEditQuestionGroups.includes(id);
   }, [activeEditQuestionGroups, id]);
 
+  const disableDelete = useMemo(() => {
+    return questions.filter((q) => q?.disableDelete)?.length;
+  }, [questions]);
+
   const handleHideQuestions = () => {
     UIStore.update((s) => {
       s.activeQuestionGroups = activeQuestionGroups.filter(
@@ -244,7 +248,7 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
     {
       type: 'delete-button',
       onClick: () => setIsModalOpen(true),
-      disabled: !index && isLastItem,
+      disabled: (!index && isLastItem) || disableDelete,
     },
     {
       type: 'edit-button',
