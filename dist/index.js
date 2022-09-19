@@ -10202,7 +10202,8 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
       questionGroupId = question.questionGroupId,
       order = question.order,
       name = question.name,
-      dependency = question.dependency;
+      dependency = question.dependency,
+      disableDelete = question.disableDelete;
   var defaultQuestionParam = hostParams.defaultQuestionParam;
   var allQuestions = questionGroups.map(function (qg) {
     return qg.questions;
@@ -10468,7 +10469,7 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
     onClick: function onClick() {
       return setIsModalOpen(true);
     },
-    disabled: !index && isLastItem || dependant.dependant.length
+    disabled: !index && isLastItem || dependant.dependant.length || disableDelete
   }];
   var leftButtons = [{
     type: 'move-button',
@@ -10610,6 +10611,13 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
   var isEditQuestionGroup = React.useMemo(function () {
     return activeEditQuestionGroups.includes(id);
   }, [activeEditQuestionGroups, id]);
+  var disableDelete = React.useMemo(function () {
+    var _questions$filter;
+
+    return (_questions$filter = questions.filter(function (q) {
+      return q === null || q === void 0 ? void 0 : q.disableDelete;
+    })) === null || _questions$filter === void 0 ? void 0 : _questions$filter.length;
+  }, [questions]);
 
   var handleHideQuestions = function handleHideQuestions() {
     UIStore.update(function (s) {
@@ -10839,7 +10847,7 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
     onClick: function onClick() {
       return setIsModalOpen(true);
     },
-    disabled: !index && isLastItem
+    disabled: !index && isLastItem || disableDelete
   }, {
     type: 'edit-button',
     isExpand: isEditQuestionGroup,
