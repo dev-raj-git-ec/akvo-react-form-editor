@@ -31,7 +31,7 @@ const App = () => {
           />
           <img
             alt="npm"
-            src="https://img.shields.io/npm/v/akvo-react-form?logo=npm&style=flat-square"
+            src="https://img.shields.io/npm/v/akvo-react-form-editor?logo=npm&style=flat-square"
           />
           <button
             onClick={() => setDefaultQuestionValue(!defaultQuestionValue)}
