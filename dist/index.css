@@ -12,7 +12,6 @@
 }
 
 .arfe-input-checkbox-wrapper {
-  width: -webkit-fit-content;
   width: -moz-fit-content;
   width: fit-content;
 }
@@ -44,7 +43,6 @@
   color: #6a6a6a;
 }
 .arfe-tabs-wrapper-sticky {
-  position: -webkit-sticky;
   position: sticky;
   top: 0;
   background: #fff;

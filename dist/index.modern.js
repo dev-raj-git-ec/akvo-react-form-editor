@@ -521,9 +521,9 @@ function commonjsRequire () {
 
 var classnames = createCommonjsModule(function (module) {
 /*!
-  Copyright (c) 2018 Jed Watson.
-  Licensed under the MIT License (MIT), see
-  http://jedwatson.github.io/classnames
+	Copyright (c) 2018 Jed Watson.
+	Licensed under the MIT License (MIT), see
+	http://jedwatson.github.io/classnames
 */
 /* global define */
 
@@ -550,14 +550,15 @@ var classnames = createCommonjsModule(function (module) {
 					}
 				}
 			} else if (argType === 'object') {
-				if (arg.toString === Object.prototype.toString) {
-					for (var key in arg) {
-						if (hasOwn.call(arg, key) && arg[key]) {
-							classes.push(key);
-						}
-					}
-				} else {
+				if (arg.toString !== Object.prototype.toString && !arg.toString.toString().includes('[native code]')) {
 					classes.push(arg.toString());
+					continue;
+				}
+
+				for (var key in arg) {
+					if (hasOwn.call(arg, key) && arg[key]) {
+						classes.push(key);
+					}
 				}
 			}
 		}
@@ -1384,7 +1385,33 @@ function canUseDom() {
   return !!(typeof window !== 'undefined' && window.document && window.document.createElement);
 }
 
+function contains(root, n) {
+  if (!root) {
+    return false;
+  } // Use native if support
+
+
+  if (root.contains) {
+    return root.contains(n);
+  } // `document.contains` not support with IE11
+
+
+  var node = n;
+
+  while (node) {
+    if (node === root) {
+      return true;
+    }
+
+    node = node.parentNode;
+  }
+
+  return false;
+}
+
+var APPEND_ORDER = 'data-rc-order';
 var MARK_KEY = "rc-util-key";
+var containerCache = new Map();
 
 function getMark() {
   var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
@@ -1406,32 +1433,58 @@ function getContainer(option) {
   return head || document.body;
 }
 
-function injectCSS(css) {
-  var _option$csp;
+function getOrder(prepend) {
+  if (prepend === 'queue') {
+    return 'prependQueue';
+  }
 
+  return prepend ? 'prepend' : 'append';
+}
+/**
+ * Find style which inject by rc-util
+ */
+
+
+function findStyles(container) {
+  return Array.from((containerCache.get(container) || container).children).filter(function (node) {
+    return node.tagName === 'STYLE';
+  });
+}
+
+function injectCSS(css) {
   var option = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
   if (!canUseDom()) {
     return null;
   }
 
+  var csp = option.csp,
+      prepend = option.prepend;
   var styleNode = document.createElement('style');
+  styleNode.setAttribute(APPEND_ORDER, getOrder(prepend));
 
-  if ((_option$csp = option.csp) === null || _option$csp === void 0 ? void 0 : _option$csp.nonce) {
-    var _option$csp2;
-
-    styleNode.nonce = (_option$csp2 = option.csp) === null || _option$csp2 === void 0 ? void 0 : _option$csp2.nonce;
+  if (csp === null || csp === void 0 ? void 0 : csp.nonce) {
+    styleNode.nonce = csp === null || csp === void 0 ? void 0 : csp.nonce;
   }
 
   styleNode.innerHTML = css;
   var container = getContainer(option);
   var firstChild = container.firstChild;
 
-  if (option.prepend && container.prepend) {
-    // Use `prepend` first
-    container.prepend(styleNode);
-  } else if (option.prepend && firstChild) {
-    // Fallback to `insertBefore` like IE not support `prepend`
+  if (prepend) {
+    // If is queue `prepend`, it will prepend first style and then append rest style
+    if (prepend === 'queue') {
+      var existStyle = findStyles(container).filter(function (node) {
+        return ['prepend', 'prependQueue'].includes(node.getAttribute(APPEND_ORDER));
+      });
+
+      if (existStyle.length) {
+        container.insertBefore(styleNode, existStyle[existStyle.length - 1].nextSibling);
+        return styleNode;
+      }
+    } // Use `insertBefore` as `prepend`
+
+
     container.insertBefore(styleNode, firstChild);
   } else {
     container.appendChild(styleNode);
@@ -1439,35 +1492,43 @@ function injectCSS(css) {
 
   return styleNode;
 }
-var containerCache = new Map();
 
 function findExistNode(key) {
   var option = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   var container = getContainer(option);
-  return Array.from(containerCache.get(container).children).find(function (node) {
-    return node.tagName === 'STYLE' && node.getAttribute(getMark(option)) === key;
+  return findStyles(container).find(function (node) {
+    return node.getAttribute(getMark(option)) === key;
   });
 }
-function updateCSS(css, key) {
-  var option = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-  var container = getContainer(option); // Get real parent
+/**
+ * qiankun will inject `appendChild` to insert into other
+ */
 
-  if (!containerCache.has(container)) {
+function syncRealContainer(container, option) {
+  var cachedRealContainer = containerCache.get(container); // Find real container when not cached or cached container removed
+
+  if (!cachedRealContainer || !contains(document, cachedRealContainer)) {
     var placeholderStyle = injectCSS('', option);
     var parentNode = placeholderStyle.parentNode;
     containerCache.set(container, parentNode);
     parentNode.removeChild(placeholderStyle);
   }
+}
 
+function updateCSS(css, key) {
+  var option = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+  var container = getContainer(option); // Sync real parent
+
+  syncRealContainer(container, option);
   var existNode = findExistNode(key, option);
 
   if (existNode) {
-    var _option$csp3, _option$csp4;
+    var _option$csp, _option$csp2;
 
-    if (((_option$csp3 = option.csp) === null || _option$csp3 === void 0 ? void 0 : _option$csp3.nonce) && existNode.nonce !== ((_option$csp4 = option.csp) === null || _option$csp4 === void 0 ? void 0 : _option$csp4.nonce)) {
-      var _option$csp5;
+    if (((_option$csp = option.csp) === null || _option$csp === void 0 ? void 0 : _option$csp.nonce) && existNode.nonce !== ((_option$csp2 = option.csp) === null || _option$csp2 === void 0 ? void 0 : _option$csp2.nonce)) {
+      var _option$csp3;
 
-      existNode.nonce = (_option$csp5 = option.csp) === null || _option$csp5 === void 0 ? void 0 : _option$csp5.nonce;
+      existNode.nonce = (_option$csp3 = option.csp) === null || _option$csp3 === void 0 ? void 0 : _option$csp3.nonce;
     }
 
     if (existNode.innerHTML !== css) {
@@ -2100,6 +2161,7 @@ var toWebform = function toWebform(formData, questionGroups) {
   var _formData$languages;
 
   var webformData = {
+    id: (formData === null || formData === void 0 ? void 0 : formData.id) || generateId(),
     name: formData.name,
     description: formData.description
   };
@@ -2969,11 +3031,20 @@ var FormPreview = function FormPreview() {
 var FormDefinition = function FormDefinition(_ref) {
   var name = _ref.name,
       description = _ref.description;
+  var form = Form.useFormInstance();
   var UIText = UIStore.useState(function (s) {
     return s.UIText;
   });
   var inputFormNameLabel = UIText.inputFormNameLabel,
       inputFormDescriptionLabel = UIText.inputFormDescriptionLabel;
+  useEffect(function () {
+    form.setFieldsValue({
+      'form-name': name
+    });
+    form.setFieldsValue({
+      'form-description': description
+    });
+  }, [form, name, description]);
   return /*#__PURE__*/React__default.createElement("div", {
     key: "form-definition-input",
     className: "arfe-form-definition"
@@ -11011,7 +11082,7 @@ var WebformEditor = function WebformEditor(_ref) {
 
       if (sanitizeSettingCascadeURL.length) {
         s.hostParams = _extends({}, s.hostParams, {
-          settingTreeDropdownValue: sanitizeSettingCascadeURL
+          settingCascadeURL: sanitizeSettingCascadeURL
         });
       }
 
