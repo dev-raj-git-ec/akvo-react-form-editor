@@ -80,7 +80,7 @@ const WebformEditor = ({
       if (sanitizeSettingCascadeURL.length) {
         s.hostParams = {
           ...s.hostParams,
-          settingTreeDropdownValue: sanitizeSettingCascadeURL,
+          settingCascadeURL: sanitizeSettingCascadeURL,
         };
       }
       if (checkDefaultQuestion) {
@@ -163,7 +163,6 @@ const WebformEditor = ({
 
   const handleSave = () => {
     if (onSave) {
-      // transform questions to remove unused setting by question type
       onSave(data.toWebform(formStore, questionGroups));
     }
   };
