@@ -20,7 +20,7 @@ docker run --rm \
        --volume "$(pwd):/home/akvo-react-form-editor" \
        --workdir "/home/akvo-react-form-editor" \
        --entrypoint /bin/bash \
-       akvo/akvo-node-17-alpine:20220121.024749.f30b815 -c './build.sh'
+       akvo/akvo-node-18-alpine:20220923.084347.0558ee6 -c './build.sh'
 
 if [[ "${CI_BRANCH}" != "main" ]]; then
 docker run -it --rm \
