@@ -117,6 +117,7 @@ const toEditor = (webFormData) => {
 
 const toWebform = (formData, questionGroups) => {
   let webformData = {
+    id: formData?.id || generateId(),
     name: formData.name,
     description: formData.description,
   };

@@ -1,10 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Form, Input } from 'antd';
 import { UIStore, FormStore } from '../lib/store';
 
 const FormDefinition = ({ name, description }) => {
+  const form = Form.useFormInstance();
   const UIText = UIStore.useState((s) => s.UIText);
   const { inputFormNameLabel, inputFormDescriptionLabel } = UIText;
+
+  useEffect(() => {
+    form.setFieldsValue({ 'form-name': name });
+    form.setFieldsValue({ 'form-description': description });
+  }, [form, name, description]);
 
   return (
     <div

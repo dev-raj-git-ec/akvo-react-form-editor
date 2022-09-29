@@ -81,7 +81,7 @@ const App = () => {
       </div>
       <div className={'half-width json-source' + (!showJson ? ' shrink' : '')}>
         <ReactJson
-          src={initialValue ? initial_value.default : source}
+          src={source}
           theme="monokai"
           displayDataTypes={false}
           onEdit={onJsonEdit}
