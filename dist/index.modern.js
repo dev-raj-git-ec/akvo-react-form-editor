@@ -13,6 +13,7 @@ import { isEmpty, mapKeys, findIndex, intersection, uniq, difference, orderBy as
 import orderBy from 'lodash/orderBy';
 import 'akvo-react-form/dist/index.css';
 import { Webform } from 'akvo-react-form';
+import isEmpty$1 from 'lodash/isEmpty';
 import { VscPreview } from 'react-icons/vsc';
 
 function _extends() {
@@ -9520,11 +9521,23 @@ var SettingDate = function SettingDate(_ref) {
         if (qg.id === questionGroupId) {
           var questions = qg.questions.map(function (q) {
             if (q.id === id) {
-              var _extends2;
+              var _q$rule;
 
-              return _extends({}, q, {
-                rule: _extends({}, q === null || q === void 0 ? void 0 : q.rule, (_extends2 = {}, _extends2[name] = moment(value).format('YYYY-MM-DD'), _extends2))
-              });
+              if (value) {
+                var _extends2;
+
+                return _extends({}, q, {
+                  rule: _extends({}, q === null || q === void 0 ? void 0 : q.rule, (_extends2 = {}, _extends2[name] = moment(value).format('YYYY-MM-DD'), _extends2))
+                });
+              }
+
+              if (!value && q !== null && q !== void 0 && (_q$rule = q.rule) !== null && _q$rule !== void 0 && _q$rule[name]) {
+                delete q.rule[name];
+
+                if (isEmpty$1(q.rule)) {
+                  delete q.rule;
+                }
+              }
             }
 
             return q;

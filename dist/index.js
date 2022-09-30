@@ -16,6 +16,7 @@ var lodash = require('lodash');
 var orderBy = _interopDefault(require('lodash/orderBy'));
 require('akvo-react-form/dist/index.css');
 var akvoReactForm = require('akvo-react-form');
+var isEmpty = _interopDefault(require('lodash/isEmpty'));
 var vsc = require('react-icons/vsc');
 
 function _extends() {
@@ -9523,11 +9524,23 @@ var SettingDate = function SettingDate(_ref) {
         if (qg.id === questionGroupId) {
           var questions = qg.questions.map(function (q) {
             if (q.id === id) {
-              var _extends2;
+              var _q$rule;
 
-              return _extends({}, q, {
-                rule: _extends({}, q === null || q === void 0 ? void 0 : q.rule, (_extends2 = {}, _extends2[name] = moment(value).format('YYYY-MM-DD'), _extends2))
-              });
+              if (value) {
+                var _extends2;
+
+                return _extends({}, q, {
+                  rule: _extends({}, q === null || q === void 0 ? void 0 : q.rule, (_extends2 = {}, _extends2[name] = moment(value).format('YYYY-MM-DD'), _extends2))
+                });
+              }
+
+              if (!value && q !== null && q !== void 0 && (_q$rule = q.rule) !== null && _q$rule !== void 0 && _q$rule[name]) {
+                delete q.rule[name];
+
+                if (isEmpty(q.rule)) {
+                  delete q.rule;
+                }
+              }
             }
 
             return q;
