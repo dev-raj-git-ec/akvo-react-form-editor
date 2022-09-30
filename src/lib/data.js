@@ -1,5 +1,5 @@
 import { questionType, generateId } from './store';
-import { findIndex, isEmpty, mapKeys } from 'lodash';
+import { findIndex, isEmpty, mapKeys, orderBy } from 'lodash';
 
 const clearQuestionObj = (
   keysToRemove = [],
@@ -62,55 +62,58 @@ const toEditor = (webFormData) => {
   webFormData = mapKeys(webFormData, (_, k) =>
     k === 'question_group' ? 'questionGroups' : k
   );
+  const questionGroups = webFormData.questionGroups.map((qg, qgi) => {
+    const gid = qg?.id || generateId() + qgi;
+    qg = mapKeys(qg, (_, k) => (k === 'question' ? 'questions' : k));
+    const questions = qg.questions.map((q, qi) => {
+      const isNotOption = ![
+        questionType.option,
+        questionType.multiple_option,
+      ].includes(q.type);
+      if (isNotOption && q.type !== questionType.tree) {
+        q = clearQuestionObj(['option'], q);
+      }
+      if (
+        [questionType.option, questionType.multiple_option].includes(q.type)
+      ) {
+        q = mapKeys(q, (_, k) => (k === 'option' ? 'options' : k));
+      }
+      if (q?.options) {
+        const options = q.options.map((o, oi) => ({
+          id: o?.id || qi + 1 + (oi + 1),
+          ...o,
+          order: o?.order || oi + 1,
+        }));
+        q = {
+          ...q,
+          options: orderBy(options, 'order'),
+        };
+      }
+      if (q?.dependency) {
+        const dependency = q.dependency.map((d) => {
+          if (d?.max) {
+            d = { ...d, max: d.max + 1 };
+          }
+          if (d?.min) {
+            d = { ...d, min: d.min - 1 };
+          }
+          return d;
+        });
+        q = { ...q, dependency: dependency };
+      }
+      return { ...q, order: q?.order || qi + 1, questionGroupId: gid };
+    });
+    qg = {
+      ...qg,
+      id: gid,
+      order: qg?.order || qgi + 1,
+      questions: orderBy(questions, 'order'),
+    };
+    return qg;
+  });
   webFormData = {
     ...webFormData,
-    questionGroups: webFormData.questionGroups.map((qg, qgi) => {
-      const gid = qg?.id || generateId() + qgi;
-      qg = mapKeys(qg, (_, k) => (k === 'question' ? 'questions' : k));
-      qg = {
-        ...qg,
-        id: gid,
-        order: qg?.order || qgi + 1,
-        questions: qg.questions.map((q, qi) => {
-          const isNotOption = ![
-            questionType.option,
-            questionType.multiple_option,
-          ].includes(q.type);
-          if (isNotOption && q.type !== questionType.tree) {
-            q = clearQuestionObj(['option'], q);
-          }
-          if (
-            [questionType.option, questionType.multiple_option].includes(q.type)
-          ) {
-            q = mapKeys(q, (_, k) => (k === 'option' ? 'options' : k));
-          }
-          if (q?.options) {
-            q = {
-              ...q,
-              options: q.options.map((o, oi) => ({
-                id: o?.id || qi + 1 + (oi + 1),
-                ...o,
-                order: o?.order || oi + 1,
-              })),
-            };
-          }
-          if (q?.dependency) {
-            const dependency = q.dependency.map((d) => {
-              if (d?.max) {
-                d = { ...d, max: d.max + 1 };
-              }
-              if (d?.min) {
-                d = { ...d, min: d.min - 1 };
-              }
-              return d;
-            });
-            q = { ...q, dependency: dependency };
-          }
-          return { ...q, order: q?.order || qi + 1, questionGroupId: gid };
-        }),
-      };
-      return qg;
-    }),
+    questionGroups: orderBy(questionGroups, 'order'),
   };
   return webFormData;
 };

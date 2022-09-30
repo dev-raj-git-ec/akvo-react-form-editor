@@ -81,7 +81,7 @@ const SettingDate = ({
           >
             <Form.Item
               label={x.label}
-              initialValue={x.value}
+              initialValue={moment(x.value)}
               name={`${namePreffix}-${x.key}`}
             >
               <DatePicker

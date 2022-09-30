@@ -780,6 +780,23 @@
               "options": ["Pagi Sore"]
             }
           ]
+        },
+        {
+          "id": 27,
+          "name": "Date with Rule",
+          "order": 2,
+          "type": "date",
+          "required": false,
+          "translations": [
+            {
+              "name": "Tanggal dengan ketentuan",
+              "language": "id"
+            }
+          ],
+          "rule": {
+            "minDate": "2022-01-01",
+            "maxDate": "2022-12-31"
+          }
         }
       ]
     }
