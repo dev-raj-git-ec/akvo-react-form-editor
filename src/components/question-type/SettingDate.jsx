@@ -3,6 +3,7 @@ import { Form, DatePicker, Row, Col } from 'antd';
 import styles from '../../styles.module.css';
 import { UIStore, questionGroupFn } from '../../lib/store';
 import moment from 'moment';
+import isEmpty from 'lodash/isEmpty';
 
 const SettingDate = ({
   id,
@@ -36,13 +37,21 @@ const SettingDate = ({
         if (qg.id === questionGroupId) {
           const questions = qg.questions.map((q) => {
             if (q.id === id) {
-              return {
-                ...q,
-                rule: {
-                  ...q?.rule,
-                  [name]: moment(value).format('YYYY-MM-DD'),
-                },
-              };
+              if (value) {
+                return {
+                  ...q,
+                  rule: {
+                    ...q?.rule,
+                    [name]: moment(value).format('YYYY-MM-DD'),
+                  },
+                };
+              }
+              if (!value && q?.rule?.[name]) {
+                delete q.rule[name];
+                if (isEmpty(q.rule)) {
+                  delete q.rule;
+                }
+              }
             }
             return q;
           });
