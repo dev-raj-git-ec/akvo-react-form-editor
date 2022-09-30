@@ -9,8 +9,8 @@ import { RiDeleteBin2Line, RiSave3Fill, RiSettings5Fill, RiSettings5Line } from 
 import { BiMove, BiCopy } from 'react-icons/bi';
 import { MdOutlineAddCircleOutline, MdOutlineArrowCircleUp, MdOutlineArrowCircleDown, MdOutlineRemoveCircleOutline, MdOutlineLanguage } from 'react-icons/md';
 import { AiOutlineEyeInvisible, AiOutlineEye } from 'react-icons/ai';
-import { isEmpty, mapKeys, findIndex, intersection, uniq, difference, orderBy as orderBy$1, takeRight, map, groupBy, maxBy, minBy } from 'lodash';
-import orderBy from 'lodash/orderBy';
+import { isEmpty, mapKeys, orderBy, findIndex, intersection, uniq, difference, takeRight, map, groupBy, maxBy, minBy } from 'lodash';
+import orderBy$1 from 'lodash/orderBy';
 import 'akvo-react-form/dist/index.css';
 import { Webform } from 'akvo-react-form';
 import isEmpty$1 from 'lodash/isEmpty';
@@ -2085,75 +2085,78 @@ var toEditor = function toEditor(webFormData) {
   webFormData = mapKeys(webFormData, function (_, k) {
     return k === 'question_group' ? 'questionGroups' : k;
   });
-  webFormData = _extends({}, webFormData, {
-    questionGroups: webFormData.questionGroups.map(function (qg, qgi) {
-      var _qg, _qg2;
+  var questionGroups = webFormData.questionGroups.map(function (qg, qgi) {
+    var _qg, _qg2;
 
-      var gid = ((_qg = qg) === null || _qg === void 0 ? void 0 : _qg.id) || generateId() + qgi;
-      qg = mapKeys(qg, function (_, k) {
-        return k === 'question' ? 'questions' : k;
-      });
-      qg = _extends({}, qg, {
-        id: gid,
-        order: ((_qg2 = qg) === null || _qg2 === void 0 ? void 0 : _qg2.order) || qgi + 1,
-        questions: qg.questions.map(function (q, qi) {
-          var _q, _q2, _q3;
+    var gid = ((_qg = qg) === null || _qg === void 0 ? void 0 : _qg.id) || generateId() + qgi;
+    qg = mapKeys(qg, function (_, k) {
+      return k === 'question' ? 'questions' : k;
+    });
+    var questions = qg.questions.map(function (q, qi) {
+      var _q, _q2, _q3;
 
-          var isNotOption = ![questionType.option, questionType.multiple_option].includes(q.type);
+      var isNotOption = ![questionType.option, questionType.multiple_option].includes(q.type);
 
-          if (isNotOption && q.type !== questionType.tree) {
-            q = clearQuestionObj(['option'], q);
-          }
+      if (isNotOption && q.type !== questionType.tree) {
+        q = clearQuestionObj(['option'], q);
+      }
 
-          if ([questionType.option, questionType.multiple_option].includes(q.type)) {
-            q = mapKeys(q, function (_, k) {
-              return k === 'option' ? 'options' : k;
-            });
-          }
+      if ([questionType.option, questionType.multiple_option].includes(q.type)) {
+        q = mapKeys(q, function (_, k) {
+          return k === 'option' ? 'options' : k;
+        });
+      }
 
-          if ((_q = q) !== null && _q !== void 0 && _q.options) {
-            q = _extends({}, q, {
-              options: q.options.map(function (o, oi) {
-                return _extends({
-                  id: (o === null || o === void 0 ? void 0 : o.id) || qi + 1 + (oi + 1)
-                }, o, {
-                  order: (o === null || o === void 0 ? void 0 : o.order) || oi + 1
-                });
-              })
-            });
-          }
-
-          if ((_q2 = q) !== null && _q2 !== void 0 && _q2.dependency) {
-            var dependency = q.dependency.map(function (d) {
-              var _d, _d2;
-
-              if ((_d = d) !== null && _d !== void 0 && _d.max) {
-                d = _extends({}, d, {
-                  max: d.max + 1
-                });
-              }
-
-              if ((_d2 = d) !== null && _d2 !== void 0 && _d2.min) {
-                d = _extends({}, d, {
-                  min: d.min - 1
-                });
-              }
-
-              return d;
-            });
-            q = _extends({}, q, {
-              dependency: dependency
-            });
-          }
-
-          return _extends({}, q, {
-            order: ((_q3 = q) === null || _q3 === void 0 ? void 0 : _q3.order) || qi + 1,
-            questionGroupId: gid
+      if ((_q = q) !== null && _q !== void 0 && _q.options) {
+        var options = q.options.map(function (o, oi) {
+          return _extends({
+            id: (o === null || o === void 0 ? void 0 : o.id) || qi + 1 + (oi + 1)
+          }, o, {
+            order: (o === null || o === void 0 ? void 0 : o.order) || oi + 1
           });
-        })
+        });
+        q = _extends({}, q, {
+          options: orderBy(options, 'order')
+        });
+      }
+
+      if ((_q2 = q) !== null && _q2 !== void 0 && _q2.dependency) {
+        var dependency = q.dependency.map(function (d) {
+          var _d, _d2;
+
+          if ((_d = d) !== null && _d !== void 0 && _d.max) {
+            d = _extends({}, d, {
+              max: d.max + 1
+            });
+          }
+
+          if ((_d2 = d) !== null && _d2 !== void 0 && _d2.min) {
+            d = _extends({}, d, {
+              min: d.min - 1
+            });
+          }
+
+          return d;
+        });
+        q = _extends({}, q, {
+          dependency: dependency
+        });
+      }
+
+      return _extends({}, q, {
+        order: ((_q3 = q) === null || _q3 === void 0 ? void 0 : _q3.order) || qi + 1,
+        questionGroupId: gid
       });
-      return qg;
-    })
+    });
+    qg = _extends({}, qg, {
+      id: gid,
+      order: ((_qg2 = qg) === null || _qg2 === void 0 ? void 0 : _qg2.order) || qgi + 1,
+      questions: orderBy(questions, 'order')
+    });
+    return qg;
+  });
+  webFormData = _extends({}, webFormData, {
+    questionGroups: orderBy(questionGroups, 'order')
   });
   return webFormData;
 };
@@ -2560,7 +2563,7 @@ var QuestionSettingTranslation = function QuestionSettingTranslation(_ref) {
   }, /*#__PURE__*/React__default.createElement(Input, {
     disabled: !existingTranslation,
     onChange: handleChangeAllowOtherText
-  })), orderBy(options, 'order').filter(function (d) {
+  })), orderBy$1(options, 'order').filter(function (d) {
     return d === null || d === void 0 ? void 0 : d.name;
   }).map(function (d, di) {
     var _d$translations;
@@ -3475,7 +3478,7 @@ var SettingOption = function SettingOption(_ref2) {
 
   var handleOnAddOption = function handleOnAddOption(current) {
     var currentOrder = current.order;
-    var lastOrder = takeRight(orderBy$1(options, 'order'))[0].order;
+    var lastOrder = takeRight(orderBy(options, 'order'))[0].order;
     var reorderOptions = options.map(function (opt) {
       if (opt.order > currentOrder) {
         opt['order'] = opt['order'] + 1;
@@ -3490,7 +3493,7 @@ var SettingOption = function SettingOption(_ref2) {
     var addOptions = [].concat(reorderOptions, [defaultOptions({
       order: currentOrder + 1
     })]);
-    setOptions(orderBy$1(addOptions, 'order'));
+    setOptions(orderBy(addOptions, 'order'));
   };
 
   var handleOnMoveOption = function handleOnMoveOption(current, targetOrder) {
@@ -3512,11 +3515,11 @@ var SettingOption = function SettingOption(_ref2) {
         order: currentOrder
       });
     });
-    setOptions(orderBy$1([].concat(prevOptions, currentOption, targetOption), 'order'));
+    setOptions(orderBy([].concat(prevOptions, currentOption, targetOption), 'order'));
   };
 
   var handleOnDeleteOption = function handleOnDeleteOption(currentId) {
-    setOptions(orderBy$1(options, 'order').filter(function (opt) {
+    setOptions(orderBy(options, 'order').filter(function (opt) {
       return opt.id !== currentId;
     }).map(function (opt, opti) {
       return _extends({}, opt, {
@@ -3543,7 +3546,7 @@ var SettingOption = function SettingOption(_ref2) {
     initialValue: allowOtherText
   }, /*#__PURE__*/React__default.createElement(Input, {
     onChange: handleOnChangeAllowOtherText
-  })))), orderBy$1(options, 'order').map(function (d, di) {
+  })))), orderBy(options, 'order').map(function (d, di) {
     return /*#__PURE__*/React__default.createElement(Row, {
       key: "option-" + id + "-" + di,
       align: "start",
@@ -9563,7 +9566,7 @@ var SettingDate = function SettingDate(_ref) {
       span: 8
     }, /*#__PURE__*/React__default.createElement(Form.Item, {
       label: x.label,
-      initialValue: x.value,
+      initialValue: moment(x.value),
       name: namePreffix + "-" + x.key
     }, /*#__PURE__*/React__default.createElement(DatePicker, {
       disabledDate: x.disabledDate,
@@ -9679,7 +9682,7 @@ var QuestionSetting = function QuestionSetting(_ref) {
     };
   }), 'group'), function (i, g) {
     return {
-      items: orderBy$1(i, 'name'),
+      items: orderBy(i, 'name'),
       group: g
     };
   });
@@ -10440,7 +10443,7 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
       s.questionGroups = s.questionGroups.map(function (qg) {
         if (qg.id === questionGroupId) {
           return _extends({}, qg, {
-            questions: orderBy$1(newQuestions, 'order')
+            questions: orderBy(newQuestions, 'order')
           });
         }
 
@@ -10525,7 +10528,7 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
 
       newQuestions = addedQ ? [].concat(newQuestions, [addedQ]) : newQuestions;
       return _extends({}, qg, {
-        questions: orderBy$1(newQuestions, 'order')
+        questions: orderBy(newQuestions, 'order')
       });
     });
     var oldQg = questionGroups.filter(function (qg) {
@@ -10535,7 +10538,7 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
       return qg.id !== questionGroupId;
     }) : oldQg;
     questionGroupFn.store.update(function (s) {
-      s.questionGroups = orderBy$1([].concat(oldQg, changedQg), 'order');
+      s.questionGroups = orderBy([].concat(oldQg, changedQg), 'order');
     });
     UIStore.update(function (s) {
       s.activeMoveQuestion = null;
@@ -10831,7 +10834,7 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
       return x;
     });
     questionGroupFn.store.update(function (s) {
-      s.questionGroups = orderBy$1([].concat(orderedQg, [currentQg]), 'order');
+      s.questionGroups = orderBy([].concat(orderedQg, [currentQg]), 'order');
     });
     UIStore.update(function (s) {
       s.activeMoveQuestionGroup = null;

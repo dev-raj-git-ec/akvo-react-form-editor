@@ -2088,75 +2088,78 @@ var toEditor = function toEditor(webFormData) {
   webFormData = lodash.mapKeys(webFormData, function (_, k) {
     return k === 'question_group' ? 'questionGroups' : k;
   });
-  webFormData = _extends({}, webFormData, {
-    questionGroups: webFormData.questionGroups.map(function (qg, qgi) {
-      var _qg, _qg2;
+  var questionGroups = webFormData.questionGroups.map(function (qg, qgi) {
+    var _qg, _qg2;
 
-      var gid = ((_qg = qg) === null || _qg === void 0 ? void 0 : _qg.id) || generateId() + qgi;
-      qg = lodash.mapKeys(qg, function (_, k) {
-        return k === 'question' ? 'questions' : k;
-      });
-      qg = _extends({}, qg, {
-        id: gid,
-        order: ((_qg2 = qg) === null || _qg2 === void 0 ? void 0 : _qg2.order) || qgi + 1,
-        questions: qg.questions.map(function (q, qi) {
-          var _q, _q2, _q3;
+    var gid = ((_qg = qg) === null || _qg === void 0 ? void 0 : _qg.id) || generateId() + qgi;
+    qg = lodash.mapKeys(qg, function (_, k) {
+      return k === 'question' ? 'questions' : k;
+    });
+    var questions = qg.questions.map(function (q, qi) {
+      var _q, _q2, _q3;
 
-          var isNotOption = ![questionType.option, questionType.multiple_option].includes(q.type);
+      var isNotOption = ![questionType.option, questionType.multiple_option].includes(q.type);
 
-          if (isNotOption && q.type !== questionType.tree) {
-            q = clearQuestionObj(['option'], q);
-          }
+      if (isNotOption && q.type !== questionType.tree) {
+        q = clearQuestionObj(['option'], q);
+      }
 
-          if ([questionType.option, questionType.multiple_option].includes(q.type)) {
-            q = lodash.mapKeys(q, function (_, k) {
-              return k === 'option' ? 'options' : k;
-            });
-          }
+      if ([questionType.option, questionType.multiple_option].includes(q.type)) {
+        q = lodash.mapKeys(q, function (_, k) {
+          return k === 'option' ? 'options' : k;
+        });
+      }
 
-          if ((_q = q) !== null && _q !== void 0 && _q.options) {
-            q = _extends({}, q, {
-              options: q.options.map(function (o, oi) {
-                return _extends({
-                  id: (o === null || o === void 0 ? void 0 : o.id) || qi + 1 + (oi + 1)
-                }, o, {
-                  order: (o === null || o === void 0 ? void 0 : o.order) || oi + 1
-                });
-              })
-            });
-          }
-
-          if ((_q2 = q) !== null && _q2 !== void 0 && _q2.dependency) {
-            var dependency = q.dependency.map(function (d) {
-              var _d, _d2;
-
-              if ((_d = d) !== null && _d !== void 0 && _d.max) {
-                d = _extends({}, d, {
-                  max: d.max + 1
-                });
-              }
-
-              if ((_d2 = d) !== null && _d2 !== void 0 && _d2.min) {
-                d = _extends({}, d, {
-                  min: d.min - 1
-                });
-              }
-
-              return d;
-            });
-            q = _extends({}, q, {
-              dependency: dependency
-            });
-          }
-
-          return _extends({}, q, {
-            order: ((_q3 = q) === null || _q3 === void 0 ? void 0 : _q3.order) || qi + 1,
-            questionGroupId: gid
+      if ((_q = q) !== null && _q !== void 0 && _q.options) {
+        var options = q.options.map(function (o, oi) {
+          return _extends({
+            id: (o === null || o === void 0 ? void 0 : o.id) || qi + 1 + (oi + 1)
+          }, o, {
+            order: (o === null || o === void 0 ? void 0 : o.order) || oi + 1
           });
-        })
+        });
+        q = _extends({}, q, {
+          options: lodash.orderBy(options, 'order')
+        });
+      }
+
+      if ((_q2 = q) !== null && _q2 !== void 0 && _q2.dependency) {
+        var dependency = q.dependency.map(function (d) {
+          var _d, _d2;
+
+          if ((_d = d) !== null && _d !== void 0 && _d.max) {
+            d = _extends({}, d, {
+              max: d.max + 1
+            });
+          }
+
+          if ((_d2 = d) !== null && _d2 !== void 0 && _d2.min) {
+            d = _extends({}, d, {
+              min: d.min - 1
+            });
+          }
+
+          return d;
+        });
+        q = _extends({}, q, {
+          dependency: dependency
+        });
+      }
+
+      return _extends({}, q, {
+        order: ((_q3 = q) === null || _q3 === void 0 ? void 0 : _q3.order) || qi + 1,
+        questionGroupId: gid
       });
-      return qg;
-    })
+    });
+    qg = _extends({}, qg, {
+      id: gid,
+      order: ((_qg2 = qg) === null || _qg2 === void 0 ? void 0 : _qg2.order) || qgi + 1,
+      questions: lodash.orderBy(questions, 'order')
+    });
+    return qg;
+  });
+  webFormData = _extends({}, webFormData, {
+    questionGroups: lodash.orderBy(questionGroups, 'order')
   });
   return webFormData;
 };
@@ -9566,7 +9569,7 @@ var SettingDate = function SettingDate(_ref) {
       span: 8
     }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
       label: x.label,
-      initialValue: x.value,
+      initialValue: moment(x.value),
       name: namePreffix + "-" + x.key
     }, /*#__PURE__*/React__default.createElement(antd.DatePicker, {
       disabledDate: x.disabledDate,
