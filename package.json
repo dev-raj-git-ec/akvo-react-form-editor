@@ -1,6 +1,6 @@
 {
   "name": "akvo-react-form-editor",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "survey editor for akvo-react-form",
   "author": "akvo",
   "license": "AGPL-3.0",
@@ -16,6 +16,11 @@
       "name": "Deden Bangkit",
       "email": "mail@dedenbangkit.com",
       "url": "https://github.com/dedenbangkit"
+    },
+    {
+      "name": "Wayan Galih Pratama",
+      "email": "wgprtm@gmail.com",
+      "url": "https://github.com/wayangalihpratama"
     },
     {
       "name": "Akvo Tech Consultancy",
