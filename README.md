@@ -60,6 +60,7 @@ const Example = () => {
 | **limitQuestionType** | Support to limit question type available                                  | Array[[QuestionType] \| `undefined`(#supported-question-type)]       | -       |
 | **defaultQuestion**   | Support to set custom default new question type, name and required status | Object{[defaultQuestion](#default-question-optional)} \| `undefined` | -       |
 | **initialValue**      | Set value by Form initialization                                          | Object{[initialValue](#initial-value-optional)} \| `undefined`       | -       |
+| **settingCascadeURL** | Value for Select Option on cascade question type                          | Array[[settingCascadeURL](#setting-cascade-url)] \| `undefined`      | -       |
 
 ## Properties
 
@@ -83,9 +84,35 @@ Example:
 }
 ```
 
+### Setting Cascade URL
+
+Setting cascade URL should be defined as array of object. This value was used to fill Select Option value for cascade question type.
+
+| Props    | Description               | Type                                                                 |
+| -------- | ------------------------- | -------------------------------------------------------------------- |
+| id       | Unique id as option value | Integer                                                              |
+| name     | Shown as option label     | String                                                               |
+| endpoint | Cascade API               | String                                                               |
+| initial  | Initial Parameter         | Integer \| String \| `undefined`                                     |
+| list     | Object name of array      | `res.data?.[list]` \| `res.data` \| String \| `undefined` \| `false` |
+
+Example:
+
+```json
+[
+  {
+    "id": 1,
+    "name": "Province",
+    "endpoint": "http://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/cascade-296940912-v1.sqlite",
+    "initial": 0,
+    "list": false
+  }
+]
+```
+
 ### Initial Value (optional)
 
-Webform initial value use the same format as [Akvo React Form](https://github.com/akvo/akvo-react-form) form default value. This value was used to load a form into Akvo React Form Editor to update that form definition.
+Webform initial value use the same format as [Akvo React Form form structure](https://github.com/akvo/akvo-react-form#example-form-structure). This value was used to load a form into Akvo React Form Editor to update that form definition.
 
 Example: [Initial Value Example](https://github.com/akvo/akvo-react-form-editor/blob/main/example/src/example-initial-value.json)
 
