@@ -54,15 +54,16 @@ const Example = () => {
 
 ### WebformEditor
 
-| Props                 | Description                                                               | Type                                            | Default |
-| --------------------- | ------------------------------------------------------------------------- | ----------------------------------------------- | ------- |
-| **onSave**            | Trigger after save button click                                           | `function(values)`                              | -       |
-| **limitQuestionType** | Support to limit question type available                                  | Array[[QuestionType](#supported-question-type)] | -       |
-| **defaultQuestion**   | Support to set custom default new question type, name and required status | Object{[defaultQuestion](#default-question)}    | -       |
+| Props                 | Description                                                               | Type                                                                 | Default |
+| --------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------- | ------- |
+| **onSave**            | Trigger after save button click                                           | `function(values)`                                                   | -       |
+| **limitQuestionType** | Support to limit question type available                                  | Array[[QuestionType] \| `undefined`(#supported-question-type)]       | -       |
+| **defaultQuestion**   | Support to set custom default new question type, name and required status | Object{[defaultQuestion](#default-question-optional)} \| `undefined` | -       |
+| **initialValue**      | Set value by Form initialization                                          | Object{[initialValue](#initial-value-optional)} \| `undefined`       | -       |
 
 ## Properties
 
-### Default Question
+### Default Question (optional)
 
 Default question should be defined as object.
 
@@ -81,6 +82,12 @@ Example:
   "required": true
 }
 ```
+
+### Initial Value (optional)
+
+Webform initial value use the same format as [Akvo React Form](https://github.com/akvo/akvo-react-form) form default value. This value was used to load a form into Akvo React Form Editor to update that form definition.
+
+Example: [Initial Value Example](https://github.com/akvo/akvo-react-form-editor/blob/main/example/src/example-initial-value.json)
 
 [![akvo-react-form](https://img.shields.io/github/package-json/dependency-version/akvo/akvo-react-form-editor/akvo-react-form)](https://www.npmjs.com/package/akvo-react-form) [![antd](https://img.shields.io/github/package-json/dependency-version/akvo/akvo-react-form-editor/antd)](https://www.npmjs.com/package/antd)
 
