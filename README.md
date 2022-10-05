@@ -18,17 +18,67 @@ npm install --save akvo-react-form-editor
 yarn add akvo-react-form-editor
 ```
 
+## Supported Question Type
+
+| Type            | Description     |
+| --------------- | --------------- |
+| input           | Input Text      |
+| number          | Input Number    |
+| cascade         | Cascade Select  |
+| text            | TextArea        |
+| date            | Date            |
+| option          | Option          |
+| multiple_option | Multiple Option |
+| tree            | Tree Select     |
+| geo             | Geolocation     |
+
 ## Usage
 
 ```jsx
-import React from 'react'
-import 'akvo-react-form-editor/dist/index.css' /* REQUIRED */
-import WebformEditor from 'akvo-react-form-editor'
+import React from 'react';
+import 'akvo-react-form-editor/dist/index.css'; /* REQUIRED */
+import WebformEditor from 'akvo-react-form-editor';
 
-class Example extends Component {
-  render() {
-    return <WebformEditor />
+const Example = () => {
+  const onSave = (values) => {
+    console.log(values)
   }
+
+  render() {
+    return <WebformEditor onSave={onSave} />;
+  }
+}
+```
+
+## API
+
+### WebformEditor
+
+| Props                 | Description                                                               | Type                                            | Default |
+| --------------------- | ------------------------------------------------------------------------- | ----------------------------------------------- | ------- |
+| **onSave**            | Trigger after save button click                                           | `function(values)`                              | -       |
+| **limitQuestionType** | Support to limit question type available                                  | Array[[QuestionType](#supported-question-type)] | -       |
+| **defaultQuestion**   | Support to set custom default new question type, name and required status | Object{[defaultQuestion](#default-question)}    | -       |
+
+## Properties
+
+### Default Question
+
+Default question should be defined as object.
+
+| Props    | Description                                                                      | Type                                                                                           |
+| -------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| type     | Use one of [QuestionType](#supported-question-type) as default new question type | `number` \| `input` \| `text` \| `option` \| `multiple_option` \| `cascade` \| `tree` \| `geo` |
+| name     | Set default new question title / name                                            | String                                                                                         |
+| required | Set new question required `true`/`false` by default                              | Boolean                                                                                        |
+
+Example:
+
+```json
+{
+  "type": "text",
+  "name": "New Question Title",
+  "required": true
 }
 ```
 
