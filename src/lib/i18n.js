@@ -36,7 +36,7 @@ const UIStaticText = {
     buttonSaveText: 'Save',
     questionSettingTabPane: 'Setting',
     questionSkipLogicTabPane: 'Skip Logic',
-    questionTranslationTabPane: 'Translation',
+    questionCustomParamsTabPane: 'Custom Params',
     questionExtraTabPane: 'Extra',
     inputQuestionDependentToLabel: 'Dependent to Question',
     inputQuestionDependentLogicLabel: 'Logic',
