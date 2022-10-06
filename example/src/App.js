@@ -75,15 +75,21 @@ const App = () => {
               name: 'params_name_a',
               label: 'Single Option Param',
               type: 'option',
-              multiple: true,
-              options: [],
+              multiple: false,
+              options: [
+                { label: 'Option 1', value: 'SO1' },
+                { label: 'Option 2', value: 'SO2' },
+              ],
             },
             {
               name: 'params_name_b',
               label: 'Multiple Option Param',
               type: 'option',
-              multiple: false,
-              options: [],
+              multiple: true,
+              options: [
+                { label: 'Multiple Option 1', value: 'MO1' },
+                { label: 'Multiple Option 2', value: 'MO2' },
+              ],
             },
             {
               name: 'params_name_c',

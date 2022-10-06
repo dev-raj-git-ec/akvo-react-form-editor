@@ -129,6 +129,7 @@ const FormTranslations = () => {
             }
             value={formStore?.defaultLanguage || staticDefaultLang}
             disabled={defaultLangDropdownValue.length === 1}
+            getPopupContainer={(triggerNode) => triggerNode.parentElement}
           />
         </Col>
         <Col
@@ -147,6 +148,7 @@ const FormTranslations = () => {
               })
             }
             value={[]}
+            getPopupContainer={(triggerNode) => triggerNode.parentElement}
           >
             {localeDropdownValue.map((ld, ldi) => (
               <Select.Option

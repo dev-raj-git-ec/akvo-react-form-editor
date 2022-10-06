@@ -36,7 +36,7 @@ const defaultQuestion = ({
   params = {},
 }) => {
   const q = {
-    id: generateId(),
+    id: generateId() + 2,
     order: prevOrder + 1,
     questionGroupId: questionGroup.id,
     name: name || dummyName(5),
@@ -70,7 +70,7 @@ const defaultQuestionGroup = ({
   defaultQuestionParam = {},
 }) => {
   const qg = {
-    id: generateId(),
+    id: generateId() + 1,
     name: name,
     order: prevOrder + 1,
     description: null,
