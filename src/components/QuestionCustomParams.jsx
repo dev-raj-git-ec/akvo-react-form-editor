@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { Form, Input, Select } from 'antd';
 import styles from '../styles.module.css';
 import { UIStore, questionGroupFn } from '../lib/store';
@@ -9,9 +9,32 @@ const QuestionCustomParams = ({ question }) => {
   const namePreffix = `question-${id}`;
 
   const { customParams } = UIStore.useState((s) => s.hostParams);
+  const [initLoad, setInitLoad] = useState(true);
   const [selectedParam, setSelectedParam] = useState(null);
   const [paramValue, setParamValue] = useState(null);
   const [paramValueOptionProps, setParamValueOptionProps] = useState({});
+
+  useEffect(() => {
+    if (initLoad) {
+      // initial value load
+      const customParamObj = customParams
+        .map((cp) => {
+          const findValue = question?.[cp.name];
+          if (findValue) {
+            return { ...cp, paramValue: findValue };
+          }
+          return false;
+        })
+        .find((x) => x);
+      handleChangeSelectParameter(customParamObj.name);
+      setParamValue(
+        customParamObj.type === 'input'
+          ? customParamObj.paramValue[0]
+          : customParamObj.paramValue
+      );
+      setInitLoad(false);
+    }
+  }, [customParams, question, initLoad, handleChangeSelectParameter]);
 
   const selectParameterOption = useMemo(() => {
     return customParams.map((cp) => ({
@@ -20,48 +43,59 @@ const QuestionCustomParams = ({ question }) => {
     }));
   }, [customParams]);
 
-  const updateGlobalStore = (objKey, value, isDelete = false) => {
-    questionGroupFn.store.update((s) => {
-      s.questionGroups = s.questionGroups.map((qg) => {
-        if (qg.id === questionGroupId) {
-          const questions = qg.questions.map((q) => {
-            if (q.id === id) {
-              if (isDelete && q?.[objKey]) {
-                delete q[objKey];
-                return q;
+  const updateGlobalStore = useCallback(
+    (objKey, value, isDelete = false) => {
+      questionGroupFn.store.update((s) => {
+        s.questionGroups = s.questionGroups.map((qg) => {
+          if (qg.id === questionGroupId) {
+            const questions = qg.questions.map((q) => {
+              if (q.id === id) {
+                if (isDelete && q?.[objKey]) {
+                  delete q[objKey];
+                  return q;
+                }
+                return { ...q, [objKey]: value };
               }
-              return { ...q, [objKey]: value };
-            }
-            return q;
-          });
-          return {
-            ...qg,
-            questions: questions,
-          };
-        }
-        return qg;
+              return q;
+            });
+            return {
+              ...qg,
+              questions: questions,
+            };
+          }
+          return qg;
+        });
       });
-    });
-  };
+    },
+    [id, questionGroupId]
+  );
 
-  const handleChangeSelectParameter = (val) => {
-    if (selectedParam) {
-      setParamValue(null);
-      updateGlobalStore(selectedParam.name, null, true);
+  const handleChangeSelectParameter = useCallback(
+    (val) => {
+      if (selectedParam) {
+        setParamValue(null);
+        updateGlobalStore(selectedParam.name, null, true);
+        form.setFieldsValue({
+          [`${namePreffix}-parameter_value`]:
+            selectedParam.type === 'input' ? null : [],
+        });
+      }
       form.setFieldsValue({
-        [`${namePreffix}-parameter_value`]:
-          selectedParam.type === 'input' ? null : [],
+        [`${namePreffix}-select_parameter`]: val,
       });
-    }
-    const findParam = customParams.find((cp) => cp.name === val);
-    if (findParam?.multiple) {
-      setParamValueOptionProps({
-        mode: 'multiple',
-        showArrow: true,
-      });
-    }
-    setSelectedParam(findParam);
-  };
+      const findParam = customParams.find((cp) => cp.name === val);
+      if (findParam?.multiple) {
+        setParamValueOptionProps({
+          mode: 'multiple',
+          showArrow: true,
+        });
+      } else {
+        setParamValueOptionProps({});
+      }
+      setSelectedParam(findParam);
+    },
+    [customParams, form, namePreffix, selectedParam, updateGlobalStore]
+  );
 
   const handleChangeParameterValue = (val) => {
     setParamValue(val);
@@ -79,6 +113,7 @@ const QuestionCustomParams = ({ question }) => {
       >
         <Select
           showSearch
+          allowClear
           className={styles['select-dropdown']}
           options={selectParameterOption}
           optionFilterProp="label"
