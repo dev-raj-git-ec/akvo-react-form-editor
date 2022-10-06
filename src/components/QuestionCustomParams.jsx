@@ -26,12 +26,14 @@ const QuestionCustomParams = ({ question }) => {
           return false;
         })
         .find((x) => x);
-      handleChangeSelectParameter(customParamObj.name);
-      setParamValue(
-        customParamObj.type === 'input'
-          ? customParamObj.paramValue[0]
-          : customParamObj.paramValue
-      );
+      if (customParamObj) {
+        handleChangeSelectParameter(customParamObj.name);
+        setParamValue(
+          customParamObj.type === 'input'
+            ? customParamObj.paramValue[0]
+            : customParamObj.paramValue
+        );
+      }
       setInitLoad(false);
     }
   }, [customParams, question, initLoad, handleChangeSelectParameter]);
