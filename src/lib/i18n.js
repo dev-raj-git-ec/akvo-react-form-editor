@@ -75,6 +75,8 @@ const UIStaticText = {
     alertDeleteQuestionGroupTitle: 'Delete Question Group',
     alertDeleteQuestionGroup:
       'Do you want to delete this question group and all the questions?',
+    inputQuestionSelectParameterText: 'Select Parameter',
+    inputQuestionParameterValueText: 'Parameter Value',
   },
 };
 

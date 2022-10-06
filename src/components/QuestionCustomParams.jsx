@@ -8,7 +8,8 @@ const QuestionCustomParams = ({ question }) => {
   const form = Form.useFormInstance();
   const namePreffix = `question-${id}`;
 
-  const { customParams } = UIStore.useState((s) => s.hostParams);
+  const { hostParams, UIText } = UIStore.useState((s) => s);
+  const { customParams } = hostParams;
   const [initLoad, setInitLoad] = useState(true);
   const [selectedParam, setSelectedParam] = useState(null);
   const [paramValue, setParamValue] = useState(null);
@@ -110,7 +111,7 @@ const QuestionCustomParams = ({ question }) => {
   return (
     <div>
       <Form.Item
-        label="Select Parameter"
+        label={UIText.inputQuestionSelectParameterText}
         name={`${namePreffix}-select_parameter`}
       >
         <Select
@@ -125,7 +126,7 @@ const QuestionCustomParams = ({ question }) => {
         />
       </Form.Item>
       <Form.Item
-        label="Parameter Value"
+        label={UIText.inputQuestionParameterValueText}
         name={`${namePreffix}-parameter_value`}
       >
         {!selectedParam && <Input disabled />}
