@@ -23,7 +23,8 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
     question;
   const { defaultQuestionParam, customParams } = hostParams;
 
-  const enableCustomParams = customParams && customParams?.length;
+  const enableCustomParams =
+    customParams && customParams?.label && customParams?.params?.length;
 
   const allQuestions = questionGroups
     .map((qg) => qg.questions)
@@ -363,7 +364,9 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
               {/* Custom Params */}
               {enableCustomParams && (
                 <Tabs.TabPane
-                  tab={UIText.questionCustomParamsTabPane}
+                  tab={
+                    customParams?.label || UIText.questionCustomParamsTabPane
+                  }
                   key="custom-params"
                 />
               )}

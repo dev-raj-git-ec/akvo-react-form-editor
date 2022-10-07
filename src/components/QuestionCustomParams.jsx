@@ -14,8 +14,8 @@ const QuestionCustomParams = ({ question }) => {
   useEffect(() => {
     if (initLoad) {
       // initial value load
-      const customParamObj = customParams
-        .map((cp) => {
+      const customParamObj = customParams?.params
+        ?.map((cp) => {
           const findValue = question?.[cp.name];
           if (findValue) {
             return { [cp.name]: findValue };
@@ -69,7 +69,7 @@ const QuestionCustomParams = ({ question }) => {
     updateGlobalStore(objKey, value, isDelete);
   };
 
-  return customParams.map((cp, cpi) => {
+  return customParams?.params?.map((cp, cpi) => {
     let multipleProps = {};
     if (cp?.multiple) {
       multipleProps = {
