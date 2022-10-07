@@ -5,15 +5,11 @@ import { UIStore, questionGroupFn } from '../lib/store';
 
 const QuestionCustomParams = ({ question }) => {
   const { id, questionGroupId } = question;
-  const form = Form.useFormInstance();
   const namePreffix = `question-${id}`;
 
-  const { hostParams, UIText } = UIStore.useState((s) => s);
-  const { customParams } = hostParams;
+  const { customParams } = UIStore.useState((s) => s.hostParams);
   const [initLoad, setInitLoad] = useState(true);
-  const [selectedParam, setSelectedParam] = useState(null);
-  const [paramValue, setParamValue] = useState(null);
-  const [paramValueOptionProps, setParamValueOptionProps] = useState({});
+  const [paramValue, setParamValue] = useState({});
 
   useEffect(() => {
     if (initLoad) {
@@ -22,29 +18,19 @@ const QuestionCustomParams = ({ question }) => {
         .map((cp) => {
           const findValue = question?.[cp.name];
           if (findValue) {
-            return { ...cp, paramValue: findValue };
+            return { [cp.name]: findValue };
           }
           return false;
         })
-        .find((x) => x);
-      if (customParamObj) {
-        handleChangeSelectParameter(customParamObj.name);
+        .filter((x) => x);
+      if (customParamObj.length) {
         setParamValue(
-          customParamObj.type === 'input'
-            ? customParamObj.paramValue[0]
-            : customParamObj.paramValue
+          customParamObj.reduce((res, curr) => ({ ...res, ...curr }))
         );
       }
       setInitLoad(false);
     }
-  }, [customParams, question, initLoad, handleChangeSelectParameter]);
-
-  const selectParameterOption = useMemo(() => {
-    return customParams.map((cp) => ({
-      label: cp.label,
-      value: cp.name,
-    }));
-  }, [customParams]);
+  }, [customParams, question, initLoad]);
 
   const updateGlobalStore = useCallback(
     (objKey, value, isDelete = false) => {
@@ -73,85 +59,55 @@ const QuestionCustomParams = ({ question }) => {
     [id, questionGroupId]
   );
 
-  const handleChangeSelectParameter = useCallback(
-    (val) => {
-      if (selectedParam) {
-        setParamValue(null);
-        updateGlobalStore(selectedParam.name, null, true);
-        form.setFieldsValue({
-          [`${namePreffix}-parameter_value`]:
-            selectedParam.type === 'input' ? null : [],
-        });
-      }
-      form.setFieldsValue({
-        [`${namePreffix}-select_parameter`]: val,
-      });
-      const findParam = customParams.find((cp) => cp.name === val);
-      if (findParam?.multiple) {
-        setParamValueOptionProps({
-          mode: 'multiple',
-          showArrow: true,
-        });
-      } else {
-        setParamValueOptionProps({});
-      }
-      setSelectedParam(findParam);
-    },
-    [customParams, form, namePreffix, selectedParam, updateGlobalStore]
-  );
-
-  const handleChangeParameterValue = (val) => {
-    setParamValue(val);
-    const isDelete = !val;
-    const objKey = selectedParam.name;
+  const handleChangeParameterValue = (objKey, val) => {
+    setParamValue({
+      ...paramValue,
+      [objKey]: val,
+    });
+    const isDelete = !val || !val?.length;
     const value = Array.isArray(val) ? val : [val];
     updateGlobalStore(objKey, value, isDelete);
   };
 
-  return (
-    <div>
-      <Form.Item
-        label={UIText.inputQuestionSelectParameterText}
-        name={`${namePreffix}-select_parameter`}
-      >
-        <Select
-          showSearch
-          allowClear
-          className={styles['select-dropdown']}
-          options={selectParameterOption}
-          optionFilterProp="label"
-          onChange={handleChangeSelectParameter}
-          getPopupContainer={(triggerNode) => triggerNode.parentElement}
-          value={selectedParam?.name || []}
-        />
-      </Form.Item>
-      <Form.Item
-        label={UIText.inputQuestionParameterValueText}
-        name={`${namePreffix}-parameter_value`}
-      >
-        {!selectedParam && <Input disabled />}
-        {selectedParam?.type === 'option' && (
-          <Select
-            showSearch
-            allowClear
-            className={styles['select-dropdown']}
-            options={selectedParam?.options || []}
-            optionFilterProp="label"
-            onChange={(val) => handleChangeParameterValue(val)}
-            getPopupContainer={(triggerNode) => triggerNode.parentElement}
-            value={paramValue || []}
-            {...paramValueOptionProps}
-          />
-        )}
-        {selectedParam?.type === 'input' && (
-          <Input
-            onChange={(e) => handleChangeParameterValue(e?.target?.value)}
-            value={paramValue || null}
-          />
-        )}
-      </Form.Item>
-    </div>
-  );
+  return customParams.map((cp, cpi) => {
+    let multipleProps = {};
+    if (cp?.multiple) {
+      multipleProps = {
+        mode: 'multiple',
+        showArrow: true,
+      };
+    }
+    return (
+      <div key={`${cp.name}-${cpi}`}>
+        <Form.Item
+          label={cp.label}
+          name={`${namePreffix}-${cp.name}`}
+        >
+          {cp.type === 'option' && (
+            <Select
+              showSearch
+              allowClear
+              className={styles['select-dropdown']}
+              options={cp?.options || []}
+              optionFilterProp="label"
+              onChange={(val) => handleChangeParameterValue(cp.name, val)}
+              getPopupContainer={(triggerNode) => triggerNode.parentElement}
+              value={paramValue?.[cp.name] || []}
+              {...multipleProps}
+            />
+          )}
+          {cp.type === 'input' && (
+            <Input
+              onChange={(e) =>
+                handleChangeParameterValue(cp.name, e?.target?.value)
+              }
+              value={paramValue?.[cp.name] || null}
+            />
+          )}
+        </Form.Item>
+      </div>
+    );
+  });
 };
 
 export default QuestionCustomParams;
