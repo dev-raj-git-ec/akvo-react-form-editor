@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Form, Input, Select } from 'antd';
 import styles from '../styles.module.css';
 import { UIStore, questionGroupFn } from '../lib/store';
