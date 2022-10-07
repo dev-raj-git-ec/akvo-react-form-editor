@@ -810,7 +810,9 @@
               "language": "id"
             }
           ],
-          "params_name_b": ["MO1", "MO2"]
+          "params_name_a": ["SO1"],
+          "params_name_b": ["MO1", "MO2"],
+          "params_name_c": ["member"]
         }
       ]
     }

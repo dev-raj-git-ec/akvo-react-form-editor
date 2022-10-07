@@ -16,7 +16,10 @@ const QuestionCustomParams = ({ question }) => {
       // initial value load
       const customParamObj = customParams?.params
         ?.map((cp) => {
-          const findValue = question?.[cp.name];
+          let findValue = question?.[cp.name];
+          if (Array.isArray(findValue) && cp.type === 'input') {
+            findValue = findValue[0];
+          }
           if (findValue) {
             return { [cp.name]: findValue };
           }
