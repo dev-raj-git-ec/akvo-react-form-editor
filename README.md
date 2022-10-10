@@ -95,6 +95,7 @@ Setting cascade URL should be defined as array of object. This value was used to
 | endpoint | Cascade API               | String                                                               |
 | initial  | Initial Parameter         | Integer \| String \| `undefined`                                     |
 | list     | Object name of array      | `res.data?.[list]` \| `res.data` \| String \| `undefined` \| `false` |
+| customParams | Custom Parameters     | [Custom Parameters Setting](#custom-parameters-setting) \| `undefined`|
 
 Example:
 
@@ -117,6 +118,69 @@ Webform initial value use the same format as [Akvo React Form form structure](ht
 Example: [Initial Value Example](https://github.com/akvo/akvo-react-form-editor/blob/main/example/src/example-initial-value.json)
 
 [![akvo-react-form](https://img.shields.io/github/package-json/dependency-version/akvo/akvo-react-form-editor/akvo-react-form)](https://www.npmjs.com/package/akvo-react-form) [![antd](https://img.shields.io/github/package-json/dependency-version/akvo/akvo-react-form-editor/antd)](https://www.npmjs.com/package/antd)
+
+
+### Custom Params
+
+Custom parameters are key-value pairs that we can implement in the Webform Editor.
+
+```jsx
+<WebformEditor
+  customParams={{
+    label: 'Set Custom Parameter',
+    params: [
+      {
+        name: 'params_name_a',
+        label: 'Single Option Param',
+        type: 'option',
+        multiple: false,
+        options: [
+          { label: 'Option 1', value: 'SO1' },
+          { label: 'Option 2', value: 'SO2' },
+        ],
+      },
+      {
+        name: 'params_name_b',
+        label: 'Multiple Option Param',
+        type: 'option',
+        multiple: true,
+        options: [
+          { label: 'Multiple Option 1', value: 'MO1' },
+          { label: 'Multiple Option 2', value: 'MO2' },
+        ],
+      },
+      {
+        name: 'params_name_c',
+        label: 'Input Param',
+        type: 'input',
+      },
+    ],
+  }}
+/>
+```
+#### Custom Parameters Setting
+
+| Props    | Description                     | Type                                                                 |
+| -------- | ------------------------------- | -------------------------------------------------------------------- |
+| label    | Label for the custom params tab | String \| `undefined`                                                |
+| params   | List of custom parameters       | Array[[Custom Parameters](custom-parameters)]                        |
+
+#### Custom Parameters
+
+| Props    | Description                     | Type                                                                 |
+| -------- | ------------------------------- | -------------------------------------------------------------------- |
+| name     | Parameter name                  | String                                                               |
+| label    | Parameter label                 | String \| `undefined`                                                |
+| type     | Field Type                      | `option|input`                                                       |
+| multiple | Whether multiple or not         | Boolean                                                              |
+| options  | Parameter Options               | Array[[Option Parameters](option-parameters)] \| `undefined`         |
+
+#### Option Parameters
+
+| Props    | Description                     | Type                                                                 |
+| -------- | ------------------------------- | -------------------------------------------------------------------- |
+| label    | Label for the params options    | String \| `undefined`                                                |
+| value    | Value for the params options    | String                                                               |
 
 ## License
 

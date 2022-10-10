@@ -96,7 +96,7 @@ var UIStaticText = {
     buttonSaveText: 'Save',
     questionSettingTabPane: 'Setting',
     questionSkipLogicTabPane: 'Skip Logic',
-    questionTranslationTabPane: 'Translation',
+    questionCustomParamsTabPane: 'Custom Params',
     questionExtraTabPane: 'Extra',
     inputQuestionDependentToLabel: 'Dependent to Question',
     inputQuestionDependentLogicLabel: 'Logic',
@@ -271,7 +271,7 @@ var defaultQuestion = function defaultQuestion(_ref) {
       _ref$params = _ref.params,
       params = _ref$params === void 0 ? {} : _ref$params;
   var q = {
-    id: generateId(),
+    id: generateId() + 2,
     order: prevOrder + 1,
     questionGroupId: questionGroup.id,
     name: name || dummyName(5),
@@ -308,7 +308,7 @@ var defaultQuestionGroup = function defaultQuestionGroup(_ref2) {
       _ref2$defaultQuestion = _ref2.defaultQuestionParam,
       defaultQuestionParam = _ref2$defaultQuestion === void 0 ? {} : _ref2$defaultQuestion;
   var qg = {
-    id: generateId(),
+    id: generateId() + 1,
     name: name,
     order: prevOrder + 1,
     description: null,
@@ -522,9 +522,9 @@ function commonjsRequire () {
 
 var classnames = createCommonjsModule(function (module) {
 /*!
-	Copyright (c) 2018 Jed Watson.
-	Licensed under the MIT License (MIT), see
-	http://jedwatson.github.io/classnames
+  Copyright (c) 2018 Jed Watson.
+  Licensed under the MIT License (MIT), see
+  http://jedwatson.github.io/classnames
 */
 /* global define */
 
@@ -551,15 +551,14 @@ var classnames = createCommonjsModule(function (module) {
 					}
 				}
 			} else if (argType === 'object') {
-				if (arg.toString !== Object.prototype.toString && !arg.toString.toString().includes('[native code]')) {
-					classes.push(arg.toString());
-					continue;
-				}
-
-				for (var key in arg) {
-					if (hasOwn.call(arg, key) && arg[key]) {
-						classes.push(key);
+				if (arg.toString === Object.prototype.toString) {
+					for (var key in arg) {
+						if (hasOwn.call(arg, key) && arg[key]) {
+							classes.push(key);
+						}
 					}
+				} else {
+					classes.push(arg.toString());
 				}
 			}
 		}
@@ -1386,33 +1385,7 @@ function canUseDom() {
   return !!(typeof window !== 'undefined' && window.document && window.document.createElement);
 }
 
-function contains(root, n) {
-  if (!root) {
-    return false;
-  } // Use native if support
-
-
-  if (root.contains) {
-    return root.contains(n);
-  } // `document.contains` not support with IE11
-
-
-  var node = n;
-
-  while (node) {
-    if (node === root) {
-      return true;
-    }
-
-    node = node.parentNode;
-  }
-
-  return false;
-}
-
-var APPEND_ORDER = 'data-rc-order';
 var MARK_KEY = "rc-util-key";
-var containerCache = new Map();
 
 function getMark() {
   var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
@@ -1434,58 +1407,32 @@ function getContainer(option) {
   return head || document.body;
 }
 
-function getOrder(prepend) {
-  if (prepend === 'queue') {
-    return 'prependQueue';
-  }
-
-  return prepend ? 'prepend' : 'append';
-}
-/**
- * Find style which inject by rc-util
- */
-
-
-function findStyles(container) {
-  return Array.from((containerCache.get(container) || container).children).filter(function (node) {
-    return node.tagName === 'STYLE';
-  });
-}
-
 function injectCSS(css) {
+  var _option$csp;
+
   var option = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
   if (!canUseDom()) {
     return null;
   }
 
-  var csp = option.csp,
-      prepend = option.prepend;
   var styleNode = document.createElement('style');
-  styleNode.setAttribute(APPEND_ORDER, getOrder(prepend));
 
-  if (csp === null || csp === void 0 ? void 0 : csp.nonce) {
-    styleNode.nonce = csp === null || csp === void 0 ? void 0 : csp.nonce;
+  if ((_option$csp = option.csp) === null || _option$csp === void 0 ? void 0 : _option$csp.nonce) {
+    var _option$csp2;
+
+    styleNode.nonce = (_option$csp2 = option.csp) === null || _option$csp2 === void 0 ? void 0 : _option$csp2.nonce;
   }
 
   styleNode.innerHTML = css;
   var container = getContainer(option);
   var firstChild = container.firstChild;
 
-  if (prepend) {
-    // If is queue `prepend`, it will prepend first style and then append rest style
-    if (prepend === 'queue') {
-      var existStyle = findStyles(container).filter(function (node) {
-        return ['prepend', 'prependQueue'].includes(node.getAttribute(APPEND_ORDER));
-      });
-
-      if (existStyle.length) {
-        container.insertBefore(styleNode, existStyle[existStyle.length - 1].nextSibling);
-        return styleNode;
-      }
-    } // Use `insertBefore` as `prepend`
-
-
+  if (option.prepend && container.prepend) {
+    // Use `prepend` first
+    container.prepend(styleNode);
+  } else if (option.prepend && firstChild) {
+    // Fallback to `insertBefore` like IE not support `prepend`
     container.insertBefore(styleNode, firstChild);
   } else {
     container.appendChild(styleNode);
@@ -1493,43 +1440,35 @@ function injectCSS(css) {
 
   return styleNode;
 }
+var containerCache = new Map();
 
 function findExistNode(key) {
   var option = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   var container = getContainer(option);
-  return findStyles(container).find(function (node) {
-    return node.getAttribute(getMark(option)) === key;
+  return Array.from(containerCache.get(container).children).find(function (node) {
+    return node.tagName === 'STYLE' && node.getAttribute(getMark(option)) === key;
   });
 }
-/**
- * qiankun will inject `appendChild` to insert into other
- */
+function updateCSS(css, key) {
+  var option = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+  var container = getContainer(option); // Get real parent
 
-function syncRealContainer(container, option) {
-  var cachedRealContainer = containerCache.get(container); // Find real container when not cached or cached container removed
-
-  if (!cachedRealContainer || !contains(document, cachedRealContainer)) {
+  if (!containerCache.has(container)) {
     var placeholderStyle = injectCSS('', option);
     var parentNode = placeholderStyle.parentNode;
     containerCache.set(container, parentNode);
     parentNode.removeChild(placeholderStyle);
   }
-}
 
-function updateCSS(css, key) {
-  var option = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-  var container = getContainer(option); // Sync real parent
-
-  syncRealContainer(container, option);
   var existNode = findExistNode(key, option);
 
   if (existNode) {
-    var _option$csp, _option$csp2;
+    var _option$csp3, _option$csp4;
 
-    if (((_option$csp = option.csp) === null || _option$csp === void 0 ? void 0 : _option$csp.nonce) && existNode.nonce !== ((_option$csp2 = option.csp) === null || _option$csp2 === void 0 ? void 0 : _option$csp2.nonce)) {
-      var _option$csp3;
+    if (((_option$csp3 = option.csp) === null || _option$csp3 === void 0 ? void 0 : _option$csp3.nonce) && existNode.nonce !== ((_option$csp4 = option.csp) === null || _option$csp4 === void 0 ? void 0 : _option$csp4.nonce)) {
+      var _option$csp5;
 
-      existNode.nonce = (_option$csp3 = option.csp) === null || _option$csp3 === void 0 ? void 0 : _option$csp3.nonce;
+      existNode.nonce = (_option$csp5 = option.csp) === null || _option$csp5 === void 0 ? void 0 : _option$csp5.nonce;
     }
 
     if (existNode.innerHTML !== css) {
@@ -2976,7 +2915,10 @@ var FormTranslations = function FormTranslations() {
       });
     },
     value: (formStore === null || formStore === void 0 ? void 0 : formStore.defaultLanguage) || staticDefaultLang,
-    disabled: defaultLangDropdownValue.length === 1
+    disabled: defaultLangDropdownValue.length === 1,
+    getPopupContainer: function getPopupContainer(triggerNode) {
+      return triggerNode.parentElement;
+    }
   })), /*#__PURE__*/React__default.createElement(Col, {
     sm: 24,
     md: 8,
@@ -2990,7 +2932,10 @@ var FormTranslations = function FormTranslations() {
         u.languages = [].concat(languages, [e]);
       });
     },
-    value: []
+    value: [],
+    getPopupContainer: function getPopupContainer(triggerNode) {
+      return triggerNode.parentElement;
+    }
   }, localeDropdownValue.map(function (ld, ldi) {
     return /*#__PURE__*/React__default.createElement(Select.Option, {
       key: ld.value + "-" + ldi,
@@ -10239,7 +10184,141 @@ var QuestionSkipLogic = function QuestionSkipLogic(_ref3) {
   }));
 };
 
+var QuestionCustomParams = function QuestionCustomParams(_ref) {
+  var _customParams$params2;
+
+  var question = _ref.question;
+  var id = question.id,
+      questionGroupId = question.questionGroupId;
+  var namePreffix = "question-" + id;
+
+  var _UIStore$useState = UIStore.useState(function (s) {
+    return s.hostParams;
+  }),
+      customParams = _UIStore$useState.customParams;
+
+  var _useState = useState(true),
+      initLoad = _useState[0],
+      setInitLoad = _useState[1];
+
+  var _useState2 = useState({}),
+      paramValue = _useState2[0],
+      setParamValue = _useState2[1];
+
+  useEffect(function () {
+    if (initLoad) {
+      var _customParams$params;
+
+      var customParamObj = customParams === null || customParams === void 0 ? void 0 : (_customParams$params = customParams.params) === null || _customParams$params === void 0 ? void 0 : _customParams$params.map(function (cp) {
+        var findValue = question === null || question === void 0 ? void 0 : question[cp.name];
+
+        if (Array.isArray(findValue) && cp.type === 'input') {
+          findValue = findValue[0];
+        }
+
+        if (findValue) {
+          var _ref2;
+
+          return _ref2 = {}, _ref2[cp.name] = findValue, _ref2;
+        }
+
+        return false;
+      }).filter(function (x) {
+        return x;
+      });
+
+      if (customParamObj.length) {
+        setParamValue(customParamObj.reduce(function (res, curr) {
+          return _extends({}, res, curr);
+        }));
+      }
+
+      setInitLoad(false);
+    }
+  }, [customParams, question, initLoad]);
+  var updateGlobalStore = useCallback(function (objKey, value, isDelete) {
+    if (isDelete === void 0) {
+      isDelete = false;
+    }
+
+    questionGroupFn.store.update(function (s) {
+      s.questionGroups = s.questionGroups.map(function (qg) {
+        if (qg.id === questionGroupId) {
+          var questions = qg.questions.map(function (q) {
+            if (q.id === id) {
+              var _extends2;
+
+              if (isDelete && q !== null && q !== void 0 && q[objKey]) {
+                delete q[objKey];
+                return q;
+              }
+
+              return _extends({}, q, (_extends2 = {}, _extends2[objKey] = value, _extends2));
+            }
+
+            return q;
+          });
+          return _extends({}, qg, {
+            questions: questions
+          });
+        }
+
+        return qg;
+      });
+    });
+  }, [id, questionGroupId]);
+
+  var handleChangeParameterValue = function handleChangeParameterValue(objKey, val) {
+    var _extends3;
+
+    setParamValue(_extends({}, paramValue, (_extends3 = {}, _extends3[objKey] = val, _extends3)));
+    var isDelete = !val || !(val !== null && val !== void 0 && val.length);
+    var value = Array.isArray(val) ? val : [val];
+    updateGlobalStore(objKey, value, isDelete);
+  };
+
+  return customParams === null || customParams === void 0 ? void 0 : (_customParams$params2 = customParams.params) === null || _customParams$params2 === void 0 ? void 0 : _customParams$params2.map(function (cp, cpi) {
+    var multipleProps = {};
+
+    if (cp !== null && cp !== void 0 && cp.multiple) {
+      multipleProps = {
+        mode: 'multiple',
+        showArrow: true
+      };
+    }
+
+    return /*#__PURE__*/React__default.createElement("div", {
+      key: cp.name + "-" + cpi
+    }, /*#__PURE__*/React__default.createElement(Form.Item, {
+      label: cp.label,
+      name: namePreffix + "-" + cp.name
+    }, cp.type === 'option' && /*#__PURE__*/React__default.createElement(Select, _extends({
+      showSearch: true,
+      allowClear: true,
+      className: styles['select-dropdown'],
+      options: (cp === null || cp === void 0 ? void 0 : cp.options) || [],
+      optionFilterProp: "label",
+      onChange: function onChange(val) {
+        return handleChangeParameterValue(cp.name, val);
+      },
+      getPopupContainer: function getPopupContainer(triggerNode) {
+        return triggerNode.parentElement;
+      },
+      value: (paramValue === null || paramValue === void 0 ? void 0 : paramValue[cp.name]) || []
+    }, multipleProps)), cp.type === 'input' && /*#__PURE__*/React__default.createElement(Input, {
+      onChange: function onChange(e) {
+        var _e$target;
+
+        return handleChangeParameterValue(cp.name, e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.value);
+      },
+      value: (paramValue === null || paramValue === void 0 ? void 0 : paramValue[cp.name]) || null
+    })));
+  });
+};
+
 var QuestionDefinition = function QuestionDefinition(_ref) {
+  var _customParams$params;
+
   var index = _ref.index,
       question = _ref.question,
       questionGroup = _ref.questionGroup,
@@ -10256,22 +10335,14 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
     return s;
   }),
       UIText = _UIStore$useState.UIText,
-      hostParams = _UIStore$useState.hostParams;
+      hostParams = _UIStore$useState.hostParams,
+      activeEditQuestions = _UIStore$useState.activeEditQuestions;
 
-  var alertDeleteQuestionTitle = UIText.alertDeleteQuestionTitle,
-      alertDeleteQuestion = UIText.alertDeleteQuestion,
-      buttonAddNewQuestionText = UIText.buttonAddNewQuestionText,
-      buttonCopyQuestionText = UIText.buttonCopyQuestionText,
-      buttonMoveQuestionText = UIText.buttonMoveQuestionText,
-      buttonDeleteText = UIText.buttonDeleteText;
   var movingQ = UIStore.useState(function (s) {
     return s.activeMoveQuestion;
   });
   var isCopying = UIStore.useState(function (s) {
     return s.isCopyingQuestion;
-  });
-  var activeEditQuestions = UIStore.useState(function (s) {
-    return s.activeEditQuestions;
   });
 
   var _useState = useState('setting'),
@@ -10288,7 +10359,9 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
       name = question.name,
       dependency = question.dependency,
       disableDelete = question.disableDelete;
-  var defaultQuestionParam = hostParams.defaultQuestionParam;
+  var defaultQuestionParam = hostParams.defaultQuestionParam,
+      customParams = hostParams.customParams;
+  var enableCustomParams = customParams && (customParams === null || customParams === void 0 ? void 0 : customParams.label) && (customParams === null || customParams === void 0 ? void 0 : (_customParams$params = customParams.params) === null || _customParams$params === void 0 ? void 0 : _customParams$params.length);
   var allQuestions = questionGroups.map(function (qg) {
     return qg.questions;
   }).flatMap(function (x) {
@@ -10566,7 +10639,7 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
     onCancel: handleCancelEdit
   }];
   return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(ButtonAddMove, {
-    text: movingQ ? isCopying ? buttonCopyQuestionText : buttonMoveQuestionText : buttonAddNewQuestionText,
+    text: movingQ ? isCopying ? UIText.buttonCopyQuestionText : UIText.buttonMoveQuestionText : UIText.buttonAddNewQuestionText,
     disabled: movingQ === question && !isCopying || (movingQ === null || movingQ === void 0 ? void 0 : movingQ.order) + 1 === order && (movingQ === null || movingQ === void 0 ? void 0 : movingQ.questionGroupId) === questionGroupId && !isCopying || dependant.disabled.current,
     handleCancelMove: handleCancelMove,
     movingItem: movingQ,
@@ -10615,13 +10688,18 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
   }), /*#__PURE__*/React__default.createElement(Tabs.TabPane, {
     tab: UIText.questionSkipLogicTabPane,
     key: "skip-logic"
+  }), enableCustomParams && /*#__PURE__*/React__default.createElement(Tabs.TabPane, {
+    tab: (customParams === null || customParams === void 0 ? void 0 : customParams.label) || UIText.questionCustomParamsTabPane,
+    key: "custom-params"
   })), activeTab === 'setting' && /*#__PURE__*/React__default.createElement(QuestionSetting, {
     question: question,
     dependant: dependant.dependant
   }), activeTab === 'skip-logic' && /*#__PURE__*/React__default.createElement(QuestionSkipLogic, {
     question: question
+  }), enableCustomParams && activeTab === 'custom-params' && /*#__PURE__*/React__default.createElement(QuestionCustomParams, {
+    question: question
   }))), isLastItem && /*#__PURE__*/React__default.createElement(ButtonAddMove, {
-    text: movingQ ? isCopying ? buttonCopyQuestionText : buttonMoveQuestionText : buttonAddNewQuestionText,
+    text: movingQ ? isCopying ? UIText.buttonCopyQuestionText : UIText.buttonMoveQuestionText : UIText.buttonAddNewQuestionText,
     disabled: movingQ === question && !isCopying || dependant.disabled.last,
     movingItem: movingQ,
     handleCancelMove: handleCancelMove,
@@ -10640,9 +10718,9 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
     okButtonProps: {
       danger: true
     },
-    title: alertDeleteQuestionTitle,
-    okText: buttonDeleteText
-  }, alertDeleteQuestion));
+    title: UIText.alertDeleteQuestionTitle,
+    okText: UIText.buttonDeleteText
+  }, UIText.alertDeleteQuestion));
 };
 
 var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
@@ -11036,7 +11114,28 @@ var WebformEditor = function WebformEditor(_ref) {
     required: null
   } : _ref$defaultQuestion,
       _ref$limitQuestionTyp = _ref.limitQuestionType,
-      limitQuestionType = _ref$limitQuestionTyp === void 0 ? [] : _ref$limitQuestionTyp;
+      limitQuestionType = _ref$limitQuestionTyp === void 0 ? [] : _ref$limitQuestionTyp,
+      _ref$customParams = _ref.customParams,
+      customParams = _ref$customParams === void 0 ? {
+    label: null,
+    params: [{
+      name: null,
+      label: 'Single Option Param',
+      type: 'option',
+      multiple: true,
+      options: []
+    }, {
+      name: null,
+      label: 'Multiple Option Param',
+      type: 'option',
+      multiple: false,
+      options: []
+    }, {
+      name: null,
+      label: 'Input Param',
+      type: 'input'
+    }]
+  } : _ref$customParams;
 
   var _useState = useState(defaultQuestion),
       init = _useState[0],
@@ -11071,6 +11170,8 @@ var WebformEditor = function WebformEditor(_ref) {
       mandatoryQuestionCount = UIText.mandatoryQuestionCount,
       version = UIText.version;
   useEffect(function () {
+    var _customParams$params;
+
     var checkDefaultQuestion = defaultQuestion ? Object.values(defaultQuestion).filter(function (x) {
       return x;
     }).length : false;
@@ -11089,6 +11190,9 @@ var WebformEditor = function WebformEditor(_ref) {
       name: defaultQuestion === null || defaultQuestion === void 0 ? void 0 : defaultQuestion.name,
       required: (defaultQuestion === null || defaultQuestion === void 0 ? void 0 : defaultQuestion.required) || false
     };
+    var sanitizeCustomParams = customParams === null || customParams === void 0 ? void 0 : (_customParams$params = customParams.params) === null || _customParams$params === void 0 ? void 0 : _customParams$params.filter(function (x) {
+      return x === null || x === void 0 ? void 0 : x.name;
+    });
     UIStore.update(function (s) {
       if (sanitizeSettingTreeDropdownValue.length) {
         s.hostParams = _extends({}, s.hostParams, {
@@ -11126,8 +11230,16 @@ var WebformEditor = function WebformEditor(_ref) {
           })
         });
       }
+
+      if (customParams !== null && customParams !== void 0 && customParams.label && sanitizeCustomParams !== null && sanitizeCustomParams !== void 0 && sanitizeCustomParams.length) {
+        s.hostParams = _extends({}, s.hostParams, {
+          customParams: _extends({}, customParams, {
+            params: sanitizeCustomParams
+          })
+        });
+      }
     });
-  }, [settingTreeDropdownValue, settingCascadeURL, defaultQuestion, limitQuestionType]);
+  }, [settingTreeDropdownValue, settingCascadeURL, defaultQuestion, limitQuestionType, customParams]);
   useEffect(function () {
     if (defaultQuestionParam && init) {
       questionGroupFn.store.update(function (s) {
