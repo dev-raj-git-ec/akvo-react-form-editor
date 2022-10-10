@@ -5,29 +5,26 @@ import { UIStore, questionFn, questionGroupFn } from '../lib/store';
 import data from '../lib/data';
 import QuestionSetting from './QuestionSetting';
 import QuestionSkipLogic from './QuestionSkipLogic';
+import QuestionCustomParams from './QuestionCustomParams';
 import { ButtonAddMove, CardTitle, AlertPopup } from '../support';
 import { orderBy, maxBy, minBy } from 'lodash';
 
 const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
   const { questionGroups } = questionGroupFn.store.useState((s) => s);
   const { questions } = questionGroup;
-  const { UIText, hostParams } = UIStore.useState((s) => s);
-  const {
-    alertDeleteQuestionTitle,
-    alertDeleteQuestion,
-    buttonAddNewQuestionText,
-    buttonCopyQuestionText,
-    buttonMoveQuestionText,
-    buttonDeleteText,
-  } = UIText;
+  const { UIText, hostParams, activeEditQuestions } = UIStore.useState(
+    (s) => s
+  );
   const movingQ = UIStore.useState((s) => s.activeMoveQuestion);
   const isCopying = UIStore.useState((s) => s.isCopyingQuestion);
-  const activeEditQuestions = UIStore.useState((s) => s.activeEditQuestions);
   const [activeTab, setActiveTab] = useState('setting');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { id, questionGroupId, order, name, dependency, disableDelete } =
     question;
-  const { defaultQuestionParam } = hostParams;
+  const { defaultQuestionParam, customParams } = hostParams;
+
+  const enableCustomParams =
+    customParams && customParams?.label && customParams?.params?.length;
 
   const allQuestions = questionGroups
     .map((qg) => qg.questions)
@@ -299,9 +296,9 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
         text={
           movingQ
             ? isCopying
-              ? buttonCopyQuestionText
-              : buttonMoveQuestionText
-            : buttonAddNewQuestionText
+              ? UIText.buttonCopyQuestionText
+              : UIText.buttonMoveQuestionText
+            : UIText.buttonAddNewQuestionText
         }
         disabled={
           (movingQ === question && !isCopying) ||
@@ -354,22 +351,30 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
               tabBarGutter={24}
               className={styles['tabs-wrapper']}
             >
+              {/* Setting */}
               <Tabs.TabPane
                 tab={UIText.questionSettingTabPane}
                 key="setting"
               />
+              {/* Skip Logic */}
               <Tabs.TabPane
                 tab={UIText.questionSkipLogicTabPane}
                 key="skip-logic"
               />
+              {/* Custom Params */}
+              {enableCustomParams && (
+                <Tabs.TabPane
+                  tab={
+                    customParams?.label || UIText.questionCustomParamsTabPane
+                  }
+                  key="custom-params"
+                />
+              )}
               {/* <Tabs.TabPane
                 tab={UIText.questionExtraTabPane}
                 key="extra"
               />
-              <Tabs.TabPane
-                tab={UIText.questionTranslationTabPane}
-                key="translation"
-              /> */}
+               */}
             </Tabs>
             {activeTab === 'setting' && (
               <QuestionSetting
@@ -380,6 +385,9 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
             {activeTab === 'skip-logic' && (
               <QuestionSkipLogic question={question} />
             )}
+            {enableCustomParams && activeTab === 'custom-params' && (
+              <QuestionCustomParams question={question} />
+            )}
           </div>
         )}
       </Card>
@@ -388,9 +396,9 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
           text={
             movingQ
               ? isCopying
-                ? buttonCopyQuestionText
-                : buttonMoveQuestionText
-              : buttonAddNewQuestionText
+                ? UIText.buttonCopyQuestionText
+                : UIText.buttonMoveQuestionText
+              : UIText.buttonAddNewQuestionText
           }
           disabled={
             (movingQ === question && !isCopying) || dependant.disabled.last
@@ -408,10 +416,10 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
         onConfirm={handleDelete}
         onCancel={() => setIsModalOpen(false)}
         okButtonProps={{ danger: true }}
-        title={alertDeleteQuestionTitle}
-        okText={buttonDeleteText}
+        title={UIText.alertDeleteQuestionTitle}
+        okText={UIText.buttonDeleteText}
       >
-        {alertDeleteQuestion}
+        {UIText.alertDeleteQuestion}
       </AlertPopup>
     </div>
   );

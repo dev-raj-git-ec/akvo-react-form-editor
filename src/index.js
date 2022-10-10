@@ -30,6 +30,30 @@ const WebformEditor = ({
   settingCascadeURL = [{ name: null, url: null, initial: 0, list: false }],
   defaultQuestion = { type: null, name: null, required: null },
   limitQuestionType = [],
+  customParams = {
+    label: null,
+    params: [
+      {
+        name: null,
+        label: 'Single Option Param',
+        type: 'option',
+        multiple: true,
+        options: [],
+      },
+      {
+        name: null,
+        label: 'Multiple Option Param',
+        type: 'option',
+        multiple: false,
+        options: [],
+      },
+      {
+        name: null,
+        label: 'Input Param',
+        type: 'input',
+      },
+    ],
+  },
 }) => {
   const [init, setInit] = useState(defaultQuestion);
   const formStore = FormStore.useState((s) => s);
@@ -69,6 +93,7 @@ const WebformEditor = ({
       name: defaultQuestion?.name,
       required: defaultQuestion?.required || false,
     };
+    const sanitizeCustomParams = customParams?.params?.filter((x) => x?.name);
     // update UIStore
     UIStore.update((s) => {
       if (sanitizeSettingTreeDropdownValue.length) {
@@ -105,12 +130,22 @@ const WebformEditor = ({
             .filter((x) => limitQuestionType.includes(x.value)),
         };
       }
+      if (customParams?.label && sanitizeCustomParams?.length) {
+        s.hostParams = {
+          ...s.hostParams,
+          customParams: {
+            ...customParams,
+            params: sanitizeCustomParams,
+          },
+        };
+      }
     });
   }, [
     settingTreeDropdownValue,
     settingCascadeURL,
     defaultQuestion,
     limitQuestionType,
+    customParams,
   ]);
 
   useEffect(() => {

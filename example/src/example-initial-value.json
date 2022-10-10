@@ -797,6 +797,22 @@
             "minDate": "2022-01-01",
             "maxDate": "2022-12-31"
           }
+        },
+        {
+          "id": 28,
+          "name": "Question with Custom Params",
+          "order": 3,
+          "type": "text",
+          "required": false,
+          "translations": [
+            {
+              "name": "Pertanyaan dengan Parameter Khusus",
+              "language": "id"
+            }
+          ],
+          "params_name_a": ["SO1"],
+          "params_name_b": ["MO1", "MO2"],
+          "params_name_c": ["member"]
         }
       ]
     }

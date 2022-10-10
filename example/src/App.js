@@ -49,6 +49,7 @@ const App = () => {
         <WebformEditor
           onSave={setSource}
           initialValue={initialValue ? initial_value.default : source}
+          defaultQuestion={defaultQuestionValue ? defaultQuestion : null}
           settingTreeDropdownValue={[
             { label: 'Administration Tree', value: 'administration' },
             { label: 'Example Tree', value: 'example' },
@@ -69,7 +70,36 @@ const App = () => {
               list: 'children',
             },
           ]}
-          defaultQuestion={defaultQuestionValue ? defaultQuestion : null}
+          customParams={{
+            label: 'Set Custom Parameter',
+            params: [
+              {
+                name: 'params_name_a',
+                label: 'Single Option Param',
+                type: 'option',
+                multiple: false,
+                options: [
+                  { label: 'Option 1', value: 'SO1' },
+                  { label: 'Option 2', value: 'SO2' },
+                ],
+              },
+              {
+                name: 'params_name_b',
+                label: 'Multiple Option Param',
+                type: 'option',
+                multiple: true,
+                options: [
+                  { label: 'Multiple Option 1', value: 'MO1' },
+                  { label: 'Multiple Option 2', value: 'MO2' },
+                ],
+              },
+              {
+                name: 'params_name_c',
+                label: 'Input Param',
+                type: 'input',
+              },
+            ],
+          }}
           // limitQuestionType={[
           //   'text',
           //   'number',
