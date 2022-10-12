@@ -23,6 +23,7 @@ const FormDefinition = ({ name, description }) => {
         initialValue={name}
       >
         <Input
+          allowClear
           onChange={(e) =>
             FormStore.update((u) => {
               u.name = e?.target?.value;
@@ -37,6 +38,7 @@ const FormDefinition = ({ name, description }) => {
       >
         <Input.TextArea
           rows={5}
+          allowClear
           onChange={(e) =>
             FormStore.update((u) => {
               u.description = e?.target?.value;

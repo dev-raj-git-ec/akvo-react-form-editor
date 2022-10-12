@@ -212,7 +212,10 @@ const SettingOption = ({
               name={`${namePreffix}-allow_other_text`}
               initialValue={allowOtherText}
             >
-              <Input onChange={handleOnChangeAllowOtherText} />
+              <Input
+                onChange={handleOnChangeAllowOtherText}
+                allowClear
+              />
             </Form.Item>
           </Col>
         )}
@@ -232,6 +235,7 @@ const SettingOption = ({
               <Input
                 placeholder="Code"
                 onChange={(e) => handleOnChangeCode(e, d)}
+                allowClear
               />
             </Form.Item>
           </Col>
@@ -240,7 +244,10 @@ const SettingOption = ({
               initialValue={d.name}
               name={`${namePreffix}-option-name-${d.id}`}
             >
-              <Input onChange={(e) => handleOnChangeOption(e, d)} />
+              <Input
+                onChange={(e) => handleOnChangeOption(e, d)}
+                allowClear
+              />
             </Form.Item>
           </Col>
           <Col>

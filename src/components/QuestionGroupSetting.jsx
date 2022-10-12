@@ -65,7 +65,10 @@ const QuestionGroupSetting = ({
         name={`${namePreffix}-name`}
         required
       >
-        <Input onChange={handleChangeName} />
+        <Input
+          onChange={handleChangeName}
+          allowClear
+        />
       </Form.Item>
       <Form.Item
         label={UIText.inputQuestionGroupDescriptionLabel}
@@ -74,6 +77,7 @@ const QuestionGroupSetting = ({
       >
         <Input.TextArea
           onChange={handleChangeDescription}
+          allowClear
           rows={5}
         />
       </Form.Item>
@@ -102,7 +106,10 @@ const QuestionGroupSetting = ({
               name={`${namePreffix}-repeat_text`}
               initialValue={repeatText}
             >
-              <Input onChange={handleChangeRepeatText} />
+              <Input
+                onChange={handleChangeRepeatText}
+                allowClear
+              />
             </Form.Item>
           </Col>
         )}

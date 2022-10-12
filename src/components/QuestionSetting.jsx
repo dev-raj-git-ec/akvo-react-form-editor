@@ -124,7 +124,10 @@ const QuestionSetting = ({ question, dependant }) => {
         name={`${namePreffix}-name`}
         required
       >
-        <Input onChange={handleChangeName} />
+        <Input
+          onChange={handleChangeName}
+          allowClear
+        />
       </Form.Item>
       <Form.Item
         label={UIText.inputQuestionTypeLabel}
@@ -145,14 +148,21 @@ const QuestionSetting = ({ question, dependant }) => {
         initialValue={variable}
         name={`${namePreffix}-variable`}
       >
-        <Input onChange={handleChangeVariableName} />
+        <Input
+          onChange={handleChangeVariableName}
+          allowClear
+        />
       </Form.Item>
       <Form.Item
         label={UIText.inputQuestionTooltipLabel}
         initialValue={tooltip?.text}
         name={`${namePreffix}-tooltip`}
       >
-        <Input.TextArea onChange={handleChangeTooltip} />
+        <Input.TextArea
+          onChange={handleChangeTooltip}
+          allowClear
+          rows={5}
+        />
       </Form.Item>
       <Form.Item
         name={`${namePreffix}-required`}

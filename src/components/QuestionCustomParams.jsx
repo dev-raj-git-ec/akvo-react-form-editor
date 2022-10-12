@@ -105,6 +105,7 @@ const QuestionCustomParams = ({ question }) => {
                 handleChangeParameterValue(cp.name, e?.target?.value)
               }
               value={paramValue?.[cp.name] || null}
+              allowClear
             />
           )}
         </Form.Item>

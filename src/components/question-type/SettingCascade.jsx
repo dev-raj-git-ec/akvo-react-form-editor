@@ -141,7 +141,10 @@ const SettingCascade = ({
               }
               name={`${namePreffix}-api-list`}
             >
-              <Input onChange={(e) => handleChangeList(e?.target?.value)} />
+              <Input
+                onChange={(e) => handleChangeList(e?.target?.value)}
+                allowClear
+              />
             </Form.Item>
           </Col>
         )}
