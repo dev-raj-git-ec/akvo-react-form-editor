@@ -9,6 +9,7 @@ import {
   SettingOption,
   SettingCascade,
   SettingDate,
+  SettingTable,
 } from './question-type';
 import { map, groupBy, orderBy } from 'lodash';
 
@@ -136,6 +137,8 @@ const QuestionSetting = ({ question, dependant }) => {
         required
       >
         <Select
+          showSearch
+          optionFilterProp="label"
           className={styles['select-dropdown']}
           options={questionTypeDropdownValue}
           getPopupContainer={(triggerNode) => triggerNode.parentElement}
@@ -184,6 +187,7 @@ const QuestionSetting = ({ question, dependant }) => {
       {qType === questionType.tree && <SettingTree {...question} />}
       {qType === questionType.cascade && <SettingCascade {...question} />}
       {qType === questionType.date && <SettingDate {...question} />}
+      {qType === questionType.table && <SettingTable {...question} />}
     </div>
   );
 };

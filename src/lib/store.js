@@ -24,6 +24,7 @@ const questionType = {
   option: 'option',
   multiple_option: 'multiple_option',
   tree: 'tree',
+  table: 'table',
   // autofield: 'autofield',
 };
 

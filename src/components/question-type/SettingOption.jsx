@@ -44,13 +44,13 @@ const SettingOption = ({
   questionGroupId,
   allowOther,
   allowOtherText,
-  options: currentOptions,
+  options: initialOptions,
 }) => {
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
   const [options, setOptions] = useState(
-    currentOptions?.length
-      ? currentOptions.map((x, xi) => ({
+    initialOptions?.length
+      ? initialOptions.map((x, xi) => ({
           ...x,
           code: x?.code || null,
           id: x?.id || generateId() + xi,
