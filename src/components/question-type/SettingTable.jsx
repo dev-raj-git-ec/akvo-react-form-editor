@@ -1,7 +1,14 @@
-import React, { useState } from 'react';
-import { Form, Input, Select, Row, Col, Card } from 'antd';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Form, Input, Select, Row, Col, Card, Button, Space } from 'antd';
 import styles from '../../styles.module.css';
 import { UIStore, questionGroupFn, generateId } from '../../lib/store';
+import {
+  MdOutlineRemoveCircleOutline,
+  MdOutlineAddCircleOutline,
+  MdOutlineArrowCircleDown,
+  MdOutlineArrowCircleUp,
+} from 'react-icons/md';
+import { takeRight, orderBy } from 'lodash';
 
 const generateColumnName = (text) =>
   text.trim().toLowerCase().split(' ').join('_');
@@ -16,8 +23,8 @@ const columnType = {
 const defaultColumns = ({ init = false }) => {
   const column = {
     name: null,
-    label: 'Column Name',
-    type: columnType.input,
+    label: null,
+    type: null,
   };
   if (init) {
     return [{ ...column, id: generateId() }];
@@ -42,24 +49,136 @@ const SettingTable = ({ id, questionGroupId, columns: initialColumns }) => {
   const [columns, setColumns] = useState(
     initialColumns?.length ? initialColumns : defaultColumns({ init: true })
   );
-  const [options, setOptions] = useState(defaultColumnOptions({ init: true }));
 
   const columnTypeOptions = Object.keys(columnType).map((key) => ({
     label: columnType[key],
     value: key,
   }));
 
+  useEffect(() => {
+    questionGroupFn.store.update((s) => {
+      s.questionGroups = s.questionGroups.map((qg) => {
+        if (qg.id === questionGroupId) {
+          const questions = qg.questions.map((q) => {
+            if (q.id === id) {
+              return { ...q, columns: columns };
+            }
+            return q;
+          });
+          return {
+            ...qg,
+            questions: questions,
+          };
+        }
+        return qg;
+      });
+    });
+  }, [id, questionGroupId, columns]);
+
+  const updateColumns = useCallback(
+    (columnId, obj) => {
+      const updatedColumn = columns.map((cl) => {
+        if (cl.id === columnId) {
+          return {
+            ...cl,
+            ...obj,
+          };
+        }
+        return cl;
+      });
+      setColumns(updatedColumn);
+    },
+    [columns]
+  );
+
+  const handleChangeColumnName = (columnId, value) => {
+    updateColumns(columnId, { name: generateColumnName(value), label: value });
+  };
+
   const handleChangeColumnType = (columnId, value) => {
-    const updatedColumn = columns.map((cl) => {
-      if (cl.id === columnId) {
+    let obj = { type: value };
+    if (value === columnType.option) {
+      obj = { ...obj, options: defaultColumnOptions({ init: true }) };
+    }
+    updateColumns(columnId, obj);
+  };
+
+  const handleOnAddOption = (currentColumn, currentOption) => {
+    const { id: columnId, options } = currentColumn;
+    const { order: currentOrder } = currentOption;
+    const lastOrder = takeRight(orderBy(options, 'order'))[0].order;
+    // reorder prev option
+    const reorderOptions = options.map((opt) => {
+      let order = opt.order;
+      if (opt.order > currentOrder) {
+        order = order + 1;
+      }
+      if (
+        opt.order < currentOrder &&
+        opt.order !== 1 &&
+        currentOrder !== lastOrder
+      ) {
+        order = order - 1;
+      }
+      return { ...opt, order: order };
+    });
+    const addOptions = [
+      ...reorderOptions,
+      defaultColumnOptions({ order: currentOrder + 1 }),
+    ];
+    updateColumns(columnId, { options: addOptions });
+  };
+
+  const handleOnMoveOption = (currentColumn, currentOption, targetOrder) => {
+    const { id: columnId, options } = currentColumn;
+    const { order: currentOrder } = currentOption;
+    // handle move
+    const prevOptions = options.filter(
+      (opt) => opt.order !== currentOrder && opt.order !== targetOrder
+    );
+    const currentOptions = options
+      .filter((opt) => opt.order === currentOrder)
+      .map((opt) => ({
+        ...opt,
+        order: targetOrder,
+      }));
+    const targetOptions = options
+      .filter((opt) => opt.order === targetOrder)
+      .map((opt) => ({
+        ...opt,
+        order: currentOrder,
+      }));
+    updateColumns(columnId, {
+      options: orderBy(
+        [...prevOptions, ...currentOptions, ...targetOptions],
+        'order'
+      ),
+    });
+  };
+
+  const handleOnDeleteOption = (currentColumn, currentOptionId) => {
+    const { id: columnId, options } = currentColumn;
+    // delete and reorder
+    updateColumns(columnId, {
+      options: orderBy(options, 'order')
+        .filter((opt) => opt.id !== currentOptionId)
+        .map((opt, opti) => ({ ...opt, order: opti + 1 })),
+    });
+  };
+
+  const handleOnChangeOption = (currentColumn, currentOption, value) => {
+    const { id: columnId, options } = currentColumn;
+    const { id: currentOptId } = currentOption;
+    const updatedOptions = options.map((op) => {
+      if (op.id === currentOptId) {
         return {
-          ...cl,
-          type: value,
+          ...op,
+          name: value,
         };
       }
-      return cl;
+      return op;
     });
-    setColumns(updatedColumn);
+    updateColumns(columnId, { options: updatedOptions });
   };
 
   return (
@@ -74,16 +193,22 @@ const SettingTable = ({ id, questionGroupId, columns: initialColumns }) => {
             <Row gutter={[24, 20]}>
               <Col span={12}>
                 <Form.Item
-                  name={`${namePreffix}-${cl.name}`}
+                  name={`${namePreffix}-column_name}`}
                   className={styles['form-item-no-bottom-margin']}
                   label={UIText.inputColumnNameLabel}
+                  initialValue={cl.label}
                 >
-                  <Input allowClear />
+                  <Input
+                    allowClear
+                    onChange={(e) =>
+                      handleChangeColumnName(cl.id, e?.target?.value)
+                    }
+                  />
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item
-                  name={`${namePreffix}-${cl.type}`}
+                  name={`${namePreffix}-column_type`}
                   className={styles['form-item-no-bottom-margin']}
                   label={UIText.inputColumnTypeLabel}
                   initialValue={cl.type}
@@ -102,19 +227,61 @@ const SettingTable = ({ id, questionGroupId, columns: initialColumns }) => {
               <Col span={24}>
                 {cl.type === columnType.option && (
                   <div>
-                    <p>Set an Option</p>
-                    {options.map((op, opi) => {
+                    <p>Define Options</p>
+                    {cl?.options?.map((op, opi) => {
                       return (
                         <Row
                           key={`option-${id}-${opi}-${op.id}`}
                           gutter={[24, 24]}
                         >
                           <Col span={12}>
-                            <Form.Item initialValue={op.name}>
-                              <Input allowClear />
+                            <Form.Item
+                              initialValue={op.name}
+                              name={`${namePreffix}-option_name_${op.id}`}
+                            >
+                              <Input
+                                allowClear
+                                onChange={(e) =>
+                                  handleOnChangeOption(cl, op, e?.target?.value)
+                                }
+                              />
                             </Form.Item>
                           </Col>
-                          <Col>+</Col>
+                          <Col>
+                            <Space>
+                              <Button
+                                type="link"
+                                className={styles['button-icon']}
+                                icon={<MdOutlineAddCircleOutline />}
+                                onClick={() => handleOnAddOption(cl, op)}
+                              />
+                              <Button
+                                type="link"
+                                className={styles['button-icon']}
+                                icon={<MdOutlineArrowCircleUp />}
+                                onClick={() =>
+                                  handleOnMoveOption(cl, op, op.order - 1)
+                                }
+                                disabled={opi === 0}
+                              />
+                              <Button
+                                type="link"
+                                className={styles['button-icon']}
+                                icon={<MdOutlineArrowCircleDown />}
+                                onClick={() =>
+                                  handleOnMoveOption(cl, op, op.order + 1)
+                                }
+                                disabled={opi === cl.options.length - 1}
+                              />
+                              <Button
+                                type="link"
+                                className={styles['button-icon']}
+                                icon={<MdOutlineRemoveCircleOutline />}
+                                onClick={() => handleOnDeleteOption(cl, op.id)}
+                                disabled={cl.options.length === 1}
+                              />
+                            </Space>
+                          </Col>
                         </Row>
                       );
                     })}

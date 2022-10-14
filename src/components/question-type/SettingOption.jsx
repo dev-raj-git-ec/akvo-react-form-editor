@@ -127,8 +127,6 @@ const SettingOption = ({
     );
   };
 
-  // allow other onchange function
-
   const handleOnAddOption = (current) => {
     const { order: currentOrder } = current;
     const lastOrder = takeRight(orderBy(options, 'order'))[0].order;
@@ -230,7 +228,7 @@ const SettingOption = ({
           <Col span={4}>
             <Form.Item
               initialValue={d.code}
-              name={`${namePreffix}-option-code-${d.id}`}
+              name={`${namePreffix}-option_code_${d.id}`}
             >
               <Input
                 placeholder="Code"
@@ -242,7 +240,7 @@ const SettingOption = ({
           <Col span={10}>
             <Form.Item
               initialValue={d.name}
-              name={`${namePreffix}-option-name-${d.id}`}
+              name={`${namePreffix}-option_name_${d.id}`}
             >
               <Input
                 onChange={(e) => handleOnChangeOption(e, d)}
