@@ -248,7 +248,9 @@ const WebformEditor = ({
                 <Tag style={{ margin: 0 }}>
                   {questionGroups.length} {questionGroupCount}
                 </Tag>
-                <Tag style={{ margin: 0 }}>{version} 1</Tag>
+                <Tag style={{ margin: 0 }}>
+                  {version} {formStore.version || 1}
+                </Tag>
                 {currentTab === 'edit-form' && (
                   <ButtonWithIcon
                     type="edit-button"
