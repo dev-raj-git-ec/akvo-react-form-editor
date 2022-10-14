@@ -47,7 +47,25 @@ const SettingTable = ({ id, questionGroupId, columns: initialColumns }) => {
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
   const [columns, setColumns] = useState(
-    initialColumns?.length ? initialColumns : defaultColumns({ init: true })
+    initialColumns?.length
+      ? initialColumns.map((cl, cli) => {
+          if (cl?.options && cl?.options?.length) {
+            const options = cl.options.map((op, opi) => ({
+              ...op,
+              id: generateId() + initialColumns.length + opi + 1,
+            }));
+            return {
+              ...cl,
+              id: generateId() + cli,
+              options: options,
+            };
+          }
+          return {
+            ...cl,
+            id: generateId() + cli,
+          };
+        })
+      : defaultColumns({ init: true })
   );
 
   const columnTypeOptions = Object.keys(columnType).map((key) => ({
@@ -101,6 +119,17 @@ const SettingTable = ({ id, questionGroupId, columns: initialColumns }) => {
       obj = { ...obj, options: defaultColumnOptions({ init: true }) };
     }
     updateColumns(columnId, obj);
+  };
+
+  const handleAddColumn = () => {
+    const addColumns = [...columns, defaultColumns({ init: false })];
+    console.log(addColumns);
+    setColumns(addColumns);
+  };
+
+  const handleDeleteColumn = (currentColumn) => {
+    const updatedColumn = columns.filter((cl) => cl.id !== currentColumn.id);
+    setColumns(updatedColumn);
   };
 
   const handleOnAddOption = (currentColumn, currentOption) => {
@@ -188,12 +217,40 @@ const SettingTable = ({ id, questionGroupId, columns: initialColumns }) => {
         return (
           <Card
             key={`column-${id}-${cli}-${cl.id}`}
-            title={`Column - ${cli + 1}`}
+            title={
+              <Row
+                gutter={[24, 24]}
+                align="middle"
+                justify="space-between"
+              >
+                <Col span={20}>{`Column - ${cli + 1}`}</Col>
+                <Col
+                  span={4}
+                  align="end"
+                >
+                  <Space>
+                    <Button
+                      type="link"
+                      className={styles['button-icon']}
+                      icon={<MdOutlineAddCircleOutline />}
+                      onClick={() => handleAddColumn()}
+                    />
+                    <Button
+                      type="link"
+                      className={styles['button-icon']}
+                      icon={<MdOutlineRemoveCircleOutline />}
+                      onClick={() => handleDeleteColumn(cl)}
+                      disabled={columns.length === 1}
+                    />
+                  </Space>
+                </Col>
+              </Row>
+            }
           >
             <Row gutter={[24, 20]}>
               <Col span={12}>
                 <Form.Item
-                  name={`${namePreffix}-column_name}`}
+                  name={`${namePreffix}-column_name_${cl.id}`}
                   className={styles['form-item-no-bottom-margin']}
                   label={UIText.inputColumnNameLabel}
                   initialValue={cl.label}
@@ -208,7 +265,7 @@ const SettingTable = ({ id, questionGroupId, columns: initialColumns }) => {
               </Col>
               <Col span={12}>
                 <Form.Item
-                  name={`${namePreffix}-column_type`}
+                  name={`${namePreffix}-column_type_${cl.id}`}
                   className={styles['form-item-no-bottom-margin']}
                   label={UIText.inputColumnTypeLabel}
                   initialValue={cl.type}
@@ -227,7 +284,7 @@ const SettingTable = ({ id, questionGroupId, columns: initialColumns }) => {
               <Col span={24}>
                 {cl.type === columnType.option && (
                   <div>
-                    <p>Define Options</p>
+                    <p>{UIText.questionTableTypeDefineOptionsText}</p>
                     {cl?.options?.map((op, opi) => {
                       return (
                         <Row
@@ -237,7 +294,7 @@ const SettingTable = ({ id, questionGroupId, columns: initialColumns }) => {
                           <Col span={12}>
                             <Form.Item
                               initialValue={op.name}
-                              name={`${namePreffix}-option_name_${op.id}`}
+                              name={`${namePreffix}-option_name_${op.id}_${cl.id}`}
                             >
                               <Input
                                 allowClear

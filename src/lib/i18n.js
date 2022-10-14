@@ -79,6 +79,7 @@ const UIStaticText = {
     inputColumnNameLabel: 'Column Name',
     inputColumnTypeLabel: 'Column Type',
     inputColumnOptionsLabel: 'Column Options',
+    questionTableTypeDefineOptionsText: 'Define Options',
   },
 };
 
