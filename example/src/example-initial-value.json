@@ -523,23 +523,40 @@
             }
           ],
           "order": 10,
-          "type": "multiple_option",
-          "option": [
+          "type": "table",
+          "columns": [
             {
-              "name": "Rendang",
-              "order": 1
+              "name": "items",
+              "label": "Items",
+              "type": "option",
+              "options": [
+                {
+                  "name": "Rendang",
+                  "order": 1
+                },
+                {
+                  "name": "Ayam Pop",
+                  "order": 2
+                },
+                {
+                  "name": "Paru Goreng",
+                  "order": 3
+                },
+                {
+                  "name": "Baluik Goreng",
+                  "order": 4
+                }
+              ]
             },
             {
-              "name": "Ayam Pop",
-              "order": 2
+              "name": "amount",
+              "label": "Amount",
+              "type": "number"
             },
             {
-              "name": "Paru Goreng",
-              "order": 3
-            },
-            {
-              "name": "Baluik Goreng",
-              "order": 4
+              "name": "note",
+              "label": "Note",
+              "type": "input"
             }
           ],
           "required": true,

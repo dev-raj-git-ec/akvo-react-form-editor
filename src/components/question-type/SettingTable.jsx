@@ -52,17 +52,17 @@ const SettingTable = ({ id, questionGroupId, columns: initialColumns }) => {
           if (cl?.options && cl?.options?.length) {
             const options = cl.options.map((op, opi) => ({
               ...op,
-              id: generateId() + initialColumns.length + opi + 1,
+              id: op?.id || generateId() + initialColumns.length + opi + 1,
             }));
             return {
               ...cl,
-              id: generateId() + cli,
+              id: cl?.id || generateId() + cli,
               options: options,
             };
           }
           return {
             ...cl,
-            id: generateId() + cli,
+            id: cl?.id || generateId() + cli,
           };
         })
       : defaultColumns({ init: true })
@@ -123,7 +123,6 @@ const SettingTable = ({ id, questionGroupId, columns: initialColumns }) => {
 
   const handleAddColumn = () => {
     const addColumns = [...columns, defaultColumns({ init: false })];
-    console.log(addColumns);
     setColumns(addColumns);
   };
 
