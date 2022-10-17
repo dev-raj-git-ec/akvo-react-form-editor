@@ -8,7 +8,6 @@ const FormPreview = () => {
   const { questionGroups } = questionGroupFn.store.useState((s) => s);
   const formStore = FormStore.useState((s) => s);
 
-  console.log('a');
   return <Webform forms={data.toWebform(formStore, questionGroups)} />;
 };
 
