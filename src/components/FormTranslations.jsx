@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import styles from '../styles.module.css';
 import { Row, Col, Divider, Tag, Select, Form, Space } from 'antd';
-import { UIStore, FormStore, questionGroupFn } from '../lib/store';
+import { UIStore, formFn, questionGroupFn } from '../lib/store';
 import {
   FormDefinitionTranslation,
   QuestionGroupDefinitionTranslation,
@@ -13,7 +13,7 @@ const ExistingTranslation = () => {
   const { localeDropdownValue, existingTranslation } = UIStore.useState(
     (s) => s
   );
-  const formStore = FormStore.useState((s) => s);
+  const formStore = formFn.store.useState((s) => s);
   const languages = formStore?.languages || [];
 
   const handleCloseTag = (lang) => {
@@ -22,7 +22,7 @@ const ExistingTranslation = () => {
         existingTranslation === lang ? null : existingTranslation;
     });
     // remove deleted translation from translations list
-    FormStore.update((u) => {
+    formFn.store.update((u) => {
       u.languages = languages.filter((ln) => ln !== lang);
       u.translations = formStore?.translations?.filter(
         (tl) => tl.language !== lang
@@ -87,7 +87,7 @@ const ExistingTranslation = () => {
 const FormTranslations = () => {
   const [formTranslation] = Form.useForm();
   const { UIText, localeDropdownValue } = UIStore.useState((s) => s);
-  const formStore = FormStore.useState((s) => s);
+  const formStore = formFn.store.useState((s) => s);
   const { questionGroups } = questionGroupFn.store.useState((s) => s);
 
   const languages = useMemo(() => {
@@ -123,7 +123,7 @@ const FormTranslations = () => {
             optionFilterProp="label"
             options={defaultLangDropdownValue}
             onChange={(e) =>
-              FormStore.update((u) => {
+              formFn.store.update((u) => {
                 u.defaultLanguage = e;
               })
             }
@@ -143,7 +143,7 @@ const FormTranslations = () => {
             className={styles['select-dropdown']}
             optionFilterProp="children"
             onChange={(e) =>
-              FormStore.update((u) => {
+              formFn.store.update((u) => {
                 u.languages = [...languages, e];
               })
             }

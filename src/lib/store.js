@@ -28,6 +28,15 @@ const questionType = {
   // autofield: 'autofield',
 };
 
+const defaultForm = () => {
+  return {
+    id: generateId(),
+    name: 'New Form',
+    version: 1,
+    description: 'New Form Description',
+  };
+};
+
 const defaultQuestion = ({
   questionGroup,
   name,
@@ -110,15 +119,17 @@ const UIStore = new Store({
 });
 
 const FormStore = new Store({
-  id: generateId(),
-  name: 'New Form',
-  version: 1,
-  description: 'New Form Description',
+  ...defaultForm(),
 });
 
 const QuestionGroupStore = new Store({
   questionGroups: [defaultQuestionGroup({})],
 });
+
+const formFn = {
+  add: defaultForm,
+  store: FormStore,
+};
 
 const questionGroupFn = {
   add: defaultQuestionGroup,
@@ -138,8 +149,8 @@ const questionFn = {
 
 export {
   UIStore,
-  FormStore,
   questionType,
+  formFn,
   questionGroupFn,
   questionFn,
   generateId,

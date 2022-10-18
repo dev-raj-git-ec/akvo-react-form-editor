@@ -11,8 +11,8 @@ import {
 } from './components';
 import { ButtonWithIcon } from './support';
 import {
-  FormStore,
   UIStore,
+  formFn,
   questionGroupFn,
   generateId,
   questionType,
@@ -56,7 +56,7 @@ const WebformEditor = ({
   },
 }) => {
   const [init, setInit] = useState(defaultQuestion);
-  const formStore = FormStore.useState((s) => s);
+  const formStore = formFn.store.useState((s) => s);
   const current = UIStore.useState((s) => s.current);
   const { UIText, hostParams } = UIStore.useState((s) => s);
   const questionGroups = questionGroupFn.store.useState(
@@ -165,7 +165,7 @@ const WebformEditor = ({
   useEffect(() => {
     if (!isEmpty(initialValue)) {
       const initialData = data.toEditor(initialValue);
-      FormStore.update((s) => {
+      formFn.store.update((s) => {
         s.id = initialData?.id || generateId();
         s.version = initialData?.version || 1;
         s.name = initialData?.name || 'Unknown Form';
@@ -177,6 +177,8 @@ const WebformEditor = ({
       questionGroupFn.store.update((s) => {
         s.questionGroups = initialData.questionGroups;
       });
+    } else {
+      console.log('a', initialValue);
     }
   }, [initialValue]);
 

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Form, Input } from 'antd';
-import { UIStore, FormStore } from '../lib/store';
+import { UIStore, formFn } from '../lib/store';
 
 const FormDefinition = ({ name, description }) => {
   const form = Form.useFormInstance();
@@ -25,7 +25,7 @@ const FormDefinition = ({ name, description }) => {
         <Input
           allowClear
           onChange={(e) =>
-            FormStore.update((u) => {
+            formFn.store.update((u) => {
               u.name = e?.target?.value;
             })
           }
@@ -40,7 +40,7 @@ const FormDefinition = ({ name, description }) => {
           rows={5}
           allowClear
           onChange={(e) =>
-            FormStore.update((u) => {
+            formFn.store.update((u) => {
               u.description = e?.target?.value;
             })
           }
