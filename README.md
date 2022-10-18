@@ -46,7 +46,7 @@ const Example = () => {
   }
 
   render() {
-    return <WebformEditor onSave={onSave} />;
+    return <WebformEditor initialValue={{}} onSave={onSave} />;
   }
 }
 ```
