@@ -20,18 +20,18 @@ yarn add akvo-react-form-editor
 
 ## Supported Question Type
 
-| Type            | Description               |
-| --------------- | ------------------------- |
-| input           | Input Text                |
-| number          | Input Number              |
-| cascade         | Cascade Select            |
-| text            | TextArea                  |
-| date            | Date                      |
-| option          | Option                    |
-| multiple_option | Multiple Option           |
-| tree            | Tree Select               |
-| geo             | Geolocation               |
-| table           | Table (Multiple Question) |
+| Type                      | Value           |
+| ------------------------- | --------------- |
+| **Input Text**                | input           |
+| **Input Number**              | number          |
+| **Cascade Select**            | cascade         |
+| **TextArea**                  | text            |
+| **Date**                      | date            |
+| **Option**                    | option          |
+| **Multiple Option**           | multiple_option |
+| **Tree Select**               | tree            |
+| **Geolocation**               | geo             |
+| **Table (Multiple Question)** | table           |
 
 ## Usage
 
@@ -55,8 +55,8 @@ const Example = () => {
 
 ### WebformEditor
 
-| Props                 | Description                                                               | Type                                                                 | Default |
-| --------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------- | ------- |
+| Props             | Description                                                               | Type                                                                 | Default |
+| ------------------| ------------------------------------------------------------------------- | -------------------------------------------------------------------- | ------- |
 | **onSave**            | Trigger after save button click                                           | `function(values)`                                                   | -       |
 | **limitQuestionType** | Support to limit question type available                                  | Array[[QuestionType] \| `undefined`(#supported-question-type)]       | -       |
 | **defaultQuestion**   | Support to set custom default new question type, name and required status | Object{[defaultQuestion](#default-question-optional)} \| `undefined` | -       |
@@ -71,9 +71,9 @@ Default question should be defined as object.
 
 | Props    | Description                                                                      | Type                                                                                           |
 | -------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| type     | Use one of [QuestionType](#supported-question-type) as default new question type | `number` \| `input` \| `text` \| `option` \| `multiple_option` \| `cascade` \| `tree` \| `geo` |
-| name     | Set default new question title / name                                            | String                                                                                         |
-| required | Set new question required `true`/`false` by default                              | Boolean                                                                                        |
+| **type**     | Use one of [QuestionType](#supported-question-type) as default new question type | `number` \| `input` \| `text` \| `option` \| `multiple_option` \| `cascade` \| `tree` \| `geo` |
+| **name**     | Set default new question title / name                                            | String                                                                                         |
+| **required** | Set new question required `true`/`false` by default                              | Boolean                                                                                        |
 
 Example:
 
@@ -91,12 +91,12 @@ Setting cascade URL should be defined as array of object. This value was used to
 
 | Props        | Description               | Type                                                                   |
 | ------------ | ------------------------- | ---------------------------------------------------------------------- |
-| id           | Unique id as option value | Integer                                                                |
-| name         | Shown as option label     | String                                                                 |
-| endpoint     | Cascade API               | String                                                                 |
-| initial      | Initial Parameter         | Integer \| String \| `undefined`                                       |
-| list         | Object name of array      | `res.data?.[list]` \| `res.data` \| String \| `undefined` \| `false`   |
-| customParams | Custom Parameters         | [Custom Parameters Setting](#custom-parameters-setting) \| `undefined` |
+| **id**           | Unique id as option value | Integer                                                                |
+| **name**         | Shown as option label     | String                                                                 |
+| **endpoint**     | Cascade API               | String                                                                 |
+| **initial**      | Initial Parameter         | Integer \| String \| `undefined`                                       |
+| **list**         | Object name of array      | `res.data?.[list]` \| `res.data` \| String \| `undefined` \| `false`   |
+| **customParams** | Custom Parameters         | [Custom Parameters Setting](#custom-parameters-setting) \| `undefined` |
 
 Example:
 
@@ -163,25 +163,25 @@ Custom parameters are key-value pairs that we can implement in the Webform Edito
 
 | Props  | Description                     | Type                                           |
 | ------ | ------------------------------- | ---------------------------------------------- |
-| label  | Label for the custom params tab | String \| `undefined`                          |
-| params | List of custom parameters       | Array[[Custom Parameters](#custom-parameters)] |
+| **label**  | Label for the custom params tab | String \| `undefined`                          |
+| **params** | List of custom parameters       | Array[[Custom Parameters](#custom-parameters)] |
 
 #### Custom Parameters
 
 | Props    | Description             | Type                                                          |
 | -------- | ----------------------- | ------------------------------------------------------------- |
-| name     | Parameter name          | String                                                        |
-| label    | Parameter label         | String \| `undefined`                                         |
-| type     | Field Type              | `option` \| `input` \| `number`                               |
-| multiple | Whether multiple or not | Boolean                                                       |
-| options  | Parameter Options       | Array[[Option Parameters](#option-parameters)] \| `undefined` |
+| **name**     | Parameter name          | String                                                        |
+| **label**    | Parameter label         | String \| `undefined`                                         |
+| **type**     | Field Type              | `option` \| `input` \| `number`                               |
+| **multiple** | Whether multiple or not | Boolean                                                       |
+| **options**  | Parameter Options       | Array[[Option Parameters](#option-parameters)] \| `undefined` |
 
 #### Option Parameters
 
 | Props | Description                  | Type                  |
 | ----- | ---------------------------- | --------------------- |
-| label | Label for the params options | String \| `undefined` |
-| value | Value for the params options | String                |
+| **label** | Label for the params options | String \| `undefined` |
+| **value** | Value for the params options | String                |
 
 ## License
 
