@@ -20,8 +20,8 @@ yarn add akvo-react-form-editor
 
 ## Supported Question Type
 
-| Type                      | Value           |
-| ------------------------- | --------------- |
+| Type                          | Value           |
+| ----------------------------- | --------------- |
 | **Input Text**                | input           |
 | **Input Number**              | number          |
 | **Cascade Select**            | cascade         |
@@ -55,12 +55,12 @@ const Example = () => {
 
 ### WebformEditor
 
-| Props             | Description                                                               | Type                                                                 | Default |
-| ------------------| ------------------------------------------------------------------------- | -------------------------------------------------------------------- | ------- |
+| Props                 | Description                                                               | Type                                                                 | Default |
+| --------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------- | ------- |
 | **onSave**            | Trigger after save button click                                           | `function(values)`                                                   | -       |
 | **limitQuestionType** | Support to limit question type available                                  | Array[[QuestionType] \| `undefined`(#supported-question-type)]       | -       |
 | **defaultQuestion**   | Support to set custom default new question type, name and required status | Object{[defaultQuestion](#default-question-optional)} \| `undefined` | -       |
-| **initialValue**      | Set value by Form initialization                                          | Object{[initialValue](#initial-value-optional)} \| `undefined`       | -       |
+| **initialValue**      | Set value by Form initialization (**Required** as empty object)           | Object{[initialValue](#initial-value-optional)} \| `{}`              | -       |
 | **settingCascadeURL** | Value for Select Option on cascade question type                          | Array[[settingCascadeURL](#setting-cascade-url)] \| `undefined`      | -       |
 
 ## Properties
@@ -69,8 +69,8 @@ const Example = () => {
 
 Default question should be defined as object.
 
-| Props    | Description                                                                      | Type                                                                                           |
-| -------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Props        | Description                                                                      | Type                                                                                           |
+| ------------ | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
 | **type**     | Use one of [QuestionType](#supported-question-type) as default new question type | `number` \| `input` \| `text` \| `option` \| `multiple_option` \| `cascade` \| `tree` \| `geo` |
 | **name**     | Set default new question title / name                                            | String                                                                                         |
 | **required** | Set new question required `true`/`false` by default                              | Boolean                                                                                        |
@@ -89,8 +89,8 @@ Example:
 
 Setting cascade URL should be defined as array of object. This value was used to fill Select Option value for cascade question type.
 
-| Props        | Description               | Type                                                                   |
-| ------------ | ------------------------- | ---------------------------------------------------------------------- |
+| Props            | Description               | Type                                                                   |
+| ---------------- | ------------------------- | ---------------------------------------------------------------------- |
 | **id**           | Unique id as option value | Integer                                                                |
 | **name**         | Shown as option label     | String                                                                 |
 | **endpoint**     | Cascade API               | String                                                                 |
@@ -161,15 +161,15 @@ Custom parameters are key-value pairs that we can implement in the Webform Edito
 
 #### Custom Parameters Setting
 
-| Props  | Description                     | Type                                           |
-| ------ | ------------------------------- | ---------------------------------------------- |
+| Props      | Description                     | Type                                           |
+| ---------- | ------------------------------- | ---------------------------------------------- |
 | **label**  | Label for the custom params tab | String \| `undefined`                          |
 | **params** | List of custom parameters       | Array[[Custom Parameters](#custom-parameters)] |
 
 #### Custom Parameters
 
-| Props    | Description             | Type                                                          |
-| -------- | ----------------------- | ------------------------------------------------------------- |
+| Props        | Description             | Type                                                          |
+| ------------ | ----------------------- | ------------------------------------------------------------- |
 | **name**     | Parameter name          | String                                                        |
 | **label**    | Parameter label         | String \| `undefined`                                         |
 | **type**     | Field Type              | `option` \| `input` \| `number`                               |
@@ -178,8 +178,8 @@ Custom parameters are key-value pairs that we can implement in the Webform Edito
 
 #### Option Parameters
 
-| Props | Description                  | Type                  |
-| ----- | ---------------------------- | --------------------- |
+| Props     | Description                  | Type                  |
+| --------- | ---------------------------- | --------------------- |
 | **label** | Label for the params options | String \| `undefined` |
 | **value** | Value for the params options | String                |
 

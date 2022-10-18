@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react';
 import { Input } from 'antd';
-import { UIStore, FormStore } from '../../lib/store';
+import { UIStore, formFn } from '../../lib/store';
 import { TranslationFormItem } from '../../support';
 import data from '../../lib/data';
 
 const FormDefinitionTranslation = () => {
   const { UIText, existingTranslation } = UIStore.useState((s) => s);
-  const formStore = FormStore.useState((s) => s);
+  const formStore = formFn.store.useState((s) => s);
   const namePreffix = `translation-${existingTranslation}`;
 
   const existingTranslationValues = useMemo(() => {
@@ -22,7 +22,7 @@ const FormDefinitionTranslation = () => {
       formStore?.translations,
       existingTranslation
     );
-    FormStore.update((u) => {
+    formFn.store.update((u) => {
       u.translations = !currentTranslations
         ? newTranslations
         : currentTranslations;
