@@ -36,7 +36,7 @@ function _extends() {
   return _extends.apply(this, arguments);
 }
 
-var styles = {"container":"arfe-container","form-definition":"arfe-form-definition","input-checkbox-wrapper":"arfe-input-checkbox-wrapper","button-icon":"arfe-button-icon","reorder-wrapper":"arfe-reorder-wrapper","reorder-button":"arfe-reorder-button","select-dropdown":"arfe-select-dropdown","tabs-wrapper":"arfe-tabs-wrapper","tabs-wrapper-sticky":"arfe-tabs-wrapper-sticky","right-tabs":"arfe-right-tabs","tab-pane-name-icon":"arfe-tab-pane-name-icon","question-group-title":"arfe-question-group-title","space-align-right":"arfe-space-align-right","space-align-left":"arfe-space-align-left","space-vertical-align-left":"arfe-space-vertical-align-left","space-vertical-align-right":"arfe-space-vertical-align-right","more-question-setting-text":"arfe-more-question-setting-text","dependant-list-box":"arfe-dependant-list-box","tags":"arfe-tags","tags-active":"arfe-tags-active","translation-form-item":"arfe-translation-form-item","translation-form-item-card":"arfe-translation-form-item-card"};
+var styles = {"container":"arfe-container","form-definition":"arfe-form-definition","form-item-no-bottom-margin":"arfe-form-item-no-bottom-margin","input-checkbox-wrapper":"arfe-input-checkbox-wrapper","button-icon":"arfe-button-icon","reorder-wrapper":"arfe-reorder-wrapper","reorder-button":"arfe-reorder-button","select-dropdown":"arfe-select-dropdown","tabs-wrapper":"arfe-tabs-wrapper","tabs-wrapper-sticky":"arfe-tabs-wrapper-sticky","right-tabs":"arfe-right-tabs","tab-pane-name-icon":"arfe-tab-pane-name-icon","question-group-title":"arfe-question-group-title","space-align-right":"arfe-space-align-right","space-align-left":"arfe-space-align-left","space-vertical-align-left":"arfe-space-vertical-align-left","space-vertical-align-right":"arfe-space-vertical-align-right","more-question-setting-text":"arfe-more-question-setting-text","dependant-list-box":"arfe-dependant-list-box","tags":"arfe-tags","tags-active":"arfe-tags-active","translation-form-item":"arfe-translation-form-item","translation-form-item-card":"arfe-translation-form-item-card"};
 
 var FormWrapper = function FormWrapper(_ref) {
   var children = _ref.children;
@@ -136,7 +136,12 @@ var UIStaticText = {
     alertDeleteQuestionTitle: 'Delete Question',
     alertDeleteQuestion: 'Do you want to delete this question?',
     alertDeleteQuestionGroupTitle: 'Delete Question Group',
-    alertDeleteQuestionGroup: 'Do you want to delete this question group and all the questions?'
+    alertDeleteQuestionGroup: 'Do you want to delete this question group and all the questions?',
+    questionMoreTableTypeSettingText: 'More Table Question Setting',
+    inputColumnNameLabel: 'Column Name',
+    inputColumnTypeLabel: 'Column Type',
+    inputColumnOptionsLabel: 'Column Options',
+    questionTableTypeDefineOptionsText: 'Define Options'
   }
 };
 
@@ -259,7 +264,8 @@ var questionType = {
   date: 'date',
   option: 'option',
   multiple_option: 'multiple_option',
-  tree: 'tree'
+  tree: 'tree',
+  table: 'table'
 };
 
 var defaultQuestion = function defaultQuestion(_ref) {
@@ -525,9 +531,9 @@ function commonjsRequire () {
 
 var classnames = createCommonjsModule(function (module) {
 /*!
-  Copyright (c) 2018 Jed Watson.
-  Licensed under the MIT License (MIT), see
-  http://jedwatson.github.io/classnames
+	Copyright (c) 2018 Jed Watson.
+	Licensed under the MIT License (MIT), see
+	http://jedwatson.github.io/classnames
 */
 /* global define */
 
@@ -554,14 +560,15 @@ var classnames = createCommonjsModule(function (module) {
 					}
 				}
 			} else if (argType === 'object') {
-				if (arg.toString === Object.prototype.toString) {
-					for (var key in arg) {
-						if (hasOwn.call(arg, key) && arg[key]) {
-							classes.push(key);
-						}
-					}
-				} else {
+				if (arg.toString !== Object.prototype.toString && !arg.toString.toString().includes('[native code]')) {
 					classes.push(arg.toString());
+					continue;
+				}
+
+				for (var key in arg) {
+					if (hasOwn.call(arg, key) && arg[key]) {
+						classes.push(key);
+					}
 				}
 			}
 		}
@@ -1388,7 +1395,33 @@ function canUseDom() {
   return !!(typeof window !== 'undefined' && window.document && window.document.createElement);
 }
 
+function contains(root, n) {
+  if (!root) {
+    return false;
+  } // Use native if support
+
+
+  if (root.contains) {
+    return root.contains(n);
+  } // `document.contains` not support with IE11
+
+
+  var node = n;
+
+  while (node) {
+    if (node === root) {
+      return true;
+    }
+
+    node = node.parentNode;
+  }
+
+  return false;
+}
+
+var APPEND_ORDER = 'data-rc-order';
 var MARK_KEY = "rc-util-key";
+var containerCache = new Map();
 
 function getMark() {
   var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
@@ -1410,32 +1443,58 @@ function getContainer(option) {
   return head || document.body;
 }
 
-function injectCSS(css) {
-  var _option$csp;
+function getOrder(prepend) {
+  if (prepend === 'queue') {
+    return 'prependQueue';
+  }
 
+  return prepend ? 'prepend' : 'append';
+}
+/**
+ * Find style which inject by rc-util
+ */
+
+
+function findStyles(container) {
+  return Array.from((containerCache.get(container) || container).children).filter(function (node) {
+    return node.tagName === 'STYLE';
+  });
+}
+
+function injectCSS(css) {
   var option = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
   if (!canUseDom()) {
     return null;
   }
 
+  var csp = option.csp,
+      prepend = option.prepend;
   var styleNode = document.createElement('style');
+  styleNode.setAttribute(APPEND_ORDER, getOrder(prepend));
 
-  if ((_option$csp = option.csp) === null || _option$csp === void 0 ? void 0 : _option$csp.nonce) {
-    var _option$csp2;
-
-    styleNode.nonce = (_option$csp2 = option.csp) === null || _option$csp2 === void 0 ? void 0 : _option$csp2.nonce;
+  if (csp === null || csp === void 0 ? void 0 : csp.nonce) {
+    styleNode.nonce = csp === null || csp === void 0 ? void 0 : csp.nonce;
   }
 
   styleNode.innerHTML = css;
   var container = getContainer(option);
   var firstChild = container.firstChild;
 
-  if (option.prepend && container.prepend) {
-    // Use `prepend` first
-    container.prepend(styleNode);
-  } else if (option.prepend && firstChild) {
-    // Fallback to `insertBefore` like IE not support `prepend`
+  if (prepend) {
+    // If is queue `prepend`, it will prepend first style and then append rest style
+    if (prepend === 'queue') {
+      var existStyle = findStyles(container).filter(function (node) {
+        return ['prepend', 'prependQueue'].includes(node.getAttribute(APPEND_ORDER));
+      });
+
+      if (existStyle.length) {
+        container.insertBefore(styleNode, existStyle[existStyle.length - 1].nextSibling);
+        return styleNode;
+      }
+    } // Use `insertBefore` as `prepend`
+
+
     container.insertBefore(styleNode, firstChild);
   } else {
     container.appendChild(styleNode);
@@ -1443,35 +1502,43 @@ function injectCSS(css) {
 
   return styleNode;
 }
-var containerCache = new Map();
 
 function findExistNode(key) {
   var option = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   var container = getContainer(option);
-  return Array.from(containerCache.get(container).children).find(function (node) {
-    return node.tagName === 'STYLE' && node.getAttribute(getMark(option)) === key;
+  return findStyles(container).find(function (node) {
+    return node.getAttribute(getMark(option)) === key;
   });
 }
-function updateCSS(css, key) {
-  var option = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-  var container = getContainer(option); // Get real parent
+/**
+ * qiankun will inject `appendChild` to insert into other
+ */
 
-  if (!containerCache.has(container)) {
+function syncRealContainer(container, option) {
+  var cachedRealContainer = containerCache.get(container); // Find real container when not cached or cached container removed
+
+  if (!cachedRealContainer || !contains(document, cachedRealContainer)) {
     var placeholderStyle = injectCSS('', option);
     var parentNode = placeholderStyle.parentNode;
     containerCache.set(container, parentNode);
     parentNode.removeChild(placeholderStyle);
   }
+}
 
+function updateCSS(css, key) {
+  var option = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+  var container = getContainer(option); // Sync real parent
+
+  syncRealContainer(container, option);
   var existNode = findExistNode(key, option);
 
   if (existNode) {
-    var _option$csp3, _option$csp4;
+    var _option$csp, _option$csp2;
 
-    if (((_option$csp3 = option.csp) === null || _option$csp3 === void 0 ? void 0 : _option$csp3.nonce) && existNode.nonce !== ((_option$csp4 = option.csp) === null || _option$csp4 === void 0 ? void 0 : _option$csp4.nonce)) {
-      var _option$csp5;
+    if (((_option$csp = option.csp) === null || _option$csp === void 0 ? void 0 : _option$csp.nonce) && existNode.nonce !== ((_option$csp2 = option.csp) === null || _option$csp2 === void 0 ? void 0 : _option$csp2.nonce)) {
+      var _option$csp3;
 
-      existNode.nonce = (_option$csp5 = option.csp) === null || _option$csp5 === void 0 ? void 0 : _option$csp5.nonce;
+      existNode.nonce = (_option$csp3 = option.csp) === null || _option$csp3 === void 0 ? void 0 : _option$csp3.nonce;
     }
 
     if (existNode.innerHTML !== css) {
@@ -2160,6 +2227,10 @@ var toWebform = function toWebform(formData, questionGroups) {
 
       if (q.type !== questionType.tree && isNotOption) {
         q = clearQuestionObj(['option'], q);
+      }
+
+      if (q.type !== questionType.table) {
+        q = clearQuestionObj(['columns'], q);
       }
 
       if (!((_q4 = q) !== null && _q4 !== void 0 && _q4.tooltip)) {
@@ -3005,6 +3076,7 @@ var FormDefinition = function FormDefinition(_ref) {
     name: "form-name",
     initialValue: name
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
+    allowClear: true,
     onChange: function onChange(e) {
       return FormStore.update(function (u) {
         var _e$target;
@@ -3018,6 +3090,7 @@ var FormDefinition = function FormDefinition(_ref) {
     initialValue: description
   }, /*#__PURE__*/React__default.createElement(antd.Input.TextArea, {
     rows: 5,
+    allowClear: true,
     onChange: function onChange(e) {
       return FormStore.update(function (u) {
         var _e$target2;
@@ -3109,13 +3182,15 @@ var QuestionGroupSetting = function QuestionGroupSetting(_ref) {
     name: namePreffix + "-name",
     required: true
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
-    onChange: handleChangeName
+    onChange: handleChangeName,
+    allowClear: true
   })), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     label: UIText.inputQuestionGroupDescriptionLabel,
     initialValue: description,
     name: namePreffix + "-description"
   }, /*#__PURE__*/React__default.createElement(antd.Input.TextArea, {
     onChange: handleChangeDescription,
+    allowClear: true,
     rows: 5
   })), /*#__PURE__*/React__default.createElement(antd.Row, {
     align: "bottom",
@@ -3133,7 +3208,8 @@ var QuestionGroupSetting = function QuestionGroupSetting(_ref) {
     name: namePreffix + "-repeat_text",
     initialValue: repeatText
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
-    onChange: handleChangeRepeatText
+    onChange: handleChangeRepeatText,
+    allowClear: true
   })))));
 };
 
@@ -3338,13 +3414,13 @@ var SettingOption = function SettingOption(_ref2) {
       questionGroupId = _ref2.questionGroupId,
       allowOther = _ref2.allowOther,
       allowOtherText = _ref2.allowOtherText,
-      currentOptions = _ref2.options;
+      initialOptions = _ref2.options;
   var namePreffix = "question-" + id;
   var UIText = UIStore.useState(function (s) {
     return s.UIText;
   });
 
-  var _useState = React.useState(currentOptions !== null && currentOptions !== void 0 && currentOptions.length ? currentOptions.map(function (x, xi) {
+  var _useState = React.useState(initialOptions !== null && initialOptions !== void 0 && initialOptions.length ? initialOptions.map(function (x, xi) {
     return _extends({}, x, {
       code: (x === null || x === void 0 ? void 0 : x.code) || null,
       id: (x === null || x === void 0 ? void 0 : x.id) || generateId() + xi,
@@ -3493,7 +3569,8 @@ var SettingOption = function SettingOption(_ref2) {
     name: namePreffix + "-allow_other_text",
     initialValue: allowOtherText
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
-    onChange: handleOnChangeAllowOtherText
+    onChange: handleOnChangeAllowOtherText,
+    allowClear: true
   })))), lodash.orderBy(options, 'order').map(function (d, di) {
     return /*#__PURE__*/React__default.createElement(antd.Row, {
       key: "option-" + id + "-" + di,
@@ -3504,21 +3581,23 @@ var SettingOption = function SettingOption(_ref2) {
       span: 4
     }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
       initialValue: d.code,
-      name: namePreffix + "-option-code-" + d.id
+      name: namePreffix + "-option_code_" + d.id
     }, /*#__PURE__*/React__default.createElement(antd.Input, {
       placeholder: "Code",
       onChange: function onChange(e) {
         return handleOnChangeCode(e, d);
-      }
+      },
+      allowClear: true
     }))), /*#__PURE__*/React__default.createElement(antd.Col, {
       span: 10
     }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
       initialValue: d.name,
-      name: namePreffix + "-option-name-" + d.id
+      name: namePreffix + "-option_name_" + d.id
     }, /*#__PURE__*/React__default.createElement(antd.Input, {
       onChange: function onChange(e) {
         return handleOnChangeOption(e, d);
-      }
+      },
+      allowClear: true
     }))), /*#__PURE__*/React__default.createElement(antd.Col, null, /*#__PURE__*/React__default.createElement(antd.Space, null, /*#__PURE__*/React__default.createElement(antd.Button, {
       type: "link",
       className: styles['button-icon'],
@@ -3753,7 +3832,8 @@ var SettingCascade = function SettingCascade(_ref) {
       var _e$target2;
 
       return handleChangeList(e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.value);
-    }
+    },
+    allowClear: true
   })))));
 };
 
@@ -9528,6 +9608,373 @@ var SettingDate = function SettingDate(_ref) {
   })));
 };
 
+var generateColumnName = function generateColumnName(text) {
+  return text.trim().toLowerCase().split(' ').join('_');
+};
+
+var columnType = {
+  input: 'input',
+  number: 'number',
+  option: 'option',
+  text: 'text'
+};
+
+var defaultColumns = function defaultColumns(_ref) {
+  var _ref$init = _ref.init,
+      init = _ref$init === void 0 ? false : _ref$init;
+  var column = {
+    name: null,
+    label: null,
+    type: null
+  };
+
+  if (init) {
+    return [_extends({}, column, {
+      id: generateId()
+    })];
+  }
+
+  return _extends({}, column, {
+    id: generateId()
+  });
+};
+
+var defaultColumnOptions = function defaultColumnOptions(_ref2) {
+  var _ref2$init = _ref2.init,
+      init = _ref2$init === void 0 ? false : _ref2$init,
+      _ref2$order = _ref2.order,
+      order = _ref2$order === void 0 ? 0 : _ref2$order;
+  var option = {
+    name: 'New Option',
+    order: 1
+  };
+
+  if (init) {
+    return [_extends({}, option, {
+      id: generateId()
+    })];
+  }
+
+  return _extends({}, option, {
+    id: generateId(),
+    order: order
+  });
+};
+
+var SettingTable = function SettingTable(_ref3) {
+  var id = _ref3.id,
+      questionGroupId = _ref3.questionGroupId,
+      initialColumns = _ref3.columns;
+  var namePreffix = "question-" + id;
+  var UIText = UIStore.useState(function (s) {
+    return s.UIText;
+  });
+
+  var _useState = React.useState(initialColumns !== null && initialColumns !== void 0 && initialColumns.length ? initialColumns.map(function (cl, cli) {
+    var _cl$options;
+
+    if (cl !== null && cl !== void 0 && cl.options && cl !== null && cl !== void 0 && (_cl$options = cl.options) !== null && _cl$options !== void 0 && _cl$options.length) {
+      var options = cl.options.map(function (op, opi) {
+        return _extends({}, op, {
+          id: (op === null || op === void 0 ? void 0 : op.id) || generateId() + initialColumns.length + opi + 1
+        });
+      });
+      return _extends({}, cl, {
+        id: (cl === null || cl === void 0 ? void 0 : cl.id) || generateId() + cli,
+        options: options
+      });
+    }
+
+    return _extends({}, cl, {
+      id: (cl === null || cl === void 0 ? void 0 : cl.id) || generateId() + cli
+    });
+  }) : defaultColumns({
+    init: true
+  })),
+      columns = _useState[0],
+      setColumns = _useState[1];
+
+  var columnTypeOptions = Object.keys(columnType).map(function (key) {
+    return {
+      label: columnType[key],
+      value: key
+    };
+  });
+  React.useEffect(function () {
+    questionGroupFn.store.update(function (s) {
+      s.questionGroups = s.questionGroups.map(function (qg) {
+        if (qg.id === questionGroupId) {
+          var questions = qg.questions.map(function (q) {
+            if (q.id === id) {
+              return _extends({}, q, {
+                columns: columns
+              });
+            }
+
+            return q;
+          });
+          return _extends({}, qg, {
+            questions: questions
+          });
+        }
+
+        return qg;
+      });
+    });
+  }, [id, questionGroupId, columns]);
+  var updateColumns = React.useCallback(function (columnId, obj) {
+    var updatedColumn = columns.map(function (cl) {
+      if (cl.id === columnId) {
+        return _extends({}, cl, obj);
+      }
+
+      return cl;
+    });
+    setColumns(updatedColumn);
+  }, [columns]);
+
+  var handleChangeColumnName = function handleChangeColumnName(columnId, value) {
+    updateColumns(columnId, {
+      name: generateColumnName(value),
+      label: value
+    });
+  };
+
+  var handleChangeColumnType = function handleChangeColumnType(columnId, value) {
+    var obj = {
+      type: value
+    };
+
+    if (value === columnType.option) {
+      obj = _extends({}, obj, {
+        options: defaultColumnOptions({
+          init: true
+        })
+      });
+    }
+
+    updateColumns(columnId, obj);
+  };
+
+  var handleAddColumn = function handleAddColumn() {
+    var addColumns = [].concat(columns, [defaultColumns({
+      init: false
+    })]);
+    setColumns(addColumns);
+  };
+
+  var handleDeleteColumn = function handleDeleteColumn(currentColumn) {
+    var updatedColumn = columns.filter(function (cl) {
+      return cl.id !== currentColumn.id;
+    });
+    setColumns(updatedColumn);
+  };
+
+  var handleOnAddOption = function handleOnAddOption(currentColumn, currentOption) {
+    var columnId = currentColumn.id,
+        options = currentColumn.options;
+    var currentOrder = currentOption.order;
+    var lastOrder = lodash.takeRight(lodash.orderBy(options, 'order'))[0].order;
+    var reorderOptions = options.map(function (opt) {
+      var order = opt.order;
+
+      if (opt.order > currentOrder) {
+        order = order + 1;
+      }
+
+      if (opt.order < currentOrder && opt.order !== 1 && currentOrder !== lastOrder) {
+        order = order - 1;
+      }
+
+      return _extends({}, opt, {
+        order: order
+      });
+    });
+    var addOptions = [].concat(reorderOptions, [defaultColumnOptions({
+      order: currentOrder + 1
+    })]);
+    updateColumns(columnId, {
+      options: addOptions
+    });
+  };
+
+  var handleOnMoveOption = function handleOnMoveOption(currentColumn, currentOption, targetOrder) {
+    var columnId = currentColumn.id,
+        options = currentColumn.options;
+    var currentOrder = currentOption.order;
+    var prevOptions = options.filter(function (opt) {
+      return opt.order !== currentOrder && opt.order !== targetOrder;
+    });
+    var currentOptions = options.filter(function (opt) {
+      return opt.order === currentOrder;
+    }).map(function (opt) {
+      return _extends({}, opt, {
+        order: targetOrder
+      });
+    });
+    var targetOptions = options.filter(function (opt) {
+      return opt.order === targetOrder;
+    }).map(function (opt) {
+      return _extends({}, opt, {
+        order: currentOrder
+      });
+    });
+    updateColumns(columnId, {
+      options: lodash.orderBy([].concat(prevOptions, currentOptions, targetOptions), 'order')
+    });
+  };
+
+  var handleOnDeleteOption = function handleOnDeleteOption(currentColumn, currentOptionId) {
+    var columnId = currentColumn.id,
+        options = currentColumn.options;
+    updateColumns(columnId, {
+      options: lodash.orderBy(options, 'order').filter(function (opt) {
+        return opt.id !== currentOptionId;
+      }).map(function (opt, opti) {
+        return _extends({}, opt, {
+          order: opti + 1
+        });
+      })
+    });
+  };
+
+  var handleOnChangeOption = function handleOnChangeOption(currentColumn, currentOption, value) {
+    var columnId = currentColumn.id,
+        options = currentColumn.options;
+    var currentOptId = currentOption.id;
+    var updatedOptions = options.map(function (op) {
+      if (op.id === currentOptId) {
+        return _extends({}, op, {
+          name: value
+        });
+      }
+
+      return op;
+    });
+    updateColumns(columnId, {
+      options: updatedOptions
+    });
+  };
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: styles['more-question-setting-text']
+  }, /*#__PURE__*/React__default.createElement("p", null, UIText.questionMoreTableTypeSettingText), columns.map(function (cl, cli) {
+    var _cl$options2;
+
+    return /*#__PURE__*/React__default.createElement(antd.Card, {
+      key: "column-" + id + "-" + cli + "-" + cl.id,
+      title: /*#__PURE__*/React__default.createElement(antd.Row, {
+        gutter: [24, 24],
+        align: "middle",
+        justify: "space-between"
+      }, /*#__PURE__*/React__default.createElement(antd.Col, {
+        span: 20
+      }, "Column - " + (cli + 1)), /*#__PURE__*/React__default.createElement(antd.Col, {
+        span: 4,
+        align: "end"
+      }, /*#__PURE__*/React__default.createElement(antd.Space, null, /*#__PURE__*/React__default.createElement(antd.Button, {
+        type: "link",
+        className: styles['button-icon'],
+        icon: /*#__PURE__*/React__default.createElement(md.MdOutlineAddCircleOutline, null),
+        onClick: function onClick() {
+          return handleAddColumn();
+        }
+      }), /*#__PURE__*/React__default.createElement(antd.Button, {
+        type: "link",
+        className: styles['button-icon'],
+        icon: /*#__PURE__*/React__default.createElement(md.MdOutlineRemoveCircleOutline, null),
+        onClick: function onClick() {
+          return handleDeleteColumn(cl);
+        },
+        disabled: columns.length === 1
+      }))))
+    }, /*#__PURE__*/React__default.createElement(antd.Row, {
+      gutter: [24, 20]
+    }, /*#__PURE__*/React__default.createElement(antd.Col, {
+      span: 12
+    }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+      name: namePreffix + "-column_name_" + cl.id,
+      className: styles['form-item-no-bottom-margin'],
+      label: UIText.inputColumnNameLabel,
+      initialValue: cl.label
+    }, /*#__PURE__*/React__default.createElement(antd.Input, {
+      allowClear: true,
+      onChange: function onChange(e) {
+        var _e$target;
+
+        return handleChangeColumnName(cl.id, e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.value);
+      }
+    }))), /*#__PURE__*/React__default.createElement(antd.Col, {
+      span: 12
+    }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+      name: namePreffix + "-column_type_" + cl.id,
+      className: styles['form-item-no-bottom-margin'],
+      label: UIText.inputColumnTypeLabel,
+      initialValue: cl.type
+    }, /*#__PURE__*/React__default.createElement(antd.Select, {
+      showSearch: true,
+      optionFilterProp: "label",
+      options: columnTypeOptions,
+      getPopupContainer: function getPopupContainer(triggerNode) {
+        return triggerNode.parentElement;
+      },
+      onChange: function onChange(val) {
+        return handleChangeColumnType(cl.id, val);
+      }
+    }))), /*#__PURE__*/React__default.createElement(antd.Col, {
+      span: 24
+    }, cl.type === columnType.option && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("p", null, UIText.questionTableTypeDefineOptionsText), cl === null || cl === void 0 ? void 0 : (_cl$options2 = cl.options) === null || _cl$options2 === void 0 ? void 0 : _cl$options2.map(function (op, opi) {
+      return /*#__PURE__*/React__default.createElement(antd.Row, {
+        key: "option-" + id + "-" + opi + "-" + op.id,
+        gutter: [24, 24]
+      }, /*#__PURE__*/React__default.createElement(antd.Col, {
+        span: 12
+      }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+        initialValue: op.name,
+        name: namePreffix + "-option_name_" + op.id + "_" + cl.id
+      }, /*#__PURE__*/React__default.createElement(antd.Input, {
+        allowClear: true,
+        onChange: function onChange(e) {
+          var _e$target2;
+
+          return handleOnChangeOption(cl, op, e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.value);
+        }
+      }))), /*#__PURE__*/React__default.createElement(antd.Col, null, /*#__PURE__*/React__default.createElement(antd.Space, null, /*#__PURE__*/React__default.createElement(antd.Button, {
+        type: "link",
+        className: styles['button-icon'],
+        icon: /*#__PURE__*/React__default.createElement(md.MdOutlineAddCircleOutline, null),
+        onClick: function onClick() {
+          return handleOnAddOption(cl, op);
+        }
+      }), /*#__PURE__*/React__default.createElement(antd.Button, {
+        type: "link",
+        className: styles['button-icon'],
+        icon: /*#__PURE__*/React__default.createElement(md.MdOutlineArrowCircleUp, null),
+        onClick: function onClick() {
+          return handleOnMoveOption(cl, op, op.order - 1);
+        },
+        disabled: opi === 0
+      }), /*#__PURE__*/React__default.createElement(antd.Button, {
+        type: "link",
+        className: styles['button-icon'],
+        icon: /*#__PURE__*/React__default.createElement(md.MdOutlineArrowCircleDown, null),
+        onClick: function onClick() {
+          return handleOnMoveOption(cl, op, op.order + 1);
+        },
+        disabled: opi === cl.options.length - 1
+      }), /*#__PURE__*/React__default.createElement(antd.Button, {
+        type: "link",
+        className: styles['button-icon'],
+        icon: /*#__PURE__*/React__default.createElement(md.MdOutlineRemoveCircleOutline, null),
+        onClick: function onClick() {
+          return handleOnDeleteOption(cl, op.id);
+        },
+        disabled: cl.options.length === 1
+      }))));
+    })))));
+  }));
+};
+
 var QuestionSetting = function QuestionSetting(_ref) {
   var question = _ref.question,
       dependant = _ref.dependant;
@@ -9656,13 +10103,16 @@ var QuestionSetting = function QuestionSetting(_ref) {
     name: namePreffix + "-name",
     required: true
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
-    onChange: handleChangeName
+    onChange: handleChangeName,
+    allowClear: true
   })), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     label: UIText.inputQuestionTypeLabel,
     initialValue: type,
     name: namePreffix + "-type",
     required: true
   }, /*#__PURE__*/React__default.createElement(antd.Select, {
+    showSearch: true,
+    optionFilterProp: "label",
     className: styles['select-dropdown'],
     options: questionTypeDropdownValue,
     getPopupContainer: function getPopupContainer(triggerNode) {
@@ -9675,20 +10125,23 @@ var QuestionSetting = function QuestionSetting(_ref) {
     initialValue: variable,
     name: namePreffix + "-variable"
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
-    onChange: handleChangeVariableName
+    onChange: handleChangeVariableName,
+    allowClear: true
   })), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     label: UIText.inputQuestionTooltipLabel,
     initialValue: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
     name: namePreffix + "-tooltip"
   }, /*#__PURE__*/React__default.createElement(antd.Input.TextArea, {
-    onChange: handleChangeTooltip
+    onChange: handleChangeTooltip,
+    allowClear: true,
+    rows: 5
   })), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     name: namePreffix + "-required",
     className: styles['input-checkbox-wrapper']
   }, /*#__PURE__*/React__default.createElement(antd.Checkbox, {
     onChange: handleChangeRequired,
     checked: required
-  }, ' ', UIText.inputQuestionRequiredCheckbox)), qType === questionType.input && /*#__PURE__*/React__default.createElement(SettingInput, question), qType === questionType.number && /*#__PURE__*/React__default.createElement(SettingNumber, question), [questionType.option, questionType.multiple_option].includes(qType) && /*#__PURE__*/React__default.createElement(SettingOption, question), qType === questionType.tree && /*#__PURE__*/React__default.createElement(SettingTree, question), qType === questionType.cascade && /*#__PURE__*/React__default.createElement(SettingCascade, question), qType === questionType.date && /*#__PURE__*/React__default.createElement(SettingDate, question));
+  }, ' ', UIText.inputQuestionRequiredCheckbox)), qType === questionType.input && /*#__PURE__*/React__default.createElement(SettingInput, question), qType === questionType.number && /*#__PURE__*/React__default.createElement(SettingNumber, question), [questionType.option, questionType.multiple_option].includes(qType) && /*#__PURE__*/React__default.createElement(SettingOption, question), qType === questionType.tree && /*#__PURE__*/React__default.createElement(SettingTree, question), qType === questionType.cascade && /*#__PURE__*/React__default.createElement(SettingCascade, question), qType === questionType.date && /*#__PURE__*/React__default.createElement(SettingDate, question), qType === questionType.table && /*#__PURE__*/React__default.createElement(SettingTable, question));
 };
 
 var dependencyTypes = [{
@@ -10314,7 +10767,8 @@ var QuestionCustomParams = function QuestionCustomParams(_ref) {
 
         return handleChangeParameterValue(cp.name, e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.value);
       },
-      value: (paramValue === null || paramValue === void 0 ? void 0 : paramValue[cp.name]) || null
+      value: (paramValue === null || paramValue === void 0 ? void 0 : paramValue[cp.name]) || null,
+      allowClear: true
     })));
   });
 };
@@ -11339,7 +11793,7 @@ var WebformEditor = function WebformEditor(_ref) {
       style: {
         margin: 0
       }
-    }, version, " 1"), currentTab === 'edit-form' && /*#__PURE__*/React__default.createElement(ButtonWithIcon, {
+    }, version, " ", formStore.version || 1), currentTab === 'edit-form' && /*#__PURE__*/React__default.createElement(ButtonWithIcon, {
       type: "edit-button",
       isExpand: activeEditFormSetting,
       onClick: handleShowFormSetting,
