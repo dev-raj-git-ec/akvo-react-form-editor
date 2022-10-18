@@ -178,7 +178,19 @@ const WebformEditor = ({
         s.questionGroups = initialData.questionGroups;
       });
     } else {
-      console.log('a', initialValue);
+      const defaultForm = formFn.add();
+      formFn.store.update((s) => {
+        s.id = defaultForm.id;
+        s.name = defaultForm.name;
+        s.version = defaultForm.version;
+        s.description = defaultForm.description;
+        s.languages = [];
+        s.defaultLanguage = 'en';
+        s.translations = [];
+      });
+      questionGroupFn.store.update((s) => {
+        s.questionGroups = [questionGroupFn.add({})];
+      });
     }
   }, [initialValue]);
 
