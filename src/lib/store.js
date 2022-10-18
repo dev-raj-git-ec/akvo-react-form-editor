@@ -123,7 +123,7 @@ const FormStore = new Store({
 });
 
 const QuestionGroupStore = new Store({
-  questionGroups: [],
+  questionGroups: [defaultQuestionGroup({})],
 });
 
 const formFn = {
