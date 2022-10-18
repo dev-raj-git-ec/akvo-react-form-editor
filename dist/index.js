@@ -268,6 +268,15 @@ var questionType = {
   table: 'table'
 };
 
+var defaultForm = function defaultForm() {
+  return {
+    id: generateId(),
+    name: 'New Form',
+    version: 1,
+    description: 'New Form Description'
+  };
+};
+
 var defaultQuestion = function defaultQuestion(_ref) {
   var questionGroup = _ref.questionGroup,
       name = _ref.name,
@@ -353,15 +362,14 @@ var UIStore = new pullstate.Store({
   activeEditTranslationQuestions: [],
   hostParams: {}
 });
-var FormStore = new pullstate.Store({
-  id: generateId(),
-  name: 'New Form',
-  version: 1,
-  description: 'New Form Description'
-});
+var FormStore = new pullstate.Store(_extends({}, defaultForm()));
 var QuestionGroupStore = new pullstate.Store({
   questionGroups: [defaultQuestionGroup({})]
 });
+var formFn = {
+  add: defaultForm,
+  store: FormStore
+};
 var questionGroupFn = {
   add: defaultQuestionGroup,
   store: QuestionGroupStore
@@ -2345,7 +2353,7 @@ var FormDefinitionTranslation = function FormDefinitionTranslation() {
       UIText = _UIStore$useState.UIText,
       existingTranslation = _UIStore$useState.existingTranslation;
 
-  var formStore = FormStore.useState(function (s) {
+  var formStore = formFn.store.useState(function (s) {
     return s;
   });
   var namePreffix = "translation-" + existingTranslation;
@@ -2362,7 +2370,7 @@ var FormDefinitionTranslation = function FormDefinitionTranslation() {
         newTranslations = _data$generateTransla.newTranslations,
         currentTranslations = _data$generateTransla.currentTranslations;
 
-    FormStore.update(function (u) {
+    formFn.store.update(function (u) {
       u.translations = !currentTranslations ? newTranslations : currentTranslations;
     });
   };
@@ -2856,7 +2864,7 @@ var ExistingTranslation = function ExistingTranslation() {
       localeDropdownValue = _UIStore$useState.localeDropdownValue,
       existingTranslation = _UIStore$useState.existingTranslation;
 
-  var formStore = FormStore.useState(function (s) {
+  var formStore = formFn.store.useState(function (s) {
     return s;
   });
   var languages = (formStore === null || formStore === void 0 ? void 0 : formStore.languages) || [];
@@ -2865,7 +2873,7 @@ var ExistingTranslation = function ExistingTranslation() {
     UIStore.update(function (u) {
       u.existingTranslation = existingTranslation === lang ? null : existingTranslation;
     });
-    FormStore.update(function (u) {
+    formFn.store.update(function (u) {
       var _formStore$translatio;
 
       u.languages = languages.filter(function (ln) {
@@ -2947,7 +2955,7 @@ var FormTranslations = function FormTranslations() {
       UIText = _UIStore$useState2.UIText,
       localeDropdownValue = _UIStore$useState2.localeDropdownValue;
 
-  var formStore = FormStore.useState(function (s) {
+  var formStore = formFn.store.useState(function (s) {
     return s;
   });
 
@@ -2984,7 +2992,7 @@ var FormTranslations = function FormTranslations() {
     optionFilterProp: "label",
     options: defaultLangDropdownValue,
     onChange: function onChange(e) {
-      return FormStore.update(function (u) {
+      return formFn.store.update(function (u) {
         u.defaultLanguage = e;
       });
     },
@@ -3002,7 +3010,7 @@ var FormTranslations = function FormTranslations() {
     className: styles['select-dropdown'],
     optionFilterProp: "children",
     onChange: function onChange(e) {
-      return FormStore.update(function (u) {
+      return formFn.store.update(function (u) {
         u.languages = [].concat(languages, [e]);
       });
     },
@@ -3043,7 +3051,7 @@ var FormPreview = function FormPreview() {
   }),
       questionGroups = _questionGroupFn$stor.questionGroups;
 
-  var formStore = FormStore.useState(function (s) {
+  var formStore = formFn.store.useState(function (s) {
     return s;
   });
   return /*#__PURE__*/React__default.createElement(akvoReactForm.Webform, {
@@ -3078,7 +3086,7 @@ var FormDefinition = function FormDefinition(_ref) {
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
     allowClear: true,
     onChange: function onChange(e) {
-      return FormStore.update(function (u) {
+      return formFn.store.update(function (u) {
         var _e$target;
 
         u.name = e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.value;
@@ -3092,7 +3100,7 @@ var FormDefinition = function FormDefinition(_ref) {
     rows: 5,
     allowClear: true,
     onChange: function onChange(e) {
-      return FormStore.update(function (u) {
+      return formFn.store.update(function (u) {
         var _e$target2;
 
         u.description = e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.value;
@@ -11551,7 +11559,7 @@ var WebformEditor = function WebformEditor(_ref) {
   var _ref$onSave = _ref.onSave,
       onSave = _ref$onSave === void 0 ? false : _ref$onSave,
       _ref$initialValue = _ref.initialValue,
-      initialValue = _ref$initialValue === void 0 ? {} : _ref$initialValue,
+      initialValue = _ref$initialValue === void 0 ? null : _ref$initialValue,
       _ref$settingTreeDropd = _ref.settingTreeDropdownValue,
       settingTreeDropdownValue = _ref$settingTreeDropd === void 0 ? [{
     label: null,
@@ -11598,7 +11606,7 @@ var WebformEditor = function WebformEditor(_ref) {
       init = _useState[0],
       setInit = _useState[1];
 
-  var formStore = FormStore.useState(function (s) {
+  var formStore = formFn.store.useState(function (s) {
     return s;
   });
   var current = UIStore.useState(function (s) {
@@ -11626,6 +11634,11 @@ var WebformEditor = function WebformEditor(_ref) {
       questionGroupCount = UIText.questionGroupCount,
       mandatoryQuestionCount = UIText.mandatoryQuestionCount,
       version = UIText.version;
+
+  if (!initialValue) {
+    console.error('initialValue required as an empty object {}');
+  }
+
   React.useEffect(function () {
     var _customParams$params;
 
@@ -11710,7 +11723,7 @@ var WebformEditor = function WebformEditor(_ref) {
   React.useEffect(function () {
     if (!lodash.isEmpty(initialValue)) {
       var initialData = data.toEditor(initialValue);
-      FormStore.update(function (s) {
+      formFn.store.update(function (s) {
         var _initialData$language;
 
         s.id = (initialData === null || initialData === void 0 ? void 0 : initialData.id) || generateId();
@@ -11725,6 +11738,20 @@ var WebformEditor = function WebformEditor(_ref) {
       });
       questionGroupFn.store.update(function (s) {
         s.questionGroups = initialData.questionGroups;
+      });
+    } else {
+      var defaultForm = formFn.add();
+      formFn.store.update(function (s) {
+        s.id = defaultForm.id;
+        s.name = defaultForm.name;
+        s.version = defaultForm.version;
+        s.description = defaultForm.description;
+        s.languages = [];
+        s.defaultLanguage = 'en';
+        s.translations = [];
+      });
+      questionGroupFn.store.update(function (s) {
+        s.questionGroups = [questionGroupFn.add({})];
       });
     }
   }, [initialValue]);
