@@ -169,10 +169,10 @@ Custom parameters are key-value pairs that we can implement in the Webform Edito
 #### Custom Parameters
 
 | Props    | Description             | Type                                                          |
-| -------- | ----------------------- | ------------------------------------------------------------- | ------ |
+| -------- | ----------------------- | ------------------------------------------------------------- |
 | name     | Parameter name          | String                                                        |
 | label    | Parameter label         | String \| `undefined`                                         |
-| type     | Field Type              | `option                                                       | input` |
+| type     | Field Type              | `option` \| `input` \| `number`                               |
 | multiple | Whether multiple or not | Boolean                                                       |
 | options  | Parameter Options       | Array[[Option Parameters](#option-parameters)] \| `undefined` |
 
