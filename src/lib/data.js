@@ -167,6 +167,9 @@ const toWebform = (formData, questionGroups) => {
       if (q.type !== questionType.tree && isNotOption) {
         q = clearQuestionObj(['option'], q);
       }
+      if (q.type !== questionType.table) {
+        q = clearQuestionObj(['columns'], q);
+      }
       if (!q?.tooltip) {
         q = clearQuestionObj(['tooltip'], q);
       }

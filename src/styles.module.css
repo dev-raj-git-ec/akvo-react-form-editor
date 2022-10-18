@@ -11,6 +11,11 @@
   margin-bottom: 20px;
 }
 
+.form-item-no-bottom-margin {
+  margin-bottom: 0;
+  width: 100%;
+}
+
 .input-checkbox-wrapper {
   width: fit-content;
 }

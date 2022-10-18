@@ -44,13 +44,13 @@ const SettingOption = ({
   questionGroupId,
   allowOther,
   allowOtherText,
-  options: currentOptions,
+  options: initialOptions,
 }) => {
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
   const [options, setOptions] = useState(
-    currentOptions?.length
-      ? currentOptions.map((x, xi) => ({
+    initialOptions?.length
+      ? initialOptions.map((x, xi) => ({
           ...x,
           code: x?.code || null,
           id: x?.id || generateId() + xi,
@@ -126,8 +126,6 @@ const SettingOption = ({
       })
     );
   };
-
-  // allow other onchange function
 
   const handleOnAddOption = (current) => {
     const { order: currentOrder } = current;
@@ -230,7 +228,7 @@ const SettingOption = ({
           <Col span={4}>
             <Form.Item
               initialValue={d.code}
-              name={`${namePreffix}-option-code-${d.id}`}
+              name={`${namePreffix}-option_code_${d.id}`}
             >
               <Input
                 placeholder="Code"
@@ -242,7 +240,7 @@ const SettingOption = ({
           <Col span={10}>
             <Form.Item
               initialValue={d.name}
-              name={`${namePreffix}-option-name-${d.id}`}
+              name={`${namePreffix}-option_name_${d.id}`}
             >
               <Input
                 onChange={(e) => handleOnChangeOption(e, d)}

@@ -7,6 +7,7 @@ import data from '../lib/data';
 const FormPreview = () => {
   const { questionGroups } = questionGroupFn.store.useState((s) => s);
   const formStore = FormStore.useState((s) => s);
+
   return <Webform forms={data.toWebform(formStore, questionGroups)} />;
 };
 

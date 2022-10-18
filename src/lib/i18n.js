@@ -75,6 +75,11 @@ const UIStaticText = {
     alertDeleteQuestionGroupTitle: 'Delete Question Group',
     alertDeleteQuestionGroup:
       'Do you want to delete this question group and all the questions?',
+    questionMoreTableTypeSettingText: 'More Table Question Setting',
+    inputColumnNameLabel: 'Column Name',
+    inputColumnTypeLabel: 'Column Type',
+    inputColumnOptionsLabel: 'Column Options',
+    questionTableTypeDefineOptionsText: 'Define Options',
   },
 };
 

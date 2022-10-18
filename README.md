@@ -20,17 +20,18 @@ yarn add akvo-react-form-editor
 
 ## Supported Question Type
 
-| Type            | Description     |
-| --------------- | --------------- |
-| input           | Input Text      |
-| number          | Input Number    |
-| cascade         | Cascade Select  |
-| text            | TextArea        |
-| date            | Date            |
-| option          | Option          |
-| multiple_option | Multiple Option |
-| tree            | Tree Select     |
-| geo             | Geolocation     |
+| Type            | Description               |
+| --------------- | ------------------------- |
+| input           | Input Text                |
+| number          | Input Number              |
+| cascade         | Cascade Select            |
+| text            | TextArea                  |
+| date            | Date                      |
+| option          | Option                    |
+| multiple_option | Multiple Option           |
+| tree            | Tree Select               |
+| geo             | Geolocation               |
+| table           | Table (Multiple Question) |
 
 ## Usage
 
@@ -88,14 +89,14 @@ Example:
 
 Setting cascade URL should be defined as array of object. This value was used to fill Select Option value for cascade question type.
 
-| Props    | Description               | Type                                                                 |
-| -------- | ------------------------- | -------------------------------------------------------------------- |
-| id       | Unique id as option value | Integer                                                              |
-| name     | Shown as option label     | String                                                               |
-| endpoint | Cascade API               | String                                                               |
-| initial  | Initial Parameter         | Integer \| String \| `undefined`                                     |
-| list     | Object name of array      | `res.data?.[list]` \| `res.data` \| String \| `undefined` \| `false` |
-| customParams | Custom Parameters     | [Custom Parameters Setting](#custom-parameters-setting) \| `undefined`|
+| Props        | Description               | Type                                                                   |
+| ------------ | ------------------------- | ---------------------------------------------------------------------- |
+| id           | Unique id as option value | Integer                                                                |
+| name         | Shown as option label     | String                                                                 |
+| endpoint     | Cascade API               | String                                                                 |
+| initial      | Initial Parameter         | Integer \| String \| `undefined`                                       |
+| list         | Object name of array      | `res.data?.[list]` \| `res.data` \| String \| `undefined` \| `false`   |
+| customParams | Custom Parameters         | [Custom Parameters Setting](#custom-parameters-setting) \| `undefined` |
 
 Example:
 
@@ -118,7 +119,6 @@ Webform initial value use the same format as [Akvo React Form form structure](ht
 Example: [Initial Value Example](https://github.com/akvo/akvo-react-form-editor/blob/main/example/src/example-initial-value.json)
 
 [![akvo-react-form](https://img.shields.io/github/package-json/dependency-version/akvo/akvo-react-form-editor/akvo-react-form)](https://www.npmjs.com/package/akvo-react-form) [![antd](https://img.shields.io/github/package-json/dependency-version/akvo/akvo-react-form-editor/antd)](https://www.npmjs.com/package/antd)
-
 
 ### Custom Params
 
@@ -158,29 +158,30 @@ Custom parameters are key-value pairs that we can implement in the Webform Edito
   }}
 />
 ```
+
 #### Custom Parameters Setting
 
-| Props    | Description                     | Type                                                                 |
-| -------- | ------------------------------- | -------------------------------------------------------------------- |
-| label    | Label for the custom params tab | String \| `undefined`                                                |
-| params   | List of custom parameters       | Array[[Custom Parameters](#custom-parameters)]                       |
+| Props  | Description                     | Type                                           |
+| ------ | ------------------------------- | ---------------------------------------------- |
+| label  | Label for the custom params tab | String \| `undefined`                          |
+| params | List of custom parameters       | Array[[Custom Parameters](#custom-parameters)] |
 
 #### Custom Parameters
 
-| Props    | Description                     | Type                                                                 |
-| -------- | ------------------------------- | -------------------------------------------------------------------- |
-| name     | Parameter name                  | String                                                               |
-| label    | Parameter label                 | String \| `undefined`                                                |
-| type     | Field Type                      | `option|input`                                                       |
-| multiple | Whether multiple or not         | Boolean                                                              |
-| options  | Parameter Options               | Array[[Option Parameters](#option-parameters)] \| `undefined`        |
+| Props    | Description             | Type                                                          |
+| -------- | ----------------------- | ------------------------------------------------------------- | ------ |
+| name     | Parameter name          | String                                                        |
+| label    | Parameter label         | String \| `undefined`                                         |
+| type     | Field Type              | `option                                                       | input` |
+| multiple | Whether multiple or not | Boolean                                                       |
+| options  | Parameter Options       | Array[[Option Parameters](#option-parameters)] \| `undefined` |
 
 #### Option Parameters
 
-| Props    | Description                     | Type                                                                 |
-| -------- | ------------------------------- | -------------------------------------------------------------------- |
-| label    | Label for the params options    | String \| `undefined`                                                |
-| value    | Value for the params options    | String                                                               |
+| Props | Description                  | Type                  |
+| ----- | ---------------------------- | --------------------- |
+| label | Label for the params options | String \| `undefined` |
+| value | Value for the params options | String                |
 
 ## License
 

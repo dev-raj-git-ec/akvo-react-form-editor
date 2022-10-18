@@ -281,24 +281,6 @@
           ]
         },
         {
-          "id": 10,
-          "name": "Average meal cost",
-          "order": 3,
-          "type": "autofield",
-          "required": false,
-          "translations": [
-            {
-              "name": "Berapa kali anda biasanya makan dalam sehari",
-              "language": "id"
-            }
-          ],
-          "rule": null,
-          "fn": {
-            "multiline": false,
-            "fnString": "function(){ return #9 / #10}"
-          }
-        },
-        {
           "id": 11,
           "name": "Favorite Food",
           "order": 4,
@@ -523,23 +505,40 @@
             }
           ],
           "order": 10,
-          "type": "multiple_option",
-          "option": [
+          "type": "table",
+          "columns": [
             {
-              "name": "Rendang",
-              "order": 1
+              "name": "items",
+              "label": "Items",
+              "type": "option",
+              "options": [
+                {
+                  "name": "Rendang",
+                  "order": 1
+                },
+                {
+                  "name": "Ayam Pop",
+                  "order": 2
+                },
+                {
+                  "name": "Paru Goreng",
+                  "order": 3
+                },
+                {
+                  "name": "Baluik Goreng",
+                  "order": 4
+                }
+              ]
             },
             {
-              "name": "Ayam Pop",
-              "order": 2
+              "name": "amount",
+              "label": "Amount",
+              "type": "number"
             },
             {
-              "name": "Paru Goreng",
-              "order": 3
-            },
-            {
-              "name": "Baluik Goreng",
-              "order": 4
+              "name": "note",
+              "label": "Note",
+              "type": "input"
             }
           ],
           "required": true,
