@@ -25,7 +25,7 @@ import { VscPreview } from 'react-icons/vsc';
 
 const WebformEditor = ({
   onSave = false,
-  initialValue = {},
+  initialValue = null,
   settingTreeDropdownValue = [{ label: null, value: null }],
   settingCascadeURL = [{ name: null, url: null, initial: 0, list: false }],
   defaultQuestion = { type: null, name: null, required: null },
@@ -76,6 +76,10 @@ const WebformEditor = ({
     mandatoryQuestionCount,
     version,
   } = UIText;
+
+  if (!initialValue) {
+    console.error('initialValue required as an empty object {}');
+  }
 
   useEffect(() => {
     // store params from host to global store
