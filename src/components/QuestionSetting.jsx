@@ -23,6 +23,12 @@ const QuestionSetting = ({ question, dependant }) => {
   const qType = Form.useWatch(`${namePreffix}-type`, form);
   const { limitQuestionType } = hostParams;
 
+  const showMetaCheckbox = useMemo(() => {
+    return ![questionType.geo, questionType.tree, questionType.table].includes(
+      type
+    );
+  }, [type]);
+
   const questionTypeDropdownValue = useMemo(() => {
     if (limitQuestionType && limitQuestionType?.length) {
       return limitQuestionType;
@@ -190,33 +196,35 @@ const QuestionSetting = ({ question, dependant }) => {
             </Checkbox>
           </Form.Item>
         </Col>
-        <Col>
-          <div>
-            <Form.Item
-              name={`${namePreffix}-meta`}
-              className={styles['input-checkbox-wrapper']}
-            >
-              <Checkbox
-                onChange={handleChangeMeta}
-                checked={meta}
+        {showMetaCheckbox && (
+          <Col>
+            <div>
+              <Form.Item
+                name={`${namePreffix}-meta`}
+                className={styles['input-checkbox-wrapper']}
               >
-                {' '}
-                {UIText.inputQuestionMetaCheckbox}
-              </Checkbox>
-              <Popover
-                placement="top"
-                content={<i>{UIText.inputQuestionMetaCheckboxHint}</i>}
-              >
-                <AiOutlineQuestionCircle
-                  style={{
-                    cursor: 'pointer',
-                    marginLeft: '-4px',
-                  }}
-                />
-              </Popover>
-            </Form.Item>
-          </div>
-        </Col>
+                <Checkbox
+                  onChange={handleChangeMeta}
+                  checked={meta}
+                >
+                  {' '}
+                  {UIText.inputQuestionMetaCheckbox}
+                </Checkbox>
+                <Popover
+                  placement="top"
+                  content={<i>{UIText.inputQuestionMetaCheckboxHint}</i>}
+                >
+                  <AiOutlineQuestionCircle
+                    style={{
+                      cursor: 'pointer',
+                      marginLeft: '-4px',
+                    }}
+                  />
+                </Popover>
+              </Form.Item>
+            </div>
+          </Col>
+        )}
       </Row>
       {qType === questionType.input && <SettingInput {...question} />}
       {qType === questionType.number && <SettingNumber {...question} />}
