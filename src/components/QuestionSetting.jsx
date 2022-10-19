@@ -1,15 +1,5 @@
 import React, { useMemo } from 'react';
-import {
-  Form,
-  Input,
-  Select,
-  Checkbox,
-  Alert,
-  Row,
-  Col,
-  Popover,
-  Space,
-} from 'antd';
+import { Form, Input, Select, Checkbox, Alert, Row, Col, Popover } from 'antd';
 import styles from '../styles.module.css';
 import { UIStore, questionType, questionGroupFn } from '../lib/store';
 import {
@@ -89,6 +79,10 @@ const QuestionSetting = ({ question, dependant }) => {
 
   const handleChangeRequired = (e) => {
     updateState('required', e?.target?.checked);
+  };
+
+  const handleChangeMeta = (e) => {
+    updateState('meta', e?.target?.checked);
   };
 
   const dependantGroup = map(
@@ -203,7 +197,7 @@ const QuestionSetting = ({ question, dependant }) => {
               className={styles['input-checkbox-wrapper']}
             >
               <Checkbox
-                onChange={() => console.info('meta')}
+                onChange={handleChangeMeta}
                 checked={meta}
               >
                 {' '}
