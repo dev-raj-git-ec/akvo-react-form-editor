@@ -1,5 +1,15 @@
 import React, { useMemo } from 'react';
-import { Form, Input, Select, Checkbox, Alert } from 'antd';
+import {
+  Form,
+  Input,
+  Select,
+  Checkbox,
+  Alert,
+  Row,
+  Col,
+  Popover,
+  Space,
+} from 'antd';
 import styles from '../styles.module.css';
 import { UIStore, questionType, questionGroupFn } from '../lib/store';
 import {
@@ -12,9 +22,10 @@ import {
   SettingTable,
 } from './question-type';
 import { map, groupBy, orderBy } from 'lodash';
+import { AiOutlineQuestionCircle } from 'react-icons/ai';
 
 const QuestionSetting = ({ question, dependant }) => {
-  const { id, name, type, variable, tooltip, required, questionGroupId } =
+  const { id, name, type, variable, tooltip, required, questionGroupId, meta } =
     question;
   const namePreffix = `question-${id}`;
   const { UIText, hostParams } = UIStore.useState((s) => s);
@@ -167,18 +178,52 @@ const QuestionSetting = ({ question, dependant }) => {
           rows={5}
         />
       </Form.Item>
-      <Form.Item
-        name={`${namePreffix}-required`}
-        className={styles['input-checkbox-wrapper']}
+      <Row
+        gutter={[24, 24]}
+        align="middle"
       >
-        <Checkbox
-          onChange={handleChangeRequired}
-          checked={required}
-        >
-          {' '}
-          {UIText.inputQuestionRequiredCheckbox}
-        </Checkbox>
-      </Form.Item>
+        <Col>
+          <Form.Item
+            name={`${namePreffix}-required`}
+            className={styles['input-checkbox-wrapper']}
+          >
+            <Checkbox
+              onChange={handleChangeRequired}
+              checked={required}
+            >
+              {' '}
+              {UIText.inputQuestionRequiredCheckbox}
+            </Checkbox>
+          </Form.Item>
+        </Col>
+        <Col>
+          <div>
+            <Form.Item
+              name={`${namePreffix}-meta`}
+              className={styles['input-checkbox-wrapper']}
+            >
+              <Checkbox
+                onChange={() => console.info('meta')}
+                checked={meta}
+              >
+                {' '}
+                {UIText.inputQuestionMetaCheckbox}
+              </Checkbox>
+              <Popover
+                placement="top"
+                content={<i>{UIText.inputQuestionMetaCheckboxHint}</i>}
+              >
+                <AiOutlineQuestionCircle
+                  style={{
+                    cursor: 'pointer',
+                    marginLeft: '-4px',
+                  }}
+                />
+              </Popover>
+            </Form.Item>
+          </div>
+        </Col>
+      </Row>
       {qType === questionType.input && <SettingInput {...question} />}
       {qType === questionType.number && <SettingNumber {...question} />}
       {[questionType.option, questionType.multiple_option].includes(qType) && (

@@ -52,6 +52,7 @@ const defaultQuestion = ({
     name: name || dummyName(5),
     type: type,
     required: required,
+    meta: false,
     tooltip: null,
   };
   if (type === questionType.option || type === questionType.multiple_option) {
