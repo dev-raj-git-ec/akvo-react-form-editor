@@ -29,6 +29,7 @@
             "lng": 40.4897
           },
           "required": true,
+          "meta": true,
           "tooltip": {
             "text": "Please allow browser to access your <a href=\"https://google.com\">test</a>",
             "translations": [
@@ -63,6 +64,7 @@
           "order": 2,
           "type": "input",
           "required": true,
+          "meta": true,
           "disableDelete": true,
           "tooltip": {
             "text": "Fullname or Nickname",
@@ -80,6 +82,7 @@
           "order": 3,
           "type": "number",
           "required": true,
+          "meta": true,
           "disableDelete": true,
           "translations": [
             {
@@ -112,6 +115,7 @@
             "list": "children"
           },
           "required": true,
+          "meta": true,
           "translations": [
             {
               "name": "Lokasi (Menggunakan API)",
@@ -137,6 +141,7 @@
           "order": 5,
           "type": "date",
           "required": true,
+          "meta": true,
           "translations": [
             {
               "name": "Tanggal Lahir",
@@ -182,6 +187,7 @@
             }
           ],
           "required": true,
+          "meta": true,
           "translations": [
             {
               "name": "Jenis Kelamin",
@@ -314,6 +320,7 @@
             }
           ],
           "required": false,
+          "meta": true,
           "tooltip": {
             "text": "Please mention the available options",
             "translations": [
