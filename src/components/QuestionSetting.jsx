@@ -22,12 +22,17 @@ const QuestionSetting = ({ question, dependant }) => {
   const form = Form.useFormInstance();
   const qType = Form.useWatch(`${namePreffix}-type`, form);
   const { limitQuestionType } = hostParams;
+  const { questionGroups } = questionGroupFn.store.useState((s) => s);
 
   const showMetaCheckbox = useMemo(() => {
-    return ![questionType.geo, questionType.tree, questionType.table].includes(
-      type
+    const currentQuestionGroup = questionGroups.find(
+      (qg) => qg.id === questionGroupId
     );
-  }, [type]);
+    return (
+      ![questionType.tree, questionType.table].includes(type) &&
+      !currentQuestionGroup?.repeatable
+    );
+  }, [type, questionGroups, questionGroupId]);
 
   const questionTypeDropdownValue = useMemo(() => {
     if (limitQuestionType && limitQuestionType?.length) {
