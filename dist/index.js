@@ -96,6 +96,8 @@ var UIStaticText = {
     inputQuestionVariableNameLabel: 'Variable Name',
     inputQuestionTooltipLabel: 'Question Tooltip',
     inputQuestionRequiredCheckbox: 'Required',
+    inputQuestionMetaCheckbox: 'Data point name',
+    inputQuestionMetaCheckboxHint: 'A string value that represents the name of the data point',
     buttonSaveText: 'Save',
     questionSettingTabPane: 'Setting',
     questionSkipLogicTabPane: 'Skip Logic',
@@ -295,6 +297,7 @@ var defaultQuestion = function defaultQuestion(_ref) {
     name: name || dummyName(5),
     type: type,
     required: required,
+    meta: false,
     tooltip: null
   };
 
@@ -9992,7 +9995,8 @@ var QuestionSetting = function QuestionSetting(_ref) {
       variable = question.variable,
       tooltip = question.tooltip,
       required = question.required,
-      questionGroupId = question.questionGroupId;
+      questionGroupId = question.questionGroupId,
+      meta = question.meta;
   var namePreffix = "question-" + id;
 
   var _UIStore$useState = UIStore.useState(function (s) {
@@ -10004,6 +10008,28 @@ var QuestionSetting = function QuestionSetting(_ref) {
   var form = antd.Form.useFormInstance();
   var qType = antd.Form.useWatch(namePreffix + "-type", form);
   var limitQuestionType = hostParams.limitQuestionType;
+
+  var _questionGroupFn$stor = questionGroupFn.store.useState(function (s) {
+    return s;
+  }),
+      questionGroups = _questionGroupFn$stor.questionGroups;
+
+  var disableMetaForGeo = React.useMemo(function () {
+    var metaGeoQuestionDefined = questionGroups.flatMap(function (qg) {
+      return qg.questions.filter(function (q) {
+        return q.type === questionType.geo && (q === null || q === void 0 ? void 0 : q.meta);
+      });
+    }).map(function (q) {
+      return q.id;
+    });
+    return type === questionType.geo && metaGeoQuestionDefined.length && !metaGeoQuestionDefined.includes(id);
+  }, [questionGroups, type, id]);
+  var showMetaCheckbox = React.useMemo(function () {
+    var currentQuestionGroup = questionGroups.find(function (qg) {
+      return qg.id === questionGroupId;
+    });
+    return ![questionType.tree, questionType.table].includes(type) && !(currentQuestionGroup !== null && currentQuestionGroup !== void 0 && currentQuestionGroup.repeatable);
+  }, [type, questionGroups, questionGroupId]);
   var questionTypeDropdownValue = React.useMemo(function () {
     if (limitQuestionType && limitQuestionType !== null && limitQuestionType !== void 0 && limitQuestionType.length) {
       return limitQuestionType;
@@ -10078,6 +10104,12 @@ var QuestionSetting = function QuestionSetting(_ref) {
     updateState('required', e === null || e === void 0 ? void 0 : (_e$target4 = e.target) === null || _e$target4 === void 0 ? void 0 : _e$target4.checked);
   };
 
+  var handleChangeMeta = function handleChangeMeta(e) {
+    var _e$target5;
+
+    updateState('meta', e === null || e === void 0 ? void 0 : (_e$target5 = e.target) === null || _e$target5 === void 0 ? void 0 : _e$target5.checked);
+  };
+
   var dependantGroup = lodash.map(lodash.groupBy(dependant.map(function (x) {
     return {
       name: x.questionGroup.order + "." + x.order + ". " + x.name,
@@ -10143,13 +10175,31 @@ var QuestionSetting = function QuestionSetting(_ref) {
     onChange: handleChangeTooltip,
     allowClear: true,
     rows: 5
-  })), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+  })), /*#__PURE__*/React__default.createElement(antd.Row, {
+    gutter: [24, 24],
+    align: "middle"
+  }, /*#__PURE__*/React__default.createElement(antd.Col, null, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     name: namePreffix + "-required",
     className: styles['input-checkbox-wrapper']
   }, /*#__PURE__*/React__default.createElement(antd.Checkbox, {
     onChange: handleChangeRequired,
     checked: required
-  }, ' ', UIText.inputQuestionRequiredCheckbox)), qType === questionType.input && /*#__PURE__*/React__default.createElement(SettingInput, question), qType === questionType.number && /*#__PURE__*/React__default.createElement(SettingNumber, question), [questionType.option, questionType.multiple_option].includes(qType) && /*#__PURE__*/React__default.createElement(SettingOption, question), qType === questionType.tree && /*#__PURE__*/React__default.createElement(SettingTree, question), qType === questionType.cascade && /*#__PURE__*/React__default.createElement(SettingCascade, question), qType === questionType.date && /*#__PURE__*/React__default.createElement(SettingDate, question), qType === questionType.table && /*#__PURE__*/React__default.createElement(SettingTable, question));
+  }, ' ', UIText.inputQuestionRequiredCheckbox))), showMetaCheckbox && /*#__PURE__*/React__default.createElement(antd.Col, null, /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    name: namePreffix + "-meta",
+    className: styles['input-checkbox-wrapper']
+  }, /*#__PURE__*/React__default.createElement(antd.Checkbox, {
+    onChange: handleChangeMeta,
+    checked: meta,
+    disabled: disableMetaForGeo
+  }, ' ', UIText.inputQuestionMetaCheckbox), /*#__PURE__*/React__default.createElement(antd.Popover, {
+    placement: "top",
+    content: /*#__PURE__*/React__default.createElement("i", null, UIText.inputQuestionMetaCheckboxHint)
+  }, /*#__PURE__*/React__default.createElement(ai.AiOutlineQuestionCircle, {
+    style: {
+      cursor: 'pointer',
+      marginLeft: '-4px'
+    }
+  })))))), qType === questionType.input && /*#__PURE__*/React__default.createElement(SettingInput, question), qType === questionType.number && /*#__PURE__*/React__default.createElement(SettingNumber, question), [questionType.option, questionType.multiple_option].includes(qType) && /*#__PURE__*/React__default.createElement(SettingOption, question), qType === questionType.tree && /*#__PURE__*/React__default.createElement(SettingTree, question), qType === questionType.cascade && /*#__PURE__*/React__default.createElement(SettingCascade, question), qType === questionType.date && /*#__PURE__*/React__default.createElement(SettingDate, question), qType === questionType.table && /*#__PURE__*/React__default.createElement(SettingTable, question));
 };
 
 var dependencyTypes = [{
