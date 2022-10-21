@@ -24,6 +24,19 @@ const QuestionSetting = ({ question, dependant }) => {
   const { limitQuestionType } = hostParams;
   const { questionGroups } = questionGroupFn.store.useState((s) => s);
 
+  const disableMetaForGeo = useMemo(() => {
+    const metaGeoQuestionDefined = questionGroups
+      .flatMap((qg) =>
+        qg.questions.filter((q) => q.type === questionType.geo && q?.meta)
+      )
+      .map((q) => q.id);
+    return (
+      type === questionType.geo &&
+      metaGeoQuestionDefined.length &&
+      !metaGeoQuestionDefined.includes(id)
+    );
+  }, [questionGroups, type, id]);
+
   const showMetaCheckbox = useMemo(() => {
     const currentQuestionGroup = questionGroups.find(
       (qg) => qg.id === questionGroupId
@@ -211,6 +224,7 @@ const QuestionSetting = ({ question, dependant }) => {
                 <Checkbox
                   onChange={handleChangeMeta}
                   checked={meta}
+                  disabled={disableMetaForGeo}
                 >
                   {' '}
                   {UIText.inputQuestionMetaCheckbox}
