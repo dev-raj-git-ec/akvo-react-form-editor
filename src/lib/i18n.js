@@ -33,6 +33,9 @@ const UIStaticText = {
     inputQuestionVariableNameLabel: 'Variable Name',
     inputQuestionTooltipLabel: 'Question Tooltip',
     inputQuestionRequiredCheckbox: 'Required',
+    inputQuestionMetaCheckbox: 'Data point name',
+    inputQuestionMetaCheckboxHint:
+      'A string value that represents the name of the data point',
     buttonSaveText: 'Save',
     questionSettingTabPane: 'Setting',
     questionSkipLogicTabPane: 'Skip Logic',

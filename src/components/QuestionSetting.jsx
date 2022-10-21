@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Form, Input, Select, Checkbox, Alert } from 'antd';
+import { Form, Input, Select, Checkbox, Alert, Row, Col, Popover } from 'antd';
 import styles from '../styles.module.css';
 import { UIStore, questionType, questionGroupFn } from '../lib/store';
 import {
@@ -12,15 +12,40 @@ import {
   SettingTable,
 } from './question-type';
 import { map, groupBy, orderBy } from 'lodash';
+import { AiOutlineQuestionCircle } from 'react-icons/ai';
 
 const QuestionSetting = ({ question, dependant }) => {
-  const { id, name, type, variable, tooltip, required, questionGroupId } =
+  const { id, name, type, variable, tooltip, required, questionGroupId, meta } =
     question;
   const namePreffix = `question-${id}`;
   const { UIText, hostParams } = UIStore.useState((s) => s);
   const form = Form.useFormInstance();
   const qType = Form.useWatch(`${namePreffix}-type`, form);
   const { limitQuestionType } = hostParams;
+  const { questionGroups } = questionGroupFn.store.useState((s) => s);
+
+  const disableMetaForGeo = useMemo(() => {
+    const metaGeoQuestionDefined = questionGroups
+      .flatMap((qg) =>
+        qg.questions.filter((q) => q.type === questionType.geo && q?.meta)
+      )
+      .map((q) => q.id);
+    return (
+      type === questionType.geo &&
+      metaGeoQuestionDefined.length &&
+      !metaGeoQuestionDefined.includes(id)
+    );
+  }, [questionGroups, type, id]);
+
+  const showMetaCheckbox = useMemo(() => {
+    const currentQuestionGroup = questionGroups.find(
+      (qg) => qg.id === questionGroupId
+    );
+    return (
+      ![questionType.tree, questionType.table].includes(type) &&
+      !currentQuestionGroup?.repeatable
+    );
+  }, [type, questionGroups, questionGroupId]);
 
   const questionTypeDropdownValue = useMemo(() => {
     if (limitQuestionType && limitQuestionType?.length) {
@@ -78,6 +103,10 @@ const QuestionSetting = ({ question, dependant }) => {
 
   const handleChangeRequired = (e) => {
     updateState('required', e?.target?.checked);
+  };
+
+  const handleChangeMeta = (e) => {
+    updateState('meta', e?.target?.checked);
   };
 
   const dependantGroup = map(
@@ -167,18 +196,55 @@ const QuestionSetting = ({ question, dependant }) => {
           rows={5}
         />
       </Form.Item>
-      <Form.Item
-        name={`${namePreffix}-required`}
-        className={styles['input-checkbox-wrapper']}
+      <Row
+        gutter={[24, 24]}
+        align="middle"
       >
-        <Checkbox
-          onChange={handleChangeRequired}
-          checked={required}
-        >
-          {' '}
-          {UIText.inputQuestionRequiredCheckbox}
-        </Checkbox>
-      </Form.Item>
+        <Col>
+          <Form.Item
+            name={`${namePreffix}-required`}
+            className={styles['input-checkbox-wrapper']}
+          >
+            <Checkbox
+              onChange={handleChangeRequired}
+              checked={required}
+            >
+              {' '}
+              {UIText.inputQuestionRequiredCheckbox}
+            </Checkbox>
+          </Form.Item>
+        </Col>
+        {showMetaCheckbox && (
+          <Col>
+            <div>
+              <Form.Item
+                name={`${namePreffix}-meta`}
+                className={styles['input-checkbox-wrapper']}
+              >
+                <Checkbox
+                  onChange={handleChangeMeta}
+                  checked={meta}
+                  disabled={disableMetaForGeo}
+                >
+                  {' '}
+                  {UIText.inputQuestionMetaCheckbox}
+                </Checkbox>
+                <Popover
+                  placement="top"
+                  content={<i>{UIText.inputQuestionMetaCheckboxHint}</i>}
+                >
+                  <AiOutlineQuestionCircle
+                    style={{
+                      cursor: 'pointer',
+                      marginLeft: '-4px',
+                    }}
+                  />
+                </Popover>
+              </Form.Item>
+            </div>
+          </Col>
+        )}
+      </Row>
       {qType === questionType.input && <SettingInput {...question} />}
       {qType === questionType.number && <SettingNumber {...question} />}
       {[questionType.option, questionType.multiple_option].includes(qType) && (
