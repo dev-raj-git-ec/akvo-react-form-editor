@@ -70,6 +70,39 @@ const App = () => {
               list: 'children',
             },
           ]}
+          settingHintURL={[
+            {
+              id: 1,
+              name: 'JMP Explorer API',
+              endpoint: 'https://jmp-explorer.akvotest.org/api/hint/',
+              path: [
+                {
+                  label: 'Maximum',
+                  value: 'max',
+                },
+                {
+                  label: 'Minimum',
+                  value: 'min',
+                },
+                {
+                  label: 'Average',
+                  value: 'mean',
+                },
+                {
+                  label: 'Quantile 1',
+                  value: 'q1',
+                },
+                {
+                  label: 'Quantile 2',
+                  value: 'q2',
+                },
+                {
+                  label: 'Quantile 3',
+                  value: 'q3',
+                },
+              ],
+            },
+          ]}
           customParams={{
             label: 'Set Custom Parameter',
             params: [

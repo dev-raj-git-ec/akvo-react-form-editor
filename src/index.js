@@ -27,7 +27,8 @@ const WebformEditor = ({
   onSave = false,
   initialValue = null,
   settingTreeDropdownValue = [{ label: null, value: null }],
-  settingCascadeURL = [{ name: null, url: null, initial: 0, list: false }],
+  settingCascadeURL = [{ name: null, endpoint: null, initial: 0, list: false }],
+  settingHintURL = [{ name: null, endpoint: null, path: [] }],
   defaultQuestion = { type: null, name: null, required: null },
   limitQuestionType = [],
   customParams = {
@@ -92,6 +93,9 @@ const WebformEditor = ({
     const sanitizeSettingCascadeURL = settingCascadeURL
       .filter((x) => x?.name && x?.endpoint)
       .map((x, xi) => ({ ...x, id: x?.id || xi + 1 }));
+    const sanitizeSettingHintURL = settingHintURL
+      .filter((x) => x?.name && x?.endpoint)
+      .map((x, xi) => ({ ...x, id: x?.id || xi + 1 }));
     const sanitizeDefaultQuestion = {
       type: defaultQuestion?.type || questionType.input,
       name: defaultQuestion?.name,
@@ -110,6 +114,12 @@ const WebformEditor = ({
         s.hostParams = {
           ...s.hostParams,
           settingCascadeURL: sanitizeSettingCascadeURL,
+        };
+      }
+      if (sanitizeSettingHintURL.length) {
+        s.hostParams = {
+          ...s.hostParams,
+          settingHintURL: sanitizeSettingHintURL,
         };
       }
       if (checkDefaultQuestion) {
@@ -147,6 +157,7 @@ const WebformEditor = ({
   }, [
     settingTreeDropdownValue,
     settingCascadeURL,
+    settingHintURL,
     defaultQuestion,
     limitQuestionType,
     customParams,
