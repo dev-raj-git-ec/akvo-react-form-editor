@@ -94,7 +94,7 @@ const WebformEditor = ({
       .filter((x) => x?.name && x?.endpoint)
       .map((x, xi) => ({ ...x, id: x?.id || xi + 1 }));
     const sanitizeSettingHintURL = settingHintURL
-      .filter((x) => x?.name && x?.endpoint)
+      .filter((x) => x?.name && x?.endpoint && x?.path?.length)
       .map((x, xi) => ({ ...x, id: x?.id || xi + 1 }));
     const sanitizeDefaultQuestion = {
       type: defaultQuestion?.type || questionType.input,

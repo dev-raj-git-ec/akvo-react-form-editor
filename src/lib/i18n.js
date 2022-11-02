@@ -83,6 +83,11 @@ const UIStaticText = {
     inputColumnTypeLabel: 'Column Type',
     inputColumnOptionsLabel: 'Column Options',
     questionTableTypeDefineOptionsText: 'Define Options',
+    questionHintSettingText: 'Hint Setting',
+    inputQuestionStaticValueLabel: 'Static Value',
+    inputSelectHintEndpointLabel: 'Hint Endpoint',
+    inputSelectHintPathLabel: 'Hint Path',
+    inputQuestionHintButtonTextLabel: 'Hint Button Text',
   },
 };
 

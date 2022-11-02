@@ -188,6 +188,9 @@ const toWebform = (formData, questionGroups) => {
       if (q?.translations) {
         q = clearTranslations(q, q.translations);
       }
+      if (q?.hint && !q?.hint?.static && !q?.hint?.endpoint) {
+        q = clearQuestionObj(['hint'], q);
+      }
       q = clearQuestionObj(['options'], q);
       return q;
     });
