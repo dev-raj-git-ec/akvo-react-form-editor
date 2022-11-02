@@ -63,7 +63,7 @@ const QuestionHint = ({
       [`${namePreffix}-hint_path`]: [],
     });
     updateGlobalState({
-      endpoint: findURL?.endpoint,
+      endpoint: `${findURL?.endpoint}/${id}`,
       path: [],
     });
   };
