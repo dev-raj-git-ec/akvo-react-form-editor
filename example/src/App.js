@@ -74,7 +74,7 @@ const App = () => {
             {
               id: 1,
               name: 'JMP Explorer API',
-              endpoint: 'https://jmp-explorer.akvotest.org/api/hint/',
+              endpoint: 'https://jmp-explorer.akvotest.org/api/hint',
               path: [
                 {
                   label: 'Maximum',

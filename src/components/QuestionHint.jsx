@@ -1,12 +1,14 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import styles from '../styles.module.css';
 import { Form, Row, Col, Select, Input } from 'antd';
 import { UIStore, questionGroupFn } from '../lib/store';
+import { useCallback } from 'react';
 
 const QuestionHint = ({
   id,
   questionGroupId,
   hint = {
+    id: null,
     endpoint: null,
     path: [],
     static: null,
@@ -17,53 +19,63 @@ const QuestionHint = ({
   const { UIText, hostParams } = UIStore.useState((s) => s);
   const { settingHintURL } = hostParams;
   const form = Form.useFormInstance();
-  const [selectedURL, setSelectedURL] = useState(null);
+
+  const updateGlobalState = useCallback(
+    (values = {}) => {
+      questionGroupFn.store.update((s) => {
+        s.questionGroups = s.questionGroups.map((qg) => {
+          if (qg.id === questionGroupId) {
+            const questions = qg.questions.map((q) => {
+              if (q.id === id) {
+                return {
+                  ...q,
+                  hint: {
+                    ...q?.hint,
+                    ...values,
+                  },
+                };
+              }
+              return q;
+            });
+            return {
+              ...qg,
+              questions: questions,
+            };
+          }
+          return qg;
+        });
+      });
+    },
+    [id, questionGroupId]
+  );
 
   const hintURLDropdownValue = useMemo(() => {
     return settingHintURL.map((x) => ({
-      label: x?.name,
+      label: x.name,
       value: x.id,
     }));
   }, [settingHintURL]);
 
   const hintPathDropdownValue = useMemo(() => {
-    return settingHintURL.find((x) => x.endpoint === hint.endpoint)?.path || [];
-  }, [settingHintURL, hint.endpoint]);
-
-  const updateGlobalState = (values = {}) => {
-    questionGroupFn.store.update((s) => {
-      s.questionGroups = s.questionGroups.map((qg) => {
-        if (qg.id === questionGroupId) {
-          const questions = qg.questions.map((q) => {
-            if (q.id === id) {
-              return {
-                ...q,
-                hint: {
-                  ...q?.hint,
-                  ...values,
-                },
-              };
-            }
-            return q;
-          });
-          return {
-            ...qg,
-            questions: questions,
-          };
-        }
-        return qg;
-      });
-    });
-  };
+    let endpoint = hint.endpoint;
+    if (hint.endpoint && endpoint.includes(String(id))) {
+      endpoint = endpoint.replace(`/${String(id)}`, '');
+    }
+    const findURL = settingHintURL.find(
+      (x) => x.id === hint.id || x.endpoint === endpoint
+    );
+    updateGlobalState({ id: findURL?.id });
+    return findURL?.path || [];
+  }, [settingHintURL, hint.id, hint.endpoint, id, updateGlobalState]);
 
   const handleChangeEndpoint = (e) => {
-    setSelectedURL(e);
     const findURL = settingHintURL.find((x) => x.id === e);
     form.setFieldsValue({
       [`${namePreffix}-hint_path`]: [],
     });
     updateGlobalState({
-      endpoint: `${findURL?.endpoint}/${id}`,
+      id: e, // set current URL id
+      endpoint: findURL?.endpoint ? `${findURL.endpoint}/${id}` : null,
       path: [],
     });
   };
@@ -75,8 +87,8 @@ const QuestionHint = ({
   };
 
   const handleChangeStaticValue = (e) => {
-    setSelectedURL(null);
     updateGlobalState({
+      id: null,
       static: e?.target?.value,
       endpoint: null,
       path: [],
@@ -111,7 +123,7 @@ const QuestionHint = ({
               options={hintURLDropdownValue}
               getPopupContainer={(triggerNode) => triggerNode.parentElement}
               onChange={handleChangeEndpoint}
-              value={selectedURL}
+              value={hint.id}
               disabled={hint.static}
             />
           </Col>
