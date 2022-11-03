@@ -55,13 +55,14 @@ const Example = () => {
 
 ### WebformEditor
 
-| Props                 | Description                                                               | Type                                                                 | Default |
-| --------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------- | ------- |
-| **onSave**            | Trigger after save button click                                           | `function(values)`                                                   | -       |
-| **limitQuestionType** | Support to limit question type available                                  | Array[[QuestionType] \| `undefined`(#supported-question-type)]       | -       |
-| **defaultQuestion**   | Support to set custom default new question type, name and required status | Object{[defaultQuestion](#default-question-optional)} \| `undefined` | -       |
-| **initialValue**      | Set value by Form initialization (**Required** as empty object)           | Object{[initialValue](#initial-value-optional)} \| `{}`              | -       |
-| **settingCascadeURL** | Value for Select Option on cascade question type                          | Array[[settingCascadeURL](#setting-cascade-url)] \| `undefined`      | -       |
+| Props                 | Description                                                               | Type                                                                   | Default |
+| --------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------- | ------- |
+| **onSave**            | Trigger after save button click                                           | `function(values)`                                                     | -       |
+| **limitQuestionType** | Support to limit question type available                                  | Array[[QuestionType](#supported-question-type)] \| `undefined`         | -       |
+| **defaultQuestion**   | Support to set custom default new question type, name and required status | Object{[defaultQuestion](#default-question-optional)} \| `undefined`   | -       |
+| **initialValue**      | Set value by Form initialization (**Required** as empty object)           | Object{[initialValue](#initial-value-optional)} \| `{}`                | -       |
+| **settingCascadeURL** | Value for Select Option on cascade question type                          | Array[[settingCascadeURL](#setting-cascade-url)] \| `undefined`        | -       |
+| **customParams**      | Custom Parameters                                                         | [Custom Parameters Setting](#custom-parameters-setting) \| `undefined` |
 
 ## Properties
 
@@ -89,14 +90,13 @@ Example:
 
 Setting cascade URL should be defined as array of object. This value was used to fill Select Option value for cascade question type.
 
-| Props            | Description               | Type                                                                   |
-| ---------------- | ------------------------- | ---------------------------------------------------------------------- |
-| **id**           | Unique id as option value | Integer                                                                |
-| **name**         | Shown as option label     | String                                                                 |
-| **endpoint**     | Cascade API               | String                                                                 |
-| **initial**      | Initial Parameter         | Integer \| String \| `undefined`                                       |
-| **list**         | Object name of array      | `res.data?.[list]` \| `res.data` \| String \| `undefined` \| `false`   |
-| **customParams** | Custom Parameters         | [Custom Parameters Setting](#custom-parameters-setting) \| `undefined` |
+| Props        | Description               | Type                                                                 |
+| ------------ | ------------------------- | -------------------------------------------------------------------- |
+| **id**       | Unique id as option value | Integer                                                              |
+| **name**     | Shown as option label     | String                                                               |
+| **endpoint** | Cascade API               | String                                                               |
+| **initial**  | Initial Parameter         | Integer \| String \| `undefined`                                     |
+| **list**     | Object name of array      | `res.data?.[list]` \| `res.data` \| String \| `undefined` \| `false` |
 
 Example:
 
