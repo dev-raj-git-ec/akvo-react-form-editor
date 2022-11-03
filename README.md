@@ -62,6 +62,7 @@ const Example = () => {
 | **defaultQuestion**   | Support to set custom default new question type, name and required status | Object{[defaultQuestion](#default-question-optional)} \| `undefined`   | -       |
 | **initialValue**      | Set value by Form initialization (**Required** as empty object)           | Object{[initialValue](#initial-value-optional)} \| `{}`                | -       |
 | **settingCascadeURL** | Value for Select Option on cascade question type                          | Array[[settingCascadeURL](#setting-cascade-url)] \| `undefined`        | -       |
+| **settingHintURL**    | Value for Hint / Validate question setting                                | Array[[settingHintURL](#setting-hint-url)] \| `undefined`              | -       |
 | **customParams**      | Custom Parameters                                                         | [Custom Parameters Setting](#custom-parameters-setting) \| `undefined` |
 
 ## Properties
@@ -78,12 +79,14 @@ Default question should be defined as object.
 
 Example:
 
-```json
-{
-  "type": "text",
-  "name": "New Question Title",
-  "required": true
-}
+```jsx
+<WebformEditor
+  defaultQuestion={{
+    type: 'text',
+    name: 'New Question Title',
+    required: true,
+  }}
+/>
 ```
 
 ### Setting Cascade URL
@@ -100,16 +103,70 @@ Setting cascade URL should be defined as array of object. This value was used to
 
 Example:
 
-```json
-[
-  {
-    "id": 1,
-    "name": "Province",
-    "endpoint": "http://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/cascade-296940912-v1.sqlite",
-    "initial": 0,
-    "list": false
-  }
-]
+```jsx
+<WebformEditor
+  settingCascadeURL={[
+    {
+      id: 1,
+      name: 'Province',
+      endpoint:
+        'http://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/cascade-296940912-v1.sqlite',
+      initial: 0,
+      list: false,
+    },
+  ]}
+/>
+```
+
+### Setting Hint URL
+
+Setting Hint URL should be defined as array of object. This value was used to fill Select Option value for hint setting in a question.
+
+| Props        | Description                                                                                     | Type                                                              |
+| ------------ | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| **id**       | Unique id as option value                                                                       | Integer                                                           |
+| **name**     | Shown as option label                                                                           | String                                                            |
+| **endpoint** | Hint API                                                                                        | String                                                            |
+| **path**     | Hint of object path provided by API which containt the value will be shown as a hint/validation | Array of `[{label: 'label shown as option label', value: 'key'}]` |
+
+Example:
+
+```jsx
+<WebformEditor
+  settingHintURL={[
+    {
+      id: 1,
+      name: 'JMP Explorer API',
+      endpoint: 'https://jmp-explorer.akvotest.org/api/hint',
+      path: [
+        {
+          label: 'Maximum',
+          value: 'max',
+        },
+        {
+          label: 'Minimum',
+          value: 'min',
+        },
+        {
+          label: 'Average',
+          value: 'mean',
+        },
+        {
+          label: 'Quantile 1',
+          value: 'q1',
+        },
+        {
+          label: 'Quantile 2',
+          value: 'q2',
+        },
+        {
+          label: 'Quantile 3',
+          value: 'q3',
+        },
+      ],
+    },
+  ]}
+/>
 ```
 
 ### Initial Value (optional)
