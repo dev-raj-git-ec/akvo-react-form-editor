@@ -143,7 +143,12 @@ var UIStaticText = {
     inputColumnNameLabel: 'Column Name',
     inputColumnTypeLabel: 'Column Type',
     inputColumnOptionsLabel: 'Column Options',
-    questionTableTypeDefineOptionsText: 'Define Options'
+    questionTableTypeDefineOptionsText: 'Define Options',
+    questionHintSettingText: 'Hint Setting',
+    inputQuestionStaticValueLabel: 'Static Value',
+    inputSelectHintEndpointLabel: 'Hint Endpoint',
+    inputSelectHintPathLabel: 'Hint Path',
+    inputQuestionHintButtonTextLabel: 'Hint Button Text'
   }
 };
 
@@ -2203,7 +2208,7 @@ var toWebform = function toWebform(formData, questionGroups) {
 
   var output = questionGroups.map(function (qg) {
     var questions = qg.questions.map(function (q) {
-      var _q4, _q5, _q6;
+      var _q4, _q5, _q6, _q7, _q8, _q8$hint, _q9, _q9$hint, _q10, _q10$hint, _q10$hint$path;
 
       var isNotOption = ![questionType.option, questionType.multiple_option].includes(q.type);
 
@@ -2273,6 +2278,10 @@ var toWebform = function toWebform(formData, questionGroups) {
 
       if ((_q6 = q) !== null && _q6 !== void 0 && _q6.translations) {
         q = clearTranslations(q, q.translations);
+      }
+
+      if ((_q7 = q) !== null && _q7 !== void 0 && _q7.hint && !((_q8 = q) !== null && _q8 !== void 0 && (_q8$hint = _q8.hint) !== null && _q8$hint !== void 0 && _q8$hint["static"]) && (!((_q9 = q) !== null && _q9 !== void 0 && (_q9$hint = _q9.hint) !== null && _q9$hint !== void 0 && _q9$hint.endpoint) || !((_q10 = q) !== null && _q10 !== void 0 && (_q10$hint = _q10.hint) !== null && _q10$hint !== void 0 && (_q10$hint$path = _q10$hint.path) !== null && _q10$hint$path !== void 0 && _q10$hint$path.length))) {
+        q = clearQuestionObj(['hint'], q);
       }
 
       q = clearQuestionObj(['options'], q);
@@ -3762,7 +3771,7 @@ var SettingCascade = function SettingCascade(_ref) {
     if (findURL) {
       var _form$setFieldsValue;
 
-      form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[namePreffix + "-api-initial"] = findURL.initial, _form$setFieldsValue[namePreffix + "-api-list"] = findURL.list, _form$setFieldsValue));
+      form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[namePreffix + "-api_initial"] = findURL.initial, _form$setFieldsValue[namePreffix + "-api_list"] = findURL.list, _form$setFieldsValue));
       updateGlobalState({
         endpoint: findURL.endpoint,
         initial: findURL.initial || 0,
@@ -3787,7 +3796,7 @@ var SettingCascade = function SettingCascade(_ref) {
     className: styles['more-question-setting-text']
   }, UIText.questionMoreCascadeSettingText), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     label: UIText.inputQuestionEndpointLabel,
-    name: namePreffix + "-api-endpoint"
+    name: namePreffix + "-api_endpoint"
   }, /*#__PURE__*/React__default.createElement(antd.Row, {
     align: "middle",
     gutter: [24, 24]
@@ -3815,7 +3824,7 @@ var SettingCascade = function SettingCascade(_ref) {
   }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     label: UIText.inputQuestionInitialValueLabel,
     initialValue: api === null || api === void 0 ? void 0 : api.initial,
-    name: namePreffix + "-api-initial"
+    name: namePreffix + "-api_initial"
   }, /*#__PURE__*/React__default.createElement(antd.InputNumber, {
     style: {
       width: '100%'
@@ -3824,7 +3833,7 @@ var SettingCascade = function SettingCascade(_ref) {
     keyboard: false,
     onChange: handleChangeInitial
   }))), /*#__PURE__*/React__default.createElement(antd.Col, null, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
-    name: namePreffix + "-api-list-checkbox"
+    name: namePreffix + "-api_list_checkbox"
   }, /*#__PURE__*/React__default.createElement(antd.Checkbox, {
     onChange: function onChange(e) {
       var _e$target;
@@ -3837,7 +3846,7 @@ var SettingCascade = function SettingCascade(_ref) {
   }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     label: UIText.inputQuestionListLabel,
     initialValue: api !== null && api !== void 0 && api.list ? api.list !== true ? api.list : null : null,
-    name: namePreffix + "-api-list"
+    name: namePreffix + "-api_list"
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
     onChange: function onChange(e) {
       var _e$target2;
@@ -9986,6 +9995,185 @@ var SettingTable = function SettingTable(_ref3) {
   }));
 };
 
+var QuestionHint = function QuestionHint(_ref) {
+  var _hostParams$settingHi;
+
+  var id = _ref.id,
+      questionGroupId = _ref.questionGroupId,
+      _ref$hint = _ref.hint,
+      hint = _ref$hint === void 0 ? {
+    id: null,
+    endpoint: null,
+    path: [],
+    "static": null,
+    buttonText: null
+  } : _ref$hint;
+  var namePreffix = "question-" + id;
+
+  var _UIStore$useState = UIStore.useState(function (s) {
+    return s;
+  }),
+      UIText = _UIStore$useState.UIText,
+      hostParams = _UIStore$useState.hostParams;
+
+  var settingHintURL = hostParams === null || hostParams === void 0 ? void 0 : (_hostParams$settingHi = hostParams.settingHintURL) === null || _hostParams$settingHi === void 0 ? void 0 : _hostParams$settingHi.settings;
+  var form = antd.Form.useFormInstance();
+  var updateGlobalState = React.useCallback(function (values) {
+    if (values === void 0) {
+      values = {};
+    }
+
+    questionGroupFn.store.update(function (s) {
+      s.questionGroups = s.questionGroups.map(function (qg) {
+        if (qg.id === questionGroupId) {
+          var questions = qg.questions.map(function (q) {
+            if (q.id === id) {
+              return _extends({}, q, {
+                hint: _extends({}, q === null || q === void 0 ? void 0 : q.hint, values)
+              });
+            }
+
+            return q;
+          });
+          return _extends({}, qg, {
+            questions: questions
+          });
+        }
+
+        return qg;
+      });
+    });
+  }, [id, questionGroupId]);
+  var hintURLDropdownValue = React.useMemo(function () {
+    return settingHintURL && settingHintURL !== null && settingHintURL !== void 0 && settingHintURL.length ? settingHintURL.map(function (x) {
+      return {
+        label: x.name,
+        value: x.id
+      };
+    }) : [];
+  }, [settingHintURL]);
+  var hintPathDropdownValue = React.useMemo(function () {
+    var endpoint = hint.endpoint;
+
+    if (hint.endpoint && endpoint.includes(String(id))) {
+      endpoint = endpoint.replace("/" + String(id), '');
+    }
+
+    var findURL = settingHintURL.find(function (x) {
+      return x.id === hint.id || x.endpoint === endpoint;
+    });
+    updateGlobalState({
+      id: findURL === null || findURL === void 0 ? void 0 : findURL.id
+    });
+    return (findURL === null || findURL === void 0 ? void 0 : findURL.path) || [];
+  }, [settingHintURL, hint.id, hint.endpoint, id, updateGlobalState]);
+
+  var handleChangeEndpoint = function handleChangeEndpoint(e) {
+    var _form$setFieldsValue;
+
+    var findURL = settingHintURL.find(function (x) {
+      return x.id === e;
+    });
+    form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[namePreffix + "-hint_path"] = [], _form$setFieldsValue));
+    updateGlobalState({
+      id: e,
+      endpoint: findURL !== null && findURL !== void 0 && findURL.endpoint ? findURL.endpoint + "/" + id : null,
+      path: []
+    });
+  };
+
+  var handleChangePath = function handleChangePath(val) {
+    updateGlobalState({
+      path: val
+    });
+  };
+
+  var handleChangeStaticValue = function handleChangeStaticValue(e) {
+    var _e$target;
+
+    updateGlobalState({
+      id: null,
+      "static": e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.value,
+      endpoint: null,
+      path: []
+    });
+  };
+
+  var handleChangeButtonText = function handleChangeButtonText(e) {
+    var _e$target2;
+
+    updateGlobalState({
+      buttonText: e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.value
+    });
+  };
+
+  return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("p", {
+    className: styles['more-question-setting-text']
+  }, UIText.questionHintSettingText), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    label: UIText.inputSelectHintEndpointLabel,
+    name: namePreffix + "-hint_endpoint"
+  }, /*#__PURE__*/React__default.createElement(antd.Row, {
+    align: "middle",
+    gutter: [24, 24]
+  }, /*#__PURE__*/React__default.createElement(antd.Col, {
+    span: 10
+  }, /*#__PURE__*/React__default.createElement(antd.Select, {
+    showSearch: true,
+    allowClear: true,
+    className: styles['select-dropdown'],
+    optionFilterProp: "label",
+    options: hintURLDropdownValue,
+    getPopupContainer: function getPopupContainer(triggerNode) {
+      return triggerNode.parentElement;
+    },
+    onChange: handleChangeEndpoint,
+    value: hint.id,
+    disabled: hint["static"]
+  })), /*#__PURE__*/React__default.createElement(antd.Col, {
+    span: 14
+  }, /*#__PURE__*/React__default.createElement(antd.Input, {
+    value: hint === null || hint === void 0 ? void 0 : hint.endpoint,
+    disabled: true
+  })))), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    label: UIText.inputSelectHintPathLabel,
+    name: namePreffix + "-hint_path",
+    initialValue: hint.path
+  }, /*#__PURE__*/React__default.createElement(antd.Select, {
+    showSearch: true,
+    allowClear: true,
+    mode: "multiple",
+    showArrow: true,
+    className: styles['select-dropdown'],
+    optionFilterProp: "label",
+    options: hintPathDropdownValue,
+    getPopupContainer: function getPopupContainer(triggerNode) {
+      return triggerNode.parentElement;
+    },
+    onChange: handleChangePath,
+    disabled: hint["static"]
+  })), /*#__PURE__*/React__default.createElement(antd.Row, {
+    align: "middle",
+    gutter: [24, 24]
+  }, /*#__PURE__*/React__default.createElement(antd.Col, {
+    span: 12
+  }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    label: UIText.inputQuestionStaticValueLabel,
+    name: namePreffix + "-hint_static_value",
+    initialValue: hint["static"]
+  }, /*#__PURE__*/React__default.createElement(antd.Input, {
+    onChange: handleChangeStaticValue,
+    disabled: hint.endpoint
+  }))), /*#__PURE__*/React__default.createElement(antd.Col, {
+    span: 12
+  }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    label: UIText.inputQuestionHintButtonTextLabel,
+    name: namePreffix + "-hint_button_text",
+    initialValue: hint.buttonText
+  }, /*#__PURE__*/React__default.createElement(antd.Input, {
+    onChange: handleChangeButtonText
+  })))));
+};
+
 var QuestionSetting = function QuestionSetting(_ref) {
   var question = _ref.question,
       dependant = _ref.dependant;
@@ -10007,7 +10195,8 @@ var QuestionSetting = function QuestionSetting(_ref) {
 
   var form = antd.Form.useFormInstance();
   var qType = antd.Form.useWatch(namePreffix + "-type", form);
-  var limitQuestionType = hostParams.limitQuestionType;
+  var limitQuestionType = hostParams.limitQuestionType,
+      settingHintURL = hostParams.settingHintURL;
 
   var _questionGroupFn$stor = questionGroupFn.store.useState(function (s) {
     return s;
@@ -10044,6 +10233,19 @@ var QuestionSetting = function QuestionSetting(_ref) {
       };
     });
   }, [limitQuestionType]);
+  var showHintSetting = React.useMemo(function () {
+    var _settingHintURL$setti, _settingHintURL$quest, _settingHintURL$setti2;
+
+    if (!settingHintURL || !(settingHintURL !== null && settingHintURL !== void 0 && (_settingHintURL$setti = settingHintURL.settings) !== null && _settingHintURL$setti !== void 0 && _settingHintURL$setti.length)) {
+      return false;
+    }
+
+    if (settingHintURL !== null && settingHintURL !== void 0 && settingHintURL.questionTypes && settingHintURL !== null && settingHintURL !== void 0 && (_settingHintURL$quest = settingHintURL.questionTypes) !== null && _settingHintURL$quest !== void 0 && _settingHintURL$quest.length) {
+      return settingHintURL.questionTypes.includes(type);
+    }
+
+    return settingHintURL === null || settingHintURL === void 0 ? void 0 : (_settingHintURL$setti2 = settingHintURL.settings) === null || _settingHintURL$setti2 === void 0 ? void 0 : _settingHintURL$setti2.length;
+  }, [settingHintURL, type]);
 
   var updateState = function updateState(name, value) {
     questionGroupFn.store.update(function (s) {
@@ -10199,7 +10401,7 @@ var QuestionSetting = function QuestionSetting(_ref) {
       cursor: 'pointer',
       marginLeft: '-4px'
     }
-  })))))), qType === questionType.input && /*#__PURE__*/React__default.createElement(SettingInput, question), qType === questionType.number && /*#__PURE__*/React__default.createElement(SettingNumber, question), [questionType.option, questionType.multiple_option].includes(qType) && /*#__PURE__*/React__default.createElement(SettingOption, question), qType === questionType.tree && /*#__PURE__*/React__default.createElement(SettingTree, question), qType === questionType.cascade && /*#__PURE__*/React__default.createElement(SettingCascade, question), qType === questionType.date && /*#__PURE__*/React__default.createElement(SettingDate, question), qType === questionType.table && /*#__PURE__*/React__default.createElement(SettingTable, question));
+  })))))), showHintSetting && /*#__PURE__*/React__default.createElement(QuestionHint, question), qType === questionType.input && /*#__PURE__*/React__default.createElement(SettingInput, question), qType === questionType.number && /*#__PURE__*/React__default.createElement(SettingNumber, question), [questionType.option, questionType.multiple_option].includes(qType) && /*#__PURE__*/React__default.createElement(SettingOption, question), qType === questionType.tree && /*#__PURE__*/React__default.createElement(SettingTree, question), qType === questionType.cascade && /*#__PURE__*/React__default.createElement(SettingCascade, question), qType === questionType.date && /*#__PURE__*/React__default.createElement(SettingDate, question), qType === questionType.table && /*#__PURE__*/React__default.createElement(SettingTable, question));
 };
 
 var dependencyTypes = [{
@@ -11618,10 +11820,19 @@ var WebformEditor = function WebformEditor(_ref) {
       _ref$settingCascadeUR = _ref.settingCascadeURL,
       settingCascadeURL = _ref$settingCascadeUR === void 0 ? [{
     name: null,
-    url: null,
+    endpoint: null,
     initial: 0,
     list: false
   }] : _ref$settingCascadeUR,
+      _ref$settingHintURL = _ref.settingHintURL,
+      settingHintURL = _ref$settingHintURL === void 0 ? {
+    questionTypes: [],
+    settings: [{
+      name: null,
+      endpoint: null,
+      path: []
+    }]
+  } : _ref$settingHintURL,
       _ref$defaultQuestion = _ref.defaultQuestion,
       defaultQuestion = _ref$defaultQuestion === void 0 ? {
     type: null,
@@ -11690,7 +11901,7 @@ var WebformEditor = function WebformEditor(_ref) {
   }
 
   React.useEffect(function () {
-    var _customParams$params;
+    var _settingHintURL$setti, _settingHintURL$setti2, _customParams$params;
 
     var checkDefaultQuestion = defaultQuestion ? Object.values(defaultQuestion).filter(function (x) {
       return x;
@@ -11705,6 +11916,17 @@ var WebformEditor = function WebformEditor(_ref) {
         id: (x === null || x === void 0 ? void 0 : x.id) || xi + 1
       });
     });
+    var sanitizeSettingHintURL = !lodash.isEmpty(settingHintURL) ? _extends({}, settingHintURL, {
+      settings: settingHintURL === null || settingHintURL === void 0 ? void 0 : (_settingHintURL$setti = settingHintURL.settings) === null || _settingHintURL$setti === void 0 ? void 0 : (_settingHintURL$setti2 = _settingHintURL$setti.filter(function (x) {
+        var _x$path;
+
+        return (x === null || x === void 0 ? void 0 : x.name) && (x === null || x === void 0 ? void 0 : x.endpoint) && (x === null || x === void 0 ? void 0 : (_x$path = x.path) === null || _x$path === void 0 ? void 0 : _x$path.length);
+      })) === null || _settingHintURL$setti2 === void 0 ? void 0 : _settingHintURL$setti2.map(function (x, xi) {
+        return _extends({}, x, {
+          id: (x === null || x === void 0 ? void 0 : x.id) || xi + 1
+        });
+      })
+    }) : {};
     var sanitizeDefaultQuestion = {
       type: (defaultQuestion === null || defaultQuestion === void 0 ? void 0 : defaultQuestion.type) || questionType.input,
       name: defaultQuestion === null || defaultQuestion === void 0 ? void 0 : defaultQuestion.name,
@@ -11714,6 +11936,8 @@ var WebformEditor = function WebformEditor(_ref) {
       return x === null || x === void 0 ? void 0 : x.name;
     });
     UIStore.update(function (s) {
+      var _sanitizeSettingHintU;
+
       if (sanitizeSettingTreeDropdownValue.length) {
         s.hostParams = _extends({}, s.hostParams, {
           settingTreeDropdownValue: sanitizeSettingTreeDropdownValue
@@ -11723,6 +11947,12 @@ var WebformEditor = function WebformEditor(_ref) {
       if (sanitizeSettingCascadeURL.length) {
         s.hostParams = _extends({}, s.hostParams, {
           settingCascadeURL: sanitizeSettingCascadeURL
+        });
+      }
+
+      if (!lodash.isEmpty(sanitizeSettingHintURL) && sanitizeSettingHintURL !== null && sanitizeSettingHintURL !== void 0 && (_sanitizeSettingHintU = sanitizeSettingHintURL.settings) !== null && _sanitizeSettingHintU !== void 0 && _sanitizeSettingHintU.length) {
+        s.hostParams = _extends({}, s.hostParams, {
+          settingHintURL: sanitizeSettingHintURL
         });
       }
 
@@ -11759,7 +11989,7 @@ var WebformEditor = function WebformEditor(_ref) {
         });
       }
     });
-  }, [settingTreeDropdownValue, settingCascadeURL, defaultQuestion, limitQuestionType, customParams]);
+  }, [settingTreeDropdownValue, settingCascadeURL, settingHintURL, defaultQuestion, limitQuestionType, customParams]);
   React.useEffect(function () {
     if (defaultQuestionParam && init) {
       questionGroupFn.store.update(function (s) {
