@@ -17,7 +17,7 @@ const QuestionHint = ({
 }) => {
   const namePreffix = `question-${id}`;
   const { UIText, hostParams } = UIStore.useState((s) => s);
-  const { settingHintURL } = hostParams;
+  const settingHintURL = hostParams?.settingHintURL?.settings;
   const form = Form.useFormInstance();
 
   const updateGlobalState = useCallback(
@@ -50,10 +50,12 @@ const QuestionHint = ({
   );
 
   const hintURLDropdownValue = useMemo(() => {
-    return settingHintURL.map((x) => ({
-      label: x.name,
-      value: x.id,
-    }));
+    return settingHintURL && settingHintURL?.length
+      ? settingHintURL.map((x) => ({
+          label: x.name,
+          value: x.id,
+        }))
+      : [];
   }, [settingHintURL]);
 
   const hintPathDropdownValue = useMemo(() => {

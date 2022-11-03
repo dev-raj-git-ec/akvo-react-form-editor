@@ -28,7 +28,10 @@ const WebformEditor = ({
   initialValue = null,
   settingTreeDropdownValue = [{ label: null, value: null }],
   settingCascadeURL = [{ name: null, endpoint: null, initial: 0, list: false }],
-  settingHintURL = [{ name: null, endpoint: null, path: [] }],
+  settingHintURL = {
+    questionTypes: [],
+    settings: [{ name: null, endpoint: null, path: [] }],
+  },
   defaultQuestion = { type: null, name: null, required: null },
   limitQuestionType = [],
   customParams = {
@@ -93,9 +96,14 @@ const WebformEditor = ({
     const sanitizeSettingCascadeURL = settingCascadeURL
       .filter((x) => x?.name && x?.endpoint)
       .map((x, xi) => ({ ...x, id: x?.id || xi + 1 }));
-    const sanitizeSettingHintURL = settingHintURL
-      .filter((x) => x?.name && x?.endpoint && x?.path?.length)
-      .map((x, xi) => ({ ...x, id: x?.id || xi + 1 }));
+    const sanitizeSettingHintURL = !isEmpty(settingHintURL)
+      ? {
+          ...settingHintURL,
+          settings: settingHintURL?.settings
+            ?.filter((x) => x?.name && x?.endpoint && x?.path?.length)
+            ?.map((x, xi) => ({ ...x, id: x?.id || xi + 1 })),
+        }
+      : {};
     const sanitizeDefaultQuestion = {
       type: defaultQuestion?.type || questionType.input,
       name: defaultQuestion?.name,
@@ -116,7 +124,10 @@ const WebformEditor = ({
           settingCascadeURL: sanitizeSettingCascadeURL,
         };
       }
-      if (sanitizeSettingHintURL.length) {
+      if (
+        !isEmpty(sanitizeSettingHintURL) &&
+        sanitizeSettingHintURL?.settings?.length
+      ) {
         s.hostParams = {
           ...s.hostParams,
           settingHintURL: sanitizeSettingHintURL,

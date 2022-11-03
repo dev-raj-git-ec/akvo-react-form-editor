@@ -59,8 +59,17 @@ const QuestionSetting = ({ question, dependant }) => {
   }, [limitQuestionType]);
 
   const showHintSetting = useMemo(() => {
-    return settingHintURL && settingHintURL?.length ? true : false;
-  }, [settingHintURL]);
+    if (!settingHintURL || !settingHintURL?.settings?.length) {
+      return false;
+    }
+    if (
+      settingHintURL?.questionTypes &&
+      settingHintURL?.questionTypes?.length
+    ) {
+      return settingHintURL.questionTypes.includes(type);
+    }
+    return settingHintURL?.settings?.length;
+  }, [settingHintURL, type]);
 
   const updateState = (name, value) => {
     questionGroupFn.store.update((s) => {
