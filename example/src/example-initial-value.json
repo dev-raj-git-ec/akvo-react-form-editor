@@ -266,6 +266,12 @@
           "order": 1,
           "type": "number",
           "required": false,
+          "hint": {
+            "endpoint": "https://jmp-explorer.akvotest.org/api/hint/8",
+            "path": ["mean"],
+            "static": null,
+            "buttonText": null
+          },
           "translations": [
             {
               "name": "Berapa biasanya uang yang anda habiskan per hari untuk makanan",
@@ -279,6 +285,12 @@
           "order": 2,
           "type": "number",
           "required": false,
+          "hint": {
+            "endpoint": "https://jmp-explorer.akvotest.org/api/hint/9",
+            "path": ["min", "max"],
+            "static": null,
+            "buttonText": null
+          },
           "translations": [
             {
               "name": "Berapa kali anda biasanya makan dalam sehari",

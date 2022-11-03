@@ -58,10 +58,12 @@ const Example = () => {
 | Props                 | Description                                                               | Type                                                                 | Default |
 | --------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------- | ------- |
 | **onSave**            | Trigger after save button click                                           | `function(values)`                                                   | -       |
-| **limitQuestionType** | Support to limit question type available                                  | Array[[QuestionType] \| `undefined`(#supported-question-type)]       | -       |
+| **limitQuestionType** | Support to limit question type available                                  | Array[[QuestionType](#supported-question-type)] \| `undefined`       | -       |
 | **defaultQuestion**   | Support to set custom default new question type, name and required status | Object{[defaultQuestion](#default-question-optional)} \| `undefined` | -       |
 | **initialValue**      | Set value by Form initialization (**Required** as empty object)           | Object{[initialValue](#initial-value-optional)} \| `{}`              | -       |
 | **settingCascadeURL** | Value for Select Option on cascade question type                          | Array[[settingCascadeURL](#setting-cascade-url)] \| `undefined`      | -       |
+| **settingHintURL**    | Value for Hint / Validate question setting                                | Object{[settingHintURL](#setting-hint-url)} \| `undefined`           | -       |
+| **customParams**      | Custom Parameters                                                         | Object{[customParams](#custom-params)} \| `undefined`                |
 
 ## Properties
 
@@ -77,40 +79,114 @@ Default question should be defined as object.
 
 Example:
 
-```json
-{
-  "type": "text",
-  "name": "New Question Title",
-  "required": true
-}
+```jsx
+<WebformEditor
+  defaultQuestion={{
+    type: 'text',
+    name: 'New Question Title',
+    required: true,
+  }}
+/>
 ```
 
 ### Setting Cascade URL
 
 Setting cascade URL should be defined as array of object. This value was used to fill Select Option value for cascade question type.
 
-| Props            | Description               | Type                                                                   |
-| ---------------- | ------------------------- | ---------------------------------------------------------------------- |
-| **id**           | Unique id as option value | Integer                                                                |
-| **name**         | Shown as option label     | String                                                                 |
-| **endpoint**     | Cascade API               | String                                                                 |
-| **initial**      | Initial Parameter         | Integer \| String \| `undefined`                                       |
-| **list**         | Object name of array      | `res.data?.[list]` \| `res.data` \| String \| `undefined` \| `false`   |
-| **customParams** | Custom Parameters         | [Custom Parameters Setting](#custom-parameters-setting) \| `undefined` |
+| Props        | Description               | Type                                                                 |
+| ------------ | ------------------------- | -------------------------------------------------------------------- |
+| **id**       | Unique id as option value | Integer                                                              |
+| **name**     | Shown as option label     | String                                                               |
+| **endpoint** | Cascade API               | String                                                               |
+| **initial**  | Initial Parameter         | Integer \| String \| `undefined`                                     |
+| **list**     | Object name of array      | `res.data?.[list]` \| `res.data` \| String \| `undefined` \| `false` |
 
 Example:
 
-```json
-[
-  {
-    "id": 1,
-    "name": "Province",
-    "endpoint": "http://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/cascade-296940912-v1.sqlite",
-    "initial": 0,
-    "list": false
-  }
-]
+```jsx
+<WebformEditor
+  settingCascadeURL={[
+    {
+      id: 1,
+      name: 'Province',
+      endpoint:
+        'http://tech-consultancy.akvo.org/akvo-flow-web-api/cascade/seap/cascade-296940912-v1.sqlite',
+      initial: 0,
+      list: false,
+    },
+  ]}
+/>
 ```
+
+### Setting Hint URL
+
+Setting Hint URL should be defined as array of object. This value was used to fill Select Option value for hint setting in a question.
+
+Example:
+
+```jsx
+<WebformEditor
+  settingHintURL={{
+    questionTypes: ['number'],
+    settings: [
+      {
+        id: 1,
+        name: 'JMP Explorer API',
+        endpoint: 'https://jmp-explorer.akvotest.org/api/hint',
+        path: [
+          {
+            label: 'Maximum',
+            value: 'max',
+          },
+          {
+            label: 'Minimum',
+            value: 'min',
+          },
+          {
+            label: 'Average',
+            value: 'mean',
+          },
+          {
+            label: 'Quantile 1',
+            value: 'q1',
+          },
+          {
+            label: 'Quantile 2',
+            value: 'q2',
+          },
+          {
+            label: 'Quantile 3',
+            value: 'q3',
+          },
+        ],
+      },
+    ],
+  }}
+/>
+```
+
+#### Setting Hint URL Object
+
+| Props             | Description                                        | Type                                                           |
+| ----------------- | -------------------------------------------------- | -------------------------------------------------------------- |
+| **questionTypes** | Value to limit hint setting for a certain question | Array[[QuestionType](#supported-question-type)] \| `undefined` |
+| **settings**      | Value for hint options                             | Array[[Settings Parameters](#settings-parameters)]             |
+
+#### Settings Parameters
+
+| Props        | Description                                                                                     | Type                                       |
+| ------------ | ----------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| **id**       | Unique id as option value                                                                       | Integer                                    |
+| **name**     | Shown as option label                                                                           | String                                     |
+| **endpoint** | Hint API                                                                                        | String                                     |
+| **path**     | Hint of object path provided by API which containt the value will be shown as a hint/validation | Array[[Path Parameters](#path-parameters)] |
+
+#### Path Parameters
+
+| Props     | Description                | Type   |
+| --------- | -------------------------- | ------ |
+| **label** | Label for the path options | String |
+| **value** | Value for the path options | String |
 
 ### Initial Value (optional)
 
@@ -123,6 +199,8 @@ Example: [Initial Value Example](https://github.com/akvo/akvo-react-form-editor/
 ### Custom Params
 
 Custom parameters are key-value pairs that we can implement in the Webform Editor.
+
+Example:
 
 ```jsx
 <WebformEditor

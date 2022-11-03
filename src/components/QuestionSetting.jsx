@@ -11,6 +11,7 @@ import {
   SettingDate,
   SettingTable,
 } from './question-type';
+import QuestionHint from './QuestionHint';
 import { map, groupBy, orderBy } from 'lodash';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 
@@ -21,7 +22,7 @@ const QuestionSetting = ({ question, dependant }) => {
   const { UIText, hostParams } = UIStore.useState((s) => s);
   const form = Form.useFormInstance();
   const qType = Form.useWatch(`${namePreffix}-type`, form);
-  const { limitQuestionType } = hostParams;
+  const { limitQuestionType, settingHintURL } = hostParams;
   const { questionGroups } = questionGroupFn.store.useState((s) => s);
 
   const disableMetaForGeo = useMemo(() => {
@@ -56,6 +57,19 @@ const QuestionSetting = ({ question, dependant }) => {
       value: questionType[key],
     }));
   }, [limitQuestionType]);
+
+  const showHintSetting = useMemo(() => {
+    if (!settingHintURL || !settingHintURL?.settings?.length) {
+      return false;
+    }
+    if (
+      settingHintURL?.questionTypes &&
+      settingHintURL?.questionTypes?.length
+    ) {
+      return settingHintURL.questionTypes.includes(type);
+    }
+    return settingHintURL?.settings?.length;
+  }, [settingHintURL, type]);
 
   const updateState = (name, value) => {
     questionGroupFn.store.update((s) => {
@@ -245,6 +259,7 @@ const QuestionSetting = ({ question, dependant }) => {
           </Col>
         )}
       </Row>
+      {showHintSetting && <QuestionHint {...question} />}
       {qType === questionType.input && <SettingInput {...question} />}
       {qType === questionType.number && <SettingNumber {...question} />}
       {[questionType.option, questionType.multiple_option].includes(qType) && (

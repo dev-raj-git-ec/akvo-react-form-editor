@@ -51,8 +51,8 @@ const SettingCascade = ({
     const findURL = settingCascadeURL.find((x) => x.id === e);
     if (findURL) {
       form.setFieldsValue({
-        [`${namePreffix}-api-initial`]: findURL.initial,
-        [`${namePreffix}-api-list`]: findURL.list,
+        [`${namePreffix}-api_initial`]: findURL.initial,
+        [`${namePreffix}-api_list`]: findURL.list,
       });
       updateGlobalState({
         endpoint: findURL.endpoint,
@@ -79,7 +79,7 @@ const SettingCascade = ({
       </p>
       <Form.Item
         label={UIText.inputQuestionEndpointLabel}
-        name={`${namePreffix}-api-endpoint`}
+        name={`${namePreffix}-api_endpoint`}
       >
         <Row
           align="middle"
@@ -111,7 +111,7 @@ const SettingCascade = ({
           <Form.Item
             label={UIText.inputQuestionInitialValueLabel}
             initialValue={api?.initial}
-            name={`${namePreffix}-api-initial`}
+            name={`${namePreffix}-api_initial`}
           >
             <InputNumber
               style={{ width: '100%' }}
@@ -122,7 +122,7 @@ const SettingCascade = ({
           </Form.Item>
         </Col>
         <Col>
-          <Form.Item name={`${namePreffix}-api-list-checkbox`}>
+          <Form.Item name={`${namePreffix}-api_list_checkbox`}>
             <Checkbox
               onChange={(e) => handleChangeList(e?.target?.checked)}
               checked={api?.list ? true : false}
@@ -139,7 +139,7 @@ const SettingCascade = ({
               initialValue={
                 api?.list ? (api.list !== true ? api.list : null) : null
               }
-              name={`${namePreffix}-api-list`}
+              name={`${namePreffix}-api_list`}
             >
               <Input
                 onChange={(e) => handleChangeList(e?.target?.value)}
