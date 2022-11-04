@@ -10243,20 +10243,25 @@ var QuestionSetting = function QuestionSetting(_ref) {
     return settingHintURL === null || settingHintURL === void 0 ? void 0 : (_settingHintURL$setti2 = settingHintURL.settings) === null || _settingHintURL$setti2 === void 0 ? void 0 : _settingHintURL$setti2.length;
   }, [settingHintURL, type]);
   var defaultTypeValue = React.useMemo(function () {
-    if (!lodash.isEmpty(defaultQuestionParam) && defaultQuestionParam !== null && defaultQuestionParam !== void 0 && defaultQuestionParam.type) {
-      return defaultQuestionParam.type;
-    }
-
     if (questionTypeDropdownValue.length) {
       var _questionTypeDropdown;
 
       var checkType = questionTypeDropdownValue.find(function (x) {
         return x.value === type;
       });
+
+      if (checkType) {
+        return type;
+      }
+
+      if (!lodash.isEmpty(defaultQuestionParam) && defaultQuestionParam !== null && defaultQuestionParam !== void 0 && defaultQuestionParam.type) {
+        return defaultQuestionParam.type;
+      }
+
       var checkText = questionTypeDropdownValue.find(function (x) {
         return x.value === questionType.text;
       });
-      return checkType ? type : checkText ? checkText.value : questionTypeDropdownValue === null || questionTypeDropdownValue === void 0 ? void 0 : (_questionTypeDropdown = questionTypeDropdownValue[0]) === null || _questionTypeDropdown === void 0 ? void 0 : _questionTypeDropdown.value;
+      return checkText ? checkText.value : questionTypeDropdownValue === null || questionTypeDropdownValue === void 0 ? void 0 : (_questionTypeDropdown = questionTypeDropdownValue[0]) === null || _questionTypeDropdown === void 0 ? void 0 : _questionTypeDropdown.value;
     }
 
     return type;
