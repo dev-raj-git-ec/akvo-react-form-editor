@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Form, Input, Select, Checkbox, Alert, Row, Col, Popover } from 'antd';
 import styles from '../styles.module.css';
 import { UIStore, questionType, questionGroupFn } from '../lib/store';
@@ -84,6 +84,32 @@ const QuestionSetting = ({ question, dependant }) => {
     return settingHintURL?.settings?.length;
   }, [settingHintURL, type]);
 
+  const updateState = useCallback(
+    (name, value) => {
+      questionGroupFn.store.update((s) => {
+        s.questionGroups = s.questionGroups.map((qg) => {
+          if (qg.id === questionGroupId) {
+            const questions = qg.questions.map((q) => {
+              if (q.id === id) {
+                return {
+                  ...q,
+                  [name]: value,
+                };
+              }
+              return q;
+            });
+            return {
+              ...qg,
+              questions: questions,
+            };
+          }
+          return qg;
+        });
+      });
+    },
+    [id, questionGroupId]
+  );
+
   const defaultTypeValue = useMemo(() => {
     if (questionTypeDropdownValue.length) {
       const checkType = questionTypeDropdownValue.find((x) => x.value === type);
@@ -91,40 +117,20 @@ const QuestionSetting = ({ question, dependant }) => {
         return type;
       }
       if (!isEmpty(defaultQuestionParam) && defaultQuestionParam?.type) {
+        updateState('type', defaultQuestionParam.type);
         return defaultQuestionParam.type;
       }
       const checkText = questionTypeDropdownValue.find(
         (x) => x.value === questionType.text
       );
-      return checkText
+      const defType = checkText
         ? checkText.value
         : questionTypeDropdownValue?.[0]?.value;
+      updateState('type', defType);
+      return defType;
     }
     return type;
-  }, [type, questionTypeDropdownValue, defaultQuestionParam]);
-
-  const updateState = (name, value) => {
-    questionGroupFn.store.update((s) => {
-      s.questionGroups = s.questionGroups.map((qg) => {
-        if (qg.id === questionGroupId) {
-          const questions = qg.questions.map((q) => {
-            if (q.id === id) {
-              return {
-                ...q,
-                [name]: value,
-              };
-            }
-            return q;
-          });
-          return {
-            ...qg,
-            questions: questions,
-          };
-        }
-        return qg;
-      });
-    });
-  };
+  }, [type, questionTypeDropdownValue, defaultQuestionParam, updateState]);
 
   const handleChangeName = (e) => {
     updateState('name', e?.target?.value);
