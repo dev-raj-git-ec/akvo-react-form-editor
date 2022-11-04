@@ -2967,12 +2967,9 @@ var FormTranslations = function FormTranslations() {
   var formStore = formFn.store.useState(function (s) {
     return s;
   });
-
-  var _questionGroupFn$stor = questionGroupFn.store.useState(function (s) {
-    return s;
-  }),
-      questionGroups = _questionGroupFn$stor.questionGroups;
-
+  var questionGroups = questionGroupFn.store.useState(function (s) {
+    return s === null || s === void 0 ? void 0 : s.questionGroups;
+  });
   var languages = useMemo(function () {
     return (formStore === null || formStore === void 0 ? void 0 : formStore.languages) || [];
   }, [formStore === null || formStore === void 0 ? void 0 : formStore.languages]);
@@ -3305,9 +3302,9 @@ var SettingNumber = function SettingNumber(_ref) {
   var UIText = UIStore.useState(function (s) {
     return s.UIText;
   });
-  var allowDecimal = rule.allowDecimal,
-      min = rule.min,
-      max = rule.max;
+  var allowDecimal = rule === null || rule === void 0 ? void 0 : rule.allowDecimal;
+  var min = rule === null || rule === void 0 ? void 0 : rule.min;
+  var max = rule === null || rule === void 0 ? void 0 : rule.max;
   var moreNumberSettings = [{
     label: UIText.inputQuestionMinimumValueLabel,
     value: min,
@@ -3662,7 +3659,7 @@ var SettingTree = function SettingTree(_ref) {
       UIText = _UIStore$useState.UIText,
       hostParams = _UIStore$useState.hostParams;
 
-  var settingTreeDropdownValue = hostParams.settingTreeDropdownValue;
+  var settingTreeDropdownValue = hostParams === null || hostParams === void 0 ? void 0 : hostParams.settingTreeDropdownValue;
 
   var handleChangeTreeDropdown = function handleChangeTreeDropdown(e) {
     questionGroupFn.store.update(function (s) {
@@ -3722,7 +3719,7 @@ var SettingCascade = function SettingCascade(_ref) {
       UIText = _UIStore$useState.UIText,
       hostParams = _UIStore$useState.hostParams;
 
-  var settingCascadeURL = hostParams.settingCascadeURL;
+  var settingCascadeURL = hostParams === null || hostParams === void 0 ? void 0 : hostParams.settingCascadeURL;
   var form = Form.useFormInstance();
   var cascadeURLDropdownValue = useMemo(function () {
     return settingCascadeURL.map(function (x) {
@@ -9545,8 +9542,8 @@ var SettingDate = function SettingDate(_ref) {
   var UIText = UIStore.useState(function (s) {
     return s.UIText;
   });
-  var minDate = rule.minDate,
-      maxDate = rule.maxDate;
+  var minDate = rule === null || rule === void 0 ? void 0 : rule.minDate;
+  var maxDate = rule === null || rule === void 0 ? void 0 : rule.maxDate;
   var moreDateSettings = [{
     label: UIText.inputQuestionAfterDateValueLabel,
     value: minDate,
@@ -9611,7 +9608,7 @@ var SettingDate = function SettingDate(_ref) {
       span: 8
     }, /*#__PURE__*/React__default.createElement(Form.Item, {
       label: x.label,
-      initialValue: moment(x.value),
+      initialValue: x.value ? moment(x.value) : null,
       name: namePreffix + "-" + x.key
     }, /*#__PURE__*/React__default.createElement(DatePicker, {
       disabledDate: x.disabledDate,
@@ -10050,20 +10047,20 @@ var QuestionHint = function QuestionHint(_ref) {
     }) : [];
   }, [settingHintURL]);
   var hintPathDropdownValue = useMemo(function () {
-    var endpoint = hint.endpoint;
+    var endpoint = hint === null || hint === void 0 ? void 0 : hint.endpoint;
 
-    if (hint.endpoint && endpoint.includes(String(id))) {
+    if (hint !== null && hint !== void 0 && hint.endpoint && endpoint.includes(String(id))) {
       endpoint = endpoint.replace("/" + String(id), '');
     }
 
     var findURL = settingHintURL.find(function (x) {
-      return x.id === hint.id || x.endpoint === endpoint;
+      return x.id === (hint === null || hint === void 0 ? void 0 : hint.id) || x.endpoint === endpoint;
     });
     updateGlobalState({
       id: findURL === null || findURL === void 0 ? void 0 : findURL.id
     });
     return (findURL === null || findURL === void 0 ? void 0 : findURL.path) || [];
-  }, [settingHintURL, hint.id, hint.endpoint, id, updateGlobalState]);
+  }, [settingHintURL, hint === null || hint === void 0 ? void 0 : hint.id, hint === null || hint === void 0 ? void 0 : hint.endpoint, id, updateGlobalState]);
 
   var handleChangeEndpoint = function handleChangeEndpoint(e) {
     var _form$setFieldsValue;
@@ -10124,8 +10121,8 @@ var QuestionHint = function QuestionHint(_ref) {
       return triggerNode.parentElement;
     },
     onChange: handleChangeEndpoint,
-    value: hint.id,
-    disabled: hint["static"]
+    value: hint === null || hint === void 0 ? void 0 : hint.id,
+    disabled: hint === null || hint === void 0 ? void 0 : hint["static"]
   })), /*#__PURE__*/React__default.createElement(Col, {
     span: 14
   }, /*#__PURE__*/React__default.createElement(Input, {
@@ -10134,7 +10131,7 @@ var QuestionHint = function QuestionHint(_ref) {
   })))), /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputSelectHintPathLabel,
     name: namePreffix + "-hint_path",
-    initialValue: hint.path
+    initialValue: hint === null || hint === void 0 ? void 0 : hint.path
   }, /*#__PURE__*/React__default.createElement(Select, {
     showSearch: true,
     allowClear: true,
@@ -10147,7 +10144,7 @@ var QuestionHint = function QuestionHint(_ref) {
       return triggerNode.parentElement;
     },
     onChange: handleChangePath,
-    disabled: hint["static"]
+    disabled: hint === null || hint === void 0 ? void 0 : hint["static"]
   })), /*#__PURE__*/React__default.createElement(Row, {
     align: "middle",
     gutter: [24, 24]
@@ -10156,16 +10153,16 @@ var QuestionHint = function QuestionHint(_ref) {
   }, /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionStaticValueLabel,
     name: namePreffix + "-hint_static_value",
-    initialValue: hint["static"]
+    initialValue: hint === null || hint === void 0 ? void 0 : hint["static"]
   }, /*#__PURE__*/React__default.createElement(Input, {
     onChange: handleChangeStaticValue,
-    disabled: hint.endpoint
+    disabled: hint === null || hint === void 0 ? void 0 : hint.endpoint
   }))), /*#__PURE__*/React__default.createElement(Col, {
     span: 12
   }, /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionHintButtonTextLabel,
     name: namePreffix + "-hint_button_text",
-    initialValue: hint.buttonText
+    initialValue: hint === null || hint === void 0 ? void 0 : hint.buttonText
   }, /*#__PURE__*/React__default.createElement(Input, {
     onChange: handleChangeButtonText
   })))));
@@ -10181,8 +10178,11 @@ var QuestionSetting = function QuestionSetting(_ref) {
       tooltip = question.tooltip,
       required = question.required,
       questionGroupId = question.questionGroupId,
-      meta = question.meta;
+      meta = question.meta,
+      disableDelete = question.disableDelete;
   var namePreffix = "question-" + id;
+  var form = Form.useFormInstance();
+  var qType = Form.useWatch(namePreffix + "-type", form);
 
   var _UIStore$useState = UIStore.useState(function (s) {
     return s;
@@ -10190,16 +10190,12 @@ var QuestionSetting = function QuestionSetting(_ref) {
       UIText = _UIStore$useState.UIText,
       hostParams = _UIStore$useState.hostParams;
 
-  var form = Form.useFormInstance();
-  var qType = Form.useWatch(namePreffix + "-type", form);
-  var limitQuestionType = hostParams.limitQuestionType,
-      settingHintURL = hostParams.settingHintURL;
-
-  var _questionGroupFn$stor = questionGroupFn.store.useState(function (s) {
-    return s;
-  }),
-      questionGroups = _questionGroupFn$stor.questionGroups;
-
+  var limitQuestionType = hostParams === null || hostParams === void 0 ? void 0 : hostParams.limitQuestionType;
+  var settingHintURL = hostParams === null || hostParams === void 0 ? void 0 : hostParams.settingHintURL;
+  var defaultQuestionParam = hostParams === null || hostParams === void 0 ? void 0 : hostParams.defaultQuestionParam;
+  var questionGroups = questionGroupFn.store.useState(function (s) {
+    return s.questionGroups;
+  });
   var disableMetaForGeo = useMemo(function () {
     var metaGeoQuestionDefined = questionGroups.flatMap(function (qg) {
       return qg.questions.filter(function (q) {
@@ -10243,6 +10239,25 @@ var QuestionSetting = function QuestionSetting(_ref) {
 
     return settingHintURL === null || settingHintURL === void 0 ? void 0 : (_settingHintURL$setti2 = settingHintURL.settings) === null || _settingHintURL$setti2 === void 0 ? void 0 : _settingHintURL$setti2.length;
   }, [settingHintURL, type]);
+  var defaultTypeValue = useMemo(function () {
+    if (!isEmpty(defaultQuestionParam) && defaultQuestionParam !== null && defaultQuestionParam !== void 0 && defaultQuestionParam.type) {
+      return defaultQuestionParam.type;
+    }
+
+    if (questionTypeDropdownValue.length) {
+      var _questionTypeDropdown;
+
+      var checkType = questionTypeDropdownValue.find(function (x) {
+        return x.value === type;
+      });
+      var checkText = questionTypeDropdownValue.find(function (x) {
+        return x.value === questionType.text;
+      });
+      return checkType ? type : checkText ? checkText.value : questionTypeDropdownValue === null || questionTypeDropdownValue === void 0 ? void 0 : (_questionTypeDropdown = questionTypeDropdownValue[0]) === null || _questionTypeDropdown === void 0 ? void 0 : _questionTypeDropdown.value;
+    }
+
+    return type;
+  }, [type, questionTypeDropdownValue, defaultQuestionParam]);
 
   var updateState = function updateState(name, value) {
     questionGroupFn.store.update(function (s) {
@@ -10346,7 +10361,7 @@ var QuestionSetting = function QuestionSetting(_ref) {
     allowClear: true
   })), /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionTypeLabel,
-    initialValue: type,
+    initialValue: defaultTypeValue,
     name: namePreffix + "-type",
     required: true
   }, /*#__PURE__*/React__default.createElement(Select, {
@@ -10358,7 +10373,7 @@ var QuestionSetting = function QuestionSetting(_ref) {
       return triggerNode.parentElement;
     },
     onChange: handleChangeType,
-    disabled: dependant.length
+    disabled: dependant.length || disableDelete
   })), /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionVariableNameLabel,
     initialValue: variable,
@@ -10828,11 +10843,9 @@ var QuestionSkipLogic = function QuestionSkipLogic(_ref3) {
   var UIText = UIStore.useState(function (s) {
     return s.UIText;
   });
-
-  var _questionGroupFn$stor = questionGroupFn.store.useState(function (s) {
-    return s;
-  }),
-      questionGroups = _questionGroupFn$stor.questionGroups;
+  var questionGroups = questionGroupFn.store.useState(function (s) {
+    return s.questionGroups;
+  });
 
   var _useState = useState(dependency !== null && dependency !== void 0 && dependency.length ? transformDependencyValue(dependency, questionGroups) : defaultSkipLogic()),
       dependencies = _useState[0],
@@ -10904,11 +10917,10 @@ var QuestionCustomParams = function QuestionCustomParams(_ref) {
   var id = question.id,
       questionGroupId = question.questionGroupId;
   var namePreffix = "question-" + id;
-
-  var _UIStore$useState = UIStore.useState(function (s) {
+  var hostParams = UIStore.useState(function (s) {
     return s.hostParams;
-  }),
-      customParams = _UIStore$useState.customParams;
+  });
+  var customParams = hostParams === null || hostParams === void 0 ? void 0 : hostParams.customParams;
 
   var _useState = useState(true),
       initLoad = _useState[0],
@@ -11037,13 +11049,10 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
       question = _ref.question,
       questionGroup = _ref.questionGroup,
       isLastItem = _ref.isLastItem;
-
-  var _questionGroupFn$stor = questionGroupFn.store.useState(function (s) {
-    return s;
-  }),
-      questionGroups = _questionGroupFn$stor.questionGroups;
-
-  var questions = questionGroup.questions;
+  var questionGroups = questionGroupFn.store.useState(function (s) {
+    return s.questionGroups;
+  });
+  var questions = questionGroup === null || questionGroup === void 0 ? void 0 : questionGroup.questions;
 
   var _UIStore$useState = UIStore.useState(function (s) {
     return s;
@@ -11073,8 +11082,8 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
       name = question.name,
       dependency = question.dependency,
       disableDelete = question.disableDelete;
-  var defaultQuestionParam = hostParams.defaultQuestionParam,
-      customParams = hostParams.customParams;
+  var defaultQuestionParam = hostParams === null || hostParams === void 0 ? void 0 : hostParams.defaultQuestionParam;
+  var customParams = hostParams === null || hostParams === void 0 ? void 0 : hostParams.customParams;
   var enableCustomParams = customParams && (customParams === null || customParams === void 0 ? void 0 : customParams.label) && (customParams === null || customParams === void 0 ? void 0 : (_customParams$params = customParams.params) === null || _customParams$params === void 0 ? void 0 : _customParams$params.length);
   var allQuestions = questionGroups.map(function (qg) {
     return qg.questions;
@@ -11446,11 +11455,9 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
       isModalOpen = _useState[0],
       setIsModalOpen = _useState[1];
 
-  var _questionGroupFn$stor = questionGroupFn.store.useState(function (s) {
-    return s;
-  }),
-      questionGroups = _questionGroupFn$stor.questionGroups;
-
+  var questionGroups = questionGroupFn.store.useState(function (s) {
+    return s.questionGroups;
+  });
   var movingQg = UIStore.useState(function (s) {
     return s.activeMoveQuestionGroup;
   });
@@ -11463,7 +11470,7 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
       activeEditQuestions = _UIStore$useState.activeEditQuestions,
       hostParams = _UIStore$useState.hostParams;
 
-  var defaultQuestionParam = hostParams.defaultQuestionParam;
+  var defaultQuestionParam = hostParams === null || hostParams === void 0 ? void 0 : hostParams.defaultQuestionParam;
   var id = questionGroup.id,
       name = questionGroup.name,
       questions = questionGroup.questions,
@@ -11883,7 +11890,7 @@ var WebformEditor = function WebformEditor(_ref) {
   var activeEditFormSetting = UIStore.useState(function (s) {
     return s.activeEditFormSetting;
   });
-  var defaultQuestionParam = hostParams.defaultQuestionParam;
+  var defaultQuestionParam = hostParams === null || hostParams === void 0 ? void 0 : hostParams.defaultQuestionParam;
   var currentTab = current.tab;
   var formTabPane = UIText.formTabPane,
       formTranslationPane = UIText.formTranslationPane,
