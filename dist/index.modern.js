@@ -10239,32 +10239,7 @@ var QuestionSetting = function QuestionSetting(_ref) {
 
     return settingHintURL === null || settingHintURL === void 0 ? void 0 : (_settingHintURL$setti2 = settingHintURL.settings) === null || _settingHintURL$setti2 === void 0 ? void 0 : _settingHintURL$setti2.length;
   }, [settingHintURL, type]);
-  var defaultTypeValue = useMemo(function () {
-    if (questionTypeDropdownValue.length) {
-      var _questionTypeDropdown;
-
-      var checkType = questionTypeDropdownValue.find(function (x) {
-        return x.value === type;
-      });
-
-      if (checkType) {
-        return type;
-      }
-
-      if (!isEmpty(defaultQuestionParam) && defaultQuestionParam !== null && defaultQuestionParam !== void 0 && defaultQuestionParam.type) {
-        return defaultQuestionParam.type;
-      }
-
-      var checkText = questionTypeDropdownValue.find(function (x) {
-        return x.value === questionType.text;
-      });
-      return checkText ? checkText.value : questionTypeDropdownValue === null || questionTypeDropdownValue === void 0 ? void 0 : (_questionTypeDropdown = questionTypeDropdownValue[0]) === null || _questionTypeDropdown === void 0 ? void 0 : _questionTypeDropdown.value;
-    }
-
-    return type;
-  }, [type, questionTypeDropdownValue, defaultQuestionParam]);
-
-  var updateState = function updateState(name, value) {
+  var updateState = useCallback(function (name, value) {
     questionGroupFn.store.update(function (s) {
       s.questionGroups = s.questionGroups.map(function (qg) {
         if (qg.id === questionGroupId) {
@@ -10285,7 +10260,34 @@ var QuestionSetting = function QuestionSetting(_ref) {
         return qg;
       });
     });
-  };
+  }, [id, questionGroupId]);
+  var defaultTypeValue = useMemo(function () {
+    if (questionTypeDropdownValue.length) {
+      var _questionTypeDropdown;
+
+      var checkType = questionTypeDropdownValue.find(function (x) {
+        return x.value === type;
+      });
+
+      if (checkType) {
+        return type;
+      }
+
+      if (!isEmpty(defaultQuestionParam) && defaultQuestionParam !== null && defaultQuestionParam !== void 0 && defaultQuestionParam.type) {
+        updateState('type', defaultQuestionParam.type);
+        return defaultQuestionParam.type;
+      }
+
+      var checkText = questionTypeDropdownValue.find(function (x) {
+        return x.value === questionType.text;
+      });
+      var defType = checkText ? checkText.value : questionTypeDropdownValue === null || questionTypeDropdownValue === void 0 ? void 0 : (_questionTypeDropdown = questionTypeDropdownValue[0]) === null || _questionTypeDropdown === void 0 ? void 0 : _questionTypeDropdown.value;
+      updateState('type', defType);
+      return defType;
+    }
+
+    return type;
+  }, [type, questionTypeDropdownValue, defaultQuestionParam, updateState]);
 
   var handleChangeName = function handleChangeName(e) {
     var _e$target;
