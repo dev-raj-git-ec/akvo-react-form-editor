@@ -12,7 +12,7 @@ import {
   SettingTable,
 } from './question-type';
 import QuestionHint from './QuestionHint';
-import { map, groupBy, orderBy } from 'lodash';
+import { map, groupBy, orderBy, isEmpty } from 'lodash';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 
 const QuestionSetting = ({ question, dependant }) => {
@@ -33,6 +33,7 @@ const QuestionSetting = ({ question, dependant }) => {
   const { UIText, hostParams } = UIStore.useState((s) => s);
   const limitQuestionType = hostParams?.limitQuestionType;
   const settingHintURL = hostParams?.settingHintURL;
+  const defaultQuestionParam = hostParams?.defaultQuestionParam;
   const questionGroups = questionGroupFn.store.useState(
     (s) => s.questionGroups
   );
@@ -82,6 +83,24 @@ const QuestionSetting = ({ question, dependant }) => {
     }
     return settingHintURL?.settings?.length;
   }, [settingHintURL, type]);
+
+  const defaultTypeValue = useMemo(() => {
+    if (!isEmpty(defaultQuestionParam) && defaultQuestionParam?.type) {
+      return defaultQuestionParam.type;
+    }
+    if (questionTypeDropdownValue.length) {
+      const checkType = questionTypeDropdownValue.find((x) => x.value === type);
+      const checkText = questionTypeDropdownValue.find(
+        (x) => x.value === questionType.text
+      );
+      return checkType
+        ? type
+        : checkText
+        ? checkText.value
+        : questionTypeDropdownValue?.[0]?.value;
+    }
+    return type;
+  }, [type, questionTypeDropdownValue, defaultQuestionParam]);
 
   const updateState = (name, value) => {
     questionGroupFn.store.update((s) => {
@@ -187,7 +206,7 @@ const QuestionSetting = ({ question, dependant }) => {
       </Form.Item>
       <Form.Item
         label={UIText.inputQuestionTypeLabel}
-        initialValue={type}
+        initialValue={defaultTypeValue}
         name={`${namePreffix}-type`}
         required
       >
