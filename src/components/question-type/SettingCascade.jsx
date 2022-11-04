@@ -14,7 +14,7 @@ const SettingCascade = ({
 }) => {
   const namePreffix = `question-${id}`;
   const { UIText, hostParams } = UIStore.useState((s) => s);
-  const { settingCascadeURL } = hostParams;
+  const settingCascadeURL = hostParams?.settingCascadeURL;
   const form = Form.useFormInstance();
 
   const cascadeURLDropdownValue = useMemo(() => {

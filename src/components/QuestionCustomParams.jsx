@@ -6,8 +6,8 @@ import { UIStore, questionGroupFn } from '../lib/store';
 const QuestionCustomParams = ({ question }) => {
   const { id, questionGroupId } = question;
   const namePreffix = `question-${id}`;
-
-  const { customParams } = UIStore.useState((s) => s.hostParams);
+  const hostParams = UIStore.useState((s) => s.hostParams);
+  const customParams = hostParams?.customParams;
   const [initLoad, setInitLoad] = useState(true);
   const [paramValue, setParamValue] = useState({});
 

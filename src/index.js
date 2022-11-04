@@ -69,7 +69,7 @@ const WebformEditor = ({
   const activeEditFormSetting = UIStore.useState(
     (s) => s.activeEditFormSetting
   );
-  const { defaultQuestionParam } = hostParams;
+  const defaultQuestionParam = hostParams?.defaultQuestionParam;
   const { tab: currentTab } = current;
   const {
     formTabPane,

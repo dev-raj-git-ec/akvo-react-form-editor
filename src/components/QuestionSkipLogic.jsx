@@ -469,7 +469,9 @@ const QuestionSkipLogic = ({ question }) => {
     order: currentQuestionOrder,
   } = question;
   const UIText = UIStore.useState((s) => s.UIText);
-  const { questionGroups } = questionGroupFn.store.useState((s) => s);
+  const questionGroups = questionGroupFn.store.useState(
+    (s) => s.questionGroups
+  );
   const [dependencies, setDependencies] = useState(
     dependency?.length
       ? transformDependencyValue(dependency, questionGroups)

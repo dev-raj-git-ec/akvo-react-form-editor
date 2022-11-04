@@ -12,7 +12,8 @@ const SettingDate = ({
 }) => {
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
-  const { minDate, maxDate } = rule;
+  const minDate = rule?.minDate;
+  const maxDate = rule?.maxDate;
 
   const moreDateSettings = [
     {
@@ -81,7 +82,7 @@ const SettingDate = ({
           >
             <Form.Item
               label={x.label}
-              initialValue={moment(x.value)}
+              initialValue={x.value ? moment(x.value) : null}
               name={`${namePreffix}-${x.key}`}
             >
               <DatePicker

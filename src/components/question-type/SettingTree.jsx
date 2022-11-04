@@ -6,7 +6,7 @@ import { UIStore, questionGroupFn } from '../../lib/store';
 const SettingTree = ({ id, questionGroupId, option }) => {
   const namePreffix = `question-${id}`;
   const { UIText, hostParams } = UIStore.useState((s) => s);
-  const { settingTreeDropdownValue } = hostParams;
+  const settingTreeDropdownValue = hostParams?.settingTreeDropdownValue;
 
   const handleChangeTreeDropdown = (e) => {
     questionGroupFn.store.update((s) => {

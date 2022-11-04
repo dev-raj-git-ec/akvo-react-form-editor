@@ -88,7 +88,9 @@ const FormTranslations = () => {
   const [formTranslation] = Form.useForm();
   const { UIText, localeDropdownValue } = UIStore.useState((s) => s);
   const formStore = formFn.store.useState((s) => s);
-  const { questionGroups } = questionGroupFn.store.useState((s) => s);
+  const questionGroups = questionGroupFn.store.useState(
+    (s) => s?.questionGroups
+  );
 
   const languages = useMemo(() => {
     return formStore?.languages || [];

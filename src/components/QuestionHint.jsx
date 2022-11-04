@@ -59,16 +59,16 @@ const QuestionHint = ({
   }, [settingHintURL]);
 
   const hintPathDropdownValue = useMemo(() => {
-    let endpoint = hint.endpoint;
-    if (hint.endpoint && endpoint.includes(String(id))) {
+    let endpoint = hint?.endpoint;
+    if (hint?.endpoint && endpoint.includes(String(id))) {
       endpoint = endpoint.replace(`/${String(id)}`, '');
     }
     const findURL = settingHintURL.find(
-      (x) => x.id === hint.id || x.endpoint === endpoint
+      (x) => x.id === hint?.id || x.endpoint === endpoint
     );
     updateGlobalState({ id: findURL?.id });
     return findURL?.path || [];
-  }, [settingHintURL, hint.id, hint.endpoint, id, updateGlobalState]);
+  }, [settingHintURL, hint?.id, hint?.endpoint, id, updateGlobalState]);
 
   const handleChangeEndpoint = (e) => {
     const findURL = settingHintURL.find((x) => x.id === e);
@@ -125,8 +125,8 @@ const QuestionHint = ({
               options={hintURLDropdownValue}
               getPopupContainer={(triggerNode) => triggerNode.parentElement}
               onChange={handleChangeEndpoint}
-              value={hint.id}
-              disabled={hint.static}
+              value={hint?.id}
+              disabled={hint?.static}
             />
           </Col>
           <Col span={14}>
@@ -140,7 +140,7 @@ const QuestionHint = ({
       <Form.Item
         label={UIText.inputSelectHintPathLabel}
         name={`${namePreffix}-hint_path`}
-        initialValue={hint.path}
+        initialValue={hint?.path}
       >
         <Select
           showSearch
@@ -152,7 +152,7 @@ const QuestionHint = ({
           options={hintPathDropdownValue}
           getPopupContainer={(triggerNode) => triggerNode.parentElement}
           onChange={handleChangePath}
-          disabled={hint.static}
+          disabled={hint?.static}
         />
       </Form.Item>
       <Row
@@ -163,11 +163,11 @@ const QuestionHint = ({
           <Form.Item
             label={UIText.inputQuestionStaticValueLabel}
             name={`${namePreffix}-hint_static_value`}
-            initialValue={hint.static}
+            initialValue={hint?.static}
           >
             <Input
               onChange={handleChangeStaticValue}
-              disabled={hint.endpoint}
+              disabled={hint?.endpoint}
             />
           </Form.Item>
         </Col>
@@ -175,7 +175,7 @@ const QuestionHint = ({
           <Form.Item
             label={UIText.inputQuestionHintButtonTextLabel}
             name={`${namePreffix}-hint_button_text`}
-            initialValue={hint.buttonText}
+            initialValue={hint?.buttonText}
           >
             <Input onChange={handleChangeButtonText} />
           </Form.Item>

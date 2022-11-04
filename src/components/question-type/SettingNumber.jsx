@@ -14,7 +14,9 @@ const SettingNumber = ({
 }) => {
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
-  const { allowDecimal, min, max } = rule;
+  const allowDecimal = rule?.allowDecimal;
+  const min = rule?.min;
+  const max = rule?.max;
 
   const moreNumberSettings = [
     {

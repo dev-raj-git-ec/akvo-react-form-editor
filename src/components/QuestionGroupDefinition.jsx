@@ -8,7 +8,9 @@ import { orderBy, maxBy, minBy, uniq, difference, intersection } from 'lodash';
 
 const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { questionGroups } = questionGroupFn.store.useState((s) => s);
+  const questionGroups = questionGroupFn.store.useState(
+    (s) => s.questionGroups
+  );
   const movingQg = UIStore.useState((s) => s.activeMoveQuestionGroup);
   const {
     activeQuestionGroups,
@@ -16,7 +18,7 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
     activeEditQuestions,
     hostParams,
   } = UIStore.useState((s) => s);
-  const { defaultQuestionParam } = hostParams;
+  const defaultQuestionParam = hostParams?.defaultQuestionParam;
 
   const { id, name, questions, order } = questionGroup;
   const questionIds = questions.map((q) => q.id);
