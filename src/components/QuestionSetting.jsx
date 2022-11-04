@@ -16,14 +16,26 @@ import { map, groupBy, orderBy } from 'lodash';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 
 const QuestionSetting = ({ question, dependant }) => {
-  const { id, name, type, variable, tooltip, required, questionGroupId, meta } =
-    question;
+  const {
+    id,
+    name,
+    type,
+    variable,
+    tooltip,
+    required,
+    questionGroupId,
+    meta,
+    disableDelete,
+  } = question;
   const namePreffix = `question-${id}`;
-  const { UIText, hostParams } = UIStore.useState((s) => s);
   const form = Form.useFormInstance();
   const qType = Form.useWatch(`${namePreffix}-type`, form);
-  const { limitQuestionType, settingHintURL } = hostParams;
-  const { questionGroups } = questionGroupFn.store.useState((s) => s);
+  const { UIText, hostParams } = UIStore.useState((s) => s);
+  const limitQuestionType = hostParams?.limitQuestionType;
+  const settingHintURL = hostParams?.settingHintURL;
+  const questionGroups = questionGroupFn.store.useState(
+    (s) => s.questionGroups
+  );
 
   const disableMetaForGeo = useMemo(() => {
     const metaGeoQuestionDefined = questionGroups
@@ -186,7 +198,7 @@ const QuestionSetting = ({ question, dependant }) => {
           options={questionTypeDropdownValue}
           getPopupContainer={(triggerNode) => triggerNode.parentElement}
           onChange={handleChangeType}
-          disabled={dependant.length}
+          disabled={dependant.length || disableDelete}
         />
       </Form.Item>
       <Form.Item

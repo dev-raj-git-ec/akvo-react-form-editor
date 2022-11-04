@@ -10,8 +10,10 @@ import { ButtonAddMove, CardTitle, AlertPopup } from '../support';
 import { orderBy, maxBy, minBy } from 'lodash';
 
 const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
-  const { questionGroups } = questionGroupFn.store.useState((s) => s);
-  const { questions } = questionGroup;
+  const questionGroups = questionGroupFn.store.useState(
+    (s) => s.questionGroups
+  );
+  const questions = questionGroup?.questions;
   const { UIText, hostParams, activeEditQuestions } = UIStore.useState(
     (s) => s
   );
@@ -21,7 +23,8 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { id, questionGroupId, order, name, dependency, disableDelete } =
     question;
-  const { defaultQuestionParam, customParams } = hostParams;
+  const defaultQuestionParam = hostParams?.defaultQuestionParam;
+  const customParams = hostParams?.customParams;
 
   const enableCustomParams =
     customParams && customParams?.label && customParams?.params?.length;
