@@ -85,17 +85,18 @@ const QuestionSetting = ({ question, dependant }) => {
   }, [settingHintURL, type]);
 
   const defaultTypeValue = useMemo(() => {
-    if (!isEmpty(defaultQuestionParam) && defaultQuestionParam?.type) {
-      return defaultQuestionParam.type;
-    }
     if (questionTypeDropdownValue.length) {
       const checkType = questionTypeDropdownValue.find((x) => x.value === type);
+      if (checkType) {
+        return type;
+      }
+      if (!isEmpty(defaultQuestionParam) && defaultQuestionParam?.type) {
+        return defaultQuestionParam.type;
+      }
       const checkText = questionTypeDropdownValue.find(
         (x) => x.value === questionType.text
       );
-      return checkType
-        ? type
-        : checkText
+      return checkText
         ? checkText.value
         : questionTypeDropdownValue?.[0]?.value;
     }
