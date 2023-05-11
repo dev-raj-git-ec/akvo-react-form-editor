@@ -26,7 +26,7 @@ const questionType = {
   tree: 'tree',
   table: 'table',
   // autofield: 'autofield',
-  image: 'image'
+  image: 'image',
 };
 
 const defaultForm = () => {
