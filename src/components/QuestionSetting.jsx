@@ -10,6 +10,7 @@ import {
   SettingCascade,
   SettingDate,
   SettingTable,
+  SettingImage,
 } from './question-type';
 import QuestionHint from './QuestionHint';
 import { map, groupBy, orderBy, isEmpty } from 'lodash';
@@ -307,6 +308,7 @@ const QuestionSetting = ({ question, dependant }) => {
       {qType === questionType.cascade && <SettingCascade {...question} />}
       {qType === questionType.date && <SettingDate {...question} />}
       {qType === questionType.table && <SettingTable {...question} />}
+      {qType === questionType.image && <SettingImage {...question} />}
     </div>
   );
 };
