@@ -148,7 +148,9 @@ var UIStaticText = {
     inputQuestionStaticValueLabel: 'Static Value',
     inputSelectHintEndpointLabel: 'Hint Endpoint',
     inputSelectHintPathLabel: 'Hint Path',
-    inputQuestionHintButtonTextLabel: 'Hint Button Text'
+    inputQuestionHintButtonTextLabel: 'Hint Button Text',
+    questionMoreImageTypeSettingText: 'More Image Question Setting',
+    inputQuestionImageLimitValidationText: 'Limit / Max file size'
   }
 };
 
@@ -272,7 +274,8 @@ var questionType = {
   option: 'option',
   multiple_option: 'multiple_option',
   tree: 'tree',
-  table: 'table'
+  table: 'table',
+  image: 'image'
 };
 
 var defaultForm = function defaultForm() {
@@ -9992,6 +9995,59 @@ var SettingTable = function SettingTable(_ref3) {
   }));
 };
 
+var SettingImage = function SettingImage(_ref) {
+  var id = _ref.id,
+      questionGroupId = _ref.questionGroupId,
+      limit = _ref.limit;
+  var namePreffix = "question-" + id;
+  var UIText = UIStore.useState(function (s) {
+    return s.UIText;
+  });
+
+  var updateState = function updateState(name, value) {
+    questionGroupFn.store.update(function (s) {
+      s.questionGroups = s.questionGroups.map(function (qg) {
+        if (qg.id === questionGroupId) {
+          var questions = qg.questions.map(function (q) {
+            if (q.id === id) {
+              var _extends2;
+
+              return _extends({}, q, (_extends2 = {}, _extends2[name] = value, _extends2));
+            }
+
+            return q;
+          });
+          return _extends({}, qg, {
+            questions: questions
+          });
+        }
+
+        return qg;
+      });
+    });
+  };
+
+  var handleOnLimit = function handleOnLimit(value) {
+    updateState('limit', value);
+  };
+
+  return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("p", {
+    className: styles['more-question-setting-text']
+  }, UIText.questionMoreImageTypeSettingText), /*#__PURE__*/React__default.createElement(antd.Row, {
+    align: "middle",
+    gutter: [24, 24]
+  }, /*#__PURE__*/React__default.createElement(antd.Col, {
+    span: 8
+  }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    label: UIText.inputQuestionImageLimitValidationText,
+    name: namePreffix + "-limit_file_size"
+  }, /*#__PURE__*/React__default.createElement(antd.InputNumber, {
+    onChange: handleOnLimit,
+    value: limit,
+    addonAfter: "MB"
+  })))));
+};
+
 var QuestionHint = function QuestionHint(_ref) {
   var _hostParams$settingHi;
 
@@ -10423,7 +10479,7 @@ var QuestionSetting = function QuestionSetting(_ref) {
       cursor: 'pointer',
       marginLeft: '-4px'
     }
-  })))))), showHintSetting && /*#__PURE__*/React__default.createElement(QuestionHint, question), qType === questionType.input && /*#__PURE__*/React__default.createElement(SettingInput, question), qType === questionType.number && /*#__PURE__*/React__default.createElement(SettingNumber, question), [questionType.option, questionType.multiple_option].includes(qType) && /*#__PURE__*/React__default.createElement(SettingOption, question), qType === questionType.tree && /*#__PURE__*/React__default.createElement(SettingTree, question), qType === questionType.cascade && /*#__PURE__*/React__default.createElement(SettingCascade, question), qType === questionType.date && /*#__PURE__*/React__default.createElement(SettingDate, question), qType === questionType.table && /*#__PURE__*/React__default.createElement(SettingTable, question));
+  })))))), showHintSetting && /*#__PURE__*/React__default.createElement(QuestionHint, question), qType === questionType.input && /*#__PURE__*/React__default.createElement(SettingInput, question), qType === questionType.number && /*#__PURE__*/React__default.createElement(SettingNumber, question), [questionType.option, questionType.multiple_option].includes(qType) && /*#__PURE__*/React__default.createElement(SettingOption, question), qType === questionType.tree && /*#__PURE__*/React__default.createElement(SettingTree, question), qType === questionType.cascade && /*#__PURE__*/React__default.createElement(SettingCascade, question), qType === questionType.date && /*#__PURE__*/React__default.createElement(SettingDate, question), qType === questionType.table && /*#__PURE__*/React__default.createElement(SettingTable, question), qType === questionType.image && /*#__PURE__*/React__default.createElement(SettingImage, question));
 };
 
 var dependencyTypes = [{

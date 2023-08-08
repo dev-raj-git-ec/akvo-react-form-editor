@@ -5,3 +5,4 @@ export { default as SettingTree } from './SettingTree';
 export { default as SettingCascade } from './SettingCascade';
 export { default as SettingDate } from './SettingDate';
 export { default as SettingTable } from './SettingTable';
+export { default as SettingImage } from './SettingImage';

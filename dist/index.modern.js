@@ -16,36 +16,18 @@ import { Webform } from 'akvo-react-form';
 import isEmpty$1 from 'lodash/isEmpty';
 import { VscPreview } from 'react-icons/vsc';
 
-function _extends() {
-  _extends = Object.assign ? Object.assign.bind() : function (target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
-
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
-    }
-
-    return target;
-  };
-  return _extends.apply(this, arguments);
-}
-
 var styles = {"container":"arfe-container","form-definition":"arfe-form-definition","form-item-no-bottom-margin":"arfe-form-item-no-bottom-margin","input-checkbox-wrapper":"arfe-input-checkbox-wrapper","button-icon":"arfe-button-icon","reorder-wrapper":"arfe-reorder-wrapper","reorder-button":"arfe-reorder-button","select-dropdown":"arfe-select-dropdown","tabs-wrapper":"arfe-tabs-wrapper","tabs-wrapper-sticky":"arfe-tabs-wrapper-sticky","right-tabs":"arfe-right-tabs","tab-pane-name-icon":"arfe-tab-pane-name-icon","question-group-title":"arfe-question-group-title","space-align-right":"arfe-space-align-right","space-align-left":"arfe-space-align-left","space-vertical-align-left":"arfe-space-vertical-align-left","space-vertical-align-right":"arfe-space-vertical-align-right","more-question-setting-text":"arfe-more-question-setting-text","dependant-list-box":"arfe-dependant-list-box","tags":"arfe-tags","tags-active":"arfe-tags-active","translation-form-item":"arfe-translation-form-item","translation-form-item-card":"arfe-translation-form-item-card"};
 
-var FormWrapper = function FormWrapper(_ref) {
-  var children = _ref.children;
+const FormWrapper = ({
+  children
+}) => {
+  const [form] = Form.useForm();
 
-  var _Form$useForm = Form.useForm(),
-      form = _Form$useForm[0];
+  const handleOnValuesChange = () => {};
 
-  var handleOnValuesChange = function handleOnValuesChange() {};
+  const handleOnFinish = () => {};
 
-  var handleOnFinish = function handleOnFinish() {};
-
-  var handleOnFinishFailed = function handleOnFinishFailed() {};
+  const handleOnFinishFailed = () => {};
 
   return /*#__PURE__*/React__default.createElement(Form, {
     form: form,
@@ -58,7 +40,7 @@ var FormWrapper = function FormWrapper(_ref) {
   }, children);
 };
 
-var UIStaticText = {
+const UIStaticText = {
   en: {
     inputFormNameLabel: 'Form Name',
     inputFormDescriptionLabel: 'Form Description',
@@ -145,7 +127,9 @@ var UIStaticText = {
     inputQuestionStaticValueLabel: 'Static Value',
     inputSelectHintEndpointLabel: 'Hint Endpoint',
     inputSelectHintPathLabel: 'Hint Path',
-    inputQuestionHintButtonTextLabel: 'Hint Button Text'
+    inputQuestionHintButtonTextLabel: 'Hint Button Text',
+    questionMoreImageTypeSettingText: 'More Image Question Setting',
+    inputQuestionImageLimitValidationText: 'Limit / Max file size'
   }
 };
 
@@ -224,42 +208,26 @@ var fake = [
 	"augue"
 ];
 
-var titleCase = function titleCase(str) {
-  return str.replace(/\w\S*/g, function (txt) {
-    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-  });
+const titleCase = str => {
+  return str.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
 };
 
-var getWords = function getWords() {
+const getWords = () => {
   return fake[Math.floor(Math.random() * fake.length)];
 };
 
-var dummyName = function dummyName(len) {
-  if (len === void 0) {
-    len = 2;
-  }
-
-  return Array.from('x'.repeat(len)).reduce(function (curr) {
-    return curr + ' ' + getWords();
-  }, titleCase(getWords()));
+const dummyName = (len = 2) => {
+  return Array.from('x'.repeat(len)).reduce(curr => curr + ' ' + getWords(), titleCase(getWords()));
 };
 
-var localeDropdownValue = uniqBy(all.filter(function (x) {
-  return x.location;
-}).map(function (x) {
-  return {
-    label: x.name,
-    value: x['iso639-1']
-  };
-}).filter(function (x) {
-  return x.value;
-}), 'value');
+const localeDropdownValue = uniqBy(all.filter(x => x.location).map(x => ({
+  label: x.name,
+  value: x['iso639-1']
+})).filter(x => x.value), 'value');
 
-var generateId = function generateId() {
-  return new Date().getTime();
-};
+const generateId = () => new Date().getTime();
 
-var questionType = {
+const questionType = {
   input: 'input',
   number: 'number',
   cascade: 'cascade',
@@ -269,10 +237,11 @@ var questionType = {
   option: 'option',
   multiple_option: 'multiple_option',
   tree: 'tree',
-  table: 'table'
+  table: 'table',
+  image: 'image'
 };
 
-var defaultForm = function defaultForm() {
+const defaultForm = () => {
   return {
     id: generateId(),
     name: 'New Form',
@@ -281,70 +250,68 @@ var defaultForm = function defaultForm() {
   };
 };
 
-var defaultQuestion = function defaultQuestion(_ref) {
-  var questionGroup = _ref.questionGroup,
-      name = _ref.name,
-      _ref$prevOrder = _ref.prevOrder,
-      prevOrder = _ref$prevOrder === void 0 ? 0 : _ref$prevOrder,
-      _ref$type = _ref.type,
-      type = _ref$type === void 0 ? questionType.input : _ref$type,
-      _ref$required = _ref.required,
-      required = _ref$required === void 0 ? false : _ref$required,
-      _ref$params = _ref.params,
-      params = _ref$params === void 0 ? {} : _ref$params;
-  var q = {
+const defaultQuestion = ({
+  questionGroup,
+  name,
+  prevOrder: _prevOrder = 0,
+  type: _type = questionType.input,
+  required: _required = false,
+  params: _params = {}
+}) => {
+  const q = {
     id: generateId() + 2,
-    order: prevOrder + 1,
+    order: _prevOrder + 1,
     questionGroupId: questionGroup.id,
     name: name || dummyName(5),
-    type: type,
-    required: required,
+    type: _type,
+    required: _required,
     meta: false,
     tooltip: null
   };
 
-  if (type === questionType.option || type === questionType.multiple_option) {
-    return _extends({}, q, {
+  if (_type === questionType.option || _type === questionType.multiple_option) {
+    return { ...q,
       options: [],
       allowOther: false
-    });
+    };
   }
 
-  if (type === questionType.cascade) {
-    return _extends({}, q, {
+  if (_type === questionType.cascade) {
+    return { ...q,
       api: {
         endpoint: null,
         initial: 0,
         list: false
       }
-    });
+    };
   }
 
-  return _extends({}, q, params);
+  return { ...q,
+    ..._params
+  };
 };
 
-var defaultQuestionGroup = function defaultQuestionGroup(_ref2) {
-  var _ref2$name = _ref2.name,
-      name = _ref2$name === void 0 ? dummyName() : _ref2$name,
-      _ref2$prevOrder = _ref2.prevOrder,
-      prevOrder = _ref2$prevOrder === void 0 ? 0 : _ref2$prevOrder,
-      _ref2$defaultQuestion = _ref2.defaultQuestionParam,
-      defaultQuestionParam = _ref2$defaultQuestion === void 0 ? {} : _ref2$defaultQuestion;
-  var qg = {
+const defaultQuestionGroup = ({
+  name: _name = dummyName(),
+  prevOrder: _prevOrder2 = 0,
+  defaultQuestionParam: _defaultQuestionParam = {}
+}) => {
+  const qg = {
     id: generateId() + 1,
-    name: name,
-    order: prevOrder + 1,
+    name: _name,
+    order: _prevOrder2 + 1,
     description: null,
     repeatable: false
   };
-  return _extends({}, qg, {
-    questions: [defaultQuestion(_extends({
-      questionGroup: qg
-    }, defaultQuestionParam))]
-  });
+  return { ...qg,
+    questions: [defaultQuestion({
+      questionGroup: qg,
+      ..._defaultQuestionParam
+    })]
+  };
 };
 
-var UIStore = new Store({
+const UIStore = new Store({
   current: {
     tab: 'edit-form',
     formId: null,
@@ -367,31 +334,32 @@ var UIStore = new Store({
   activeEditTranslationQuestions: [],
   hostParams: {}
 });
-var FormStore = new Store(_extends({}, defaultForm()));
-var QuestionGroupStore = new Store({
+const FormStore = new Store({ ...defaultForm()
+});
+const QuestionGroupStore = new Store({
   questionGroups: [defaultQuestionGroup({})]
 });
-var formFn = {
+const formFn = {
   add: defaultForm,
   store: FormStore
 };
-var questionGroupFn = {
+const questionGroupFn = {
   add: defaultQuestionGroup,
   store: QuestionGroupStore
 };
-var questionFn = {
+const questionFn = {
   add: defaultQuestion,
-  update: function update(_ref3) {
-    var id = _ref3.id,
-        type = _ref3.type,
-        questionGroup = _ref3.questionGroup,
-        params = _ref3.params;
-    return defaultQuestion(_extends({
-      id: id,
-      type: type,
-      questionGroup: questionGroup
-    }, params));
-  }
+  update: ({
+    id,
+    type,
+    questionGroup,
+    params
+  }) => defaultQuestion({
+    id: id,
+    type: type,
+    questionGroup: questionGroup,
+    ...params
+  })
 };
 
 var IconContext = /*#__PURE__*/createContext({});
@@ -1802,193 +1770,174 @@ var PlusOutlined$1 = function PlusOutlined$1(props, ref) {
 PlusOutlined$1.displayName = 'PlusOutlined';
 var PlusOutlined$2 = /*#__PURE__*/forwardRef(PlusOutlined$1);
 
-var ButtonAddMove = function ButtonAddMove(_ref) {
-  var text = _ref.text,
-      className = _ref.className,
-      _ref$movingItem = _ref.movingItem,
-      movingItem = _ref$movingItem === void 0 ? null : _ref$movingItem,
-      _ref$handleCancelMove = _ref.handleCancelMove,
-      handleCancelMove = _ref$handleCancelMove === void 0 ? function () {} : _ref$handleCancelMove,
-      _ref$disabled = _ref.disabled,
-      disabled = _ref$disabled === void 0 ? false : _ref$disabled,
-      _ref$handleOnAdd = _ref.handleOnAdd,
-      handleOnAdd = _ref$handleOnAdd === void 0 ? function () {} : _ref$handleOnAdd,
-      _ref$handleOnMove = _ref.handleOnMove,
-      handleOnMove = _ref$handleOnMove === void 0 ? function () {} : _ref$handleOnMove;
-
-  var _UIStore$useState = UIStore.useState(function (s) {
-    return s.UIText;
-  }),
-      buttonCancelText = _UIStore$useState.buttonCancelText;
-
+const ButtonAddMove = ({
+  text,
+  className,
+  movingItem: _movingItem = null,
+  handleCancelMove: _handleCancelMove = () => {},
+  disabled: _disabled = false,
+  handleOnAdd: _handleOnAdd = () => {},
+  handleOnMove: _handleOnMove = () => {}
+}) => {
+  const {
+    buttonCancelText
+  } = UIStore.useState(s => s.UIText);
   return /*#__PURE__*/React__default.createElement(Row, {
     align: "middle",
     justify: "start",
-    className: "arfe-reorder-wrapper " + className
+    className: `arfe-reorder-wrapper ${className}`
   }, /*#__PURE__*/React__default.createElement(Col, {
-    span: movingItem ? 12 : 24,
+    span: _movingItem ? 12 : 24,
     align: "left"
   }, /*#__PURE__*/React__default.createElement(Button, {
     type: "dashed",
     className: "arfe-reorder-button",
     size: "small",
-    onClick: movingItem ? handleOnMove : handleOnAdd,
-    disabled: disabled,
-    icon: movingItem ? /*#__PURE__*/React__default.createElement(CaretRightOutlined$2, null) : /*#__PURE__*/React__default.createElement(PlusOutlined$2, null)
-  }, text)), movingItem && /*#__PURE__*/React__default.createElement(Col, {
+    onClick: _movingItem ? _handleOnMove : _handleOnAdd,
+    disabled: _disabled,
+    icon: _movingItem ? /*#__PURE__*/React__default.createElement(CaretRightOutlined$2, null) : /*#__PURE__*/React__default.createElement(PlusOutlined$2, null)
+  }, text)), _movingItem && /*#__PURE__*/React__default.createElement(Col, {
     span: 12,
     align: "right"
   }, /*#__PURE__*/React__default.createElement(Button, {
     type: "danger",
     className: "reorder-button",
     size: "small",
-    onClick: handleCancelMove
+    onClick: _handleCancelMove
   }, buttonCancelText)));
 };
 
-var ButtonWithIcon = function ButtonWithIcon(_ref) {
-  var _ref$type = _ref.type,
-      type = _ref$type === void 0 ? 'delete-button' : _ref$type,
-      _ref$isExpand = _ref.isExpand,
-      isExpand = _ref$isExpand === void 0 ? false : _ref$isExpand,
-      _ref$onClick = _ref.onClick,
-      onClick = _ref$onClick === void 0 ? function () {} : _ref$onClick,
-      _ref$onCancel = _ref.onCancel,
-      onCancel = _ref$onCancel === void 0 ? function () {} : _ref$onCancel,
-      _ref$disabled = _ref.disabled,
-      disabled = _ref$disabled === void 0 ? false : _ref$disabled;
-  var buttonProps = {};
+const ButtonWithIcon = ({
+  type: _type = 'delete-button',
+  isExpand: _isExpand = false,
+  onClick: _onClick = () => {},
+  onCancel: _onCancel = () => {},
+  disabled: _disabled = false
+}) => {
+  let buttonProps = {};
 
-  switch (type) {
+  switch (_type) {
     case 'show-button':
-      if (isExpand) {
+      if (_isExpand) {
         buttonProps = {
-          onClick: onCancel,
+          onClick: _onCancel,
           icon: /*#__PURE__*/React__default.createElement(TbEditOff, null)
         };
         break;
       }
 
       buttonProps = {
-        onClick: onClick,
+        onClick: _onClick,
         icon: /*#__PURE__*/React__default.createElement(TbEdit, null)
       };
       break;
 
     case 'copy-button':
       buttonProps = {
-        onClick: onClick,
+        onClick: _onClick,
         icon: /*#__PURE__*/React__default.createElement(BiCopy, null)
       };
       break;
 
     case 'move-button':
       buttonProps = {
-        onClick: onClick,
+        onClick: _onClick,
         icon: /*#__PURE__*/React__default.createElement(BiMove, null)
       };
       break;
 
     case 'edit-button':
-      if (isExpand) {
+      if (_isExpand) {
         buttonProps = {
-          onClick: onCancel,
+          onClick: _onCancel,
           icon: /*#__PURE__*/React__default.createElement(RiSettings5Fill, null)
         };
         break;
       }
 
       buttonProps = {
-        onClick: onClick,
+        onClick: _onClick,
         icon: /*#__PURE__*/React__default.createElement(RiSettings5Line, null)
       };
       break;
 
     case 'add-button':
       buttonProps = {
-        onClick: onClick,
+        onClick: _onClick,
         icon: /*#__PURE__*/React__default.createElement(MdOutlineAddCircleOutline, null)
       };
       break;
 
     case 'save-button':
       buttonProps = {
-        onClick: onClick,
+        onClick: _onClick,
         icon: /*#__PURE__*/React__default.createElement(RiSave3Fill, null)
       };
       break;
 
     case 'expand-all-button':
-      if (isExpand) {
+      if (_isExpand) {
         buttonProps = {
-          onClick: onCancel,
+          onClick: _onCancel,
           icon: /*#__PURE__*/React__default.createElement(AiOutlineEyeInvisible, null)
         };
         break;
       }
 
       buttonProps = {
-        onClick: onClick,
+        onClick: _onClick,
         icon: /*#__PURE__*/React__default.createElement(AiOutlineEye, null)
       };
       break;
 
     default:
       buttonProps = {
-        onClick: onClick,
+        onClick: _onClick,
         icon: /*#__PURE__*/React__default.createElement(RiDeleteBin2Line, null)
       };
       break;
   }
 
-  return /*#__PURE__*/React__default.createElement(Button, _extends({
+  return /*#__PURE__*/React__default.createElement(Button, Object.assign({
     type: "link",
     className: styles['button-icon'],
-    disabled: disabled
+    disabled: _disabled
   }, buttonProps));
 };
 
-var CardTitle = function CardTitle(_ref) {
-  var id = _ref.id,
-      title = _ref.title,
-      buttons = _ref.buttons,
-      _ref$dependency = _ref.dependency,
-      dependency = _ref$dependency === void 0 ? [] : _ref$dependency;
-  return /*#__PURE__*/React__default.createElement(Space, null, !!dependency.length && /*#__PURE__*/React__default.createElement(Tag, {
+const CardTitle = ({
+  id,
+  title,
+  buttons,
+  dependency: _dependency = []
+}) => {
+  return /*#__PURE__*/React__default.createElement(Space, null, !!_dependency.length && /*#__PURE__*/React__default.createElement(Tag, {
     style: {
       margin: 'auto'
     }
-  }, dependency.length, " Dependenc", dependency.length > 1 ? 'ies' : 'y'), buttons === null || buttons === void 0 ? void 0 : buttons.map(function (cfg) {
-    return /*#__PURE__*/React__default.createElement(ButtonWithIcon, {
-      key: cfg.type + "-" + id,
-      type: cfg.type,
-      isExpand: cfg.isExpand,
-      onClick: function onClick() {
-        return cfg.onClick();
-      },
-      onCancel: function onCancel() {
-        return cfg.onCancel();
-      },
-      disabled: cfg === null || cfg === void 0 ? void 0 : cfg.disabled
-    });
-  }), title && /*#__PURE__*/React__default.createElement("div", {
+  }, _dependency.length, " Dependenc", _dependency.length > 1 ? 'ies' : 'y'), buttons === null || buttons === void 0 ? void 0 : buttons.map(cfg => /*#__PURE__*/React__default.createElement(ButtonWithIcon, {
+    key: `${cfg.type}-${id}`,
+    type: cfg.type,
+    isExpand: cfg.isExpand,
+    onClick: () => cfg.onClick(),
+    onCancel: () => cfg.onCancel(),
+    disabled: cfg === null || cfg === void 0 ? void 0 : cfg.disabled
+  })), title && /*#__PURE__*/React__default.createElement("div", {
     className: "arfe-question-group-title"
   }, title));
 };
 
-var Text = Typography.Text;
+const {
+  Text
+} = Typography;
 
-var TranslationFormItem = function TranslationFormItem(_ref) {
-  var _ref$labelText = _ref.labelText,
-      labelText = _ref$labelText === void 0 ? '' : _ref$labelText,
-      _ref$name = _ref.name,
-      name = _ref$name === void 0 ? '' : _ref$name,
-      _ref$currentValue = _ref.currentValue,
-      currentValue = _ref$currentValue === void 0 ? '' : _ref$currentValue,
-      _ref$children = _ref.children,
-      children = _ref$children === void 0 ? '' : _ref$children,
-      _ref$initialValue = _ref.initialValue,
-      initialValue = _ref$initialValue === void 0 ? '' : _ref$initialValue;
+const TranslationFormItem = ({
+  labelText: _labelText = '',
+  name: _name = '',
+  currentValue: _currentValue = '',
+  children: _children = '',
+  initialValue: _initialValue = ''
+}) => {
   return /*#__PURE__*/React__default.createElement(Row, {
     align: "top",
     justify: "space-between",
@@ -2003,69 +1952,53 @@ var TranslationFormItem = function TranslationFormItem(_ref) {
     style: {
       width: '100%'
     }
-  }, /*#__PURE__*/React__default.createElement("b", null, labelText), /*#__PURE__*/React__default.createElement(Text, null, currentValue))), /*#__PURE__*/React__default.createElement(Col, {
+  }, /*#__PURE__*/React__default.createElement("b", null, _labelText), /*#__PURE__*/React__default.createElement(Text, null, _currentValue))), /*#__PURE__*/React__default.createElement(Col, {
     span: 12
   }, /*#__PURE__*/React__default.createElement(Form.Item, {
-    name: name,
-    label: /*#__PURE__*/React__default.createElement("b", null, labelText),
+    name: _name,
+    label: /*#__PURE__*/React__default.createElement("b", null, _labelText),
     className: styles['translation-form-item'],
-    initialValue: initialValue
-  }, children)));
+    initialValue: _initialValue
+  }, _children)));
 };
 
-var AlertPopup = function AlertPopup(_ref) {
-  var onConfirm = _ref.onConfirm,
-      onCancel = _ref.onCancel,
-      visible = _ref.visible,
-      children = _ref.children,
-      _ref$title = _ref.title,
-      title = _ref$title === void 0 ? 'Alert' : _ref$title,
-      _ref$okButtonProps = _ref.okButtonProps,
-      okButtonProps = _ref$okButtonProps === void 0 ? {} : _ref$okButtonProps,
-      _ref$okText = _ref.okText,
-      okText = _ref$okText === void 0 ? 'OK' : _ref$okText;
+const AlertPopup = ({
+  onConfirm,
+  onCancel,
+  visible,
+  children,
+  title: _title = 'Alert',
+  okButtonProps: _okButtonProps = {},
+  okText: _okText = 'OK'
+}) => {
   return /*#__PURE__*/React__default.createElement(Modal, {
-    title: title,
+    title: _title,
     visible: visible,
     onOk: onConfirm,
     onCancel: onCancel,
     centered: true,
-    okButtonProps: okButtonProps,
-    okText: okText
+    okButtonProps: _okButtonProps,
+    okText: _okText
   }, children);
 };
 
-var clearQuestionObj = function clearQuestionObj(keysToRemove, obj, checkEmpty) {
-  if (keysToRemove === void 0) {
-    keysToRemove = [];
-  }
-
-  if (obj === void 0) {
-    obj = false;
-  }
-
-  if (checkEmpty === void 0) {
-    checkEmpty = false;
-  }
-
-  var clearedQuestion = {};
+const clearQuestionObj = (keysToRemove = [], obj = false, checkEmpty = false) => {
+  let clearedQuestion = {};
 
   if (obj) {
-    Object.keys(obj).forEach(function (key) {
+    Object.keys(obj).forEach(key => {
       if (!keysToRemove.includes(key)) {
-        var _obj;
-
         if (!checkEmpty) {
-          var _extends2;
-
-          clearedQuestion = _extends({}, clearedQuestion, (_extends2 = {}, _extends2[key] = obj[key], _extends2));
+          clearedQuestion = { ...clearedQuestion,
+            [key]: obj[key]
+          };
           return key;
         }
 
-        if (checkEmpty && !isEmpty((_obj = obj) === null || _obj === void 0 ? void 0 : _obj[key])) {
-          var _extends3;
-
-          clearedQuestion = _extends({}, clearedQuestion, (_extends3 = {}, _extends3[key] = obj[key], _extends3));
+        if (checkEmpty && !isEmpty(obj === null || obj === void 0 ? void 0 : obj[key])) {
+          clearedQuestion = { ...clearedQuestion,
+            [key]: obj[key]
+          };
           return key;
         }
       }
@@ -2075,25 +2008,23 @@ var clearQuestionObj = function clearQuestionObj(keysToRemove, obj, checkEmpty) 
   return clearedQuestion;
 };
 
-var clearTranslations = function clearTranslations(obj, translations) {
-  var newObj = _extends({}, obj);
-
-  var clearedTranslations = translations.map(function (tl) {
-    var clearedObj = clearQuestionObj([], tl, true);
+const clearTranslations = (obj, translations) => {
+  let newObj = { ...obj
+  };
+  const clearedTranslations = translations.map(tl => {
+    const clearedObj = clearQuestionObj([], tl, true);
 
     if (Object.keys(clearedObj).length === 1 && clearedObj !== null && clearedObj !== void 0 && clearedObj.language) {
       return false;
     }
 
     return clearedObj;
-  }).filter(function (x) {
-    return x;
-  });
+  }).filter(x => x);
 
   if (clearedTranslations.length) {
-    newObj = _extends({}, newObj, {
+    newObj = { ...newObj,
       translations: clearedTranslations
-    });
+    };
   } else {
     var _newObj;
 
@@ -2103,111 +2034,103 @@ var clearTranslations = function clearTranslations(obj, translations) {
   return newObj;
 };
 
-var toEditor = function toEditor(webFormData) {
-  webFormData = mapKeys(webFormData, function (_, k) {
-    return k === 'question_group' ? 'questionGroups' : k;
-  });
-  var questionGroups = webFormData.questionGroups.map(function (qg, qgi) {
+const toEditor = webFormData => {
+  webFormData = mapKeys(webFormData, (_, k) => k === 'question_group' ? 'questionGroups' : k);
+  const questionGroups = webFormData.questionGroups.map((qg, qgi) => {
     var _qg, _qg2;
 
-    var gid = ((_qg = qg) === null || _qg === void 0 ? void 0 : _qg.id) || generateId() + qgi;
-    qg = mapKeys(qg, function (_, k) {
-      return k === 'question' ? 'questions' : k;
-    });
-    var questions = qg.questions.map(function (q, qi) {
+    const gid = ((_qg = qg) === null || _qg === void 0 ? void 0 : _qg.id) || generateId() + qgi;
+    qg = mapKeys(qg, (_, k) => k === 'question' ? 'questions' : k);
+    const questions = qg.questions.map((q, qi) => {
       var _q, _q2, _q3;
 
-      var isNotOption = ![questionType.option, questionType.multiple_option].includes(q.type);
+      const isNotOption = ![questionType.option, questionType.multiple_option].includes(q.type);
 
       if (isNotOption && q.type !== questionType.tree) {
         q = clearQuestionObj(['option'], q);
       }
 
       if ([questionType.option, questionType.multiple_option].includes(q.type)) {
-        q = mapKeys(q, function (_, k) {
-          return k === 'option' ? 'options' : k;
-        });
+        q = mapKeys(q, (_, k) => k === 'option' ? 'options' : k);
       }
 
       if ((_q = q) !== null && _q !== void 0 && _q.options) {
-        var options = q.options.map(function (o, oi) {
-          return _extends({
-            id: (o === null || o === void 0 ? void 0 : o.id) || qi + 1 + (oi + 1)
-          }, o, {
-            order: (o === null || o === void 0 ? void 0 : o.order) || oi + 1
-          });
-        });
-        q = _extends({}, q, {
+        const options = q.options.map((o, oi) => ({
+          id: (o === null || o === void 0 ? void 0 : o.id) || qi + 1 + (oi + 1),
+          ...o,
+          order: (o === null || o === void 0 ? void 0 : o.order) || oi + 1
+        }));
+        q = { ...q,
           options: orderBy(options, 'order')
-        });
+        };
       }
 
       if ((_q2 = q) !== null && _q2 !== void 0 && _q2.dependency) {
-        var dependency = q.dependency.map(function (d) {
+        const dependency = q.dependency.map(d => {
           var _d, _d2;
 
           if ((_d = d) !== null && _d !== void 0 && _d.max) {
-            d = _extends({}, d, {
+            d = { ...d,
               max: d.max + 1
-            });
+            };
           }
 
           if ((_d2 = d) !== null && _d2 !== void 0 && _d2.min) {
-            d = _extends({}, d, {
+            d = { ...d,
               min: d.min - 1
-            });
+            };
           }
 
           return d;
         });
-        q = _extends({}, q, {
+        q = { ...q,
           dependency: dependency
-        });
+        };
       }
 
-      return _extends({}, q, {
+      return { ...q,
         order: ((_q3 = q) === null || _q3 === void 0 ? void 0 : _q3.order) || qi + 1,
         questionGroupId: gid
-      });
+      };
     });
-    qg = _extends({}, qg, {
+    qg = { ...qg,
       id: gid,
       order: ((_qg2 = qg) === null || _qg2 === void 0 ? void 0 : _qg2.order) || qgi + 1,
       questions: orderBy(questions, 'order')
-    });
+    };
     return qg;
   });
-  webFormData = _extends({}, webFormData, {
+  webFormData = { ...webFormData,
     questionGroups: orderBy(questionGroups, 'order')
-  });
+  };
   return webFormData;
 };
 
-var toWebform = function toWebform(formData, questionGroups) {
+const toWebform = (formData, questionGroups) => {
   var _formData$languages;
 
-  var webformData = {
+  let webformData = {
     id: (formData === null || formData === void 0 ? void 0 : formData.id) || generateId(),
     name: formData.name,
     description: formData.description
   };
 
   if (formData !== null && formData !== void 0 && formData.languages && formData !== null && formData !== void 0 && (_formData$languages = formData.languages) !== null && _formData$languages !== void 0 && _formData$languages.length) {
-    webformData = _extends({}, webformData, {
-      languages: ['en'].concat(formData.languages),
+    webformData = { ...webformData,
+      languages: ['en', ...formData.languages],
       defaultLanguage: (formData === null || formData === void 0 ? void 0 : formData.defaultLanguage) || 'en'
-    });
+    };
   }
 
   if (formData !== null && formData !== void 0 && formData.translations) {
     webformData = clearTranslations(webformData, formData.translations);
   }
 
-  var output = questionGroups.map(function (qg) {
-    var questions = qg.questions.map(function (q) {
+  const output = questionGroups.map(qg => {
+    const questions = qg.questions.map(q => {
       var _q4, _q5, _q6, _q7, _q8, _q8$hint, _q9, _q9$hint, _q10, _q10$hint, _q10$hint$path;
 
-      var isNotOption = ![questionType.option, questionType.multiple_option].includes(q.type);
+      const isNotOption = ![questionType.option, questionType.multiple_option].includes(q.type);
 
       if (q.type !== questionType.input) {
         q = clearQuestionObj(['requiredDoubleEntry', 'hiddenString'], q);
@@ -2218,16 +2141,16 @@ var toWebform = function toWebform(formData, questionGroups) {
       }
 
       if ([questionType.option, questionType.multiple_option].includes(q.type)) {
-        var options = q.options.map(function (op) {
+        const options = q.options.map(op => {
           if (op !== null && op !== void 0 && op.translations) {
             return clearTranslations(op, op.translations);
           }
 
           return op;
         });
-        q = _extends({}, q, {
+        q = { ...q,
           option: options
-        });
+        };
       }
 
       if (isNotOption) {
@@ -2251,40 +2174,40 @@ var toWebform = function toWebform(formData, questionGroups) {
       }
 
       if ((_q5 = q) !== null && _q5 !== void 0 && _q5.dependency) {
-        var dependency = q.dependency.map(function (d) {
+        const dependency = q.dependency.map(d => {
           var _d3, _d4;
 
           if ((_d3 = d) !== null && _d3 !== void 0 && _d3.max) {
-            d = _extends({}, d, {
+            d = { ...d,
               max: d.max - 1
-            });
+            };
           }
 
           if ((_d4 = d) !== null && _d4 !== void 0 && _d4.min) {
-            d = _extends({}, d, {
+            d = { ...d,
               min: d.min + 1
-            });
+            };
           }
 
           return d;
         });
-        q = _extends({}, q, {
+        q = { ...q,
           dependency: dependency
-        });
+        };
       }
 
       if ((_q6 = q) !== null && _q6 !== void 0 && _q6.translations) {
         q = clearTranslations(q, q.translations);
       }
 
-      if ((_q7 = q) !== null && _q7 !== void 0 && _q7.hint && !((_q8 = q) !== null && _q8 !== void 0 && (_q8$hint = _q8.hint) !== null && _q8$hint !== void 0 && _q8$hint["static"]) && (!((_q9 = q) !== null && _q9 !== void 0 && (_q9$hint = _q9.hint) !== null && _q9$hint !== void 0 && _q9$hint.endpoint) || !((_q10 = q) !== null && _q10 !== void 0 && (_q10$hint = _q10.hint) !== null && _q10$hint !== void 0 && (_q10$hint$path = _q10$hint.path) !== null && _q10$hint$path !== void 0 && _q10$hint$path.length))) {
+      if ((_q7 = q) !== null && _q7 !== void 0 && _q7.hint && !((_q8 = q) !== null && _q8 !== void 0 && (_q8$hint = _q8.hint) !== null && _q8$hint !== void 0 && _q8$hint.static) && (!((_q9 = q) !== null && _q9 !== void 0 && (_q9$hint = _q9.hint) !== null && _q9$hint !== void 0 && _q9$hint.endpoint) || !((_q10 = q) !== null && _q10 !== void 0 && (_q10$hint = _q10.hint) !== null && _q10$hint !== void 0 && (_q10$hint$path = _q10$hint.path) !== null && _q10$hint$path !== void 0 && _q10$hint$path.length))) {
         q = clearQuestionObj(['hint'], q);
       }
 
       q = clearQuestionObj(['options'], q);
       return q;
     });
-    var result = {
+    let result = {
       id: qg.id,
       name: qg.name,
       order: qg.order,
@@ -2293,15 +2216,15 @@ var toWebform = function toWebform(formData, questionGroups) {
     };
 
     if (qg !== null && qg !== void 0 && qg.repeatText) {
-      result = _extends({}, result, {
+      result = { ...result,
         repeatText: qg.repeatText
-      });
+      };
     }
 
     if (qg !== null && qg !== void 0 && qg.description) {
-      result = _extends({}, result, {
+      result = { ...result,
         description: qg.description
-      });
+      };
     }
 
     if (qg !== null && qg !== void 0 && qg.translations) {
@@ -2310,35 +2233,32 @@ var toWebform = function toWebform(formData, questionGroups) {
 
     return result;
   });
-  return _extends({}, webformData, {
+  return { ...webformData,
     question_group: output
-  });
+  };
 };
 
-var generateTranslations = function generateTranslations(key, value, savedTranslations, existingTranslation) {
-  var _ref;
-
-  var newTranslations = [(_ref = {
-    language: existingTranslation
-  }, _ref[key] = value, _ref)];
-  var currentTranslations = null;
+const generateTranslations = (key, value, savedTranslations, existingTranslation) => {
+  const newTranslations = [{
+    language: existingTranslation,
+    [key]: value
+  }];
+  let currentTranslations = null;
 
   if (savedTranslations && savedTranslations !== null && savedTranslations !== void 0 && savedTranslations.length) {
-    currentTranslations = savedTranslations.map(function (tl) {
+    currentTranslations = savedTranslations.map(tl => {
       if (tl.language === existingTranslation) {
-        var _extends4;
-
-        return _extends({}, tl, (_extends4 = {}, _extends4[key] = value, _extends4));
+        return { ...tl,
+          [key]: value
+        };
       }
 
       return tl;
     });
-    var isExistingExist = findIndex(savedTranslations, function (tr) {
-      return tr.language === existingTranslation;
-    });
+    const isExistingExist = findIndex(savedTranslations, tr => tr.language === existingTranslation);
 
     if (isExistingExist === -1) {
-      currentTranslations = [].concat(currentTranslations, newTranslations);
+      currentTranslations = [...currentTranslations, ...newTranslations];
     }
   }
 
@@ -2348,49 +2268,43 @@ var generateTranslations = function generateTranslations(key, value, savedTransl
   };
 };
 
-var data = {
+const data = {
   clear: clearQuestionObj,
   toWebform: toWebform,
   toEditor: toEditor,
   generateTranslations: generateTranslations
 };
 
-var FormDefinitionTranslation = function FormDefinitionTranslation() {
-  var _UIStore$useState = UIStore.useState(function (s) {
-    return s;
-  }),
-      UIText = _UIStore$useState.UIText,
-      existingTranslation = _UIStore$useState.existingTranslation;
-
-  var formStore = formFn.store.useState(function (s) {
-    return s;
-  });
-  var namePreffix = "translation-" + existingTranslation;
-  var existingTranslationValues = useMemo(function () {
+const FormDefinitionTranslation = () => {
+  const {
+    UIText,
+    existingTranslation
+  } = UIStore.useState(s => s);
+  const formStore = formFn.store.useState(s => s);
+  const namePreffix = `translation-${existingTranslation}`;
+  const existingTranslationValues = useMemo(() => {
     var _formStore$translatio;
 
-    return formStore === null || formStore === void 0 ? void 0 : (_formStore$translatio = formStore.translations) === null || _formStore$translatio === void 0 ? void 0 : _formStore$translatio.find(function (tl) {
-      return tl.language === existingTranslation;
-    });
+    return formStore === null || formStore === void 0 ? void 0 : (_formStore$translatio = formStore.translations) === null || _formStore$translatio === void 0 ? void 0 : _formStore$translatio.find(tl => tl.language === existingTranslation);
   }, [formStore, existingTranslation]);
 
-  var updateTranslation = function updateTranslation(key, value) {
-    var _data$generateTransla = data.generateTranslations(key, value, formStore === null || formStore === void 0 ? void 0 : formStore.translations, existingTranslation),
-        newTranslations = _data$generateTransla.newTranslations,
-        currentTranslations = _data$generateTransla.currentTranslations;
-
-    formFn.store.update(function (u) {
+  const updateTranslation = (key, value) => {
+    const {
+      newTranslations,
+      currentTranslations
+    } = data.generateTranslations(key, value, formStore === null || formStore === void 0 ? void 0 : formStore.translations, existingTranslation);
+    formFn.store.update(u => {
       u.translations = !currentTranslations ? newTranslations : currentTranslations;
     });
   };
 
-  var handleChangeName = function handleChangeName(e) {
+  const handleChangeName = e => {
     var _e$target;
 
     updateTranslation('name', e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.value);
   };
 
-  var handleChangeDescription = function handleChangeDescription(e) {
+  const handleChangeDescription = e => {
     var _e$target2;
 
     updateTranslation('description', e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.value);
@@ -2399,7 +2313,7 @@ var FormDefinitionTranslation = function FormDefinitionTranslation() {
   return /*#__PURE__*/React__default.createElement("div", null, (formStore === null || formStore === void 0 ? void 0 : formStore.name) && /*#__PURE__*/React__default.createElement(TranslationFormItem, {
     labelText: UIText.inputFormNameLabel,
     currentValue: formStore.name,
-    name: namePreffix + "-form-name",
+    name: `${namePreffix}-form-name`,
     initialValue: existingTranslationValues === null || existingTranslationValues === void 0 ? void 0 : existingTranslationValues.name
   }, /*#__PURE__*/React__default.createElement(Input, {
     disabled: !existingTranslation,
@@ -2407,7 +2321,7 @@ var FormDefinitionTranslation = function FormDefinitionTranslation() {
   })), (formStore === null || formStore === void 0 ? void 0 : formStore.description) && /*#__PURE__*/React__default.createElement(TranslationFormItem, {
     labelText: UIText.inputFormDescriptionLabel,
     currentValue: formStore.description,
-    name: namePreffix + "-form-description",
+    name: `${namePreffix}-form-description`,
     initialValue: existingTranslationValues === null || existingTranslationValues === void 0 ? void 0 : existingTranslationValues.description
   }, /*#__PURE__*/React__default.createElement(Input.TextArea, {
     rows: 5,
@@ -2416,60 +2330,51 @@ var FormDefinitionTranslation = function FormDefinitionTranslation() {
   })));
 };
 
-var QuestionSettingTranslation = function QuestionSettingTranslation(_ref) {
-  var id = _ref.id,
-      questionGroupId = _ref.questionGroupId,
-      name = _ref.name,
-      type = _ref.type,
-      _ref$tooltip = _ref.tooltip,
-      tooltip = _ref$tooltip === void 0 ? {} : _ref$tooltip,
-      allowOther = _ref.allowOther,
-      allowOtherText = _ref.allowOtherText,
-      _ref$options = _ref.options,
-      options = _ref$options === void 0 ? [] : _ref$options,
-      _ref$translations = _ref.translations,
-      translations = _ref$translations === void 0 ? [] : _ref$translations;
-
-  var _UIStore$useState = UIStore.useState(function (s) {
-    return s;
-  }),
-      UIText = _UIStore$useState.UIText,
-      existingTranslation = _UIStore$useState.existingTranslation;
-
-  var namePreffix = "translation-" + existingTranslation + "-question-" + id;
-  var existingTranslationValues = useMemo(function () {
-    return translations === null || translations === void 0 ? void 0 : translations.find(function (tl) {
-      return tl.language === existingTranslation;
-    });
-  }, [translations, existingTranslation]);
-  var existingTooltipTranslationValues = useMemo(function () {
+const QuestionSettingTranslation = ({
+  id,
+  questionGroupId,
+  name,
+  type,
+  tooltip: _tooltip = {},
+  allowOther,
+  allowOtherText,
+  options: _options = [],
+  translations: _translations = []
+}) => {
+  const {
+    UIText,
+    existingTranslation
+  } = UIStore.useState(s => s);
+  const namePreffix = `translation-${existingTranslation}-question-${id}`;
+  const existingTranslationValues = useMemo(() => {
+    return _translations === null || _translations === void 0 ? void 0 : _translations.find(tl => tl.language === existingTranslation);
+  }, [_translations, existingTranslation]);
+  const existingTooltipTranslationValues = useMemo(() => {
     var _tooltip$translations;
 
-    return tooltip === null || tooltip === void 0 ? void 0 : (_tooltip$translations = tooltip.translations) === null || _tooltip$translations === void 0 ? void 0 : _tooltip$translations.find(function (tl) {
-      return tl.language === existingTranslation;
-    });
-  }, [tooltip, existingTranslation]);
+    return _tooltip === null || _tooltip === void 0 ? void 0 : (_tooltip$translations = _tooltip.translations) === null || _tooltip$translations === void 0 ? void 0 : _tooltip$translations.find(tl => tl.language === existingTranslation);
+  }, [_tooltip, existingTranslation]);
 
-  var updateTranslation = function updateTranslation(key, value) {
-    var _data$generateTransla = data.generateTranslations(key, value, translations, existingTranslation),
-        newTranslations = _data$generateTransla.newTranslations,
-        currentTranslations = _data$generateTransla.currentTranslations;
-
-    questionGroupFn.store.update(function (u) {
-      u.questionGroups = u.questionGroups.map(function (qg) {
+  const updateTranslation = (key, value) => {
+    const {
+      newTranslations,
+      currentTranslations
+    } = data.generateTranslations(key, value, _translations, existingTranslation);
+    questionGroupFn.store.update(u => {
+      u.questionGroups = u.questionGroups.map(qg => {
         if (qg.id === questionGroupId) {
-          var questions = qg.questions.map(function (q) {
+          const questions = qg.questions.map(q => {
             if (q.id === id) {
-              return _extends({}, q, {
+              return { ...q,
                 translations: !currentTranslations ? newTranslations : currentTranslations
-              });
+              };
             }
 
             return q;
           });
-          return _extends({}, qg, {
+          return { ...qg,
             questions: questions
-          });
+          };
         }
 
         return qg;
@@ -2477,35 +2382,34 @@ var QuestionSettingTranslation = function QuestionSettingTranslation(_ref) {
     });
   };
 
-  var handleChangeTooltip = function handleChangeTooltip(e) {
+  const handleChangeTooltip = e => {
     var _e$target;
 
-    var key = 'text';
-    var value = e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.value;
-
-    var _data$generateTransla2 = data.generateTranslations(key, value, tooltip === null || tooltip === void 0 ? void 0 : tooltip.translations, existingTranslation),
-        newTranslations = _data$generateTransla2.newTranslations,
-        currentTranslations = _data$generateTransla2.currentTranslations;
-
-    questionGroupFn.store.update(function (u) {
-      u.questionGroups = u.questionGroups.map(function (qg) {
+    const key = 'text';
+    const value = e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.value;
+    const {
+      newTranslations,
+      currentTranslations
+    } = data.generateTranslations(key, value, _tooltip === null || _tooltip === void 0 ? void 0 : _tooltip.translations, existingTranslation);
+    questionGroupFn.store.update(u => {
+      u.questionGroups = u.questionGroups.map(qg => {
         if (qg.id === questionGroupId) {
-          var questions = qg.questions.map(function (q) {
+          const questions = qg.questions.map(q => {
             var _q$tooltip;
 
             if (q.id === id && q !== null && q !== void 0 && (_q$tooltip = q.tooltip) !== null && _q$tooltip !== void 0 && _q$tooltip.text) {
-              return _extends({}, q, {
-                tooltip: _extends({}, q.tooltip, {
+              return { ...q,
+                tooltip: { ...q.tooltip,
                   translations: !currentTranslations ? newTranslations : currentTranslations
-                })
-              });
+                }
+              };
             }
 
             return q;
           });
-          return _extends({}, qg, {
+          return { ...qg,
             questions: questions
-          });
+          };
         }
 
         return qg;
@@ -2513,53 +2417,51 @@ var QuestionSettingTranslation = function QuestionSettingTranslation(_ref) {
     });
   };
 
-  var handleChangeName = function handleChangeName(e) {
+  const handleChangeName = e => {
     var _e$target2;
 
     updateTranslation('name', e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.value);
   };
 
-  var handleChangeAllowOtherText = function handleChangeAllowOtherText(e) {
+  const handleChangeAllowOtherText = e => {
     var _e$target3;
 
     updateTranslation('allowOtherText', e === null || e === void 0 ? void 0 : (_e$target3 = e.target) === null || _e$target3 === void 0 ? void 0 : _e$target3.value);
   };
 
-  var handleChangeOptionName = function handleChangeOptionName(e, optionTranslations, optionId) {
+  const handleChangeOptionName = (e, optionTranslations, optionId) => {
     var _e$target4;
 
-    var key = 'name';
-    var value = e === null || e === void 0 ? void 0 : (_e$target4 = e.target) === null || _e$target4 === void 0 ? void 0 : _e$target4.value;
-
-    var _data$generateTransla3 = data.generateTranslations(key, value, optionTranslations, existingTranslation),
-        newTranslations = _data$generateTransla3.newTranslations,
-        currentTranslations = _data$generateTransla3.currentTranslations;
-
-    questionGroupFn.store.update(function (u) {
-      u.questionGroups = u.questionGroups.map(function (qg) {
+    const key = 'name';
+    const value = e === null || e === void 0 ? void 0 : (_e$target4 = e.target) === null || _e$target4 === void 0 ? void 0 : _e$target4.value;
+    const {
+      newTranslations,
+      currentTranslations
+    } = data.generateTranslations(key, value, optionTranslations, existingTranslation);
+    questionGroupFn.store.update(u => {
+      u.questionGroups = u.questionGroups.map(qg => {
         if (qg.id === questionGroupId) {
-          var questions = qg.questions.map(function (q) {
+          const questions = qg.questions.map(q => {
             if (q.id === id && [questionType.option, questionType.multiple_option].includes(q.type)) {
-              var _options = q.options.map(function (opt) {
+              const options = q.options.map(opt => {
                 if (opt.id === optionId) {
-                  return _extends({}, opt, {
+                  return { ...opt,
                     translations: !currentTranslations ? newTranslations : currentTranslations
-                  });
+                  };
                 }
 
                 return opt;
               });
-
-              return _extends({}, q, {
-                options: _options
-              });
+              return { ...q,
+                options: options
+              };
             }
 
             return q;
           });
-          return _extends({}, qg, {
+          return { ...qg,
             questions: questions
-          });
+          };
         }
 
         return qg;
@@ -2570,15 +2472,15 @@ var QuestionSettingTranslation = function QuestionSettingTranslation(_ref) {
   return /*#__PURE__*/React__default.createElement("div", null, name && /*#__PURE__*/React__default.createElement(TranslationFormItem, {
     labelText: UIText.inputQuestionNameLabel,
     currentValue: name,
-    name: namePreffix + "-name",
+    name: `${namePreffix}-name`,
     initialValue: existingTranslationValues === null || existingTranslationValues === void 0 ? void 0 : existingTranslationValues.name
   }, /*#__PURE__*/React__default.createElement(Input, {
     disabled: !existingTranslation,
     onChange: handleChangeName
-  })), (tooltip === null || tooltip === void 0 ? void 0 : tooltip.text) && /*#__PURE__*/React__default.createElement(TranslationFormItem, {
+  })), (_tooltip === null || _tooltip === void 0 ? void 0 : _tooltip.text) && /*#__PURE__*/React__default.createElement(TranslationFormItem, {
     labelText: UIText.inputQuestionTooltipLabel,
-    currentValue: tooltip.text,
-    name: namePreffix + "-tooltip",
+    currentValue: _tooltip.text,
+    name: `${namePreffix}-tooltip`,
     initialValue: existingTooltipTranslationValues === null || existingTooltipTranslationValues === void 0 ? void 0 : existingTooltipTranslationValues.text
   }, /*#__PURE__*/React__default.createElement(Input.TextArea, {
     disabled: !existingTranslation,
@@ -2588,75 +2490,67 @@ var QuestionSettingTranslation = function QuestionSettingTranslation(_ref) {
   }, UIText.questionMoreOptionTranslationText), allowOther && allowOtherText && /*#__PURE__*/React__default.createElement(TranslationFormItem, {
     labelText: UIText.inputQuestionAllowOtherTextLabel,
     currentValue: allowOtherText,
-    name: namePreffix + "-allow_other_text",
+    name: `${namePreffix}-allow_other_text`,
     initialValue: existingTranslationValues === null || existingTranslationValues === void 0 ? void 0 : existingTranslationValues.allowOtherText
   }, /*#__PURE__*/React__default.createElement(Input, {
     disabled: !existingTranslation,
     onChange: handleChangeAllowOtherText
-  })), orderBy$1(options, 'order').filter(function (d) {
-    return d === null || d === void 0 ? void 0 : d.name;
-  }).map(function (d, di) {
+  })), orderBy$1(_options, 'order').filter(d => d === null || d === void 0 ? void 0 : d.name).map((d, di) => {
     var _d$translations;
 
-    var existingOptionTranslationValues = d === null || d === void 0 ? void 0 : (_d$translations = d.translations) === null || _d$translations === void 0 ? void 0 : _d$translations.find(function (tl) {
-      return tl.language === existingTranslation;
-    });
+    const existingOptionTranslationValues = d === null || d === void 0 ? void 0 : (_d$translations = d.translations) === null || _d$translations === void 0 ? void 0 : _d$translations.find(tl => tl.language === existingTranslation);
     return /*#__PURE__*/React__default.createElement(TranslationFormItem, {
-      key: "translation-option-" + d.id + "-" + di,
-      labelText: UIText.inputQuestionOptionNameLabel + " " + d.order,
+      key: `translation-option-${d.id}-${di}`,
+      labelText: `${UIText.inputQuestionOptionNameLabel} ${d.order}`,
       currentValue: d.name,
-      name: namePreffix + "-option-name-" + ((d === null || d === void 0 ? void 0 : d.id) || d.name),
+      name: `${namePreffix}-option-name-${(d === null || d === void 0 ? void 0 : d.id) || d.name}`,
       initialValue: existingOptionTranslationValues === null || existingOptionTranslationValues === void 0 ? void 0 : existingOptionTranslationValues.name
     }, /*#__PURE__*/React__default.createElement(Input, {
       disabled: !existingTranslation,
-      onChange: function onChange(e) {
-        return handleChangeOptionName(e, d === null || d === void 0 ? void 0 : d.translations, d.id);
-      }
+      onChange: e => handleChangeOptionName(e, d === null || d === void 0 ? void 0 : d.translations, d.id)
     }));
   })));
 };
 
-var QuestionDefinitionTranslation = function QuestionDefinitionTranslation(_ref2) {
-  var index = _ref2.index,
-      question = _ref2.question;
-  var id = question.id,
-      name = question.name,
-      order = question.order,
-      questionGroupOrder = question.questionGroupOrder;
-
-  var _UIStore$useState2 = UIStore.useState(function (s) {
-    return s;
-  }),
-      activeEditTranslationQuestions = _UIStore$useState2.activeEditTranslationQuestions;
-
-  var isEditTranslationQuestion = useMemo(function () {
+const QuestionDefinitionTranslation = ({
+  index,
+  question
+}) => {
+  const {
+    id,
+    name,
+    order,
+    questionGroupOrder
+  } = question;
+  const {
+    activeEditTranslationQuestions
+  } = UIStore.useState(s => s);
+  const isEditTranslationQuestion = useMemo(() => {
     return activeEditTranslationQuestions.includes(id);
   }, [activeEditTranslationQuestions, id]);
 
-  var handleEditTranslationQuestion = function handleEditTranslationQuestion() {
-    UIStore.update(function (s) {
-      s.activeEditTranslationQuestions = [].concat(activeEditTranslationQuestions, [id]);
+  const handleEditTranslationQuestion = () => {
+    UIStore.update(s => {
+      s.activeEditTranslationQuestions = [...activeEditTranslationQuestions, id];
     });
   };
 
-  var handleCancelEditTranslationQuestion = function handleCancelEditTranslationQuestion() {
-    UIStore.update(function (s) {
-      s.activeEditTranslationQuestions = activeEditTranslationQuestions.filter(function (qId) {
-        return qId !== id;
-      });
+  const handleCancelEditTranslationQuestion = () => {
+    UIStore.update(s => {
+      s.activeEditTranslationQuestions = activeEditTranslationQuestions.filter(qId => qId !== id);
     });
   };
 
-  var cardTitleButton = [{
+  const cardTitleButton = [{
     type: 'show-button',
     isExpand: isEditTranslationQuestion,
     onClick: handleEditTranslationQuestion,
     onCancel: handleCancelEditTranslationQuestion
   }];
   return /*#__PURE__*/React__default.createElement(Card, {
-    key: "translation-question-" + index + "-" + id,
+    key: `translation-question-${index}-${id}`,
     title: /*#__PURE__*/React__default.createElement(CardTitle, {
-      title: questionGroupOrder + "." + order + ". " + name,
+      title: `${questionGroupOrder}.${order}. ${name}`,
       buttons: cardTitleButton
     }),
     headStyle: {
@@ -2670,39 +2564,34 @@ var QuestionDefinitionTranslation = function QuestionDefinitionTranslation(_ref2
   }, isEditTranslationQuestion && /*#__PURE__*/React__default.createElement(QuestionSettingTranslation, question));
 };
 
-var QuestionGroupSettingTranslation = function QuestionGroupSettingTranslation(_ref) {
-  var id = _ref.id,
-      name = _ref.name,
-      description = _ref.description,
-      repeatable = _ref.repeatable,
-      repeatText = _ref.repeatText,
-      _ref$translations = _ref.translations,
-      translations = _ref$translations === void 0 ? [] : _ref$translations;
+const QuestionGroupSettingTranslation = ({
+  id,
+  name,
+  description,
+  repeatable,
+  repeatText,
+  translations: _translations = []
+}) => {
+  const {
+    UIText,
+    existingTranslation
+  } = UIStore.useState(s => s);
+  const namePreffix = `translation-${existingTranslation}-question_group-${id}`;
+  const existingTranslationValues = useMemo(() => {
+    return _translations === null || _translations === void 0 ? void 0 : _translations.find(tl => tl.language === existingTranslation);
+  }, [_translations, existingTranslation]);
 
-  var _UIStore$useState = UIStore.useState(function (s) {
-    return s;
-  }),
-      UIText = _UIStore$useState.UIText,
-      existingTranslation = _UIStore$useState.existingTranslation;
-
-  var namePreffix = "translation-" + existingTranslation + "-question_group-" + id;
-  var existingTranslationValues = useMemo(function () {
-    return translations === null || translations === void 0 ? void 0 : translations.find(function (tl) {
-      return tl.language === existingTranslation;
-    });
-  }, [translations, existingTranslation]);
-
-  var updateTranslation = function updateTranslation(key, value) {
-    var _data$generateTransla = data.generateTranslations(key, value, translations, existingTranslation),
-        newTranslations = _data$generateTransla.newTranslations,
-        currentTranslations = _data$generateTransla.currentTranslations;
-
-    questionGroupFn.store.update(function (u) {
-      u.questionGroups = u.questionGroups.map(function (qg) {
+  const updateTranslation = (key, value) => {
+    const {
+      newTranslations,
+      currentTranslations
+    } = data.generateTranslations(key, value, _translations, existingTranslation);
+    questionGroupFn.store.update(u => {
+      u.questionGroups = u.questionGroups.map(qg => {
         if (qg.id === id) {
-          return _extends({}, qg, {
+          return { ...qg,
             translations: !currentTranslations ? newTranslations : currentTranslations
-          });
+          };
         }
 
         return qg;
@@ -2710,19 +2599,19 @@ var QuestionGroupSettingTranslation = function QuestionGroupSettingTranslation(_
     });
   };
 
-  var handleChangeName = function handleChangeName(e) {
+  const handleChangeName = e => {
     var _e$target;
 
     updateTranslation('name', e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.value);
   };
 
-  var handleChangeDescription = function handleChangeDescription(e) {
+  const handleChangeDescription = e => {
     var _e$target2;
 
     updateTranslation('description', e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.value);
   };
 
-  var handleChangeRepeatText = function handleChangeRepeatText(e) {
+  const handleChangeRepeatText = e => {
     var _e$target3;
 
     updateTranslation('repeatText', e === null || e === void 0 ? void 0 : (_e$target3 = e.target) === null || _e$target3 === void 0 ? void 0 : _e$target3.value);
@@ -2731,7 +2620,7 @@ var QuestionGroupSettingTranslation = function QuestionGroupSettingTranslation(_
   return /*#__PURE__*/React__default.createElement("div", null, name && /*#__PURE__*/React__default.createElement(TranslationFormItem, {
     labelText: UIText.inputQuestionGroupNameLabel,
     currentValue: name,
-    name: namePreffix + "-name",
+    name: `${namePreffix}-name`,
     initialValue: existingTranslationValues === null || existingTranslationValues === void 0 ? void 0 : existingTranslationValues.name
   }, /*#__PURE__*/React__default.createElement(Input, {
     disabled: !existingTranslation,
@@ -2739,7 +2628,7 @@ var QuestionGroupSettingTranslation = function QuestionGroupSettingTranslation(_
   })), description && /*#__PURE__*/React__default.createElement(TranslationFormItem, {
     labelText: UIText.inputQuestionGroupDescriptionLabel,
     currentValue: description,
-    name: namePreffix + "-description",
+    name: `${namePreffix}-description`,
     initialValue: existingTranslationValues === null || existingTranslationValues === void 0 ? void 0 : existingTranslationValues.description
   }, /*#__PURE__*/React__default.createElement(Input.TextArea, {
     rows: 5,
@@ -2748,7 +2637,7 @@ var QuestionGroupSettingTranslation = function QuestionGroupSettingTranslation(_
   })), repeatable && repeatText && /*#__PURE__*/React__default.createElement(TranslationFormItem, {
     labelText: UIText.inputRepeatTextLabel,
     currentValue: repeatText,
-    name: namePreffix + "-repeat_text",
+    name: `${namePreffix}-repeat_text`,
     initialValue: existingTranslationValues === null || existingTranslationValues === void 0 ? void 0 : existingTranslationValues.repeatText
   }, /*#__PURE__*/React__default.createElement(Input, {
     disabled: !existingTranslation,
@@ -2756,90 +2645,82 @@ var QuestionGroupSettingTranslation = function QuestionGroupSettingTranslation(_
   })));
 };
 
-var QuestionGroupDefinitionTranslation = function QuestionGroupDefinitionTranslation(_ref2) {
-  var index = _ref2.index,
-      questionGroup = _ref2.questionGroup;
-  var id = questionGroup.id,
-      name = questionGroup.name,
-      order = questionGroup.order,
-      questions = questionGroup.questions;
-
-  var _UIStore$useState2 = UIStore.useState(function (s) {
-    return s;
-  }),
-      activeTranslationQuestionGroups = _UIStore$useState2.activeTranslationQuestionGroups,
-      activeEditTranslationQuestionGroups = _UIStore$useState2.activeEditTranslationQuestionGroups,
-      activeEditTranslationQuestions = _UIStore$useState2.activeEditTranslationQuestions;
-
-  var questionIds = questions.map(function (q) {
-    return q.id;
-  });
-  var showTranslationQuestion = useMemo(function () {
+const QuestionGroupDefinitionTranslation = ({
+  index,
+  questionGroup
+}) => {
+  const {
+    id,
+    name,
+    order,
+    questions
+  } = questionGroup;
+  const {
+    activeTranslationQuestionGroups,
+    activeEditTranslationQuestionGroups,
+    activeEditTranslationQuestions
+  } = UIStore.useState(s => s);
+  const questionIds = questions.map(q => q.id);
+  const showTranslationQuestion = useMemo(() => {
     return activeTranslationQuestionGroups.includes(id);
   }, [activeTranslationQuestionGroups, id]);
-  var isEditTranslationQuestionGroup = useMemo(function () {
+  const isEditTranslationQuestionGroup = useMemo(() => {
     return activeEditTranslationQuestionGroups.includes(id);
   }, [activeEditTranslationQuestionGroups, id]);
 
-  var handleHideTranslationQuestions = function handleHideTranslationQuestions() {
-    UIStore.update(function (s) {
-      s.activeTranslationQuestionGroups = activeTranslationQuestionGroups.filter(function (qgId) {
-        return qgId !== id;
-      });
+  const handleHideTranslationQuestions = () => {
+    UIStore.update(s => {
+      s.activeTranslationQuestionGroups = activeTranslationQuestionGroups.filter(qgId => qgId !== id);
     });
   };
 
-  var handleCancelEditTranslationGroup = function handleCancelEditTranslationGroup() {
-    UIStore.update(function (s) {
-      s.activeEditTranslationQuestionGroups = activeEditTranslationQuestionGroups.filter(function (qgId) {
-        return qgId !== id;
-      });
+  const handleCancelEditTranslationGroup = () => {
+    UIStore.update(s => {
+      s.activeEditTranslationQuestionGroups = activeEditTranslationQuestionGroups.filter(qgId => qgId !== id);
     });
     handleHideTranslationQuestions();
   };
 
-  var handleEditTranslationGroup = function handleEditTranslationGroup() {
-    UIStore.update(function (s) {
+  const handleEditTranslationGroup = () => {
+    UIStore.update(s => {
       if (!activeEditTranslationQuestionGroups.includes(id)) {
-        s.activeEditTranslationQuestionGroups = [].concat(activeEditTranslationQuestionGroups, [id]);
+        s.activeEditTranslationQuestionGroups = [...activeEditTranslationQuestionGroups, id];
       } else {
-        s.activeEditTranslationQuestionGroups = activeEditTranslationQuestionGroups.filter(function (a) {
-          return a !== id;
-        });
+        s.activeEditTranslationQuestionGroups = activeEditTranslationQuestionGroups.filter(a => a !== id);
       }
     });
   };
 
-  var handleExpandAll = function handleExpandAll() {
-    UIStore.update(function (s) {
-      s.activeEditTranslationQuestionGroups = uniq([].concat(activeEditTranslationQuestionGroups, [id]));
-      s.activeEditTranslationQuestions = uniq([].concat(s.activeEditTranslationQuestions, questionIds));
+  const handleExpandAll = () => {
+    UIStore.update(s => {
+      s.activeEditTranslationQuestionGroups = uniq([...activeEditTranslationQuestionGroups, id]);
+      s.activeEditTranslationQuestions = uniq([...s.activeEditTranslationQuestions, ...questionIds]);
     });
   };
 
-  var handleCancelExpandAll = function handleCancelExpandAll() {
+  const handleCancelExpandAll = () => {
     handleCancelEditTranslationGroup();
-    UIStore.update(function (s) {
+    UIStore.update(s => {
       s.activeEditTranslationQuestions = difference(s.activeEditTranslationQuestions, questionIds);
     });
   };
 
-  var cardTitleButton = [{
+  const cardTitleButton = [{
     type: 'show-button',
     isExpand: isEditTranslationQuestionGroup,
     onClick: handleEditTranslationGroup,
     onCancel: handleCancelEditTranslationGroup
   }];
-  var cardExtraButton = [{
+  const cardExtraButton = [{
     type: 'expand-all-button',
     isExpand: intersection(activeEditTranslationQuestions, questionIds).length,
     onClick: handleExpandAll,
     onCancel: handleCancelExpandAll
   }];
   return /*#__PURE__*/React__default.createElement(Card, {
-    key: "translation-" + index + "-" + id,
+    key: `translation-${index}-${id}`,
     title: /*#__PURE__*/React__default.createElement(CardTitle, {
-      title: order + ". " + name,
+      title: `${order}. ${name}`,
       buttons: cardTitleButton
     }),
     headStyle: {
@@ -2853,130 +2734,98 @@ var QuestionGroupDefinitionTranslation = function QuestionGroupDefinitionTransla
     extra: /*#__PURE__*/React__default.createElement(CardTitle, {
       buttons: cardExtraButton
     })
-  }, isEditTranslationQuestionGroup && /*#__PURE__*/React__default.createElement(QuestionGroupSettingTranslation, questionGroup), isEditTranslationQuestionGroup && questions.map(function (q, qi) {
-    return /*#__PURE__*/React__default.createElement(QuestionDefinitionTranslation, {
-      key: "question-definition-translation-" + qi,
-      index: qi,
-      question: _extends({}, q, {
-        questionGroupOrder: order
-      })
-    });
-  }));
+  }, isEditTranslationQuestionGroup && /*#__PURE__*/React__default.createElement(QuestionGroupSettingTranslation, questionGroup), isEditTranslationQuestionGroup && questions.map((q, qi) => /*#__PURE__*/React__default.createElement(QuestionDefinitionTranslation, {
+    key: `question-definition-translation-${qi}`,
+    index: qi,
+    question: { ...q,
+      questionGroupOrder: order
+    }
+  })));
 };
 
-var staticDefaultLang = 'en';
+const staticDefaultLang = 'en';
 
-var ExistingTranslation = function ExistingTranslation() {
-  var _UIStore$useState = UIStore.useState(function (s) {
-    return s;
-  }),
-      localeDropdownValue = _UIStore$useState.localeDropdownValue,
-      existingTranslation = _UIStore$useState.existingTranslation;
+const ExistingTranslation = () => {
+  const {
+    localeDropdownValue,
+    existingTranslation
+  } = UIStore.useState(s => s);
+  const formStore = formFn.store.useState(s => s);
+  const languages = (formStore === null || formStore === void 0 ? void 0 : formStore.languages) || [];
 
-  var formStore = formFn.store.useState(function (s) {
-    return s;
-  });
-  var languages = (formStore === null || formStore === void 0 ? void 0 : formStore.languages) || [];
-
-  var handleCloseTag = function handleCloseTag(lang) {
-    UIStore.update(function (u) {
+  const handleCloseTag = lang => {
+    UIStore.update(u => {
       u.existingTranslation = existingTranslation === lang ? null : existingTranslation;
     });
-    formFn.store.update(function (u) {
+    formFn.store.update(u => {
       var _formStore$translatio;
 
-      u.languages = languages.filter(function (ln) {
-        return ln !== lang;
-      });
-      u.translations = formStore === null || formStore === void 0 ? void 0 : (_formStore$translatio = formStore.translations) === null || _formStore$translatio === void 0 ? void 0 : _formStore$translatio.filter(function (tl) {
-        return tl.language !== lang;
-      });
+      u.languages = languages.filter(ln => ln !== lang);
+      u.translations = formStore === null || formStore === void 0 ? void 0 : (_formStore$translatio = formStore.translations) === null || _formStore$translatio === void 0 ? void 0 : _formStore$translatio.filter(tl => tl.language !== lang);
     });
-    questionGroupFn.store.update(function (u) {
-      u.questionGroups = u.questionGroups.map(function (qg) {
+    questionGroupFn.store.update(u => {
+      u.questionGroups = u.questionGroups.map(qg => {
         var _qg$translations;
 
-        var questions = qg.questions.map(function (q) {
+        const questions = qg.questions.map(q => {
           var _q$options, _q$translations;
 
-          var newObj = q;
+          let newObj = q;
 
           if (q !== null && q !== void 0 && q.options && q !== null && q !== void 0 && (_q$options = q.options) !== null && _q$options !== void 0 && _q$options.length) {
-            var options = q.options.map(function (op) {
+            const options = q.options.map(op => {
               var _op$translations;
 
-              return _extends({}, op, {
-                translations: op === null || op === void 0 ? void 0 : (_op$translations = op.translations) === null || _op$translations === void 0 ? void 0 : _op$translations.filter(function (tl) {
-                  return tl.language !== lang;
-                })
-              });
+              return { ...op,
+                translations: op === null || op === void 0 ? void 0 : (_op$translations = op.translations) === null || _op$translations === void 0 ? void 0 : _op$translations.filter(tl => tl.language !== lang)
+              };
             });
-            newObj = _extends({}, newObj, {
+            newObj = { ...newObj,
               options: options
-            });
+            };
           }
 
-          return _extends({}, newObj, {
-            translations: q === null || q === void 0 ? void 0 : (_q$translations = q.translations) === null || _q$translations === void 0 ? void 0 : _q$translations.filter(function (tl) {
-              return tl.language !== lang;
-            })
-          });
+          return { ...newObj,
+            translations: q === null || q === void 0 ? void 0 : (_q$translations = q.translations) === null || _q$translations === void 0 ? void 0 : _q$translations.filter(tl => tl.language !== lang)
+          };
         });
-        return _extends({}, qg, {
+        return { ...qg,
           questions: questions,
-          translations: qg === null || qg === void 0 ? void 0 : (_qg$translations = qg.translations) === null || _qg$translations === void 0 ? void 0 : _qg$translations.filter(function (tl) {
-            return tl.language !== lang;
-          })
-        });
+          translations: qg === null || qg === void 0 ? void 0 : (_qg$translations = qg.translations) === null || _qg$translations === void 0 ? void 0 : _qg$translations.filter(tl => tl.language !== lang)
+        };
       });
     });
   };
 
-  return languages.map(function (lang) {
-    var findLang = localeDropdownValue.find(function (lc) {
-      return lc.value === lang;
-    });
+  return languages.map(lang => {
+    const findLang = localeDropdownValue.find(lc => lc.value === lang);
     return /*#__PURE__*/React__default.createElement("a", {
       key: lang,
       href: "#",
-      onClick: function onClick() {
-        return UIStore.update(function (u) {
-          u.existingTranslation = existingTranslation !== lang ? lang : null;
-        });
-      }
+      onClick: () => UIStore.update(u => {
+        u.existingTranslation = existingTranslation !== lang ? lang : null;
+      })
     }, /*#__PURE__*/React__default.createElement(Tag, {
-      className: styles.tags + " " + (existingTranslation === lang ? styles['tags-active'] : ''),
+      className: `${styles.tags} ${existingTranslation === lang ? styles['tags-active'] : ''}`,
       closable: true,
-      onClose: function onClose() {
-        return handleCloseTag(lang);
-      }
+      onClose: () => handleCloseTag(lang)
     }, findLang.label));
   });
 };
 
-var FormTranslations = function FormTranslations() {
-  var _Form$useForm = Form.useForm(),
-      formTranslation = _Form$useForm[0];
-
-  var _UIStore$useState2 = UIStore.useState(function (s) {
-    return s;
-  }),
-      UIText = _UIStore$useState2.UIText,
-      localeDropdownValue = _UIStore$useState2.localeDropdownValue;
-
-  var formStore = formFn.store.useState(function (s) {
-    return s;
-  });
-  var questionGroups = questionGroupFn.store.useState(function (s) {
-    return s === null || s === void 0 ? void 0 : s.questionGroups;
-  });
-  var languages = useMemo(function () {
+const FormTranslations = () => {
+  const [formTranslation] = Form.useForm();
+  const {
+    UIText,
+    localeDropdownValue
+  } = UIStore.useState(s => s);
+  const formStore = formFn.store.useState(s => s);
+  const questionGroups = questionGroupFn.store.useState(s => s === null || s === void 0 ? void 0 : s.questionGroups);
+  const languages = useMemo(() => {
     return (formStore === null || formStore === void 0 ? void 0 : formStore.languages) || [];
   }, [formStore === null || formStore === void 0 ? void 0 : formStore.languages]);
-  var defaultLangDropdownValue = useMemo(function () {
-    return localeDropdownValue.filter(function (ld) {
-      return [staticDefaultLang].concat(languages).includes(ld.value);
-    });
+  const defaultLangDropdownValue = useMemo(() => {
+    return localeDropdownValue.filter(ld => [staticDefaultLang, ...languages].includes(ld.value));
   }, [localeDropdownValue, languages]);
   return /*#__PURE__*/React__default.createElement(Space, {
     direction: "vertical",
@@ -2997,16 +2846,12 @@ var FormTranslations = function FormTranslations() {
     className: styles['select-dropdown'],
     optionFilterProp: "label",
     options: defaultLangDropdownValue,
-    onChange: function onChange(e) {
-      return formFn.store.update(function (u) {
-        u.defaultLanguage = e;
-      });
-    },
+    onChange: e => formFn.store.update(u => {
+      u.defaultLanguage = e;
+    }),
     value: (formStore === null || formStore === void 0 ? void 0 : formStore.defaultLanguage) || staticDefaultLang,
     disabled: defaultLangDropdownValue.length === 1,
-    getPopupContainer: function getPopupContainer(triggerNode) {
-      return triggerNode.parentElement;
-    }
+    getPopupContainer: triggerNode => triggerNode.parentElement
   })), /*#__PURE__*/React__default.createElement(Col, {
     sm: 24,
     md: 8,
@@ -3015,22 +2860,16 @@ var FormTranslations = function FormTranslations() {
     showSearch: true,
     className: styles['select-dropdown'],
     optionFilterProp: "children",
-    onChange: function onChange(e) {
-      return formFn.store.update(function (u) {
-        u.languages = [].concat(languages, [e]);
-      });
-    },
+    onChange: e => formFn.store.update(u => {
+      u.languages = [...languages, e];
+    }),
     value: [],
-    getPopupContainer: function getPopupContainer(triggerNode) {
-      return triggerNode.parentElement;
-    }
-  }, localeDropdownValue.map(function (ld, ldi) {
-    return /*#__PURE__*/React__default.createElement(Select.Option, {
-      key: ld.value + "-" + ldi,
-      value: ld.value,
-      disabled: languages.includes(ld.value) || ld.value === staticDefaultLang
-    }, ld.label);
-  }))), /*#__PURE__*/React__default.createElement(Col, {
+    getPopupContainer: triggerNode => triggerNode.parentElement
+  }, localeDropdownValue.map((ld, ldi) => /*#__PURE__*/React__default.createElement(Select.Option, {
+    key: `${ld.value}-${ldi}`,
+    value: ld.value,
+    disabled: languages.includes(ld.value) || ld.value === staticDefaultLang
+  }, ld.label)))), /*#__PURE__*/React__default.createElement(Col, {
     sm: 24,
     md: 10,
     lg: 12
@@ -3042,39 +2881,36 @@ var FormTranslations = function FormTranslations() {
     key: "akvo-react-form-editor-translation",
     name: "akvo-react-form-editor-translation",
     layout: "vertical"
-  }, /*#__PURE__*/React__default.createElement(FormDefinitionTranslation, null), questionGroups.map(function (qg, qgi) {
+  }, /*#__PURE__*/React__default.createElement(FormDefinitionTranslation, null), questionGroups.map((qg, qgi) => {
     return /*#__PURE__*/React__default.createElement(QuestionGroupDefinitionTranslation, {
-      key: "translation-question-group-definition-" + qgi,
+      key: `translation-question-group-definition-${qgi}`,
       index: qgi,
       questionGroup: qg
     });
   })));
 };
 
-var FormPreview = function FormPreview() {
-  var _questionGroupFn$stor = questionGroupFn.store.useState(function (s) {
-    return s;
-  }),
-      questionGroups = _questionGroupFn$stor.questionGroups;
-
-  var formStore = formFn.store.useState(function (s) {
-    return s;
-  });
+const FormPreview = () => {
+  const {
+    questionGroups
+  } = questionGroupFn.store.useState(s => s);
+  const formStore = formFn.store.useState(s => s);
   return /*#__PURE__*/React__default.createElement(Webform, {
     forms: data.toWebform(formStore, questionGroups)
   });
 };
 
-var FormDefinition = function FormDefinition(_ref) {
-  var name = _ref.name,
-      description = _ref.description;
-  var form = Form.useFormInstance();
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
-  var inputFormNameLabel = UIText.inputFormNameLabel,
-      inputFormDescriptionLabel = UIText.inputFormDescriptionLabel;
-  useEffect(function () {
+const FormDefinition = ({
+  name,
+  description
+}) => {
+  const form = Form.useFormInstance();
+  const UIText = UIStore.useState(s => s.UIText);
+  const {
+    inputFormNameLabel,
+    inputFormDescriptionLabel
+  } = UIText;
+  useEffect(() => {
     form.setFieldsValue({
       'form-name': name
     });
@@ -3091,13 +2927,11 @@ var FormDefinition = function FormDefinition(_ref) {
     initialValue: name
   }, /*#__PURE__*/React__default.createElement(Input, {
     allowClear: true,
-    onChange: function onChange(e) {
-      return formFn.store.update(function (u) {
-        var _e$target;
+    onChange: e => formFn.store.update(u => {
+      var _e$target;
 
-        u.name = e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.value;
-      });
-    }
+      u.name = e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.value;
+    })
   })), /*#__PURE__*/React__default.createElement(Form.Item, {
     label: inputFormDescriptionLabel,
     name: "form-description",
@@ -3105,36 +2939,33 @@ var FormDefinition = function FormDefinition(_ref) {
   }, /*#__PURE__*/React__default.createElement(Input.TextArea, {
     rows: 5,
     allowClear: true,
-    onChange: function onChange(e) {
-      return formFn.store.update(function (u) {
-        var _e$target2;
+    onChange: e => formFn.store.update(u => {
+      var _e$target2;
 
-        u.description = e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.value;
-      });
-    }
+      u.description = e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.value;
+    })
   })));
 };
 
-var QuestionGroupSetting = function QuestionGroupSetting(_ref) {
-  var id = _ref.id,
-      name = _ref.name,
-      description = _ref.description,
-      repeatable = _ref.repeatable,
-      repeatText = _ref.repeatText;
-  var namePreffix = "question_group-" + id;
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
+const QuestionGroupSetting = ({
+  id,
+  name,
+  description,
+  repeatable,
+  repeatText
+}) => {
+  const namePreffix = `question_group-${id}`;
+  const UIText = UIStore.useState(s => s.UIText);
 
-  var handleChangeName = function handleChangeName(e) {
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (x) {
+  const handleChangeName = e => {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(x => {
         if (x.id === id) {
           var _e$target;
 
-          return _extends({}, x, {
+          return { ...x,
             name: e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.value
-          });
+          };
         }
 
         return x;
@@ -3142,15 +2973,15 @@ var QuestionGroupSetting = function QuestionGroupSetting(_ref) {
     });
   };
 
-  var handleChangeDescription = function handleChangeDescription(e) {
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (x) {
+  const handleChangeDescription = e => {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(x => {
         if (x.id === id) {
           var _e$target2;
 
-          return _extends({}, x, {
+          return { ...x,
             description: e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.value
-          });
+          };
         }
 
         return x;
@@ -3158,15 +2989,15 @@ var QuestionGroupSetting = function QuestionGroupSetting(_ref) {
     });
   };
 
-  var handleChangeRepeatable = function handleChangeRepeatable(e) {
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (x) {
+  const handleChangeRepeatable = e => {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(x => {
         if (x.id === id) {
           var _e$target3;
 
-          return _extends({}, x, {
+          return { ...x,
             repeatable: e === null || e === void 0 ? void 0 : (_e$target3 = e.target) === null || _e$target3 === void 0 ? void 0 : _e$target3.checked
-          });
+          };
         }
 
         return x;
@@ -3174,15 +3005,15 @@ var QuestionGroupSetting = function QuestionGroupSetting(_ref) {
     });
   };
 
-  var handleChangeRepeatText = function handleChangeRepeatText(e) {
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (x) {
+  const handleChangeRepeatText = e => {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(x => {
         if (x.id === id) {
           var _e$target4;
 
-          return _extends({}, x, {
+          return { ...x,
             repeatText: e === null || e === void 0 ? void 0 : (_e$target4 = e.target) === null || _e$target4 === void 0 ? void 0 : _e$target4.value
-          });
+          };
         }
 
         return x;
@@ -3193,7 +3024,7 @@ var QuestionGroupSetting = function QuestionGroupSetting(_ref) {
   return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionGroupNameLabel,
     initialValue: name,
-    name: namePreffix + "-name",
+    name: `${namePreffix}-name`,
     required: true
   }, /*#__PURE__*/React__default.createElement(Input, {
     onChange: handleChangeName,
@@ -3201,7 +3032,7 @@ var QuestionGroupSetting = function QuestionGroupSetting(_ref) {
   })), /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionGroupDescriptionLabel,
     initialValue: description,
-    name: namePreffix + "-description"
+    name: `${namePreffix}-description`
   }, /*#__PURE__*/React__default.createElement(Input.TextArea, {
     onChange: handleChangeDescription,
     allowClear: true,
@@ -3210,7 +3041,7 @@ var QuestionGroupSetting = function QuestionGroupSetting(_ref) {
     align: "bottom",
     gutter: [24, 24]
   }, /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement(Form.Item, {
-    name: namePreffix + "-repeatable",
+    name: `${namePreffix}-repeatable`,
     className: styles['input-checkbox-wrapper']
   }, /*#__PURE__*/React__default.createElement(Checkbox, {
     onChange: handleChangeRepeatable,
@@ -3219,7 +3050,7 @@ var QuestionGroupSetting = function QuestionGroupSetting(_ref) {
     span: 10
   }, /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputRepeatTextLabel,
-    name: namePreffix + "-repeat_text",
+    name: `${namePreffix}-repeat_text`,
     initialValue: repeatText
   }, /*#__PURE__*/React__default.createElement(Input, {
     onChange: handleChangeRepeatText,
@@ -3227,32 +3058,31 @@ var QuestionGroupSetting = function QuestionGroupSetting(_ref) {
   })))));
 };
 
-var SettingInput = function SettingInput(_ref) {
-  var id = _ref.id,
-      questionGroupId = _ref.questionGroupId,
-      requiredDoubleEntry = _ref.requiredDoubleEntry,
-      hiddenString = _ref.hiddenString;
-  var namePreffix = "question-" + id;
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
+const SettingInput = ({
+  id,
+  questionGroupId,
+  requiredDoubleEntry,
+  hiddenString
+}) => {
+  const namePreffix = `question-${id}`;
+  const UIText = UIStore.useState(s => s.UIText);
 
-  var updateState = function updateState(name, value) {
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (qg) {
+  const updateState = (name, value) => {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(qg => {
         if (qg.id === questionGroupId) {
-          var questions = qg.questions.map(function (q) {
+          const questions = qg.questions.map(q => {
             if (q.id === id) {
-              var _extends2;
-
-              return _extends({}, q, (_extends2 = {}, _extends2[name] = value, _extends2));
+              return { ...q,
+                [name]: value
+              };
             }
 
             return q;
           });
-          return _extends({}, qg, {
+          return { ...qg,
             questions: questions
-          });
+          };
         }
 
         return qg;
@@ -3260,13 +3090,13 @@ var SettingInput = function SettingInput(_ref) {
     });
   };
 
-  var handleChangeDoubleEntry = function handleChangeDoubleEntry(e) {
+  const handleChangeDoubleEntry = e => {
     var _e$target;
 
     updateState('requiredDoubleEntry', e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.checked);
   };
 
-  var handleChangeHiddenString = function handleChangeHiddenString(e) {
+  const handleChangeHiddenString = e => {
     var _e$target2;
 
     updateState('hiddenString', e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.checked);
@@ -3277,41 +3107,39 @@ var SettingInput = function SettingInput(_ref) {
   }, UIText.questionMoreInputTypeSettingText), /*#__PURE__*/React__default.createElement(Space, {
     className: styles['space-align-left']
   }, /*#__PURE__*/React__default.createElement(Form.Item, {
-    name: namePreffix + "-require_double_entry"
+    name: `${namePreffix}-require_double_entry`
   }, /*#__PURE__*/React__default.createElement(Checkbox, {
     onChange: handleChangeDoubleEntry,
     checked: requiredDoubleEntry
   }, ' ', UIText.inputQuestionRequireDoubleEntryCheckbox)), /*#__PURE__*/React__default.createElement(Form.Item, {
-    name: namePreffix + "-hidden_string"
+    name: `${namePreffix}-hidden_string`
   }, /*#__PURE__*/React__default.createElement(Checkbox, {
     onChange: handleChangeHiddenString,
     checked: hiddenString
   }, ' ', UIText.inputQuestionHiddenStringCheckbox))));
 };
 
-var SettingNumber = function SettingNumber(_ref) {
-  var id = _ref.id,
-      questionGroupId = _ref.questionGroupId,
-      _ref$rule = _ref.rule,
-      rule = _ref$rule === void 0 ? {
+const SettingNumber = ({
+  id,
+  questionGroupId,
+  rule: _rule = {
     allowDecimal: false,
     min: null,
     max: null
-  } : _ref$rule;
-  var namePreffix = "question-" + id;
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
-  var allowDecimal = rule === null || rule === void 0 ? void 0 : rule.allowDecimal;
-  var min = rule === null || rule === void 0 ? void 0 : rule.min;
-  var max = rule === null || rule === void 0 ? void 0 : rule.max;
-  var moreNumberSettings = [{
+  }
+}) => {
+  const namePreffix = `question-${id}`;
+  const UIText = UIStore.useState(s => s.UIText);
+  const allowDecimal = _rule === null || _rule === void 0 ? void 0 : _rule.allowDecimal;
+  const min = _rule === null || _rule === void 0 ? void 0 : _rule.min;
+  const max = _rule === null || _rule === void 0 ? void 0 : _rule.max;
+  const moreNumberSettings = [{
     label: UIText.inputQuestionMinimumValueLabel,
     value: min,
     key: 'min',
     rules: {
       max: max - 1,
-      message: UIText.inputQuestionMinimumValidationText + " " + max
+      message: `${UIText.inputQuestionMinimumValidationText} ${max}`
     }
   }, {
     label: UIText.inputQuestionMaximumValueLabel,
@@ -3319,28 +3147,28 @@ var SettingNumber = function SettingNumber(_ref) {
     key: 'max',
     rules: {
       min: min + 1,
-      message: UIText.inputQuestionMaximumValidationText + " " + min
+      message: `${UIText.inputQuestionMaximumValidationText} ${min}`
     }
   }];
 
-  var updateState = function updateState(name, value) {
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (qg) {
+  const updateState = (name, value) => {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(qg => {
         if (qg.id === questionGroupId) {
-          var questions = qg.questions.map(function (q) {
+          const questions = qg.questions.map(q => {
             if (q.id === id) {
-              var _extends2;
-
-              return _extends({}, q, {
-                rule: _extends({}, q === null || q === void 0 ? void 0 : q.rule, (_extends2 = {}, _extends2[name] = value, _extends2))
-              });
+              return { ...q,
+                rule: { ...(q === null || q === void 0 ? void 0 : q.rule),
+                  [name]: value
+                }
+              };
             }
 
             return q;
           });
-          return _extends({}, qg, {
+          return { ...qg,
             questions: questions
-          });
+          };
         }
 
         return qg;
@@ -3348,13 +3176,13 @@ var SettingNumber = function SettingNumber(_ref) {
     });
   };
 
-  var handleChangeAllowDecimal = function handleChangeAllowDecimal(e) {
+  const handleChangeAllowDecimal = e => {
     var _e$target;
 
     updateState('allowDecimal', e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.checked);
   };
 
-  var handleChangeMinMax = function handleChangeMinMax(key, e) {
+  const handleChangeMinMax = (key, e) => {
     updateState(key, e);
   };
 
@@ -3363,161 +3191,156 @@ var SettingNumber = function SettingNumber(_ref) {
   }, UIText.questionMoreInputNumberSettingText), /*#__PURE__*/React__default.createElement(Space, {
     className: styles['space-align-left']
   }, /*#__PURE__*/React__default.createElement(Form.Item, {
-    name: namePreffix + "-allow_decimal"
+    name: `${namePreffix}-allow_decimal`
   }, /*#__PURE__*/React__default.createElement(Checkbox, {
     onChange: handleChangeAllowDecimal,
     checked: allowDecimal
   }, ' ', UIText.inputQuestionAllowDecimalCheckbox))), /*#__PURE__*/React__default.createElement(Row, {
     align: "middle",
     gutter: [24, 24]
-  }, moreNumberSettings.map(function (x) {
-    return /*#__PURE__*/React__default.createElement(Col, {
-      key: namePreffix + "-" + x.key,
-      span: 8
-    }, /*#__PURE__*/React__default.createElement(Form.Item, {
-      label: x.label,
-      initialValue: x.value,
-      name: namePreffix + "-" + x.key,
-      rules: [_extends({
-        type: 'number'
-      }, x.rules)]
-    }, /*#__PURE__*/React__default.createElement(InputNumber, {
-      style: {
-        width: '100%'
-      },
-      controls: false,
-      keyboard: false,
-      onChange: function onChange(e) {
-        return handleChangeMinMax(x.key, e);
-      }
-    })));
-  })));
+  }, moreNumberSettings.map(x => /*#__PURE__*/React__default.createElement(Col, {
+    key: `${namePreffix}-${x.key}`,
+    span: 8
+  }, /*#__PURE__*/React__default.createElement(Form.Item, {
+    label: x.label,
+    initialValue: x.value,
+    name: `${namePreffix}-${x.key}`,
+    rules: [{
+      type: 'number',
+      ...x.rules
+    }]
+  }, /*#__PURE__*/React__default.createElement(InputNumber, {
+    style: {
+      width: '100%'
+    },
+    controls: false,
+    keyboard: false,
+    onChange: e => handleChangeMinMax(x.key, e)
+  }))))));
 };
 
-var defaultOptions = function defaultOptions(_ref) {
-  var _ref$init = _ref.init,
-      init = _ref$init === void 0 ? false : _ref$init,
-      _ref$order = _ref.order,
-      order = _ref$order === void 0 ? 0 : _ref$order;
-  var option = {
+const defaultOptions = ({
+  init: _init = false,
+  order: _order = 0
+}) => {
+  const option = {
     code: null,
     name: 'New Option',
     order: 1
   };
 
-  if (init) {
-    return [_extends({}, option, {
+  if (_init) {
+    return [{ ...option,
       id: generateId(),
       name: 'New Option 1',
       order: 1
-    }), _extends({}, option, {
+    }, { ...option,
       id: generateId() + 1,
       name: 'New Option 2',
       order: 2
-    })];
+    }];
   }
 
-  return _extends({}, option, {
+  return { ...option,
     id: generateId(),
-    order: order
-  });
+    order: _order
+  };
 };
 
-var SettingOption = function SettingOption(_ref2) {
-  var id = _ref2.id,
-      questionGroupId = _ref2.questionGroupId,
-      allowOther = _ref2.allowOther,
-      allowOtherText = _ref2.allowOtherText,
-      initialOptions = _ref2.options;
-  var namePreffix = "question-" + id;
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
-
-  var _useState = useState(initialOptions !== null && initialOptions !== void 0 && initialOptions.length ? initialOptions.map(function (x, xi) {
-    return _extends({}, x, {
-      code: (x === null || x === void 0 ? void 0 : x.code) || null,
-      id: (x === null || x === void 0 ? void 0 : x.id) || generateId() + xi,
-      order: (x === null || x === void 0 ? void 0 : x.order) || xi + 1
-    });
-  }) : defaultOptions({
+const SettingOption = ({
+  id,
+  questionGroupId,
+  allowOther,
+  allowOtherText,
+  options: initialOptions
+}) => {
+  const namePreffix = `question-${id}`;
+  const UIText = UIStore.useState(s => s.UIText);
+  const [options, setOptions] = useState(initialOptions !== null && initialOptions !== void 0 && initialOptions.length ? initialOptions.map((x, xi) => ({ ...x,
+    code: (x === null || x === void 0 ? void 0 : x.code) || null,
+    id: (x === null || x === void 0 ? void 0 : x.id) || generateId() + xi,
+    order: (x === null || x === void 0 ? void 0 : x.order) || xi + 1
+  })) : defaultOptions({
     init: true
-  })),
-      options = _useState[0],
-      setOptions = _useState[1];
-
-  var updateState = useCallback(function (name, value) {
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (qg) {
+  }));
+  const updateState = useCallback((name, value) => {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(qg => {
         if (qg.id === questionGroupId) {
-          var questions = qg.questions.map(function (q) {
+          const questions = qg.questions.map(q => {
             if (q.id === id) {
-              var _extends2;
-
-              return _extends({}, q, (_extends2 = {}, _extends2[name] = value, _extends2));
+              return { ...q,
+                [name]: value
+              };
             }
 
             return q;
           });
-          return _extends({}, qg, {
+          return { ...qg,
             questions: questions
-          });
+          };
         }
 
         return qg;
       });
     });
   }, [id, questionGroupId]);
-  useEffect(function () {
+  useEffect(() => {
     updateState('options', options);
   }, [options, id, questionGroupId, updateState]);
 
-  var handleOnChangeAllowOther = function handleOnChangeAllowOther(e) {
+  const handleOnChangeAllowOther = e => {
     var _e$target;
 
     updateState('allowOther', e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.checked);
   };
 
-  var handleOnChangeAllowOtherText = function handleOnChangeAllowOtherText(e) {
+  const handleOnChangeAllowOtherText = e => {
     var _e$target2;
 
     updateState('allowOtherText', e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.value);
   };
 
-  var handleOnChangeCode = function handleOnChangeCode(e, current) {
-    var currentId = current.id;
-    setOptions(options.map(function (opt) {
+  const handleOnChangeCode = (e, current) => {
+    const {
+      id: currentId
+    } = current;
+    setOptions(options.map(opt => {
       if (opt.id === currentId) {
         var _e$target3;
 
-        return _extends({}, opt, {
+        return { ...opt,
           code: e === null || e === void 0 ? void 0 : (_e$target3 = e.target) === null || _e$target3 === void 0 ? void 0 : _e$target3.value
-        });
+        };
       }
 
       return opt;
     }));
   };
 
-  var handleOnChangeOption = function handleOnChangeOption(e, current) {
-    var currentId = current.id;
-    setOptions(options.map(function (opt) {
+  const handleOnChangeOption = (e, current) => {
+    const {
+      id: currentId
+    } = current;
+    setOptions(options.map(opt => {
       if (opt.id === currentId) {
         var _e$target4;
 
-        return _extends({}, opt, {
+        return { ...opt,
           name: e === null || e === void 0 ? void 0 : (_e$target4 = e.target) === null || _e$target4 === void 0 ? void 0 : _e$target4.value
-        });
+        };
       }
 
       return opt;
     }));
   };
 
-  var handleOnAddOption = function handleOnAddOption(current) {
-    var currentOrder = current.order;
-    var lastOrder = takeRight(orderBy(options, 'order'))[0].order;
-    var reorderOptions = options.map(function (opt) {
+  const handleOnAddOption = current => {
+    const {
+      order: currentOrder
+    } = current;
+    const lastOrder = takeRight(orderBy(options, 'order'))[0].order;
+    const reorderOptions = options.map(opt => {
       if (opt.order > currentOrder) {
         opt['order'] = opt['order'] + 1;
       }
@@ -3528,42 +3351,30 @@ var SettingOption = function SettingOption(_ref2) {
 
       return opt;
     });
-    var addOptions = [].concat(reorderOptions, [defaultOptions({
+    const addOptions = [...reorderOptions, defaultOptions({
       order: currentOrder + 1
-    })]);
+    })];
     setOptions(orderBy(addOptions, 'order'));
   };
 
-  var handleOnMoveOption = function handleOnMoveOption(current, targetOrder) {
-    var currentOrder = current.order;
-    var prevOptions = options.filter(function (opt) {
-      return opt.order !== currentOrder && opt.order !== targetOrder;
-    });
-    var currentOption = options.filter(function (opt) {
-      return opt.order === currentOrder;
-    }).map(function (opt) {
-      return _extends({}, opt, {
-        order: targetOrder
-      });
-    });
-    var targetOption = options.filter(function (opt) {
-      return opt.order === targetOrder;
-    }).map(function (opt) {
-      return _extends({}, opt, {
-        order: currentOrder
-      });
-    });
-    setOptions(orderBy([].concat(prevOptions, currentOption, targetOption), 'order'));
+  const handleOnMoveOption = (current, targetOrder) => {
+    const {
+      order: currentOrder
+    } = current;
+    const prevOptions = options.filter(opt => opt.order !== currentOrder && opt.order !== targetOrder);
+    const currentOption = options.filter(opt => opt.order === currentOrder).map(opt => ({ ...opt,
+      order: targetOrder
+    }));
+    const targetOption = options.filter(opt => opt.order === targetOrder).map(opt => ({ ...opt,
+      order: currentOrder
+    }));
+    setOptions(orderBy([...prevOptions, ...currentOption, ...targetOption], 'order'));
   };
 
-  var handleOnDeleteOption = function handleOnDeleteOption(currentId) {
-    setOptions(orderBy(options, 'order').filter(function (opt) {
-      return opt.id !== currentId;
-    }).map(function (opt, opti) {
-      return _extends({}, opt, {
-        order: opti + 1
-      });
-    }));
+  const handleOnDeleteOption = currentId => {
+    setOptions(orderBy(options, 'order').filter(opt => opt.id !== currentId).map((opt, opti) => ({ ...opt,
+      order: opti + 1
+    })));
   };
 
   return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("p", {
@@ -3572,7 +3383,7 @@ var SettingOption = function SettingOption(_ref2) {
     align: "bottom",
     gutter: [24, 24]
   }, /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement(Form.Item, {
-    name: namePreffix + "-allow_other"
+    name: `${namePreffix}-allow_other`
   }, /*#__PURE__*/React__default.createElement(Checkbox, {
     onChange: handleOnChangeAllowOther,
     checked: allowOther
@@ -3580,103 +3391,87 @@ var SettingOption = function SettingOption(_ref2) {
     span: 11
   }, /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionAllowOtherTextLabel,
-    name: namePreffix + "-allow_other_text",
+    name: `${namePreffix}-allow_other_text`,
     initialValue: allowOtherText
   }, /*#__PURE__*/React__default.createElement(Input, {
     onChange: handleOnChangeAllowOtherText,
     allowClear: true
-  })))), orderBy(options, 'order').map(function (d, di) {
-    return /*#__PURE__*/React__default.createElement(Row, {
-      key: "option-" + id + "-" + di,
-      align: "start",
-      justify: "start",
-      gutter: [12, 12]
-    }, /*#__PURE__*/React__default.createElement(Col, {
-      span: 4
-    }, /*#__PURE__*/React__default.createElement(Form.Item, {
-      initialValue: d.code,
-      name: namePreffix + "-option_code_" + d.id
-    }, /*#__PURE__*/React__default.createElement(Input, {
-      placeholder: "Code",
-      onChange: function onChange(e) {
-        return handleOnChangeCode(e, d);
-      },
-      allowClear: true
-    }))), /*#__PURE__*/React__default.createElement(Col, {
-      span: 10
-    }, /*#__PURE__*/React__default.createElement(Form.Item, {
-      initialValue: d.name,
-      name: namePreffix + "-option_name_" + d.id
-    }, /*#__PURE__*/React__default.createElement(Input, {
-      onChange: function onChange(e) {
-        return handleOnChangeOption(e, d);
-      },
-      allowClear: true
-    }))), /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement(Space, null, /*#__PURE__*/React__default.createElement(Button, {
-      type: "link",
-      className: styles['button-icon'],
-      icon: /*#__PURE__*/React__default.createElement(MdOutlineAddCircleOutline, null),
-      onClick: function onClick() {
-        return handleOnAddOption(d);
-      }
-    }), /*#__PURE__*/React__default.createElement(Button, {
-      type: "link",
-      className: styles['button-icon'],
-      icon: /*#__PURE__*/React__default.createElement(MdOutlineArrowCircleUp, null),
-      onClick: function onClick() {
-        return handleOnMoveOption(d, d.order - 1);
-      },
-      disabled: di === 0
-    }), /*#__PURE__*/React__default.createElement(Button, {
-      type: "link",
-      className: styles['button-icon'],
-      icon: /*#__PURE__*/React__default.createElement(MdOutlineArrowCircleDown, null),
-      onClick: function onClick() {
-        return handleOnMoveOption(d, d.order + 1);
-      },
-      disabled: di === options.length - 1
-    }), /*#__PURE__*/React__default.createElement(Button, {
-      type: "link",
-      className: styles['button-icon'],
-      icon: /*#__PURE__*/React__default.createElement(MdOutlineRemoveCircleOutline, null),
-      onClick: function onClick() {
-        return handleOnDeleteOption(d.id);
-      },
-      disabled: options.length === 1
-    }))));
-  }));
+  })))), orderBy(options, 'order').map((d, di) => /*#__PURE__*/React__default.createElement(Row, {
+    key: `option-${id}-${di}`,
+    align: "start",
+    justify: "start",
+    gutter: [12, 12]
+  }, /*#__PURE__*/React__default.createElement(Col, {
+    span: 4
+  }, /*#__PURE__*/React__default.createElement(Form.Item, {
+    initialValue: d.code,
+    name: `${namePreffix}-option_code_${d.id}`
+  }, /*#__PURE__*/React__default.createElement(Input, {
+    placeholder: "Code",
+    onChange: e => handleOnChangeCode(e, d),
+    allowClear: true
+  }))), /*#__PURE__*/React__default.createElement(Col, {
+    span: 10
+  }, /*#__PURE__*/React__default.createElement(Form.Item, {
+    initialValue: d.name,
+    name: `${namePreffix}-option_name_${d.id}`
+  }, /*#__PURE__*/React__default.createElement(Input, {
+    onChange: e => handleOnChangeOption(e, d),
+    allowClear: true
+  }))), /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement(Space, null, /*#__PURE__*/React__default.createElement(Button, {
+    type: "link",
+    className: styles['button-icon'],
+    icon: /*#__PURE__*/React__default.createElement(MdOutlineAddCircleOutline, null),
+    onClick: () => handleOnAddOption(d)
+  }), /*#__PURE__*/React__default.createElement(Button, {
+    type: "link",
+    className: styles['button-icon'],
+    icon: /*#__PURE__*/React__default.createElement(MdOutlineArrowCircleUp, null),
+    onClick: () => handleOnMoveOption(d, d.order - 1),
+    disabled: di === 0
+  }), /*#__PURE__*/React__default.createElement(Button, {
+    type: "link",
+    className: styles['button-icon'],
+    icon: /*#__PURE__*/React__default.createElement(MdOutlineArrowCircleDown, null),
+    onClick: () => handleOnMoveOption(d, d.order + 1),
+    disabled: di === options.length - 1
+  }), /*#__PURE__*/React__default.createElement(Button, {
+    type: "link",
+    className: styles['button-icon'],
+    icon: /*#__PURE__*/React__default.createElement(MdOutlineRemoveCircleOutline, null),
+    onClick: () => handleOnDeleteOption(d.id),
+    disabled: options.length === 1
+  }))))));
 };
 
-var SettingTree = function SettingTree(_ref) {
-  var id = _ref.id,
-      questionGroupId = _ref.questionGroupId,
-      option = _ref.option;
-  var namePreffix = "question-" + id;
+const SettingTree = ({
+  id,
+  questionGroupId,
+  option
+}) => {
+  const namePreffix = `question-${id}`;
+  const {
+    UIText,
+    hostParams
+  } = UIStore.useState(s => s);
+  const settingTreeDropdownValue = hostParams === null || hostParams === void 0 ? void 0 : hostParams.settingTreeDropdownValue;
 
-  var _UIStore$useState = UIStore.useState(function (s) {
-    return s;
-  }),
-      UIText = _UIStore$useState.UIText,
-      hostParams = _UIStore$useState.hostParams;
-
-  var settingTreeDropdownValue = hostParams === null || hostParams === void 0 ? void 0 : hostParams.settingTreeDropdownValue;
-
-  var handleChangeTreeDropdown = function handleChangeTreeDropdown(e) {
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (qg) {
+  const handleChangeTreeDropdown = e => {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(qg => {
         if (qg.id === questionGroupId) {
-          var questions = qg.questions.map(function (q) {
+          const questions = qg.questions.map(q => {
             if (q.id === id) {
-              return _extends({}, q, {
+              return { ...q,
                 option: e
-              });
+              };
             }
 
             return q;
           });
-          return _extends({}, qg, {
+          return { ...qg,
             questions: questions
-          });
+          };
         }
 
         return qg;
@@ -3688,68 +3483,59 @@ var SettingTree = function SettingTree(_ref) {
     className: styles['more-question-setting-text']
   }, UIText.questionMoreTreeSettingText), /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputSelectTreeDropdownValueLabel,
-    name: namePreffix + "-tree-options",
+    name: `${namePreffix}-tree-options`,
     initialValue: option
   }, /*#__PURE__*/React__default.createElement(Select, {
     showSearch: true,
     className: styles['select-dropdown'],
     optionFilterProp: "label",
     options: settingTreeDropdownValue,
-    getPopupContainer: function getPopupContainer(triggerNode) {
-      return triggerNode.parentElement;
-    },
+    getPopupContainer: triggerNode => triggerNode.parentElement,
     onChange: handleChangeTreeDropdown
   })));
 };
 
-var SettingCascade = function SettingCascade(_ref) {
-  var id = _ref.id,
-      questionGroupId = _ref.questionGroupId,
-      _ref$api = _ref.api,
-      api = _ref$api === void 0 ? {
+const SettingCascade = ({
+  id,
+  questionGroupId,
+  api: _api = {
     endpoint: null,
     initial: 0,
     list: false
-  } : _ref$api;
-  var namePreffix = "question-" + id;
-
-  var _UIStore$useState = UIStore.useState(function (s) {
-    return s;
-  }),
-      UIText = _UIStore$useState.UIText,
-      hostParams = _UIStore$useState.hostParams;
-
-  var settingCascadeURL = hostParams === null || hostParams === void 0 ? void 0 : hostParams.settingCascadeURL;
-  var form = Form.useFormInstance();
-  var cascadeURLDropdownValue = useMemo(function () {
-    return settingCascadeURL.map(function (x) {
-      return {
-        label: x.name,
-        value: x.id
-      };
-    });
+  }
+}) => {
+  const namePreffix = `question-${id}`;
+  const {
+    UIText,
+    hostParams
+  } = UIStore.useState(s => s);
+  const settingCascadeURL = hostParams === null || hostParams === void 0 ? void 0 : hostParams.settingCascadeURL;
+  const form = Form.useFormInstance();
+  const cascadeURLDropdownValue = useMemo(() => {
+    return settingCascadeURL.map(x => ({
+      label: x.name,
+      value: x.id
+    }));
   }, [settingCascadeURL]);
 
-  var updateGlobalState = function updateGlobalState(values) {
-    if (values === void 0) {
-      values = {};
-    }
-
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (qg) {
+  const updateGlobalState = (values = {}) => {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(qg => {
         if (qg.id === questionGroupId) {
-          var questions = qg.questions.map(function (q) {
+          const questions = qg.questions.map(q => {
             if (q.id === id) {
-              return _extends({}, q, {
-                api: _extends({}, q === null || q === void 0 ? void 0 : q.api, values)
-              });
+              return { ...q,
+                api: { ...(q === null || q === void 0 ? void 0 : q.api),
+                  ...values
+                }
+              };
             }
 
             return q;
           });
-          return _extends({}, qg, {
+          return { ...qg,
             questions: questions
-          });
+          };
         }
 
         return qg;
@@ -3757,15 +3543,14 @@ var SettingCascade = function SettingCascade(_ref) {
     });
   };
 
-  var handleChangeEndpoint = function handleChangeEndpoint(e) {
-    var findURL = settingCascadeURL.find(function (x) {
-      return x.id === e;
-    });
+  const handleChangeEndpoint = e => {
+    const findURL = settingCascadeURL.find(x => x.id === e);
 
     if (findURL) {
-      var _form$setFieldsValue;
-
-      form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[namePreffix + "-api_initial"] = findURL.initial, _form$setFieldsValue[namePreffix + "-api_list"] = findURL.list, _form$setFieldsValue));
+      form.setFieldsValue({
+        [`${namePreffix}-api_initial`]: findURL.initial,
+        [`${namePreffix}-api_list`]: findURL.list
+      });
       updateGlobalState({
         endpoint: findURL.endpoint,
         initial: findURL.initial || 0,
@@ -3774,13 +3559,13 @@ var SettingCascade = function SettingCascade(_ref) {
     }
   };
 
-  var handleChangeInitial = function handleChangeInitial(e) {
+  const handleChangeInitial = e => {
     updateGlobalState({
       initial: e
     });
   };
 
-  var handleChangeList = function handleChangeList(value) {
+  const handleChangeList = value => {
     updateGlobalState({
       list: value
     });
@@ -3790,7 +3575,7 @@ var SettingCascade = function SettingCascade(_ref) {
     className: styles['more-question-setting-text']
   }, UIText.questionMoreCascadeSettingText), /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionEndpointLabel,
-    name: namePreffix + "-api_endpoint"
+    name: `${namePreffix}-api_endpoint`
   }, /*#__PURE__*/React__default.createElement(Row, {
     align: "middle",
     gutter: [24, 24]
@@ -3801,14 +3586,12 @@ var SettingCascade = function SettingCascade(_ref) {
     className: styles['select-dropdown'],
     optionFilterProp: "label",
     options: cascadeURLDropdownValue,
-    getPopupContainer: function getPopupContainer(triggerNode) {
-      return triggerNode.parentElement;
-    },
+    getPopupContainer: triggerNode => triggerNode.parentElement,
     onChange: handleChangeEndpoint
   })), /*#__PURE__*/React__default.createElement(Col, {
     span: 14
   }, /*#__PURE__*/React__default.createElement(Input, {
-    value: api === null || api === void 0 ? void 0 : api.endpoint,
+    value: _api === null || _api === void 0 ? void 0 : _api.endpoint,
     disabled: true
   })))), /*#__PURE__*/React__default.createElement(Row, {
     align: "bottom",
@@ -3817,8 +3600,8 @@ var SettingCascade = function SettingCascade(_ref) {
     span: 4
   }, /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionInitialValueLabel,
-    initialValue: api === null || api === void 0 ? void 0 : api.initial,
-    name: namePreffix + "-api_initial"
+    initialValue: _api === null || _api === void 0 ? void 0 : _api.initial,
+    name: `${namePreffix}-api_initial`
   }, /*#__PURE__*/React__default.createElement(InputNumber, {
     style: {
       width: '100%'
@@ -3827,22 +3610,22 @@ var SettingCascade = function SettingCascade(_ref) {
     keyboard: false,
     onChange: handleChangeInitial
   }))), /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement(Form.Item, {
-    name: namePreffix + "-api_list_checkbox"
+    name: `${namePreffix}-api_list_checkbox`
   }, /*#__PURE__*/React__default.createElement(Checkbox, {
-    onChange: function onChange(e) {
+    onChange: e => {
       var _e$target;
 
       return handleChangeList(e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.checked);
     },
-    checked: api !== null && api !== void 0 && api.list ? true : false
-  }, ' ', UIText.inputQuestionListCheckbox))), (api === null || api === void 0 ? void 0 : api.list) && /*#__PURE__*/React__default.createElement(Col, {
+    checked: _api !== null && _api !== void 0 && _api.list ? true : false
+  }, ' ', UIText.inputQuestionListCheckbox))), (_api === null || _api === void 0 ? void 0 : _api.list) && /*#__PURE__*/React__default.createElement(Col, {
     span: 8
   }, /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionListLabel,
-    initialValue: api !== null && api !== void 0 && api.list ? api.list !== true ? api.list : null : null,
-    name: namePreffix + "-api_list"
+    initialValue: _api !== null && _api !== void 0 && _api.list ? _api.list !== true ? _api.list : null : null,
+    name: `${namePreffix}-api_list`
   }, /*#__PURE__*/React__default.createElement(Input, {
-    onChange: function onChange(e) {
+    onChange: e => {
       var _e$target2;
 
       return handleChangeList(e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.value);
@@ -9530,50 +9313,44 @@ var moment = createCommonjsModule(function (module, exports) {
 })));
 });
 
-var SettingDate = function SettingDate(_ref) {
-  var id = _ref.id,
-      questionGroupId = _ref.questionGroupId,
-      _ref$rule = _ref.rule,
-      rule = _ref$rule === void 0 ? {
+const SettingDate = ({
+  id,
+  questionGroupId,
+  rule: _rule = {
     minDate: null,
     maxDate: null
-  } : _ref$rule;
-  var namePreffix = "question-" + id;
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
-  var minDate = rule === null || rule === void 0 ? void 0 : rule.minDate;
-  var maxDate = rule === null || rule === void 0 ? void 0 : rule.maxDate;
-  var moreDateSettings = [{
+  }
+}) => {
+  const namePreffix = `question-${id}`;
+  const UIText = UIStore.useState(s => s.UIText);
+  const minDate = _rule === null || _rule === void 0 ? void 0 : _rule.minDate;
+  const maxDate = _rule === null || _rule === void 0 ? void 0 : _rule.maxDate;
+  const moreDateSettings = [{
     label: UIText.inputQuestionAfterDateValueLabel,
     value: minDate,
     key: 'minDate',
-    disabledDate: function disabledDate(current) {
-      return current && maxDate && current >= moment(maxDate);
-    }
+    disabledDate: current => current && maxDate && current >= moment(maxDate)
   }, {
     label: UIText.inputQuestionBeforeDateValueLabel,
     value: maxDate,
     key: 'maxDate',
-    disabledDate: function disabledDate(current) {
-      return current && minDate && current <= moment(minDate);
-    }
+    disabledDate: current => current && minDate && current <= moment(minDate)
   }];
 
-  var handleChangeAfterBefore = function handleChangeAfterBefore(name, value) {
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (qg) {
+  const handleChangeAfterBefore = (name, value) => {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(qg => {
         if (qg.id === questionGroupId) {
-          var questions = qg.questions.map(function (q) {
+          const questions = qg.questions.map(q => {
             if (q.id === id) {
               var _q$rule;
 
               if (value) {
-                var _extends2;
-
-                return _extends({}, q, {
-                  rule: _extends({}, q === null || q === void 0 ? void 0 : q.rule, (_extends2 = {}, _extends2[name] = moment(value).format('YYYY-MM-DD'), _extends2))
-                });
+                return { ...q,
+                  rule: { ...(q === null || q === void 0 ? void 0 : q.rule),
+                    [name]: moment(value).format('YYYY-MM-DD')
+                  }
+                };
               }
 
               if (!value && q !== null && q !== void 0 && (_q$rule = q.rule) !== null && _q$rule !== void 0 && _q$rule[name]) {
@@ -9587,9 +9364,9 @@ var SettingDate = function SettingDate(_ref) {
 
             return q;
           });
-          return _extends({}, qg, {
+          return { ...qg,
             questions: questions
-          });
+          };
         }
 
         return qg;
@@ -9602,144 +9379,130 @@ var SettingDate = function SettingDate(_ref) {
   }, UIText.questionMoreInputDateSettingText), /*#__PURE__*/React__default.createElement(Row, {
     align: "middle",
     gutter: [24, 24]
-  }, moreDateSettings.map(function (x) {
-    return /*#__PURE__*/React__default.createElement(Col, {
-      key: namePreffix + "-" + x.key,
-      span: 8
-    }, /*#__PURE__*/React__default.createElement(Form.Item, {
-      label: x.label,
-      initialValue: x.value ? moment(x.value) : null,
-      name: namePreffix + "-" + x.key
-    }, /*#__PURE__*/React__default.createElement(DatePicker, {
-      disabledDate: x.disabledDate,
-      style: {
-        width: '100%'
-      },
-      onChange: function onChange(e) {
-        return handleChangeAfterBefore(x.key, e);
-      }
-    })));
-  })));
+  }, moreDateSettings.map(x => /*#__PURE__*/React__default.createElement(Col, {
+    key: `${namePreffix}-${x.key}`,
+    span: 8
+  }, /*#__PURE__*/React__default.createElement(Form.Item, {
+    label: x.label,
+    initialValue: x.value ? moment(x.value) : null,
+    name: `${namePreffix}-${x.key}`
+  }, /*#__PURE__*/React__default.createElement(DatePicker, {
+    disabledDate: x.disabledDate,
+    style: {
+      width: '100%'
+    },
+    onChange: e => handleChangeAfterBefore(x.key, e)
+  }))))));
 };
 
-var generateColumnName = function generateColumnName(text) {
-  return text.trim().toLowerCase().split(' ').join('_');
-};
+const generateColumnName = text => text.trim().toLowerCase().split(' ').join('_');
 
-var columnType = {
+const columnType = {
   input: 'input',
   number: 'number',
   option: 'option',
   text: 'text'
 };
 
-var defaultColumns = function defaultColumns(_ref) {
-  var _ref$init = _ref.init,
-      init = _ref$init === void 0 ? false : _ref$init;
-  var column = {
+const defaultColumns = ({
+  init: _init = false
+}) => {
+  const column = {
     name: null,
     label: null,
     type: null
   };
 
-  if (init) {
-    return [_extends({}, column, {
+  if (_init) {
+    return [{ ...column,
       id: generateId()
-    })];
+    }];
   }
 
-  return _extends({}, column, {
+  return { ...column,
     id: generateId()
-  });
+  };
 };
 
-var defaultColumnOptions = function defaultColumnOptions(_ref2) {
-  var _ref2$init = _ref2.init,
-      init = _ref2$init === void 0 ? false : _ref2$init,
-      _ref2$order = _ref2.order,
-      order = _ref2$order === void 0 ? 0 : _ref2$order;
-  var option = {
+const defaultColumnOptions = ({
+  init: _init2 = false,
+  order: _order = 0
+}) => {
+  const option = {
     name: 'New Option',
     order: 1
   };
 
-  if (init) {
-    return [_extends({}, option, {
+  if (_init2) {
+    return [{ ...option,
       id: generateId()
-    })];
+    }];
   }
 
-  return _extends({}, option, {
+  return { ...option,
     id: generateId(),
-    order: order
-  });
+    order: _order
+  };
 };
 
-var SettingTable = function SettingTable(_ref3) {
-  var id = _ref3.id,
-      questionGroupId = _ref3.questionGroupId,
-      initialColumns = _ref3.columns;
-  var namePreffix = "question-" + id;
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
-
-  var _useState = useState(initialColumns !== null && initialColumns !== void 0 && initialColumns.length ? initialColumns.map(function (cl, cli) {
+const SettingTable = ({
+  id,
+  questionGroupId,
+  columns: initialColumns
+}) => {
+  const namePreffix = `question-${id}`;
+  const UIText = UIStore.useState(s => s.UIText);
+  const [columns, setColumns] = useState(initialColumns !== null && initialColumns !== void 0 && initialColumns.length ? initialColumns.map((cl, cli) => {
     var _cl$options;
 
     if (cl !== null && cl !== void 0 && cl.options && cl !== null && cl !== void 0 && (_cl$options = cl.options) !== null && _cl$options !== void 0 && _cl$options.length) {
-      var options = cl.options.map(function (op, opi) {
-        return _extends({}, op, {
-          id: (op === null || op === void 0 ? void 0 : op.id) || generateId() + initialColumns.length + opi + 1
-        });
-      });
-      return _extends({}, cl, {
+      const options = cl.options.map((op, opi) => ({ ...op,
+        id: (op === null || op === void 0 ? void 0 : op.id) || generateId() + initialColumns.length + opi + 1
+      }));
+      return { ...cl,
         id: (cl === null || cl === void 0 ? void 0 : cl.id) || generateId() + cli,
         options: options
-      });
+      };
     }
 
-    return _extends({}, cl, {
+    return { ...cl,
       id: (cl === null || cl === void 0 ? void 0 : cl.id) || generateId() + cli
-    });
+    };
   }) : defaultColumns({
     init: true
-  })),
-      columns = _useState[0],
-      setColumns = _useState[1];
-
-  var columnTypeOptions = Object.keys(columnType).map(function (key) {
-    return {
-      label: columnType[key],
-      value: key
-    };
-  });
-  useEffect(function () {
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (qg) {
+  }));
+  const columnTypeOptions = Object.keys(columnType).map(key => ({
+    label: columnType[key],
+    value: key
+  }));
+  useEffect(() => {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(qg => {
         if (qg.id === questionGroupId) {
-          var questions = qg.questions.map(function (q) {
+          const questions = qg.questions.map(q => {
             if (q.id === id) {
-              return _extends({}, q, {
+              return { ...q,
                 columns: columns
-              });
+              };
             }
 
             return q;
           });
-          return _extends({}, qg, {
+          return { ...qg,
             questions: questions
-          });
+          };
         }
 
         return qg;
       });
     });
   }, [id, questionGroupId, columns]);
-  var updateColumns = useCallback(function (columnId, obj) {
-    var updatedColumn = columns.map(function (cl) {
+  const updateColumns = useCallback((columnId, obj) => {
+    const updatedColumn = columns.map(cl => {
       if (cl.id === columnId) {
-        return _extends({}, cl, obj);
+        return { ...cl,
+          ...obj
+        };
       }
 
       return cl;
@@ -9747,50 +9510,52 @@ var SettingTable = function SettingTable(_ref3) {
     setColumns(updatedColumn);
   }, [columns]);
 
-  var handleChangeColumnName = function handleChangeColumnName(columnId, value) {
+  const handleChangeColumnName = (columnId, value) => {
     updateColumns(columnId, {
       name: generateColumnName(value),
       label: value
     });
   };
 
-  var handleChangeColumnType = function handleChangeColumnType(columnId, value) {
-    var obj = {
+  const handleChangeColumnType = (columnId, value) => {
+    let obj = {
       type: value
     };
 
     if (value === columnType.option) {
-      obj = _extends({}, obj, {
+      obj = { ...obj,
         options: defaultColumnOptions({
           init: true
         })
-      });
+      };
     }
 
     updateColumns(columnId, obj);
   };
 
-  var handleAddColumn = function handleAddColumn() {
-    var addColumns = [].concat(columns, [defaultColumns({
+  const handleAddColumn = () => {
+    const addColumns = [...columns, defaultColumns({
       init: false
-    })]);
+    })];
     setColumns(addColumns);
   };
 
-  var handleDeleteColumn = function handleDeleteColumn(currentColumn) {
-    var updatedColumn = columns.filter(function (cl) {
-      return cl.id !== currentColumn.id;
-    });
+  const handleDeleteColumn = currentColumn => {
+    const updatedColumn = columns.filter(cl => cl.id !== currentColumn.id);
     setColumns(updatedColumn);
   };
 
-  var handleOnAddOption = function handleOnAddOption(currentColumn, currentOption) {
-    var columnId = currentColumn.id,
-        options = currentColumn.options;
-    var currentOrder = currentOption.order;
-    var lastOrder = takeRight(orderBy(options, 'order'))[0].order;
-    var reorderOptions = options.map(function (opt) {
-      var order = opt.order;
+  const handleOnAddOption = (currentColumn, currentOption) => {
+    const {
+      id: columnId,
+      options
+    } = currentColumn;
+    const {
+      order: currentOrder
+    } = currentOption;
+    const lastOrder = takeRight(orderBy(options, 'order'))[0].order;
+    const reorderOptions = options.map(opt => {
+      let order = opt.order;
 
       if (opt.order > currentOrder) {
         order = order + 1;
@@ -9800,67 +9565,63 @@ var SettingTable = function SettingTable(_ref3) {
         order = order - 1;
       }
 
-      return _extends({}, opt, {
+      return { ...opt,
         order: order
-      });
+      };
     });
-    var addOptions = [].concat(reorderOptions, [defaultColumnOptions({
+    const addOptions = [...reorderOptions, defaultColumnOptions({
       order: currentOrder + 1
-    })]);
+    })];
     updateColumns(columnId, {
       options: addOptions
     });
   };
 
-  var handleOnMoveOption = function handleOnMoveOption(currentColumn, currentOption, targetOrder) {
-    var columnId = currentColumn.id,
-        options = currentColumn.options;
-    var currentOrder = currentOption.order;
-    var prevOptions = options.filter(function (opt) {
-      return opt.order !== currentOrder && opt.order !== targetOrder;
-    });
-    var currentOptions = options.filter(function (opt) {
-      return opt.order === currentOrder;
-    }).map(function (opt) {
-      return _extends({}, opt, {
-        order: targetOrder
-      });
-    });
-    var targetOptions = options.filter(function (opt) {
-      return opt.order === targetOrder;
-    }).map(function (opt) {
-      return _extends({}, opt, {
-        order: currentOrder
-      });
-    });
+  const handleOnMoveOption = (currentColumn, currentOption, targetOrder) => {
+    const {
+      id: columnId,
+      options
+    } = currentColumn;
+    const {
+      order: currentOrder
+    } = currentOption;
+    const prevOptions = options.filter(opt => opt.order !== currentOrder && opt.order !== targetOrder);
+    const currentOptions = options.filter(opt => opt.order === currentOrder).map(opt => ({ ...opt,
+      order: targetOrder
+    }));
+    const targetOptions = options.filter(opt => opt.order === targetOrder).map(opt => ({ ...opt,
+      order: currentOrder
+    }));
     updateColumns(columnId, {
-      options: orderBy([].concat(prevOptions, currentOptions, targetOptions), 'order')
+      options: orderBy([...prevOptions, ...currentOptions, ...targetOptions], 'order')
     });
   };
 
-  var handleOnDeleteOption = function handleOnDeleteOption(currentColumn, currentOptionId) {
-    var columnId = currentColumn.id,
-        options = currentColumn.options;
+  const handleOnDeleteOption = (currentColumn, currentOptionId) => {
+    const {
+      id: columnId,
+      options
+    } = currentColumn;
     updateColumns(columnId, {
-      options: orderBy(options, 'order').filter(function (opt) {
-        return opt.id !== currentOptionId;
-      }).map(function (opt, opti) {
-        return _extends({}, opt, {
-          order: opti + 1
-        });
-      })
+      options: orderBy(options, 'order').filter(opt => opt.id !== currentOptionId).map((opt, opti) => ({ ...opt,
+        order: opti + 1
+      }))
     });
   };
 
-  var handleOnChangeOption = function handleOnChangeOption(currentColumn, currentOption, value) {
-    var columnId = currentColumn.id,
-        options = currentColumn.options;
-    var currentOptId = currentOption.id;
-    var updatedOptions = options.map(function (op) {
+  const handleOnChangeOption = (currentColumn, currentOption, value) => {
+    const {
+      id: columnId,
+      options
+    } = currentColumn;
+    const {
+      id: currentOptId
+    } = currentOption;
+    const updatedOptions = options.map(op => {
       if (op.id === currentOptId) {
-        return _extends({}, op, {
+        return { ...op,
           name: value
-        });
+        };
       }
 
       return op;
@@ -9872,34 +9633,30 @@ var SettingTable = function SettingTable(_ref3) {
 
   return /*#__PURE__*/React__default.createElement("div", {
     className: styles['more-question-setting-text']
-  }, /*#__PURE__*/React__default.createElement("p", null, UIText.questionMoreTableTypeSettingText), columns.map(function (cl, cli) {
+  }, /*#__PURE__*/React__default.createElement("p", null, UIText.questionMoreTableTypeSettingText), columns.map((cl, cli) => {
     var _cl$options2;
 
     return /*#__PURE__*/React__default.createElement(Card, {
-      key: "column-" + id + "-" + cli + "-" + cl.id,
+      key: `column-${id}-${cli}-${cl.id}`,
       title: /*#__PURE__*/React__default.createElement(Row, {
         gutter: [24, 24],
         align: "middle",
         justify: "space-between"
       }, /*#__PURE__*/React__default.createElement(Col, {
         span: 20
-      }, "Column - " + (cli + 1)), /*#__PURE__*/React__default.createElement(Col, {
+      }, `Column - ${cli + 1}`), /*#__PURE__*/React__default.createElement(Col, {
         span: 4,
         align: "end"
       }, /*#__PURE__*/React__default.createElement(Space, null, /*#__PURE__*/React__default.createElement(Button, {
         type: "link",
         className: styles['button-icon'],
         icon: /*#__PURE__*/React__default.createElement(MdOutlineAddCircleOutline, null),
-        onClick: function onClick() {
-          return handleAddColumn();
-        }
+        onClick: () => handleAddColumn()
       }), /*#__PURE__*/React__default.createElement(Button, {
         type: "link",
         className: styles['button-icon'],
         icon: /*#__PURE__*/React__default.createElement(MdOutlineRemoveCircleOutline, null),
-        onClick: function onClick() {
-          return handleDeleteColumn(cl);
-        },
+        onClick: () => handleDeleteColumn(cl),
         disabled: columns.length === 1
       }))))
     }, /*#__PURE__*/React__default.createElement(Row, {
@@ -9907,13 +9664,13 @@ var SettingTable = function SettingTable(_ref3) {
     }, /*#__PURE__*/React__default.createElement(Col, {
       span: 12
     }, /*#__PURE__*/React__default.createElement(Form.Item, {
-      name: namePreffix + "-column_name_" + cl.id,
+      name: `${namePreffix}-column_name_${cl.id}`,
       className: styles['form-item-no-bottom-margin'],
       label: UIText.inputColumnNameLabel,
       initialValue: cl.label
     }, /*#__PURE__*/React__default.createElement(Input, {
       allowClear: true,
-      onChange: function onChange(e) {
+      onChange: e => {
         var _e$target;
 
         return handleChangeColumnName(cl.id, e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.value);
@@ -9921,7 +9678,7 @@ var SettingTable = function SettingTable(_ref3) {
     }))), /*#__PURE__*/React__default.createElement(Col, {
       span: 12
     }, /*#__PURE__*/React__default.createElement(Form.Item, {
-      name: namePreffix + "-column_type_" + cl.id,
+      name: `${namePreffix}-column_type_${cl.id}`,
       className: styles['form-item-no-bottom-margin'],
       label: UIText.inputColumnTypeLabel,
       initialValue: cl.type
@@ -9929,26 +9686,22 @@ var SettingTable = function SettingTable(_ref3) {
       showSearch: true,
       optionFilterProp: "label",
       options: columnTypeOptions,
-      getPopupContainer: function getPopupContainer(triggerNode) {
-        return triggerNode.parentElement;
-      },
-      onChange: function onChange(val) {
-        return handleChangeColumnType(cl.id, val);
-      }
+      getPopupContainer: triggerNode => triggerNode.parentElement,
+      onChange: val => handleChangeColumnType(cl.id, val)
     }))), /*#__PURE__*/React__default.createElement(Col, {
       span: 24
-    }, cl.type === columnType.option && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("p", null, UIText.questionTableTypeDefineOptionsText), cl === null || cl === void 0 ? void 0 : (_cl$options2 = cl.options) === null || _cl$options2 === void 0 ? void 0 : _cl$options2.map(function (op, opi) {
+    }, cl.type === columnType.option && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("p", null, UIText.questionTableTypeDefineOptionsText), cl === null || cl === void 0 ? void 0 : (_cl$options2 = cl.options) === null || _cl$options2 === void 0 ? void 0 : _cl$options2.map((op, opi) => {
       return /*#__PURE__*/React__default.createElement(Row, {
-        key: "option-" + id + "-" + opi + "-" + op.id,
+        key: `option-${id}-${opi}-${op.id}`,
         gutter: [24, 24]
       }, /*#__PURE__*/React__default.createElement(Col, {
         span: 12
       }, /*#__PURE__*/React__default.createElement(Form.Item, {
         initialValue: op.name,
-        name: namePreffix + "-option_name_" + op.id + "_" + cl.id
+        name: `${namePreffix}-option_name_${op.id}_${cl.id}`
       }, /*#__PURE__*/React__default.createElement(Input, {
         allowClear: true,
-        onChange: function onChange(e) {
+        onChange: e => {
           var _e$target2;
 
           return handleOnChangeOption(cl, op, e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.value);
@@ -9957,143 +9710,176 @@ var SettingTable = function SettingTable(_ref3) {
         type: "link",
         className: styles['button-icon'],
         icon: /*#__PURE__*/React__default.createElement(MdOutlineAddCircleOutline, null),
-        onClick: function onClick() {
-          return handleOnAddOption(cl, op);
-        }
+        onClick: () => handleOnAddOption(cl, op)
       }), /*#__PURE__*/React__default.createElement(Button, {
         type: "link",
         className: styles['button-icon'],
         icon: /*#__PURE__*/React__default.createElement(MdOutlineArrowCircleUp, null),
-        onClick: function onClick() {
-          return handleOnMoveOption(cl, op, op.order - 1);
-        },
+        onClick: () => handleOnMoveOption(cl, op, op.order - 1),
         disabled: opi === 0
       }), /*#__PURE__*/React__default.createElement(Button, {
         type: "link",
         className: styles['button-icon'],
         icon: /*#__PURE__*/React__default.createElement(MdOutlineArrowCircleDown, null),
-        onClick: function onClick() {
-          return handleOnMoveOption(cl, op, op.order + 1);
-        },
+        onClick: () => handleOnMoveOption(cl, op, op.order + 1),
         disabled: opi === cl.options.length - 1
       }), /*#__PURE__*/React__default.createElement(Button, {
         type: "link",
         className: styles['button-icon'],
         icon: /*#__PURE__*/React__default.createElement(MdOutlineRemoveCircleOutline, null),
-        onClick: function onClick() {
-          return handleOnDeleteOption(cl, op.id);
-        },
+        onClick: () => handleOnDeleteOption(cl, op.id),
         disabled: cl.options.length === 1
       }))));
     })))));
   }));
 };
 
-var QuestionHint = function QuestionHint(_ref) {
-  var _hostParams$settingHi;
+const SettingImage = ({
+  id,
+  questionGroupId,
+  limit
+}) => {
+  const namePreffix = `question-${id}`;
+  const UIText = UIStore.useState(s => s.UIText);
 
-  var id = _ref.id,
-      questionGroupId = _ref.questionGroupId,
-      _ref$hint = _ref.hint,
-      hint = _ref$hint === void 0 ? {
-    id: null,
-    endpoint: null,
-    path: [],
-    "static": null,
-    buttonText: null
-  } : _ref$hint;
-  var namePreffix = "question-" + id;
-
-  var _UIStore$useState = UIStore.useState(function (s) {
-    return s;
-  }),
-      UIText = _UIStore$useState.UIText,
-      hostParams = _UIStore$useState.hostParams;
-
-  var settingHintURL = hostParams === null || hostParams === void 0 ? void 0 : (_hostParams$settingHi = hostParams.settingHintURL) === null || _hostParams$settingHi === void 0 ? void 0 : _hostParams$settingHi.settings;
-  var form = Form.useFormInstance();
-  var updateGlobalState = useCallback(function (values) {
-    if (values === void 0) {
-      values = {};
-    }
-
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (qg) {
+  const updateState = (name, value) => {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(qg => {
         if (qg.id === questionGroupId) {
-          var questions = qg.questions.map(function (q) {
+          const questions = qg.questions.map(q => {
             if (q.id === id) {
-              return _extends({}, q, {
-                hint: _extends({}, q === null || q === void 0 ? void 0 : q.hint, values)
-              });
+              return { ...q,
+                [name]: value
+              };
             }
 
             return q;
           });
-          return _extends({}, qg, {
+          return { ...qg,
             questions: questions
+          };
+        }
+
+        return qg;
+      });
+    });
+  };
+
+  const handleOnLimit = value => {
+    updateState('limit', value);
+  };
+
+  return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("p", {
+    className: styles['more-question-setting-text']
+  }, UIText.questionMoreImageTypeSettingText), /*#__PURE__*/React__default.createElement(Row, {
+    align: "middle",
+    gutter: [24, 24]
+  }, /*#__PURE__*/React__default.createElement(Col, {
+    span: 8
+  }, /*#__PURE__*/React__default.createElement(Form.Item, {
+    label: UIText.inputQuestionImageLimitValidationText,
+    name: `${namePreffix}-limit_file_size`
+  }, /*#__PURE__*/React__default.createElement(InputNumber, {
+    onChange: handleOnLimit,
+    value: limit,
+    addonAfter: "MB"
+  })))));
+};
+
+const QuestionHint = ({
+  id,
+  questionGroupId,
+  hint: _hint = {
+    id: null,
+    endpoint: null,
+    path: [],
+    static: null,
+    buttonText: null
+  }
+}) => {
+  var _hostParams$settingHi;
+
+  const namePreffix = `question-${id}`;
+  const {
+    UIText,
+    hostParams
+  } = UIStore.useState(s => s);
+  const settingHintURL = hostParams === null || hostParams === void 0 ? void 0 : (_hostParams$settingHi = hostParams.settingHintURL) === null || _hostParams$settingHi === void 0 ? void 0 : _hostParams$settingHi.settings;
+  const form = Form.useFormInstance();
+  const updateGlobalState = useCallback((values = {}) => {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(qg => {
+        if (qg.id === questionGroupId) {
+          const questions = qg.questions.map(q => {
+            if (q.id === id) {
+              return { ...q,
+                hint: { ...(q === null || q === void 0 ? void 0 : q.hint),
+                  ...values
+                }
+              };
+            }
+
+            return q;
           });
+          return { ...qg,
+            questions: questions
+          };
         }
 
         return qg;
       });
     });
   }, [id, questionGroupId]);
-  var hintURLDropdownValue = useMemo(function () {
-    return settingHintURL && settingHintURL !== null && settingHintURL !== void 0 && settingHintURL.length ? settingHintURL.map(function (x) {
-      return {
-        label: x.name,
-        value: x.id
-      };
-    }) : [];
+  const hintURLDropdownValue = useMemo(() => {
+    return settingHintURL && settingHintURL !== null && settingHintURL !== void 0 && settingHintURL.length ? settingHintURL.map(x => ({
+      label: x.name,
+      value: x.id
+    })) : [];
   }, [settingHintURL]);
-  var hintPathDropdownValue = useMemo(function () {
-    var endpoint = hint === null || hint === void 0 ? void 0 : hint.endpoint;
+  const hintPathDropdownValue = useMemo(() => {
+    let endpoint = _hint === null || _hint === void 0 ? void 0 : _hint.endpoint;
 
-    if (hint !== null && hint !== void 0 && hint.endpoint && endpoint.includes(String(id))) {
-      endpoint = endpoint.replace("/" + String(id), '');
+    if (_hint !== null && _hint !== void 0 && _hint.endpoint && endpoint.includes(String(id))) {
+      endpoint = endpoint.replace(`/${String(id)}`, '');
     }
 
-    var findURL = settingHintURL.find(function (x) {
-      return x.id === (hint === null || hint === void 0 ? void 0 : hint.id) || x.endpoint === endpoint;
-    });
+    const findURL = settingHintURL.find(x => x.id === (_hint === null || _hint === void 0 ? void 0 : _hint.id) || x.endpoint === endpoint);
     updateGlobalState({
       id: findURL === null || findURL === void 0 ? void 0 : findURL.id
     });
     return (findURL === null || findURL === void 0 ? void 0 : findURL.path) || [];
-  }, [settingHintURL, hint === null || hint === void 0 ? void 0 : hint.id, hint === null || hint === void 0 ? void 0 : hint.endpoint, id, updateGlobalState]);
+  }, [settingHintURL, _hint === null || _hint === void 0 ? void 0 : _hint.id, _hint === null || _hint === void 0 ? void 0 : _hint.endpoint, id, updateGlobalState]);
 
-  var handleChangeEndpoint = function handleChangeEndpoint(e) {
-    var _form$setFieldsValue;
-
-    var findURL = settingHintURL.find(function (x) {
-      return x.id === e;
+  const handleChangeEndpoint = e => {
+    const findURL = settingHintURL.find(x => x.id === e);
+    form.setFieldsValue({
+      [`${namePreffix}-hint_path`]: []
     });
-    form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[namePreffix + "-hint_path"] = [], _form$setFieldsValue));
     updateGlobalState({
       id: e,
-      endpoint: findURL !== null && findURL !== void 0 && findURL.endpoint ? findURL.endpoint + "/" + id : null,
+      endpoint: findURL !== null && findURL !== void 0 && findURL.endpoint ? `${findURL.endpoint}/${id}` : null,
       path: []
     });
   };
 
-  var handleChangePath = function handleChangePath(val) {
+  const handleChangePath = val => {
     updateGlobalState({
       path: val
     });
   };
 
-  var handleChangeStaticValue = function handleChangeStaticValue(e) {
+  const handleChangeStaticValue = e => {
     var _e$target;
 
     updateGlobalState({
       id: null,
-      "static": e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.value,
+      static: e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.value,
       endpoint: null,
       path: []
     });
   };
 
-  var handleChangeButtonText = function handleChangeButtonText(e) {
+  const handleChangeButtonText = e => {
     var _e$target2;
 
     updateGlobalState({
@@ -10105,7 +9891,7 @@ var QuestionHint = function QuestionHint(_ref) {
     className: styles['more-question-setting-text']
   }, UIText.questionHintSettingText), /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputSelectHintEndpointLabel,
-    name: namePreffix + "-hint_endpoint"
+    name: `${namePreffix}-hint_endpoint`
   }, /*#__PURE__*/React__default.createElement(Row, {
     align: "middle",
     gutter: [24, 24]
@@ -10117,21 +9903,19 @@ var QuestionHint = function QuestionHint(_ref) {
     className: styles['select-dropdown'],
     optionFilterProp: "label",
     options: hintURLDropdownValue,
-    getPopupContainer: function getPopupContainer(triggerNode) {
-      return triggerNode.parentElement;
-    },
+    getPopupContainer: triggerNode => triggerNode.parentElement,
     onChange: handleChangeEndpoint,
-    value: hint === null || hint === void 0 ? void 0 : hint.id,
-    disabled: hint === null || hint === void 0 ? void 0 : hint["static"]
+    value: _hint === null || _hint === void 0 ? void 0 : _hint.id,
+    disabled: _hint === null || _hint === void 0 ? void 0 : _hint.static
   })), /*#__PURE__*/React__default.createElement(Col, {
     span: 14
   }, /*#__PURE__*/React__default.createElement(Input, {
-    value: hint === null || hint === void 0 ? void 0 : hint.endpoint,
+    value: _hint === null || _hint === void 0 ? void 0 : _hint.endpoint,
     disabled: true
   })))), /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputSelectHintPathLabel,
-    name: namePreffix + "-hint_path",
-    initialValue: hint === null || hint === void 0 ? void 0 : hint.path
+    name: `${namePreffix}-hint_path`,
+    initialValue: _hint === null || _hint === void 0 ? void 0 : _hint.path
   }, /*#__PURE__*/React__default.createElement(Select, {
     showSearch: true,
     allowClear: true,
@@ -10140,11 +9924,9 @@ var QuestionHint = function QuestionHint(_ref) {
     className: styles['select-dropdown'],
     optionFilterProp: "label",
     options: hintPathDropdownValue,
-    getPopupContainer: function getPopupContainer(triggerNode) {
-      return triggerNode.parentElement;
-    },
+    getPopupContainer: triggerNode => triggerNode.parentElement,
     onChange: handleChangePath,
-    disabled: hint === null || hint === void 0 ? void 0 : hint["static"]
+    disabled: _hint === null || _hint === void 0 ? void 0 : _hint.static
   })), /*#__PURE__*/React__default.createElement(Row, {
     align: "middle",
     gutter: [24, 24]
@@ -10152,72 +9934,62 @@ var QuestionHint = function QuestionHint(_ref) {
     span: 12
   }, /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionStaticValueLabel,
-    name: namePreffix + "-hint_static_value",
-    initialValue: hint === null || hint === void 0 ? void 0 : hint["static"]
+    name: `${namePreffix}-hint_static_value`,
+    initialValue: _hint === null || _hint === void 0 ? void 0 : _hint.static
   }, /*#__PURE__*/React__default.createElement(Input, {
     onChange: handleChangeStaticValue,
-    disabled: hint === null || hint === void 0 ? void 0 : hint.endpoint
+    disabled: _hint === null || _hint === void 0 ? void 0 : _hint.endpoint
   }))), /*#__PURE__*/React__default.createElement(Col, {
     span: 12
   }, /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionHintButtonTextLabel,
-    name: namePreffix + "-hint_button_text",
-    initialValue: hint === null || hint === void 0 ? void 0 : hint.buttonText
+    name: `${namePreffix}-hint_button_text`,
+    initialValue: _hint === null || _hint === void 0 ? void 0 : _hint.buttonText
   }, /*#__PURE__*/React__default.createElement(Input, {
     onChange: handleChangeButtonText
   })))));
 };
 
-var QuestionSetting = function QuestionSetting(_ref) {
-  var question = _ref.question,
-      dependant = _ref.dependant;
-  var id = question.id,
-      name = question.name,
-      type = question.type,
-      variable = question.variable,
-      tooltip = question.tooltip,
-      required = question.required,
-      questionGroupId = question.questionGroupId,
-      meta = question.meta,
-      disableDelete = question.disableDelete;
-  var namePreffix = "question-" + id;
-  var form = Form.useFormInstance();
-  var qType = Form.useWatch(namePreffix + "-type", form);
-
-  var _UIStore$useState = UIStore.useState(function (s) {
-    return s;
-  }),
-      UIText = _UIStore$useState.UIText,
-      hostParams = _UIStore$useState.hostParams;
-
-  var limitQuestionType = hostParams === null || hostParams === void 0 ? void 0 : hostParams.limitQuestionType;
-  var settingHintURL = hostParams === null || hostParams === void 0 ? void 0 : hostParams.settingHintURL;
-  var defaultQuestionParam = hostParams === null || hostParams === void 0 ? void 0 : hostParams.defaultQuestionParam;
-  var questionGroups = questionGroupFn.store.useState(function (s) {
-    return s.questionGroups;
-  });
-  var disableMetaForGeo = useMemo(function () {
-    var metaGeoQuestionDefined = questionGroups.flatMap(function (qg) {
-      return qg.questions.filter(function (q) {
-        return q.type === questionType.geo && (q === null || q === void 0 ? void 0 : q.meta);
-      });
-    }).map(function (q) {
-      return q.id;
-    });
+const QuestionSetting = ({
+  question,
+  dependant
+}) => {
+  const {
+    id,
+    name,
+    type,
+    variable,
+    tooltip,
+    required,
+    questionGroupId,
+    meta,
+    disableDelete
+  } = question;
+  const namePreffix = `question-${id}`;
+  const form = Form.useFormInstance();
+  const qType = Form.useWatch(`${namePreffix}-type`, form);
+  const {
+    UIText,
+    hostParams
+  } = UIStore.useState(s => s);
+  const limitQuestionType = hostParams === null || hostParams === void 0 ? void 0 : hostParams.limitQuestionType;
+  const settingHintURL = hostParams === null || hostParams === void 0 ? void 0 : hostParams.settingHintURL;
+  const defaultQuestionParam = hostParams === null || hostParams === void 0 ? void 0 : hostParams.defaultQuestionParam;
+  const questionGroups = questionGroupFn.store.useState(s => s.questionGroups);
+  const disableMetaForGeo = useMemo(() => {
+    const metaGeoQuestionDefined = questionGroups.flatMap(qg => qg.questions.filter(q => q.type === questionType.geo && (q === null || q === void 0 ? void 0 : q.meta))).map(q => q.id);
     return type === questionType.geo && metaGeoQuestionDefined.length && !metaGeoQuestionDefined.includes(id);
   }, [questionGroups, type, id]);
-  var showMetaCheckbox = useMemo(function () {
-    var currentQuestionGroup = questionGroups.find(function (qg) {
-      return qg.id === questionGroupId;
-    });
+  const showMetaCheckbox = useMemo(() => {
+    const currentQuestionGroup = questionGroups.find(qg => qg.id === questionGroupId);
     return ![questionType.tree, questionType.table].includes(type) && !(currentQuestionGroup !== null && currentQuestionGroup !== void 0 && currentQuestionGroup.repeatable);
   }, [type, questionGroups, questionGroupId]);
-  var questionTypeDropdownValue = useMemo(function () {
+  const questionTypeDropdownValue = useMemo(() => {
     if (limitQuestionType && limitQuestionType !== null && limitQuestionType !== void 0 && limitQuestionType.length) {
       return limitQuestionType;
     }
 
-    return Object.keys(questionType).map(function (key) {
+    return Object.keys(questionType).map(key => {
       var _questionType$key;
 
       return {
@@ -10226,7 +9998,7 @@ var QuestionSetting = function QuestionSetting(_ref) {
       };
     });
   }, [limitQuestionType]);
-  var showHintSetting = useMemo(function () {
+  const showHintSetting = useMemo(() => {
     var _settingHintURL$setti, _settingHintURL$quest, _settingHintURL$setti2;
 
     if (!settingHintURL || !(settingHintURL !== null && settingHintURL !== void 0 && (_settingHintURL$setti = settingHintURL.settings) !== null && _settingHintURL$setti !== void 0 && _settingHintURL$setti.length)) {
@@ -10239,35 +10011,33 @@ var QuestionSetting = function QuestionSetting(_ref) {
 
     return settingHintURL === null || settingHintURL === void 0 ? void 0 : (_settingHintURL$setti2 = settingHintURL.settings) === null || _settingHintURL$setti2 === void 0 ? void 0 : _settingHintURL$setti2.length;
   }, [settingHintURL, type]);
-  var updateState = useCallback(function (name, value) {
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (qg) {
+  const updateState = useCallback((name, value) => {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(qg => {
         if (qg.id === questionGroupId) {
-          var questions = qg.questions.map(function (q) {
+          const questions = qg.questions.map(q => {
             if (q.id === id) {
-              var _extends2;
-
-              return _extends({}, q, (_extends2 = {}, _extends2[name] = value, _extends2));
+              return { ...q,
+                [name]: value
+              };
             }
 
             return q;
           });
-          return _extends({}, qg, {
+          return { ...qg,
             questions: questions
-          });
+          };
         }
 
         return qg;
       });
     });
   }, [id, questionGroupId]);
-  var defaultTypeValue = useMemo(function () {
+  const defaultTypeValue = useMemo(() => {
     if (questionTypeDropdownValue.length) {
       var _questionTypeDropdown;
 
-      var checkType = questionTypeDropdownValue.find(function (x) {
-        return x.value === type;
-      });
+      const checkType = questionTypeDropdownValue.find(x => x.value === type);
 
       if (checkType) {
         return type;
@@ -10278,10 +10048,8 @@ var QuestionSetting = function QuestionSetting(_ref) {
         return defaultQuestionParam.type;
       }
 
-      var checkText = questionTypeDropdownValue.find(function (x) {
-        return x.value === questionType.text;
-      });
-      var defType = checkText ? checkText.value : questionTypeDropdownValue === null || questionTypeDropdownValue === void 0 ? void 0 : (_questionTypeDropdown = questionTypeDropdownValue[0]) === null || _questionTypeDropdown === void 0 ? void 0 : _questionTypeDropdown.value;
+      const checkText = questionTypeDropdownValue.find(x => x.value === questionType.text);
+      const defType = checkText ? checkText.value : questionTypeDropdownValue === null || questionTypeDropdownValue === void 0 ? void 0 : (_questionTypeDropdown = questionTypeDropdownValue[0]) === null || _questionTypeDropdown === void 0 ? void 0 : _questionTypeDropdown.value;
       updateState('type', defType);
       return defType;
     }
@@ -10289,71 +10057,63 @@ var QuestionSetting = function QuestionSetting(_ref) {
     return type;
   }, [type, questionTypeDropdownValue, defaultQuestionParam, updateState]);
 
-  var handleChangeName = function handleChangeName(e) {
+  const handleChangeName = e => {
     var _e$target;
 
     updateState('name', e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.value);
   };
 
-  var handleChangeType = function handleChangeType(e) {
+  const handleChangeType = e => {
     updateState('type', e);
   };
 
-  var handleChangeVariableName = function handleChangeVariableName(e) {
+  const handleChangeVariableName = e => {
     var _e$target2;
 
     updateState('variableName', e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.value);
   };
 
-  var handleChangeTooltip = function handleChangeTooltip(e) {
+  const handleChangeTooltip = e => {
     var _e$target3;
 
-    var value = e === null || e === void 0 ? void 0 : (_e$target3 = e.target) === null || _e$target3 === void 0 ? void 0 : _e$target3.value;
+    const value = e === null || e === void 0 ? void 0 : (_e$target3 = e.target) === null || _e$target3 === void 0 ? void 0 : _e$target3.value;
 
     if (value) {
-      updateState('tooltip', _extends({}, tooltip, {
+      updateState('tooltip', { ...tooltip,
         text: value
-      }));
+      });
     } else {
       updateState('tooltip', null);
     }
   };
 
-  var handleChangeRequired = function handleChangeRequired(e) {
+  const handleChangeRequired = e => {
     var _e$target4;
 
     updateState('required', e === null || e === void 0 ? void 0 : (_e$target4 = e.target) === null || _e$target4 === void 0 ? void 0 : _e$target4.checked);
   };
 
-  var handleChangeMeta = function handleChangeMeta(e) {
+  const handleChangeMeta = e => {
     var _e$target5;
 
     updateState('meta', e === null || e === void 0 ? void 0 : (_e$target5 = e.target) === null || _e$target5 === void 0 ? void 0 : _e$target5.checked);
   };
 
-  var dependantGroup = map(groupBy(dependant.map(function (x) {
-    return {
-      name: x.questionGroup.order + "." + x.order + ". " + x.name,
-      group: x.questionGroup.order + ". " + x.questionGroup.name
-    };
-  }), 'group'), function (i, g) {
-    return {
-      items: orderBy(i, 'name'),
-      group: g
-    };
-  });
+  const dependantGroup = map(groupBy(dependant.map(x => ({
+    name: `${x.questionGroup.order}.${x.order}. ${x.name}`,
+    group: `${x.questionGroup.order}. ${x.questionGroup.name}`
+  })), 'group'), (i, g) => ({
+    items: orderBy(i, 'name'),
+    group: g
+  }));
   return /*#__PURE__*/React__default.createElement("div", null, !!dependant.length && /*#__PURE__*/React__default.createElement(Alert, {
     message: /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("ul", {
       className: "arfe-dependant-list-box"
-    }, "Dependant Questions:", dependantGroup.map(function (d, di) {
-      return /*#__PURE__*/React__default.createElement("li", {
-        key: di
-      }, d.group, /*#__PURE__*/React__default.createElement("ul", null, d.items.map(function (i, ii) {
-        return /*#__PURE__*/React__default.createElement("li", {
-          key: ii
-        }, i.name);
-      })));
-    }))),
+    }, "Dependant Questions:", dependantGroup.map((d, di) => /*#__PURE__*/React__default.createElement("li", {
+      key: di
+    }, d.group, /*#__PURE__*/React__default.createElement("ul", null, d.items.map((i, ii) => /*#__PURE__*/React__default.createElement("li", {
+      key: ii
+    }, i.name))))))),
     type: "info",
     style: {
       marginBottom: 24
@@ -10361,7 +10121,7 @@ var QuestionSetting = function QuestionSetting(_ref) {
   }), /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionNameLabel,
     initialValue: name,
-    name: namePreffix + "-name",
+    name: `${namePreffix}-name`,
     required: true
   }, /*#__PURE__*/React__default.createElement(Input, {
     onChange: handleChangeName,
@@ -10369,29 +10129,27 @@ var QuestionSetting = function QuestionSetting(_ref) {
   })), /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionTypeLabel,
     initialValue: defaultTypeValue,
-    name: namePreffix + "-type",
+    name: `${namePreffix}-type`,
     required: true
   }, /*#__PURE__*/React__default.createElement(Select, {
     showSearch: true,
     optionFilterProp: "label",
     className: styles['select-dropdown'],
     options: questionTypeDropdownValue,
-    getPopupContainer: function getPopupContainer(triggerNode) {
-      return triggerNode.parentElement;
-    },
+    getPopupContainer: triggerNode => triggerNode.parentElement,
     onChange: handleChangeType,
     disabled: dependant.length || disableDelete
   })), /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionVariableNameLabel,
     initialValue: variable,
-    name: namePreffix + "-variable"
+    name: `${namePreffix}-variable`
   }, /*#__PURE__*/React__default.createElement(Input, {
     onChange: handleChangeVariableName,
     allowClear: true
   })), /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionTooltipLabel,
     initialValue: tooltip === null || tooltip === void 0 ? void 0 : tooltip.text,
-    name: namePreffix + "-tooltip"
+    name: `${namePreffix}-tooltip`
   }, /*#__PURE__*/React__default.createElement(Input.TextArea, {
     onChange: handleChangeTooltip,
     allowClear: true,
@@ -10400,13 +10158,13 @@ var QuestionSetting = function QuestionSetting(_ref) {
     gutter: [24, 24],
     align: "middle"
   }, /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement(Form.Item, {
-    name: namePreffix + "-required",
+    name: `${namePreffix}-required`,
     className: styles['input-checkbox-wrapper']
   }, /*#__PURE__*/React__default.createElement(Checkbox, {
     onChange: handleChangeRequired,
     checked: required
   }, ' ', UIText.inputQuestionRequiredCheckbox))), showMetaCheckbox && /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(Form.Item, {
-    name: namePreffix + "-meta",
+    name: `${namePreffix}-meta`,
     className: styles['input-checkbox-wrapper']
   }, /*#__PURE__*/React__default.createElement(Checkbox, {
     onChange: handleChangeMeta,
@@ -10420,10 +10178,10 @@ var QuestionSetting = function QuestionSetting(_ref) {
       cursor: 'pointer',
       marginLeft: '-4px'
     }
-  })))))), showHintSetting && /*#__PURE__*/React__default.createElement(QuestionHint, question), qType === questionType.input && /*#__PURE__*/React__default.createElement(SettingInput, question), qType === questionType.number && /*#__PURE__*/React__default.createElement(SettingNumber, question), [questionType.option, questionType.multiple_option].includes(qType) && /*#__PURE__*/React__default.createElement(SettingOption, question), qType === questionType.tree && /*#__PURE__*/React__default.createElement(SettingTree, question), qType === questionType.cascade && /*#__PURE__*/React__default.createElement(SettingCascade, question), qType === questionType.date && /*#__PURE__*/React__default.createElement(SettingDate, question), qType === questionType.table && /*#__PURE__*/React__default.createElement(SettingTable, question));
+  })))))), showHintSetting && /*#__PURE__*/React__default.createElement(QuestionHint, question), qType === questionType.input && /*#__PURE__*/React__default.createElement(SettingInput, question), qType === questionType.number && /*#__PURE__*/React__default.createElement(SettingNumber, question), [questionType.option, questionType.multiple_option].includes(qType) && /*#__PURE__*/React__default.createElement(SettingOption, question), qType === questionType.tree && /*#__PURE__*/React__default.createElement(SettingTree, question), qType === questionType.cascade && /*#__PURE__*/React__default.createElement(SettingCascade, question), qType === questionType.date && /*#__PURE__*/React__default.createElement(SettingDate, question), qType === questionType.table && /*#__PURE__*/React__default.createElement(SettingTable, question), qType === questionType.image && /*#__PURE__*/React__default.createElement(SettingImage, question));
 };
 
-var dependencyTypes = [{
+const dependencyTypes = [{
   type: [questionType.option, questionType.multiple_option],
   logicDropdowns: [{
     label: 'contains',
@@ -10452,7 +10210,7 @@ var dependencyTypes = [{
   }]
 }];
 
-var defaultSkipLogic = function defaultSkipLogic() {
+const defaultSkipLogic = () => {
   return [{
     id: generateId(),
     dependentTo: null,
@@ -10464,53 +10222,39 @@ var defaultSkipLogic = function defaultSkipLogic() {
   }];
 };
 
-var fetchDependencyLogicDropdown = function fetchDependencyLogicDropdown(question) {
+const fetchDependencyLogicDropdown = question => {
   var _dependencyTypes$find;
 
-  var value = (_dependencyTypes$find = dependencyTypes.find(function (dt) {
-    return dt.type.includes(question.type);
-  })) === null || _dependencyTypes$find === void 0 ? void 0 : _dependencyTypes$find.logicDropdowns;
+  const value = (_dependencyTypes$find = dependencyTypes.find(dt => dt.type.includes(question.type))) === null || _dependencyTypes$find === void 0 ? void 0 : _dependencyTypes$find.logicDropdowns;
   return value || [];
 };
 
-var fetchDependencyAnswerDropdown = function fetchDependencyAnswerDropdown(question) {
+const fetchDependencyAnswerDropdown = question => {
   if (question !== null && question !== void 0 && question.options) {
-    return question.options.map(function (opt) {
-      return {
-        label: opt.name,
-        value: opt.name
-      };
-    });
+    return question.options.map(opt => ({
+      label: opt.name,
+      value: opt.name
+    }));
   }
 
   return [];
 };
 
-var transformDependencyValue = function transformDependencyValue(dependency, questionGroups) {
-  var questions = questionGroups.flatMap(function (qg) {
-    return qg.questions;
-  });
-  var logicDropdowns = dependencyTypes.flatMap(function (d) {
-    return d.logicDropdowns;
-  }).map(function (x) {
-    return x.value;
-  });
-  var value = dependency.map(function (d) {
+const transformDependencyValue = (dependency, questionGroups) => {
+  const questions = questionGroups.flatMap(qg => qg.questions);
+  const logicDropdowns = dependencyTypes.flatMap(d => d.logicDropdowns).map(x => x.value);
+  const value = dependency.map(d => {
     var _logicDropdowns$map$f;
 
-    var dependentLogic = null;
-    var dependentAnswer = (_logicDropdowns$map$f = logicDropdowns.map(function (lg) {
+    let dependentLogic = null;
+    const dependentAnswer = (_logicDropdowns$map$f = logicDropdowns.map(lg => {
       if (d !== null && d !== void 0 && d[lg]) {
         dependentLogic = lg;
       }
 
       return d === null || d === void 0 ? void 0 : d[lg];
-    }).filter(function (x) {
-      return x;
-    })) === null || _logicDropdowns$map$f === void 0 ? void 0 : _logicDropdowns$map$f[0];
-    var findQ = questions.find(function (q) {
-      return q.id === d.id;
-    });
+    }).filter(x => x)) === null || _logicDropdowns$map$f === void 0 ? void 0 : _logicDropdowns$map$f[0];
+    const findQ = questions.find(q => q.id === d.id);
     return {
       id: generateId(),
       dependentTo: d.id,
@@ -10524,43 +10268,37 @@ var transformDependencyValue = function transformDependencyValue(dependency, que
   return value;
 };
 
-var SettingSkipLogic = function SettingSkipLogic(_ref) {
-  var question = _ref.question,
-      questions = _ref.questions,
-      dependency = _ref.dependency,
-      dependencies = _ref.dependencies,
-      setDependencies = _ref.setDependencies,
-      dependentToQuestions = _ref.dependentToQuestions;
-  var id = question.id,
-      questionGroupId = question.questionGroupId,
-      savedDependency = question.dependency;
-  var namePreffix = "question-" + id;
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
-  var form = Form.useFormInstance();
-  var updateGlobalStore = useCallback(function (dependencyValue, isDelete) {
-    if (isDelete === void 0) {
-      isDelete = false;
-    }
-
-    var transformDependencies = dependencyValue.map(function (dp) {
-      var _ref2;
-
-      return _ref2 = {
-        id: dp.dependentTo
-      }, _ref2[dp.dependentLogic] = dp.dependentAnswer, _ref2;
-    }).filter(function (d) {
-      return d.id;
-    });
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (qg) {
+const SettingSkipLogic = ({
+  question,
+  questions,
+  dependency,
+  dependencies,
+  setDependencies,
+  dependentToQuestions
+}) => {
+  const {
+    id,
+    questionGroupId,
+    dependency: savedDependency
+  } = question;
+  const namePreffix = `question-${id}`;
+  const UIText = UIStore.useState(s => s.UIText);
+  const form = Form.useFormInstance();
+  const updateGlobalStore = useCallback((dependencyValue, isDelete = false) => {
+    const transformDependencies = dependencyValue.map(dp => {
+      return {
+        id: dp.dependentTo,
+        [dp.dependentLogic]: dp.dependentAnswer
+      };
+    }).filter(d => d.id);
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(qg => {
         if (qg.id === questionGroupId) {
-          var _questions = qg.questions.map(function (q) {
+          const questions = qg.questions.map(q => {
             if (q.id === id && !isDelete) {
-              return _extends({}, q, {
+              return { ...q,
                 dependency: transformDependencies
-              });
+              };
             }
 
             if (q.id === id && !isDelete && !transformDependencies.length) {
@@ -10569,9 +10307,9 @@ var SettingSkipLogic = function SettingSkipLogic(_ref) {
             }
 
             if (q.id === id && isDelete && transformDependencies.length) {
-              return _extends({}, q, {
+              return { ...q,
                 dependency: transformDependencies
-              });
+              };
             }
 
             if (q.id === id && isDelete && !transformDependencies.length) {
@@ -10581,18 +10319,17 @@ var SettingSkipLogic = function SettingSkipLogic(_ref) {
 
             return q;
           });
-
-          return _extends({}, qg, {
-            questions: _questions
-          });
+          return { ...qg,
+            questions: questions
+          };
         }
 
         return qg;
       });
     });
   }, [id, questionGroupId]);
-  useEffect(function () {
-    var checkDependencies = dependencies.filter(function (dp) {
+  useEffect(() => {
+    const checkDependencies = dependencies.filter(dp => {
       if (dp.dependentTo && dp.dependentLogic && Array.isArray(dp.dependentAnswer) && dp.dependentAnswer.length) {
         return dp;
       }
@@ -10606,63 +10343,49 @@ var SettingSkipLogic = function SettingSkipLogic(_ref) {
       updateGlobalStore(checkDependencies);
     }
   }, [dependencies, id, questionGroupId, updateGlobalStore]);
-  var updateLocalState = useCallback(function (dependencyId, values) {
-    if (values === void 0) {
-      values = {};
-    }
-
-    var updatedDependencies = dependencies.map(function (d) {
+  const updateLocalState = useCallback((dependencyId, values = {}) => {
+    const updatedDependencies = dependencies.map(d => {
       if (d.id === dependencyId) {
-        return _extends({}, d, values);
+        return { ...d,
+          ...values
+        };
       }
 
       return d;
-    }).filter(function (d) {
-      return dependencyTypes.flatMap(function (dt) {
-        return dt.type;
-      }).includes(d.dependentToType);
-    });
+    }).filter(d => dependencyTypes.flatMap(dt => dt.type).includes(d.dependentToType));
     setDependencies(updatedDependencies);
   }, [dependencies, setDependencies]);
-  useEffect(function () {
-    setTimeout(function () {
-      var checkChangedType = dependencies.map(function (d) {
-        var findQ = questions.find(function (q) {
-          return q.id === d.dependentTo;
-        });
+  useEffect(() => {
+    setTimeout(() => {
+      const checkChangedType = dependencies.map(d => {
+        const findQ = questions.find(q => q.id === d.dependentTo);
 
         if (findQ !== null && findQ !== void 0 && findQ.id && findQ.type !== d.dependentToType) {
           return findQ;
         }
 
         return false;
-      }).filter(function (x) {
-        return x;
-      });
+      }).filter(x => x);
 
       if (dependencies.length && checkChangedType.length) {
-        checkChangedType.forEach(function (q) {
-          var _form$setFieldsValue;
-
-          var updatedDependency = dependencies.find(function (d) {
-            return d.dependentTo === q.id;
-          });
-          updateLocalState(updatedDependency.id, _extends({}, updatedDependency, {
+        checkChangedType.forEach(q => {
+          const updatedDependency = dependencies.find(d => d.dependentTo === q.id);
+          updateLocalState(updatedDependency.id, { ...updatedDependency,
             dependentToType: q.type,
             dependencyLogicDropdownValue: fetchDependencyLogicDropdown(q),
             dependencyAnswerDropdownValue: fetchDependencyAnswerDropdown(q)
-          }));
-          form.setFieldsValue((_form$setFieldsValue = {}, _form$setFieldsValue[namePreffix + "-dependent_logic-" + updatedDependency.id] = null, _form$setFieldsValue));
+          });
+          form.setFieldsValue({
+            [`${namePreffix}-dependent_logic-${updatedDependency.id}`]: null
+          });
         });
       }
     }, 500);
   }, [dependencies, questions, form, namePreffix, updateLocalState]);
 
-  var handleChangeDependentTo = function handleChangeDependentTo(dependencyId, e) {
-    var question = questions.find(function (q) {
-      return q.id === e;
-    });
-    var values = {
+  const handleChangeDependentTo = (dependencyId, e) => {
+    const question = questions.find(q => q.id === e);
+    const values = {
       dependentTo: e,
       dependentToType: question.type,
       dependencyLogicDropdownValue: fetchDependencyLogicDropdown(question),
@@ -10671,21 +10394,19 @@ var SettingSkipLogic = function SettingSkipLogic(_ref) {
     updateLocalState(dependencyId, values);
   };
 
-  var handleChangeDependentLogic = function handleChangeDependentLogic(dependencyId, e) {
+  const handleChangeDependentLogic = (dependencyId, e) => {
     updateLocalState(dependencyId, {
       dependentLogic: e
     });
   };
 
-  var handleChangeDependentAnswer = function handleChangeDependentAnswer(dependencyId, val) {
+  const handleChangeDependentAnswer = (dependencyId, val) => {
     updateLocalState(dependencyId, {
       dependentAnswer: val
     });
 
     if (savedDependency !== null && savedDependency !== void 0 && savedDependency.length) {
-      var updatedDependencies = savedDependency.filter(function (d) {
-        return d.id !== dependencyId;
-      });
+      const updatedDependencies = savedDependency.filter(d => d.id !== dependencyId);
 
       if (Array.isArray(val) && !val.length) {
         updateGlobalStore(updatedDependencies, true);
@@ -10699,18 +10420,16 @@ var SettingSkipLogic = function SettingSkipLogic(_ref) {
     }
   };
 
-  var handleAddMoreDependency = function handleAddMoreDependency() {
-    var newDependencies = [].concat(dependencies, defaultSkipLogic());
+  const handleAddMoreDependency = () => {
+    const newDependencies = [...dependencies, ...defaultSkipLogic()];
     setDependencies(newDependencies);
   };
 
-  var handleDeleteDependentTo = function handleDeleteDependentTo(dependencyId) {
-    var _form$setFieldsValue2;
-
-    form.setFieldsValue((_form$setFieldsValue2 = {}, _form$setFieldsValue2[namePreffix + "-dependent_logic-" + dependencyId] = null, _form$setFieldsValue2));
-    var updatedDependencies = dependencies.filter(function (dependency) {
-      return dependency.id !== dependencyId;
+  const handleDeleteDependentTo = dependencyId => {
+    form.setFieldsValue({
+      [`${namePreffix}-dependent_logic-${dependencyId}`]: null
     });
+    const updatedDependencies = dependencies.filter(dependency => dependency.id !== dependencyId);
 
     if (updatedDependencies.length) {
       setDependencies(updatedDependencies);
@@ -10720,22 +10439,18 @@ var SettingSkipLogic = function SettingSkipLogic(_ref) {
     }
   };
 
-  var dropdown = map(groupBy(dependentToQuestions, 'group'), function (i, l) {
-    return {
-      label: l,
-      item: i
-    };
-  }).map(function (g, gi) {
-    return _extends({}, g, {
-      key: gi
-    });
-  });
+  const dropdown = map(groupBy(dependentToQuestions, 'group'), (i, l) => ({
+    label: l,
+    item: i
+  })).map((g, gi) => ({ ...g,
+    key: gi
+  }));
   return /*#__PURE__*/React__default.createElement(Col, {
-    key: "dependency-" + id + "-" + dependency.id,
+    key: `dependency-${id}-${dependency.id}`,
     span: 24
   }, /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionDependentToLabel,
-    name: namePreffix + "-dependent_to-" + dependency.id
+    name: `${namePreffix}-dependent_to-${dependency.id}`
   }, /*#__PURE__*/React__default.createElement(Row, {
     align: "middle",
     justify: "space-between",
@@ -10745,28 +10460,18 @@ var SettingSkipLogic = function SettingSkipLogic(_ref) {
   }, /*#__PURE__*/React__default.createElement(Select, {
     showSearch: true,
     className: styles['select-dropdown'],
-    getPopupContainer: function getPopupContainer(triggerNode) {
-      return triggerNode.parentElement;
-    },
-    onChange: function onChange(e) {
-      return handleChangeDependentTo(dependency.id, e);
-    },
+    getPopupContainer: triggerNode => triggerNode.parentElement,
+    onChange: e => handleChangeDependentTo(dependency.id, e),
     value: dependency.dependentTo || [],
     optionFilterProp: "children"
-  }, dropdown.map(function (g) {
-    return /*#__PURE__*/React__default.createElement(Select.OptGroup, {
-      key: g.key,
-      label: g.label
-    }, g.item.map(function (dq) {
-      return /*#__PURE__*/React__default.createElement(Select.Option, {
-        key: dq.value + "-dq",
-        value: dq.value,
-        disabled: dependencies.map(function (d) {
-          return d.dependentTo;
-        }).includes(dq.value)
-      }, dq.label);
-    }));
-  }))), /*#__PURE__*/React__default.createElement(Col, {
+  }, dropdown.map(g => /*#__PURE__*/React__default.createElement(Select.OptGroup, {
+    key: g.key,
+    label: g.label
+  }, g.item.map(dq => /*#__PURE__*/React__default.createElement(Select.Option, {
+    key: `${dq.value}-dq`,
+    value: dq.value,
+    disabled: dependencies.map(d => d.dependentTo).includes(dq.value)
+  }, dq.label)))))), /*#__PURE__*/React__default.createElement(Col, {
     span: 2,
     align: "end"
   }, /*#__PURE__*/React__default.createElement(Space, null, /*#__PURE__*/React__default.createElement(ButtonWithIcon, {
@@ -10776,9 +10481,7 @@ var SettingSkipLogic = function SettingSkipLogic(_ref) {
   }), /*#__PURE__*/React__default.createElement(ButtonWithIcon, {
     type: "delete-button",
     disabled: !dependency.dependentTo,
-    onClick: function onClick() {
-      return handleDeleteDependentTo(dependency.id);
-    }
+    onClick: () => handleDeleteDependentTo(dependency.id)
   }))))), /*#__PURE__*/React__default.createElement(Row, {
     align: "middle",
     justify: "space-between",
@@ -10788,21 +10491,17 @@ var SettingSkipLogic = function SettingSkipLogic(_ref) {
   }, /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionDependentLogicLabel,
     initialValue: dependency.dependentLogic || [],
-    name: namePreffix + "-dependent_logic-" + dependency.id
+    name: `${namePreffix}-dependent_logic-${dependency.id}`
   }, /*#__PURE__*/React__default.createElement(Select, {
     className: styles['select-dropdown'],
     options: dependency.dependencyLogicDropdownValue,
-    getPopupContainer: function getPopupContainer(triggerNode) {
-      return triggerNode.parentElement;
-    },
-    onChange: function onChange(e) {
-      return handleChangeDependentLogic(dependency.id, e);
-    }
+    getPopupContainer: triggerNode => triggerNode.parentElement,
+    onChange: e => handleChangeDependentLogic(dependency.id, e)
   }))), /*#__PURE__*/React__default.createElement(Col, {
     span: 16
   }, /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionDependentAnswerLabel,
-    name: namePreffix + "-dependent_answer-" + dependency.id
+    name: `${namePreffix}-dependent_answer-${dependency.id}`
   }, !dependency.dependentTo && /*#__PURE__*/React__default.createElement(Input, {
     disabled: true
   }), dependency.dependentToType === questionType.number && /*#__PURE__*/React__default.createElement(InputNumber, {
@@ -10811,19 +10510,13 @@ var SettingSkipLogic = function SettingSkipLogic(_ref) {
     },
     controls: false,
     keyboard: false,
-    onChange: function onChange(e) {
-      return handleChangeDependentAnswer(dependency.id, e);
-    },
+    onChange: e => handleChangeDependentAnswer(dependency.id, e),
     value: dependency.dependentAnswer || null
   }), [questionType.option, questionType.multiple_option].includes(dependency.dependentToType) && /*#__PURE__*/React__default.createElement(Select, {
     className: styles['select-dropdown'],
     options: dependency.dependencyAnswerDropdownValue,
-    getPopupContainer: function getPopupContainer(triggerNode) {
-      return triggerNode.parentElement;
-    },
-    onChange: function onChange(e) {
-      return handleChangeDependentAnswer(dependency.id, e);
-    },
+    getPopupContainer: triggerNode => triggerNode.parentElement,
+    onChange: e => handleChangeDependentAnswer(dependency.id, e),
     mode: "multiple",
     showSearch: true,
     allowClear: true,
@@ -10833,60 +10526,39 @@ var SettingSkipLogic = function SettingSkipLogic(_ref) {
     style: {
       width: '100%'
     },
-    onChange: function onChange(e) {
-      return handleChangeDependentAnswer(dependency.id, moment(e).format('YYYY-MM-DD'));
-    }
+    onChange: e => handleChangeDependentAnswer(dependency.id, moment(e).format('YYYY-MM-DD'))
   })))));
 };
 
-var QuestionSkipLogic = function QuestionSkipLogic(_ref3) {
+const QuestionSkipLogic = ({
+  question
+}) => {
   var _dependencies$;
 
-  var question = _ref3.question;
-  var id = question.id,
-      questionGroupId = question.questionGroupId,
-      dependency = question.dependency,
-      currentQuestionOrder = question.order;
-  var UIText = UIStore.useState(function (s) {
-    return s.UIText;
-  });
-  var questionGroups = questionGroupFn.store.useState(function (s) {
-    return s.questionGroups;
-  });
-
-  var _useState = useState(dependency !== null && dependency !== void 0 && dependency.length ? transformDependencyValue(dependency, questionGroups) : defaultSkipLogic()),
-      dependencies = _useState[0],
-      setDependencies = _useState[1];
-
-  var currentQuestionGroupOrder = useMemo(function () {
+  const {
+    id,
+    questionGroupId,
+    dependency,
+    order: currentQuestionOrder
+  } = question;
+  const UIText = UIStore.useState(s => s.UIText);
+  const questionGroups = questionGroupFn.store.useState(s => s.questionGroups);
+  const [dependencies, setDependencies] = useState(dependency !== null && dependency !== void 0 && dependency.length ? transformDependencyValue(dependency, questionGroups) : defaultSkipLogic());
+  const currentQuestionGroupOrder = useMemo(() => {
     var _questionGroups$find;
 
-    return (_questionGroups$find = questionGroups.find(function (qg) {
-      return qg.id === questionGroupId;
-    })) === null || _questionGroups$find === void 0 ? void 0 : _questionGroups$find.order;
+    return (_questionGroups$find = questionGroups.find(qg => qg.id === questionGroupId)) === null || _questionGroups$find === void 0 ? void 0 : _questionGroups$find.order;
   }, [questionGroups, questionGroupId]);
-  var questions = useMemo(function () {
-    return questionGroups.filter(function (qg) {
-      return qg.order <= currentQuestionGroupOrder;
-    }).flatMap(function (qg) {
-      return qg.questions;
-    }).filter(function (q) {
-      return q.questionGroupId === questionGroupId && q.order < currentQuestionOrder || q.questionGroupId !== questionGroupId;
-    });
+  const questions = useMemo(() => {
+    return questionGroups.filter(qg => qg.order <= currentQuestionGroupOrder).flatMap(qg => qg.questions).filter(q => q.questionGroupId === questionGroupId && q.order < currentQuestionOrder || q.questionGroupId !== questionGroupId);
   }, [questionGroups, currentQuestionGroupOrder, currentQuestionOrder, questionGroupId]);
-  var dependentToQuestions = useMemo(function () {
-    return questions.filter(function (q) {
-      return dependencyTypes.flatMap(function (dt) {
-        return dt.type;
-      }).includes(q.type);
-    }).map(function (q) {
-      var group = questionGroups.find(function (g) {
-        return g.id === q.questionGroupId;
-      });
+  const dependentToQuestions = useMemo(() => {
+    return questions.filter(q => dependencyTypes.flatMap(dt => dt.type).includes(q.type)).map(q => {
+      const group = questionGroups.find(g => g.id === q.questionGroupId);
       return {
-        label: group.order + "." + q.order + ". " + q.name,
+        label: `${group.order}.${q.order}. ${q.name}`,
         value: q.id,
-        group: group.order + ". " + group.name
+        group: `${group.order}. ${group.name}`
       };
     });
   }, [questions, questionGroups]);
@@ -10904,95 +10576,81 @@ var QuestionSkipLogic = function QuestionSkipLogic(_ref3) {
 
   return /*#__PURE__*/React__default.createElement(Row, {
     gutter: [24, 24]
-  }, dependencies === null || dependencies === void 0 ? void 0 : dependencies.map(function (dependency, di) {
-    return /*#__PURE__*/React__default.createElement(SettingSkipLogic, {
-      key: "dependency-" + id + "-" + di,
-      dependency: dependency,
-      question: question,
-      questions: questions,
-      dependencies: dependencies,
-      setDependencies: setDependencies,
-      dependentToQuestions: dependentToQuestions
-    });
-  }));
+  }, dependencies === null || dependencies === void 0 ? void 0 : dependencies.map((dependency, di) => /*#__PURE__*/React__default.createElement(SettingSkipLogic, {
+    key: `dependency-${id}-${di}`,
+    dependency: dependency,
+    question: question,
+    questions: questions,
+    dependencies: dependencies,
+    setDependencies: setDependencies,
+    dependentToQuestions: dependentToQuestions
+  })));
 };
 
-var QuestionCustomParams = function QuestionCustomParams(_ref) {
+const QuestionCustomParams = ({
+  question
+}) => {
   var _customParams$params2;
 
-  var question = _ref.question;
-  var id = question.id,
-      questionGroupId = question.questionGroupId;
-  var namePreffix = "question-" + id;
-  var hostParams = UIStore.useState(function (s) {
-    return s.hostParams;
-  });
-  var customParams = hostParams === null || hostParams === void 0 ? void 0 : hostParams.customParams;
-
-  var _useState = useState(true),
-      initLoad = _useState[0],
-      setInitLoad = _useState[1];
-
-  var _useState2 = useState({}),
-      paramValue = _useState2[0],
-      setParamValue = _useState2[1];
-
-  useEffect(function () {
+  const {
+    id,
+    questionGroupId
+  } = question;
+  const namePreffix = `question-${id}`;
+  const hostParams = UIStore.useState(s => s.hostParams);
+  const customParams = hostParams === null || hostParams === void 0 ? void 0 : hostParams.customParams;
+  const [initLoad, setInitLoad] = useState(true);
+  const [paramValue, setParamValue] = useState({});
+  useEffect(() => {
     if (initLoad) {
       var _customParams$params;
 
-      var customParamObj = customParams === null || customParams === void 0 ? void 0 : (_customParams$params = customParams.params) === null || _customParams$params === void 0 ? void 0 : _customParams$params.map(function (cp) {
-        var findValue = question === null || question === void 0 ? void 0 : question[cp.name];
+      const customParamObj = customParams === null || customParams === void 0 ? void 0 : (_customParams$params = customParams.params) === null || _customParams$params === void 0 ? void 0 : _customParams$params.map(cp => {
+        let findValue = question === null || question === void 0 ? void 0 : question[cp.name];
 
         if (Array.isArray(findValue) && cp.type === 'input') {
           findValue = findValue[0];
         }
 
         if (findValue) {
-          var _ref2;
-
-          return _ref2 = {}, _ref2[cp.name] = findValue, _ref2;
+          return {
+            [cp.name]: findValue
+          };
         }
 
         return false;
-      }).filter(function (x) {
-        return x;
-      });
+      }).filter(x => x);
 
       if (customParamObj.length) {
-        setParamValue(customParamObj.reduce(function (res, curr) {
-          return _extends({}, res, curr);
-        }));
+        setParamValue(customParamObj.reduce((res, curr) => ({ ...res,
+          ...curr
+        })));
       }
 
       setInitLoad(false);
     }
   }, [customParams, question, initLoad]);
-  var updateGlobalStore = useCallback(function (objKey, value, isDelete) {
-    if (isDelete === void 0) {
-      isDelete = false;
-    }
-
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (qg) {
+  const updateGlobalStore = useCallback((objKey, value, isDelete = false) => {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(qg => {
         if (qg.id === questionGroupId) {
-          var questions = qg.questions.map(function (q) {
+          const questions = qg.questions.map(q => {
             if (q.id === id) {
-              var _extends2;
-
               if (isDelete && q !== null && q !== void 0 && q[objKey]) {
                 delete q[objKey];
                 return q;
               }
 
-              return _extends({}, q, (_extends2 = {}, _extends2[objKey] = value, _extends2));
+              return { ...q,
+                [objKey]: value
+              };
             }
 
             return q;
           });
-          return _extends({}, qg, {
+          return { ...qg,
             questions: questions
-          });
+          };
         }
 
         return qg;
@@ -11000,17 +10658,17 @@ var QuestionCustomParams = function QuestionCustomParams(_ref) {
     });
   }, [id, questionGroupId]);
 
-  var handleChangeParameterValue = function handleChangeParameterValue(objKey, val) {
-    var _extends3;
-
-    setParamValue(_extends({}, paramValue, (_extends3 = {}, _extends3[objKey] = val, _extends3)));
-    var isDelete = !val || !(val !== null && val !== void 0 && val.length);
-    var value = Array.isArray(val) ? val : [val];
+  const handleChangeParameterValue = (objKey, val) => {
+    setParamValue({ ...paramValue,
+      [objKey]: val
+    });
+    const isDelete = !val || !(val !== null && val !== void 0 && val.length);
+    const value = Array.isArray(val) ? val : [val];
     updateGlobalStore(objKey, value, isDelete);
   };
 
-  return customParams === null || customParams === void 0 ? void 0 : (_customParams$params2 = customParams.params) === null || _customParams$params2 === void 0 ? void 0 : _customParams$params2.map(function (cp, cpi) {
-    var multipleProps = {};
+  return customParams === null || customParams === void 0 ? void 0 : (_customParams$params2 = customParams.params) === null || _customParams$params2 === void 0 ? void 0 : _customParams$params2.map((cp, cpi) => {
+    let multipleProps = {};
 
     if (cp !== null && cp !== void 0 && cp.multiple) {
       multipleProps = {
@@ -11020,25 +10678,21 @@ var QuestionCustomParams = function QuestionCustomParams(_ref) {
     }
 
     return /*#__PURE__*/React__default.createElement("div", {
-      key: cp.name + "-" + cpi
+      key: `${cp.name}-${cpi}`
     }, /*#__PURE__*/React__default.createElement(Form.Item, {
       label: cp.label,
-      name: namePreffix + "-" + cp.name
-    }, cp.type === 'option' && /*#__PURE__*/React__default.createElement(Select, _extends({
+      name: `${namePreffix}-${cp.name}`
+    }, cp.type === 'option' && /*#__PURE__*/React__default.createElement(Select, Object.assign({
       showSearch: true,
       allowClear: true,
       className: styles['select-dropdown'],
       options: (cp === null || cp === void 0 ? void 0 : cp.options) || [],
       optionFilterProp: "label",
-      onChange: function onChange(val) {
-        return handleChangeParameterValue(cp.name, val);
-      },
-      getPopupContainer: function getPopupContainer(triggerNode) {
-        return triggerNode.parentElement;
-      },
+      onChange: val => handleChangeParameterValue(cp.name, val),
+      getPopupContainer: triggerNode => triggerNode.parentElement,
       value: (paramValue === null || paramValue === void 0 ? void 0 : paramValue[cp.name]) || []
     }, multipleProps)), cp.type === 'input' && /*#__PURE__*/React__default.createElement(Input, {
-      onChange: function onChange(e) {
+      onChange: e => {
         var _e$target;
 
         return handleChangeParameterValue(cp.name, e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.value);
@@ -11049,108 +10703,79 @@ var QuestionCustomParams = function QuestionCustomParams(_ref) {
   });
 };
 
-var QuestionDefinition = function QuestionDefinition(_ref) {
+const QuestionDefinition = ({
+  index,
+  question,
+  questionGroup,
+  isLastItem
+}) => {
   var _customParams$params;
 
-  var index = _ref.index,
-      question = _ref.question,
-      questionGroup = _ref.questionGroup,
-      isLastItem = _ref.isLastItem;
-  var questionGroups = questionGroupFn.store.useState(function (s) {
-    return s.questionGroups;
-  });
-  var questions = questionGroup === null || questionGroup === void 0 ? void 0 : questionGroup.questions;
-
-  var _UIStore$useState = UIStore.useState(function (s) {
-    return s;
-  }),
-      UIText = _UIStore$useState.UIText,
-      hostParams = _UIStore$useState.hostParams,
-      activeEditQuestions = _UIStore$useState.activeEditQuestions;
-
-  var movingQ = UIStore.useState(function (s) {
-    return s.activeMoveQuestion;
-  });
-  var isCopying = UIStore.useState(function (s) {
-    return s.isCopyingQuestion;
-  });
-
-  var _useState = useState('setting'),
-      activeTab = _useState[0],
-      setActiveTab = _useState[1];
-
-  var _useState2 = useState(false),
-      isModalOpen = _useState2[0],
-      setIsModalOpen = _useState2[1];
-
-  var id = question.id,
-      questionGroupId = question.questionGroupId,
-      order = question.order,
-      name = question.name,
-      dependency = question.dependency,
-      disableDelete = question.disableDelete;
-  var defaultQuestionParam = hostParams === null || hostParams === void 0 ? void 0 : hostParams.defaultQuestionParam;
-  var customParams = hostParams === null || hostParams === void 0 ? void 0 : hostParams.customParams;
-  var enableCustomParams = customParams && (customParams === null || customParams === void 0 ? void 0 : customParams.label) && (customParams === null || customParams === void 0 ? void 0 : (_customParams$params = customParams.params) === null || _customParams$params === void 0 ? void 0 : _customParams$params.length);
-  var allQuestions = questionGroups.map(function (qg) {
-    return qg.questions;
-  }).flatMap(function (x) {
-    return x;
-  }).map(function (q) {
-    return _extends({}, q, {
-      questionGroup: questionGroups.find(function (qg) {
-        return q.questionGroupId === qg.id;
-      })
-    });
-  });
-  var dependant = useMemo(function () {
+  const questionGroups = questionGroupFn.store.useState(s => s.questionGroups);
+  const questions = questionGroup === null || questionGroup === void 0 ? void 0 : questionGroup.questions;
+  const {
+    UIText,
+    hostParams,
+    activeEditQuestions
+  } = UIStore.useState(s => s);
+  const movingQ = UIStore.useState(s => s.activeMoveQuestion);
+  const isCopying = UIStore.useState(s => s.isCopyingQuestion);
+  const [activeTab, setActiveTab] = useState('setting');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const {
+    id,
+    questionGroupId,
+    order,
+    name,
+    dependency,
+    disableDelete
+  } = question;
+  const defaultQuestionParam = hostParams === null || hostParams === void 0 ? void 0 : hostParams.defaultQuestionParam;
+  const customParams = hostParams === null || hostParams === void 0 ? void 0 : hostParams.customParams;
+  const enableCustomParams = customParams && (customParams === null || customParams === void 0 ? void 0 : customParams.label) && (customParams === null || customParams === void 0 ? void 0 : (_customParams$params = customParams.params) === null || _customParams$params === void 0 ? void 0 : _customParams$params.length);
+  const allQuestions = questionGroups.map(qg => qg.questions).flatMap(x => x).map(q => ({ ...q,
+    questionGroup: questionGroups.find(qg => q.questionGroupId === qg.id)
+  }));
+  const dependant = useMemo(() => {
     var _movingQ$dependency, _movingQDependency$qu, _movingQDependant$que;
 
-    var dependant = allQuestions.filter(function (q) {
+    const dependant = allQuestions.filter(q => {
       var _q$dependency;
 
-      return (q === null || q === void 0 ? void 0 : (_q$dependency = q.dependency) === null || _q$dependency === void 0 ? void 0 : _q$dependency.filter(function (d) {
-        return d.id === id;
-      }).length) || false;
+      return (q === null || q === void 0 ? void 0 : (_q$dependency = q.dependency) === null || _q$dependency === void 0 ? void 0 : _q$dependency.filter(d => d.id === id).length) || false;
     });
-    var disabled = {
+    let disabled = {
       current: false,
       last: false
     };
-    var movingQDependency = maxBy(movingQ === null || movingQ === void 0 ? void 0 : (_movingQ$dependency = movingQ.dependency) === null || _movingQ$dependency === void 0 ? void 0 : _movingQ$dependency.map(function (q) {
-      return allQuestions.find(function (a) {
-        return a.id === q.id;
-      });
-    }), 'questionGroup.order');
+    const movingQDependency = maxBy(movingQ === null || movingQ === void 0 ? void 0 : (_movingQ$dependency = movingQ.dependency) === null || _movingQ$dependency === void 0 ? void 0 : _movingQ$dependency.map(q => allQuestions.find(a => a.id === q.id)), 'questionGroup.order');
 
     if ((movingQDependency === null || movingQDependency === void 0 ? void 0 : (_movingQDependency$qu = movingQDependency.questionGroup) === null || _movingQDependency$qu === void 0 ? void 0 : _movingQDependency$qu.order) >= (questionGroup === null || questionGroup === void 0 ? void 0 : questionGroup.order)) {
       var _movingQDependency$qu2, _movingQDependency$qu3;
 
-      disabled = _extends({}, disabled, {
+      disabled = { ...disabled,
         current: (movingQDependency === null || movingQDependency === void 0 ? void 0 : (_movingQDependency$qu2 = movingQDependency.questionGroup) === null || _movingQDependency$qu2 === void 0 ? void 0 : _movingQDependency$qu2.order) === questionGroup.order ? movingQDependency.order >= order : true
-      });
-      disabled = _extends({}, disabled, {
+      };
+      disabled = { ...disabled,
         last: (movingQDependency === null || movingQDependency === void 0 ? void 0 : (_movingQDependency$qu3 = movingQDependency.questionGroup) === null || _movingQDependency$qu3 === void 0 ? void 0 : _movingQDependency$qu3.order) === questionGroup.order ? movingQDependency.order >= order + 1 : true
-      });
+      };
     }
 
-    var movingQDependant = minBy(allQuestions.filter(function (q) {
+    const movingQDependant = minBy(allQuestions.filter(q => {
       var _q$dependency2;
 
-      return (q === null || q === void 0 ? void 0 : (_q$dependency2 = q.dependency) === null || _q$dependency2 === void 0 ? void 0 : _q$dependency2.filter(function (d) {
-        return d.id === (movingQ === null || movingQ === void 0 ? void 0 : movingQ.id);
-      }).length) || false;
+      return (q === null || q === void 0 ? void 0 : (_q$dependency2 = q.dependency) === null || _q$dependency2 === void 0 ? void 0 : _q$dependency2.filter(d => d.id === (movingQ === null || movingQ === void 0 ? void 0 : movingQ.id)).length) || false;
     }), 'questionGroup.order');
 
     if ((movingQDependant === null || movingQDependant === void 0 ? void 0 : (_movingQDependant$que = movingQDependant.questionGroup) === null || _movingQDependant$que === void 0 ? void 0 : _movingQDependant$que.order) <= (questionGroup === null || questionGroup === void 0 ? void 0 : questionGroup.order)) {
       var _movingQDependant$que2, _movingQDependant$que3;
 
-      disabled = _extends({}, disabled, {
+      disabled = { ...disabled,
         current: (movingQDependant === null || movingQDependant === void 0 ? void 0 : (_movingQDependant$que2 = movingQDependant.questionGroup) === null || _movingQDependant$que2 === void 0 ? void 0 : _movingQDependant$que2.order) === questionGroup.order ? movingQDependant.order <= order - 1 : true
-      });
-      disabled = _extends({}, disabled, {
+      };
+      disabled = { ...disabled,
         last: (movingQDependant === null || movingQDependant === void 0 ? void 0 : (_movingQDependant$que3 = movingQDependant.questionGroup) === null || _movingQDependant$que3 === void 0 ? void 0 : _movingQDependant$que3.order) === questionGroup.order ? movingQDependant.order <= order : true
-      });
+      };
     }
 
     return {
@@ -11158,63 +10783,59 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
       dependant: dependant
     };
   }, [id, order, questionGroup, allQuestions, movingQ]);
-  var isEditQuestion = useMemo(function () {
+  const isEditQuestion = useMemo(() => {
     return activeEditQuestions.includes(id);
   }, [activeEditQuestions, id]);
 
-  var handleEdit = function handleEdit() {
-    UIStore.update(function (s) {
-      s.activeEditQuestions = [].concat(activeEditQuestions, [id]);
+  const handleEdit = () => {
+    UIStore.update(s => {
+      s.activeEditQuestions = [...activeEditQuestions, id];
     });
   };
 
-  var handleCancelEdit = function handleCancelEdit() {
-    UIStore.update(function (s) {
-      s.activeEditQuestions = activeEditQuestions.filter(function (qId) {
-        return qId !== id;
-      });
+  const handleCancelEdit = () => {
+    UIStore.update(s => {
+      s.activeEditQuestions = activeEditQuestions.filter(qId => qId !== id);
     });
   };
 
-  var handleCancelMove = function handleCancelMove() {
-    UIStore.update(function (s) {
+  const handleCancelMove = () => {
+    UIStore.update(s => {
       s.isCopyingQuestion = false;
       s.activeMoveQuestion = null;
     });
   };
 
-  var handleMove = function handleMove() {
-    UIStore.update(function (s) {
+  const handleMove = () => {
+    UIStore.update(s => {
       s.activeMoveQuestion = movingQ === question && !s.isCopyingQuestion ? null : question;
       s.isCopyingQuestion = false;
     });
   };
 
-  var handleCopy = function handleCopy() {
-    UIStore.update(function (s) {
+  const handleCopy = () => {
+    UIStore.update(s => {
       s.activeMoveQuestion = movingQ === question && s.isCopyingQuestion ? null : question;
       s.isCopyingQuestion = !s.isCopyingQuestion;
     });
   };
 
-  var handleDelete = function handleDelete() {
-    var newQuestions = questions.filter(function (q) {
-      return q.id !== id;
-    }).map(function (q) {
+  const handleDelete = () => {
+    const newQuestions = questions.filter(q => q.id !== id).map(q => {
       if (q.order > order) {
-        return _extends({}, q, {
+        return { ...q,
           order: q.order - 1
-        });
+        };
       }
 
       return q;
     });
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (qg) {
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(qg => {
         if (qg.id === questionGroupId) {
-          return _extends({}, qg, {
+          return { ...qg,
             questions: newQuestions
-          });
+          };
         }
 
         return qg;
@@ -11223,78 +10844,59 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
     setIsModalOpen(false);
   };
 
-  var _handleOnAdd = function handleOnAdd(prevOrder) {
-    var prevQ = questions.filter(function (q) {
-      return q.order <= prevOrder;
-    });
-    var nextQ = questions.filter(function (q) {
-      return q.order > prevOrder;
-    }).map(function (q) {
-      return _extends({}, q, {
-        order: q.order + 1
-      });
-    });
-
-    var newQ = _extends({}, defaultQuestionParam, {
+  const handleOnAdd = prevOrder => {
+    const prevQ = questions.filter(q => q.order <= prevOrder);
+    const nextQ = questions.filter(q => q.order > prevOrder).map(q => ({ ...q,
+      order: q.order + 1
+    }));
+    const newQ = { ...defaultQuestionParam,
       questionGroup: questionGroup,
       prevOrder: prevOrder,
       params: data.clear(['id', 'order', 'questionGroupId'], movingQ)
-    });
-
-    var newQuestions = [].concat(prevQ, [questionFn.add(newQ)], nextQ);
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = s.questionGroups.map(function (qg) {
+    };
+    const newQuestions = [...prevQ, questionFn.add(newQ), ...nextQ];
+    questionGroupFn.store.update(s => {
+      s.questionGroups = s.questionGroups.map(qg => {
         if (qg.id === questionGroupId) {
-          return _extends({}, qg, {
+          return { ...qg,
             questions: orderBy(newQuestions, 'order')
-          });
+          };
         }
 
         return qg;
       });
     });
-    UIStore.update(function (s) {
+    UIStore.update(s => {
       s.activeMoveQuestion = null;
       s.isCopyingQuestion = false;
     });
   };
 
-  var _handleOnMove = function handleOnMove(prevOrder, lastItem) {
-    if (lastItem === void 0) {
-      lastItem = false;
-    }
-
-    var currentQ = _extends({}, movingQ, {
+  const handleOnMove = (prevOrder, lastItem = false) => {
+    const currentQ = { ...movingQ,
       questionGroupId: questionGroupId,
       order: questionGroupId !== movingQ.questionGroupId ? prevOrder + 1 : movingQ.order < prevOrder ? prevOrder : prevOrder + 1
-    });
-
-    var changedQg = questionGroups.filter(function (qg) {
-      return qg.id === movingQ.questionGroupId || qg.id === questionGroupId;
-    }).map(function (qg) {
-      var addedQ = qg.id === questionGroupId ? currentQ : false;
-      var newQuestions = qg.questions.filter(function (q) {
-        return q.id !== movingQ.id;
-      });
+    };
+    const changedQg = questionGroups.filter(qg => qg.id === movingQ.questionGroupId || qg.id === questionGroupId).map(qg => {
+      const addedQ = qg.id === questionGroupId ? currentQ : false;
+      let newQuestions = qg.questions.filter(q => q.id !== movingQ.id);
 
       if (questionGroupId !== movingQ.questionGroupId && newQuestions.length < qg.questions.length) {
-        newQuestions = newQuestions.map(function (q, qi) {
-          return _extends({}, q, {
-            order: qi + 1
-          });
-        });
+        newQuestions = newQuestions.map((q, qi) => ({ ...q,
+          order: qi + 1
+        }));
       }
 
       if (questionGroupId !== movingQ.questionGroupId && qg.id === questionGroupId) {
-        newQuestions = newQuestions.map(function (x) {
+        newQuestions = newQuestions.map(x => {
           if (lastItem) {
             return x;
           }
 
           if (x.order >= prevOrder + 1) {
-            return _extends({}, x, {
+            return { ...x,
               order: x.order + 1
-            });
+            };
           }
 
           return x;
@@ -11302,63 +10904,57 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
       }
 
       if (questionGroupId === movingQ.questionGroupId) {
-        newQuestions = newQuestions.map(function (x) {
+        newQuestions = newQuestions.map(x => {
           if (lastItem) {
             if (x.order > movingQ.order) {
-              return _extends({}, x, {
+              return { ...x,
                 order: x.order - 1
-              });
+              };
             }
 
             return x;
           }
 
           if (prevOrder > movingQ.order && x.order > movingQ.order && x.order <= prevOrder) {
-            return _extends({}, x, {
+            return { ...x,
               order: x.order - 1
-            });
+            };
           }
 
           if (prevOrder < movingQ.order && x.order < movingQ.order && x.order >= prevOrder + 1) {
-            return _extends({}, x, {
+            return { ...x,
               order: x.order + 1
-            });
+            };
           }
 
           return x;
         });
       }
 
-      newQuestions = addedQ ? [].concat(newQuestions, [addedQ]) : newQuestions;
-      return _extends({}, qg, {
+      newQuestions = addedQ ? [...newQuestions, addedQ] : newQuestions;
+      return { ...qg,
         questions: orderBy(newQuestions, 'order')
-      });
+      };
     });
-    var oldQg = questionGroups.filter(function (qg) {
-      return qg.id !== movingQ.questionGroupId;
+    let oldQg = questionGroups.filter(qg => qg.id !== movingQ.questionGroupId);
+    oldQg = movingQ.questionGroupId !== questionGroupId ? oldQg.filter(qg => qg.id !== questionGroupId) : oldQg;
+    questionGroupFn.store.update(s => {
+      s.questionGroups = orderBy([...oldQg, ...changedQg], 'order');
     });
-    oldQg = movingQ.questionGroupId !== questionGroupId ? oldQg.filter(function (qg) {
-      return qg.id !== questionGroupId;
-    }) : oldQg;
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = orderBy([].concat(oldQg, changedQg), 'order');
-    });
-    UIStore.update(function (s) {
+    UIStore.update(s => {
       s.activeMoveQuestion = null;
     });
   };
 
-  var rightButtons = [{
+  const rightButtons = [{
     type: 'copy-button',
     onClick: handleCopy
   }, {
     type: 'delete-button',
-    onClick: function onClick() {
-      return setIsModalOpen(true);
-    },
+    onClick: () => setIsModalOpen(true),
     disabled: !index && isLastItem || dependant.dependant.length || disableDelete
   }];
-  var leftButtons = [{
+  const leftButtons = [{
     type: 'move-button',
     onClick: handleMove,
     disabled: !index && isLastItem
@@ -11374,16 +10970,12 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
     handleCancelMove: handleCancelMove,
     movingItem: movingQ,
     isCopying: isCopying,
-    handleOnAdd: function handleOnAdd() {
-      return _handleOnAdd(order - 1);
-    },
-    handleOnMove: function handleOnMove() {
-      return isCopying ? _handleOnAdd(order - 1) : _handleOnMove(order - 1);
-    }
+    handleOnAdd: () => handleOnAdd(order - 1),
+    handleOnMove: () => isCopying ? handleOnAdd(order - 1) : handleOnMove(order - 1)
   }), /*#__PURE__*/React__default.createElement(Card, {
-    key: index + "-" + id,
+    key: `${index}-${id}`,
     title: /*#__PURE__*/React__default.createElement(CardTitle, {
-      title: questionGroup.order + "." + order + ". " + name,
+      title: `${questionGroup.order}.${order}. ${name}`,
       buttons: leftButtons
     }),
     headStyle: {
@@ -11399,17 +10991,11 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
     loading: false,
     extra: /*#__PURE__*/React__default.createElement(CardTitle, {
       buttons: rightButtons,
-      dependency: allQuestions.filter(function (q) {
-        return dependency === null || dependency === void 0 ? void 0 : dependency.find(function (d) {
-          return d.id === q.id;
-        });
-      })
+      dependency: allQuestions.filter(q => dependency === null || dependency === void 0 ? void 0 : dependency.find(d => d.id === q.id))
     })
   }, isEditQuestion && /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(Tabs, {
     defaultActiveKey: activeTab,
-    onChange: function onChange(key) {
-      return setActiveTab(key);
-    },
+    onChange: key => setActiveTab(key),
     tabBarGutter: 24,
     className: styles['tabs-wrapper']
   }, /*#__PURE__*/React__default.createElement(Tabs.TabPane, {
@@ -11433,18 +11019,12 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
     disabled: movingQ === question && !isCopying || dependant.disabled.last,
     movingItem: movingQ,
     handleCancelMove: handleCancelMove,
-    handleOnAdd: function handleOnAdd() {
-      return _handleOnAdd(order);
-    },
-    handleOnMove: function handleOnMove() {
-      return isCopying ? _handleOnAdd(order) : _handleOnMove(order, true);
-    }
+    handleOnAdd: () => handleOnAdd(order),
+    handleOnMove: () => isCopying ? handleOnAdd(order) : handleOnMove(order, true)
   }), /*#__PURE__*/React__default.createElement(AlertPopup, {
     visible: isModalOpen,
     onConfirm: handleDelete,
-    onCancel: function onCancel() {
-      return setIsModalOpen(false);
-    },
+    onCancel: () => setIsModalOpen(false),
     okButtonProps: {
       danger: true
     },
@@ -11453,249 +11033,193 @@ var QuestionDefinition = function QuestionDefinition(_ref) {
   }, UIText.alertDeleteQuestion));
 };
 
-var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
-  var index = _ref.index,
-      questionGroup = _ref.questionGroup,
-      isLastItem = _ref.isLastItem;
-
-  var _useState = useState(false),
-      isModalOpen = _useState[0],
-      setIsModalOpen = _useState[1];
-
-  var questionGroups = questionGroupFn.store.useState(function (s) {
-    return s.questionGroups;
-  });
-  var movingQg = UIStore.useState(function (s) {
-    return s.activeMoveQuestionGroup;
-  });
-
-  var _UIStore$useState = UIStore.useState(function (s) {
-    return s;
-  }),
-      activeQuestionGroups = _UIStore$useState.activeQuestionGroups,
-      activeEditQuestionGroups = _UIStore$useState.activeEditQuestionGroups,
-      activeEditQuestions = _UIStore$useState.activeEditQuestions,
-      hostParams = _UIStore$useState.hostParams;
-
-  var defaultQuestionParam = hostParams === null || hostParams === void 0 ? void 0 : hostParams.defaultQuestionParam;
-  var id = questionGroup.id,
-      name = questionGroup.name,
-      questions = questionGroup.questions,
-      order = questionGroup.order;
-  var questionIds = questions.map(function (q) {
-    return q.id;
-  });
-
-  var _UIStore$useState2 = UIStore.useState(function (s) {
-    return s.UIText;
-  }),
-      buttonAddNewQuestionGroupText = _UIStore$useState2.buttonAddNewQuestionGroupText,
-      buttonMoveQuestionGroupText = _UIStore$useState2.buttonMoveQuestionGroupText,
-      alertDeleteQuestionGroupTitle = _UIStore$useState2.alertDeleteQuestionGroupTitle,
-      alertDeleteQuestionGroup = _UIStore$useState2.alertDeleteQuestionGroup,
-      buttonDeleteText = _UIStore$useState2.buttonDeleteText;
-
-  var showQuestion = useMemo(function () {
+const QuestionGroupDefinition = ({
+  index,
+  questionGroup,
+  isLastItem
+}) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const questionGroups = questionGroupFn.store.useState(s => s.questionGroups);
+  const movingQg = UIStore.useState(s => s.activeMoveQuestionGroup);
+  const {
+    activeQuestionGroups,
+    activeEditQuestionGroups,
+    activeEditQuestions,
+    hostParams
+  } = UIStore.useState(s => s);
+  const defaultQuestionParam = hostParams === null || hostParams === void 0 ? void 0 : hostParams.defaultQuestionParam;
+  const {
+    id,
+    name,
+    questions,
+    order
+  } = questionGroup;
+  const questionIds = questions.map(q => q.id);
+  const {
+    buttonAddNewQuestionGroupText,
+    buttonMoveQuestionGroupText,
+    alertDeleteQuestionGroupTitle,
+    alertDeleteQuestionGroup,
+    buttonDeleteText
+  } = UIStore.useState(s => s.UIText);
+  const showQuestion = useMemo(() => {
     return activeQuestionGroups.includes(id);
   }, [activeQuestionGroups, id]);
-  var isEditQuestionGroup = useMemo(function () {
+  const isEditQuestionGroup = useMemo(() => {
     return activeEditQuestionGroups.includes(id);
   }, [activeEditQuestionGroups, id]);
-  var disableDelete = useMemo(function () {
+  const disableDelete = useMemo(() => {
     var _questions$filter;
 
-    return (_questions$filter = questions.filter(function (q) {
-      return q === null || q === void 0 ? void 0 : q.disableDelete;
-    })) === null || _questions$filter === void 0 ? void 0 : _questions$filter.length;
+    return (_questions$filter = questions.filter(q => q === null || q === void 0 ? void 0 : q.disableDelete)) === null || _questions$filter === void 0 ? void 0 : _questions$filter.length;
   }, [questions]);
 
-  var handleHideQuestions = function handleHideQuestions() {
-    UIStore.update(function (s) {
-      s.activeQuestionGroups = activeQuestionGroups.filter(function (qgId) {
-        return qgId !== id;
-      });
+  const handleHideQuestions = () => {
+    UIStore.update(s => {
+      s.activeQuestionGroups = activeQuestionGroups.filter(qgId => qgId !== id);
     });
   };
 
-  var handleCancelEditGroup = function handleCancelEditGroup() {
-    UIStore.update(function (s) {
-      s.activeEditQuestionGroups = activeEditQuestionGroups.filter(function (qgId) {
-        return qgId !== id;
-      });
+  const handleCancelEditGroup = () => {
+    UIStore.update(s => {
+      s.activeEditQuestionGroups = activeEditQuestionGroups.filter(qgId => qgId !== id);
     });
   };
 
-  var handleShowQuestions = function handleShowQuestions() {
-    UIStore.update(function (s) {
-      s.activeQuestionGroups = [].concat(activeQuestionGroups, [id]);
+  const handleShowQuestions = () => {
+    UIStore.update(s => {
+      s.activeQuestionGroups = [...activeQuestionGroups, id];
     });
     handleCancelEditGroup();
   };
 
-  var handleEditGroup = function handleEditGroup() {
-    UIStore.update(function (s) {
-      s.activeEditQuestionGroups = [].concat(activeEditQuestionGroups, [id]);
+  const handleEditGroup = () => {
+    UIStore.update(s => {
+      s.activeEditQuestionGroups = [...activeEditQuestionGroups, id];
     });
     handleHideQuestions();
   };
 
-  var handleCancelMove = function handleCancelMove() {
-    UIStore.update(function (s) {
+  const handleCancelMove = () => {
+    UIStore.update(s => {
       s.activeMoveQuestionGroup = null;
     });
   };
 
-  var handleMove = function handleMove() {
-    UIStore.update(function (s) {
+  const handleMove = () => {
+    UIStore.update(s => {
       s.activeMoveQuestionGroup = movingQg === questionGroup ? null : questionGroup;
     });
   };
 
-  var handleExpandAll = function handleExpandAll() {
+  const handleExpandAll = () => {
     handleShowQuestions();
-    UIStore.update(function (s) {
-      s.activeEditQuestions = uniq([].concat(s.activeEditQuestions, questionIds));
+    UIStore.update(s => {
+      s.activeEditQuestions = uniq([...s.activeEditQuestions, ...questionIds]);
     });
   };
 
-  var handleCancelExpandAll = function handleCancelExpandAll() {
+  const handleCancelExpandAll = () => {
     handleHideQuestions();
-    UIStore.update(function (s) {
+    UIStore.update(s => {
       s.activeEditQuestions = difference(s.activeEditQuestions, questionIds);
     });
   };
 
-  var handleDelete = function handleDelete() {
-    var newQuestionGroups = questionGroups.filter(function (qg) {
-      return id !== qg.id;
-    }).map(function (qg) {
+  const handleDelete = () => {
+    const newQuestionGroups = questionGroups.filter(qg => id !== qg.id).map(qg => {
       if (qg.order > order) {
-        return _extends({}, qg, {
+        return { ...qg,
           order: qg.order - 1
-        });
+        };
       }
 
       return qg;
     });
-    questionGroupFn.store.update(function (s) {
+    questionGroupFn.store.update(s => {
       s.questionGroups = newQuestionGroups;
     });
     setIsModalOpen(false);
   };
 
-  var _handleOnAdd = function handleOnAdd(prevOrder) {
-    var prevQg = questionGroups.filter(function (qg) {
-      return qg.order <= prevOrder;
-    });
-    var nextQg = questionGroups.filter(function (qg) {
-      return qg.order > prevOrder;
-    }).map(function (qg) {
-      return _extends({}, qg, {
-        order: qg.order + 1
-      });
-    });
-    var newQuestionGroups = [].concat(prevQg, [questionGroupFn.add({
+  const handleOnAdd = prevOrder => {
+    const prevQg = questionGroups.filter(qg => qg.order <= prevOrder);
+    const nextQg = questionGroups.filter(qg => qg.order > prevOrder).map(qg => ({ ...qg,
+      order: qg.order + 1
+    }));
+    const newQuestionGroups = [...prevQg, questionGroupFn.add({
       prevOrder: prevOrder,
       defaultQuestionParam: defaultQuestionParam
-    })], nextQg);
-    questionGroupFn.store.update(function (s) {
+    }), ...nextQg];
+    questionGroupFn.store.update(s => {
       s.questionGroups = newQuestionGroups;
     });
   };
 
-  var _handleOnMove = function handleOnMove(prevOrder, lastItem) {
-    if (lastItem === void 0) {
-      lastItem = false;
-    }
-
-    var currentQg = _extends({}, movingQg, {
+  const handleOnMove = (prevOrder, lastItem = false) => {
+    const currentQg = { ...movingQg,
       order: movingQg.order < prevOrder ? prevOrder : prevOrder + 1
-    });
-
-    var orderedQg = questionGroups.filter(function (qg) {
-      return qg.order !== movingQg.order;
-    }).map(function (x) {
+    };
+    const orderedQg = questionGroups.filter(qg => qg.order !== movingQg.order).map(x => {
       if (lastItem) {
         if (x.order > movingQg.order) {
-          return _extends({}, x, {
+          return { ...x,
             order: x.order - 1
-          });
+          };
         }
 
         return x;
       }
 
       if (prevOrder > movingQg.order && x.order > movingQg.order && x.order <= prevOrder) {
-        return _extends({}, x, {
+        return { ...x,
           order: x.order - 1
-        });
+        };
       }
 
       if (prevOrder < movingQg.order && x.order < movingQg.order && x.order >= prevOrder + 1) {
-        return _extends({}, x, {
+        return { ...x,
           order: x.order + 1
-        });
+        };
       }
 
       return x;
     });
-    questionGroupFn.store.update(function (s) {
-      s.questionGroups = orderBy([].concat(orderedQg, [currentQg]), 'order');
+    questionGroupFn.store.update(s => {
+      s.questionGroups = orderBy([...orderedQg, currentQg], 'order');
     });
-    UIStore.update(function (s) {
+    UIStore.update(s => {
       s.activeMoveQuestionGroup = null;
     });
   };
 
-  var dependant = useMemo(function () {
+  const dependant = useMemo(() => {
     var _movingQg$questions, _movingQg$questions2, _movingQ$map, _movingQDependency$qu, _movingQDependant$que;
 
-    var allQ = questionGroups.map(function (qg) {
-      return qg.questions;
-    }).flatMap(function (x) {
-      return x;
-    }).map(function (q) {
-      return _extends({}, q, {
-        questionGroup: questionGroups.find(function (qg) {
-          return q.questionGroupId === qg.id;
-        })
-      });
-    });
-    var dependencies = allQ.filter(function (q) {
+    const allQ = questionGroups.map(qg => qg.questions).flatMap(x => x).map(q => ({ ...q,
+      questionGroup: questionGroups.find(qg => q.questionGroupId === qg.id)
+    }));
+    const dependencies = allQ.filter(q => {
       var _q$dependency;
 
-      return (q === null || q === void 0 ? void 0 : (_q$dependency = q.dependency) === null || _q$dependency === void 0 ? void 0 : _q$dependency.filter(function (d) {
-        return questionIds.find(function (qid) {
-          return qid === d.id;
-        });
-      }).length) || false;
+      return (q === null || q === void 0 ? void 0 : (_q$dependency = q.dependency) === null || _q$dependency === void 0 ? void 0 : _q$dependency.filter(d => questionIds.find(qid => qid === d.id)).length) || false;
     });
-    var movingQids = (movingQg === null || movingQg === void 0 ? void 0 : (_movingQg$questions = movingQg.questions) === null || _movingQg$questions === void 0 ? void 0 : _movingQg$questions.map(function (q) {
-      return q.id;
-    })) || [];
-    var movingQ = movingQg === null || movingQg === void 0 ? void 0 : (_movingQg$questions2 = movingQg.questions) === null || _movingQg$questions2 === void 0 ? void 0 : _movingQg$questions2.filter(function (q) {
+    const movingQids = (movingQg === null || movingQg === void 0 ? void 0 : (_movingQg$questions = movingQg.questions) === null || _movingQg$questions === void 0 ? void 0 : _movingQg$questions.map(q => q.id)) || [];
+    const movingQ = movingQg === null || movingQg === void 0 ? void 0 : (_movingQg$questions2 = movingQg.questions) === null || _movingQg$questions2 === void 0 ? void 0 : _movingQg$questions2.filter(q => {
       var _q$dependency2, _q$dependency2$filter;
 
-      var selfDependency = (q === null || q === void 0 ? void 0 : (_q$dependency2 = q.dependency) === null || _q$dependency2 === void 0 ? void 0 : (_q$dependency2$filter = _q$dependency2.filter(function (d) {
-        return movingQids.includes(d.id);
-      })) === null || _q$dependency2$filter === void 0 ? void 0 : _q$dependency2$filter.length) || 0;
+      const selfDependency = (q === null || q === void 0 ? void 0 : (_q$dependency2 = q.dependency) === null || _q$dependency2 === void 0 ? void 0 : (_q$dependency2$filter = _q$dependency2.filter(d => movingQids.includes(d.id))) === null || _q$dependency2$filter === void 0 ? void 0 : _q$dependency2$filter.length) || 0;
       return !selfDependency;
     });
-    var disabled = {
+    let disabled = {
       current: false,
       last: false
     };
-    var movingQDependency = maxBy((movingQ === null || movingQ === void 0 ? void 0 : (_movingQ$map = movingQ.map(function (q) {
+    const movingQDependency = maxBy((movingQ === null || movingQ === void 0 ? void 0 : (_movingQ$map = movingQ.map(q => {
       var _q$dependency3;
 
-      return (q === null || q === void 0 ? void 0 : (_q$dependency3 = q.dependency) === null || _q$dependency3 === void 0 ? void 0 : _q$dependency3.map(function (q) {
-        return allQ.find(function (a) {
-          return a.id === q.id;
-        });
-      })) || [];
-    })) === null || _movingQ$map === void 0 ? void 0 : _movingQ$map.flatMap(function (q) {
-      return q;
-    })) || [], 'questionGroup.order');
+      return (q === null || q === void 0 ? void 0 : (_q$dependency3 = q.dependency) === null || _q$dependency3 === void 0 ? void 0 : _q$dependency3.map(q => allQ.find(a => a.id === q.id))) || [];
+    })) === null || _movingQ$map === void 0 ? void 0 : _movingQ$map.flatMap(q => q)) || [], 'questionGroup.order');
 
     if ((movingQDependency === null || movingQDependency === void 0 ? void 0 : (_movingQDependency$qu = movingQDependency.questionGroup) === null || _movingQDependency$qu === void 0 ? void 0 : _movingQDependency$qu.order) >= order) {
       disabled = {
@@ -11704,16 +11228,12 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
       };
     }
 
-    var movingQDependant = minBy(allQ.filter(function (q) {
+    const movingQDependant = minBy(allQ.filter(q => {
       var _q$dependency4;
 
-      return (q === null || q === void 0 ? void 0 : (_q$dependency4 = q.dependency) === null || _q$dependency4 === void 0 ? void 0 : _q$dependency4.filter(function (d) {
-        return movingQ === null || movingQ === void 0 ? void 0 : movingQ.find(function (qs) {
-          return qs.id === d.id;
-        });
-      }).length) || false;
+      return (q === null || q === void 0 ? void 0 : (_q$dependency4 = q.dependency) === null || _q$dependency4 === void 0 ? void 0 : _q$dependency4.filter(d => movingQ === null || movingQ === void 0 ? void 0 : movingQ.find(qs => qs.id === d.id)).length) || false;
     }), 'questionGroup.order');
-    var dependantIsLessThanOrder = (movingQDependant === null || movingQDependant === void 0 ? void 0 : (_movingQDependant$que = movingQDependant.questionGroup) === null || _movingQDependant$que === void 0 ? void 0 : _movingQDependant$que.order) < (isLastItem ? order + 1 : order);
+    const dependantIsLessThanOrder = (movingQDependant === null || movingQDependant === void 0 ? void 0 : (_movingQDependant$que = movingQDependant.questionGroup) === null || _movingQDependant$que === void 0 ? void 0 : _movingQDependant$que.order) < (isLastItem ? order + 1 : order);
 
     if (dependantIsLessThanOrder) {
       disabled = {
@@ -11727,16 +11247,14 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
       dependant: dependencies
     };
   }, [questionGroups, questionIds, movingQg, order, isLastItem]);
-  var rightButtons = [{
+  const rightButtons = [{
     type: 'expand-all-button',
     isExpand: showQuestion && intersection(activeEditQuestions, questionIds).length,
     onClick: handleExpandAll,
     onCancel: handleCancelExpandAll
   }, {
     type: 'delete-button',
-    onClick: function onClick() {
-      return setIsModalOpen(true);
-    },
+    onClick: () => setIsModalOpen(true),
     disabled: !index && isLastItem || disableDelete
   }, {
     type: 'edit-button',
@@ -11744,7 +11262,7 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
     onClick: handleEditGroup,
     onCancel: handleCancelEditGroup
   }];
-  var leftButtons = [{
+  const leftButtons = [{
     type: 'move-button',
     onClick: handleMove,
     onCancel: handleHideQuestions,
@@ -11760,17 +11278,13 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
     disabled: movingQg === questionGroup || (movingQg === null || movingQg === void 0 ? void 0 : movingQg.order) + 1 === order || dependant.disabled.current,
     movingItem: movingQg,
     handleCancelMove: handleCancelMove,
-    handleOnAdd: function handleOnAdd() {
-      return _handleOnAdd(order - 1);
-    },
-    handleOnMove: function handleOnMove() {
-      return _handleOnMove(order - 1);
-    }
+    handleOnAdd: () => handleOnAdd(order - 1),
+    handleOnMove: () => handleOnMove(order - 1)
   }), /*#__PURE__*/React__default.createElement(Card, {
-    key: index + "-" + id,
+    key: `${index}-${id}`,
     title: /*#__PURE__*/React__default.createElement(CardTitle, {
       buttons: leftButtons,
-      title: order + ". " + name
+      title: `${order}. ${name}`
     }),
     headStyle: {
       textAlign: 'left',
@@ -11785,31 +11299,23 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
     extra: /*#__PURE__*/React__default.createElement(CardTitle, {
       buttons: rightButtons
     })
-  }, isEditQuestionGroup && /*#__PURE__*/React__default.createElement(QuestionGroupSetting, questionGroup), showQuestion && questions.map(function (q, qi) {
-    return /*#__PURE__*/React__default.createElement(QuestionDefinition, {
-      key: "question-definition-" + qi,
-      index: qi,
-      question: q,
-      questionGroup: questionGroup,
-      isLastItem: qi === questions.length - 1
-    });
-  })), isLastItem && /*#__PURE__*/React__default.createElement(ButtonAddMove, {
+  }, isEditQuestionGroup && /*#__PURE__*/React__default.createElement(QuestionGroupSetting, questionGroup), showQuestion && questions.map((q, qi) => /*#__PURE__*/React__default.createElement(QuestionDefinition, {
+    key: `question-definition-${qi}`,
+    index: qi,
+    question: q,
+    questionGroup: questionGroup,
+    isLastItem: qi === questions.length - 1
+  }))), isLastItem && /*#__PURE__*/React__default.createElement(ButtonAddMove, {
     text: movingQg ? buttonMoveQuestionGroupText : buttonAddNewQuestionGroupText,
     disabled: movingQg === questionGroup || dependant.disabled.last,
     movingItem: movingQg,
     handleCancelMove: handleCancelMove,
-    handleOnAdd: function handleOnAdd() {
-      return _handleOnAdd(order);
-    },
-    handleOnMove: function handleOnMove() {
-      return _handleOnMove(order, true);
-    }
+    handleOnAdd: () => handleOnAdd(order),
+    handleOnMove: () => handleOnMove(order, true)
   }), /*#__PURE__*/React__default.createElement(AlertPopup, {
     visible: isModalOpen,
     onConfirm: handleDelete,
-    onCancel: function onCancel() {
-      return setIsModalOpen(false);
-    },
+    onCancel: () => setIsModalOpen(false),
     okButtonProps: {
       danger: true
     },
@@ -11818,42 +11324,34 @@ var QuestionGroupDefinition = function QuestionGroupDefinition(_ref) {
   }, alertDeleteQuestionGroup));
 };
 
-var WebformEditor = function WebformEditor(_ref) {
-  var _ref$onSave = _ref.onSave,
-      onSave = _ref$onSave === void 0 ? false : _ref$onSave,
-      _ref$initialValue = _ref.initialValue,
-      initialValue = _ref$initialValue === void 0 ? null : _ref$initialValue,
-      _ref$settingTreeDropd = _ref.settingTreeDropdownValue,
-      settingTreeDropdownValue = _ref$settingTreeDropd === void 0 ? [{
+const WebformEditor = ({
+  onSave: _onSave = false,
+  initialValue: _initialValue = null,
+  settingTreeDropdownValue: _settingTreeDropdownValue = [{
     label: null,
     value: null
-  }] : _ref$settingTreeDropd,
-      _ref$settingCascadeUR = _ref.settingCascadeURL,
-      settingCascadeURL = _ref$settingCascadeUR === void 0 ? [{
+  }],
+  settingCascadeURL: _settingCascadeURL = [{
     name: null,
     endpoint: null,
     initial: 0,
     list: false
-  }] : _ref$settingCascadeUR,
-      _ref$settingHintURL = _ref.settingHintURL,
-      settingHintURL = _ref$settingHintURL === void 0 ? {
+  }],
+  settingHintURL: _settingHintURL = {
     questionTypes: [],
     settings: [{
       name: null,
       endpoint: null,
       path: []
     }]
-  } : _ref$settingHintURL,
-      _ref$defaultQuestion = _ref.defaultQuestion,
-      defaultQuestion = _ref$defaultQuestion === void 0 ? {
+  },
+  defaultQuestion: _defaultQuestion = {
     type: null,
     name: null,
     required: null
-  } : _ref$defaultQuestion,
-      _ref$limitQuestionTyp = _ref.limitQuestionType,
-      limitQuestionType = _ref$limitQuestionTyp === void 0 ? [] : _ref$limitQuestionTyp,
-      _ref$customParams = _ref.customParams,
-      customParams = _ref$customParams === void 0 ? {
+  },
+  limitQuestionType: _limitQuestionType = [],
+  customParams: _customParams = {
     label: null,
     params: [{
       name: null,
@@ -11872,138 +11370,117 @@ var WebformEditor = function WebformEditor(_ref) {
       label: 'Input Param',
       type: 'input'
     }]
-  } : _ref$customParams;
+  }
+}) => {
+  const [init, setInit] = useState(_defaultQuestion);
+  const formStore = formFn.store.useState(s => s);
+  const current = UIStore.useState(s => s.current);
+  const {
+    UIText,
+    hostParams
+  } = UIStore.useState(s => s);
+  const questionGroups = questionGroupFn.store.useState(s => s.questionGroups);
+  const activeEditFormSetting = UIStore.useState(s => s.activeEditFormSetting);
+  const defaultQuestionParam = hostParams === null || hostParams === void 0 ? void 0 : hostParams.defaultQuestionParam;
+  const {
+    tab: currentTab
+  } = current;
+  const {
+    formTabPane,
+    formTranslationPane,
+    previewTabPane,
+    questionCount,
+    questionGroupCount,
+    mandatoryQuestionCount,
+    version
+  } = UIText;
 
-  var _useState = useState(defaultQuestion),
-      init = _useState[0],
-      setInit = _useState[1];
-
-  var formStore = formFn.store.useState(function (s) {
-    return s;
-  });
-  var current = UIStore.useState(function (s) {
-    return s.current;
-  });
-
-  var _UIStore$useState = UIStore.useState(function (s) {
-    return s;
-  }),
-      UIText = _UIStore$useState.UIText,
-      hostParams = _UIStore$useState.hostParams;
-
-  var questionGroups = questionGroupFn.store.useState(function (s) {
-    return s.questionGroups;
-  });
-  var activeEditFormSetting = UIStore.useState(function (s) {
-    return s.activeEditFormSetting;
-  });
-  var defaultQuestionParam = hostParams === null || hostParams === void 0 ? void 0 : hostParams.defaultQuestionParam;
-  var currentTab = current.tab;
-  var formTabPane = UIText.formTabPane,
-      formTranslationPane = UIText.formTranslationPane,
-      previewTabPane = UIText.previewTabPane,
-      questionCount = UIText.questionCount,
-      questionGroupCount = UIText.questionGroupCount,
-      mandatoryQuestionCount = UIText.mandatoryQuestionCount,
-      version = UIText.version;
-
-  if (!initialValue) {
+  if (!_initialValue) {
     console.error('initialValue required as an empty object {}');
   }
 
-  useEffect(function () {
+  useEffect(() => {
     var _settingHintURL$setti, _settingHintURL$setti2, _customParams$params;
 
-    var checkDefaultQuestion = defaultQuestion ? Object.values(defaultQuestion).filter(function (x) {
-      return x;
-    }).length : false;
-    var sanitizeSettingTreeDropdownValue = settingTreeDropdownValue.filter(function (x) {
-      return (x === null || x === void 0 ? void 0 : x.label) && (x === null || x === void 0 ? void 0 : x.value);
-    });
-    var sanitizeSettingCascadeURL = settingCascadeURL.filter(function (x) {
-      return (x === null || x === void 0 ? void 0 : x.name) && (x === null || x === void 0 ? void 0 : x.endpoint);
-    }).map(function (x, xi) {
-      return _extends({}, x, {
-        id: (x === null || x === void 0 ? void 0 : x.id) || xi + 1
-      });
-    });
-    var sanitizeSettingHintURL = !isEmpty(settingHintURL) ? _extends({}, settingHintURL, {
-      settings: settingHintURL === null || settingHintURL === void 0 ? void 0 : (_settingHintURL$setti = settingHintURL.settings) === null || _settingHintURL$setti === void 0 ? void 0 : (_settingHintURL$setti2 = _settingHintURL$setti.filter(function (x) {
+    const checkDefaultQuestion = _defaultQuestion ? Object.values(_defaultQuestion).filter(x => x).length : false;
+
+    const sanitizeSettingTreeDropdownValue = _settingTreeDropdownValue.filter(x => (x === null || x === void 0 ? void 0 : x.label) && (x === null || x === void 0 ? void 0 : x.value));
+
+    const sanitizeSettingCascadeURL = _settingCascadeURL.filter(x => (x === null || x === void 0 ? void 0 : x.name) && (x === null || x === void 0 ? void 0 : x.endpoint)).map((x, xi) => ({ ...x,
+      id: (x === null || x === void 0 ? void 0 : x.id) || xi + 1
+    }));
+
+    const sanitizeSettingHintURL = !isEmpty(_settingHintURL) ? { ..._settingHintURL,
+      settings: _settingHintURL === null || _settingHintURL === void 0 ? void 0 : (_settingHintURL$setti = _settingHintURL.settings) === null || _settingHintURL$setti === void 0 ? void 0 : (_settingHintURL$setti2 = _settingHintURL$setti.filter(x => {
         var _x$path;
 
         return (x === null || x === void 0 ? void 0 : x.name) && (x === null || x === void 0 ? void 0 : x.endpoint) && (x === null || x === void 0 ? void 0 : (_x$path = x.path) === null || _x$path === void 0 ? void 0 : _x$path.length);
-      })) === null || _settingHintURL$setti2 === void 0 ? void 0 : _settingHintURL$setti2.map(function (x, xi) {
-        return _extends({}, x, {
-          id: (x === null || x === void 0 ? void 0 : x.id) || xi + 1
-        });
-      })
-    }) : {};
-    var sanitizeDefaultQuestion = {
-      type: (defaultQuestion === null || defaultQuestion === void 0 ? void 0 : defaultQuestion.type) || questionType.input,
-      name: defaultQuestion === null || defaultQuestion === void 0 ? void 0 : defaultQuestion.name,
-      required: (defaultQuestion === null || defaultQuestion === void 0 ? void 0 : defaultQuestion.required) || false
+      })) === null || _settingHintURL$setti2 === void 0 ? void 0 : _settingHintURL$setti2.map((x, xi) => ({ ...x,
+        id: (x === null || x === void 0 ? void 0 : x.id) || xi + 1
+      }))
+    } : {};
+    const sanitizeDefaultQuestion = {
+      type: (_defaultQuestion === null || _defaultQuestion === void 0 ? void 0 : _defaultQuestion.type) || questionType.input,
+      name: _defaultQuestion === null || _defaultQuestion === void 0 ? void 0 : _defaultQuestion.name,
+      required: (_defaultQuestion === null || _defaultQuestion === void 0 ? void 0 : _defaultQuestion.required) || false
     };
-    var sanitizeCustomParams = customParams === null || customParams === void 0 ? void 0 : (_customParams$params = customParams.params) === null || _customParams$params === void 0 ? void 0 : _customParams$params.filter(function (x) {
-      return x === null || x === void 0 ? void 0 : x.name;
-    });
-    UIStore.update(function (s) {
+    const sanitizeCustomParams = _customParams === null || _customParams === void 0 ? void 0 : (_customParams$params = _customParams.params) === null || _customParams$params === void 0 ? void 0 : _customParams$params.filter(x => x === null || x === void 0 ? void 0 : x.name);
+    UIStore.update(s => {
       var _sanitizeSettingHintU;
 
       if (sanitizeSettingTreeDropdownValue.length) {
-        s.hostParams = _extends({}, s.hostParams, {
+        s.hostParams = { ...s.hostParams,
           settingTreeDropdownValue: sanitizeSettingTreeDropdownValue
-        });
+        };
       }
 
       if (sanitizeSettingCascadeURL.length) {
-        s.hostParams = _extends({}, s.hostParams, {
+        s.hostParams = { ...s.hostParams,
           settingCascadeURL: sanitizeSettingCascadeURL
-        });
+        };
       }
 
       if (!isEmpty(sanitizeSettingHintURL) && sanitizeSettingHintURL !== null && sanitizeSettingHintURL !== void 0 && (_sanitizeSettingHintU = sanitizeSettingHintURL.settings) !== null && _sanitizeSettingHintU !== void 0 && _sanitizeSettingHintU.length) {
-        s.hostParams = _extends({}, s.hostParams, {
+        s.hostParams = { ...s.hostParams,
           settingHintURL: sanitizeSettingHintURL
-        });
+        };
       }
 
       if (checkDefaultQuestion) {
-        s.hostParams = _extends({}, s.hostParams, {
+        s.hostParams = { ...s.hostParams,
           defaultQuestionParam: sanitizeDefaultQuestion
-        });
+        };
       } else {
-        s.hostParams = _extends({}, s.hostParams, {
+        s.hostParams = { ...s.hostParams,
           defaultQuestionParam: {}
-        });
+        };
       }
 
-      if (limitQuestionType.length) {
-        s.hostParams = _extends({}, s.hostParams, {
-          limitQuestionType: Object.keys(questionType).map(function (key) {
+      if (_limitQuestionType.length) {
+        s.hostParams = { ...s.hostParams,
+          limitQuestionType: Object.keys(questionType).map(key => {
             var _questionType$key;
 
             return {
               label: (_questionType$key = questionType[key]) === null || _questionType$key === void 0 ? void 0 : _questionType$key.split('_').join(' '),
               value: questionType[key]
             };
-          }).filter(function (x) {
-            return limitQuestionType.includes(x.value);
-          })
-        });
+          }).filter(x => _limitQuestionType.includes(x.value))
+        };
       }
 
-      if (customParams !== null && customParams !== void 0 && customParams.label && sanitizeCustomParams !== null && sanitizeCustomParams !== void 0 && sanitizeCustomParams.length) {
-        s.hostParams = _extends({}, s.hostParams, {
-          customParams: _extends({}, customParams, {
+      if (_customParams !== null && _customParams !== void 0 && _customParams.label && sanitizeCustomParams !== null && sanitizeCustomParams !== void 0 && sanitizeCustomParams.length) {
+        s.hostParams = { ...s.hostParams,
+          customParams: { ..._customParams,
             params: sanitizeCustomParams
-          })
-        });
+          }
+        };
       }
     });
-  }, [settingTreeDropdownValue, settingCascadeURL, settingHintURL, defaultQuestion, limitQuestionType, customParams]);
-  useEffect(function () {
+  }, [_settingTreeDropdownValue, _settingCascadeURL, _settingHintURL, _defaultQuestion, _limitQuestionType, _customParams]);
+  useEffect(() => {
     if (defaultQuestionParam && init) {
-      questionGroupFn.store.update(function (s) {
+      questionGroupFn.store.update(s => {
         s.questionGroups = [questionGroupFn.add({
           defaultQuestionParam: defaultQuestionParam
         })];
@@ -12011,28 +11488,26 @@ var WebformEditor = function WebformEditor(_ref) {
       setInit(false);
     }
   }, [defaultQuestionParam, init]);
-  useEffect(function () {
-    if (!isEmpty(initialValue)) {
-      var initialData = data.toEditor(initialValue);
-      formFn.store.update(function (s) {
+  useEffect(() => {
+    if (!isEmpty(_initialValue)) {
+      const initialData = data.toEditor(_initialValue);
+      formFn.store.update(s => {
         var _initialData$language;
 
         s.id = (initialData === null || initialData === void 0 ? void 0 : initialData.id) || generateId();
         s.version = (initialData === null || initialData === void 0 ? void 0 : initialData.version) || 1;
         s.name = (initialData === null || initialData === void 0 ? void 0 : initialData.name) || 'Unknown Form';
         s.description = (initialData === null || initialData === void 0 ? void 0 : initialData.description) || 'Unknown Description';
-        s.languages = (initialData === null || initialData === void 0 ? void 0 : (_initialData$language = initialData.languages) === null || _initialData$language === void 0 ? void 0 : _initialData$language.filter(function (x) {
-          return x !== 'en';
-        })) || [];
+        s.languages = (initialData === null || initialData === void 0 ? void 0 : (_initialData$language = initialData.languages) === null || _initialData$language === void 0 ? void 0 : _initialData$language.filter(x => x !== 'en')) || [];
         s.defaultLanguage = (initialData === null || initialData === void 0 ? void 0 : initialData.defaultLanguage) || 'en';
         s.translations = (initialData === null || initialData === void 0 ? void 0 : initialData.translations) || [];
       });
-      questionGroupFn.store.update(function (s) {
+      questionGroupFn.store.update(s => {
         s.questionGroups = initialData.questionGroups;
       });
     } else {
-      var defaultForm = formFn.add();
-      formFn.store.update(function (s) {
+      const defaultForm = formFn.add();
+      formFn.store.update(s => {
         s.id = defaultForm.id;
         s.name = defaultForm.name;
         s.version = defaultForm.version;
@@ -12041,40 +11516,36 @@ var WebformEditor = function WebformEditor(_ref) {
         s.defaultLanguage = 'en';
         s.translations = [];
       });
-      questionGroupFn.store.update(function (s) {
+      questionGroupFn.store.update(s => {
         s.questionGroups = [questionGroupFn.add({})];
       });
     }
-  }, [initialValue]);
+  }, [_initialValue]);
 
-  var handleTabsOnChange = function handleTabsOnChange(e) {
-    UIStore.update(function (s) {
-      s.current = _extends({}, current, {
+  const handleTabsOnChange = e => {
+    UIStore.update(s => {
+      s.current = { ...current,
         tab: e
-      });
+      };
     });
   };
 
-  var handleShowFormSetting = function handleShowFormSetting(e) {
+  const handleShowFormSetting = e => {
     e.preventDefault();
-    UIStore.update(function (s) {
+    UIStore.update(s => {
       s.activeEditFormSetting = activeEditFormSetting ? false : true;
     });
   };
 
-  var handleSave = function handleSave() {
-    if (onSave) {
-      onSave(data.toWebform(formStore, questionGroups));
+  const handleSave = () => {
+    if (_onSave) {
+      _onSave(data.toWebform(formStore, questionGroups));
     }
   };
 
-  var questions = questionGroups.reduce(function (curr, qg) {
-    return [].concat(curr, qg.questions);
-  }, []);
-  var mandatory = questions.filter(function (q) {
-    return q === null || q === void 0 ? void 0 : q.required;
-  });
-  var tabProps = [{
+  const questions = questionGroups.reduce((curr, qg) => [...curr, ...qg.questions], []);
+  const mandatory = questions.filter(q => q === null || q === void 0 ? void 0 : q.required);
+  const tabProps = [{
     icon: TbEdit,
     tab: formTabPane,
     key: 'edit-form'
@@ -12121,18 +11592,16 @@ var WebformEditor = function WebformEditor(_ref) {
       onClick: handleSave
     }))),
     tabBarGutter: 24,
-    className: styles['tabs-wrapper'] + " " + styles['tabs-wrapper-sticky']
-  }, tabProps.map(function (prop) {
-    return /*#__PURE__*/React__default.createElement(Tabs.TabPane, {
-      tab: /*#__PURE__*/React__default.createElement(Space, {
-        size: 2,
-        className: styles['tab-pane-name-icon']
-      }, /*#__PURE__*/React__default.createElement(prop.icon, null), " ", prop.tab),
-      key: prop.key
-    });
-  })), currentTab === 'edit-form' && /*#__PURE__*/React__default.createElement(FormWrapper, null, activeEditFormSetting && /*#__PURE__*/React__default.createElement(FormDefinition, formStore), questionGroups.map(function (qg, qgi) {
+    className: `${styles['tabs-wrapper']} ${styles['tabs-wrapper-sticky']}`
+  }, tabProps.map(prop => /*#__PURE__*/React__default.createElement(Tabs.TabPane, {
+    tab: /*#__PURE__*/React__default.createElement(Space, {
+      size: 2,
+      className: styles['tab-pane-name-icon']
+    }, /*#__PURE__*/React__default.createElement(prop.icon, null), " ", prop.tab),
+    key: prop.key
+  }))), currentTab === 'edit-form' && /*#__PURE__*/React__default.createElement(FormWrapper, null, activeEditFormSetting && /*#__PURE__*/React__default.createElement(FormDefinition, formStore), questionGroups.map((qg, qgi) => {
     return /*#__PURE__*/React__default.createElement(QuestionGroupDefinition, {
-      key: "question-group-definition-" + qgi,
+      key: `question-group-definition-${qgi}`,
       index: qgi,
       questionGroup: qg,
       isLastItem: qgi === questionGroups.length - 1

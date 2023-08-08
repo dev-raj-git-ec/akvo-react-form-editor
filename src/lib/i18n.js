@@ -88,6 +88,8 @@ const UIStaticText = {
     inputSelectHintEndpointLabel: 'Hint Endpoint',
     inputSelectHintPathLabel: 'Hint Path',
     inputQuestionHintButtonTextLabel: 'Hint Button Text',
+    questionMoreImageTypeSettingText: 'More Image Question Setting',
+    inputQuestionImageLimitValidationText: 'Limit / Max file size',
   },
 };
 
