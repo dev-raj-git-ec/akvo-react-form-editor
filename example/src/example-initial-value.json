@@ -311,6 +311,7 @@
               "50000": "#ef6548"
             }
           },
+          "dataApiUrl": "https://form-service.akvotest.org/api/answer-stats/1693403547388",
           "translations": [
             {
               "name": "Rata-rata biaya makan",
