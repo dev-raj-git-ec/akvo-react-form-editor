@@ -25,8 +25,8 @@ const questionType = {
   multiple_option: 'multiple_option',
   tree: 'tree',
   table: 'table',
-  // autofield: 'autofield',
   image: 'image',
+  autofield: 'autofield',
 };
 
 const defaultForm = () => {

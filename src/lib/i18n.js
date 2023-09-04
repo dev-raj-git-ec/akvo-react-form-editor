@@ -90,6 +90,10 @@ const UIStaticText = {
     inputQuestionHintButtonTextLabel: 'Hint Button Text',
     questionMoreImageTypeSettingText: 'More Image Question Setting',
     inputQuestionImageLimitValidationText: 'Limit / Max file size',
+    questionMoreAutofieldTypeSettingText: 'More Autofield Question Setting',
+    inputQuestionAutofieldMultiline: 'Support Multiline Function',
+    inputQuestionAutofieldFnString: 'Add Function (String) Here',
+    inputQuestionAutofieldFnColor: 'Add Function Color Here',
   },
 };
 
