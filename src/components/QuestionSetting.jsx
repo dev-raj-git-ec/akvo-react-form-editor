@@ -14,6 +14,7 @@ import {
   SettingAutofield,
 } from './question-type';
 import QuestionHint from './QuestionHint';
+import QuestionStats from './QuestionStats';
 import { map, groupBy, orderBy, isEmpty } from 'lodash';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 
@@ -299,7 +300,9 @@ const QuestionSetting = ({ question, dependant }) => {
           </Col>
         )}
       </Row>
+      {/* Question Hint */}
       {showHintSetting && <QuestionHint {...question} />}
+      {/* Question Type Setting */}
       {qType === questionType.input && <SettingInput {...question} />}
       {qType === questionType.number && <SettingNumber {...question} />}
       {[questionType.option, questionType.multiple_option].includes(qType) && (
@@ -311,6 +314,8 @@ const QuestionSetting = ({ question, dependant }) => {
       {qType === questionType.table && <SettingTable {...question} />}
       {qType === questionType.image && <SettingImage {...question} />}
       {qType === questionType.autofield && <SettingAutofield {...question} />}
+      {/* Question Stats  */}
+      <QuestionStats {...question} />
     </div>
   );
 };

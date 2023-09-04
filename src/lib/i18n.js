@@ -94,6 +94,8 @@ const UIStaticText = {
     inputQuestionAutofieldMultiline: 'Support Multiline Function',
     inputQuestionAutofieldFnString: 'Add Function (String) Here',
     inputQuestionAutofieldFnColor: 'Add Function Color Here',
+    questionStatsSettingTest: 'Stats Setting',
+    inputStatsUrlText: 'Add Stats Endpoint Here',
   },
 };
 
