@@ -299,6 +299,27 @@
           ]
         },
         {
+          "id": 29,
+          "name": "Average spent for meal",
+          "order": 3,
+          "type": "autofield",
+          "required": true,
+          "fn": {
+            "multiline": false,
+            "fnString": "function () { return #8 / #9 || 0 }",
+            "fnColor": {
+              "#8": "#fdbb84",
+              "#9": "#fee8c8"
+            }
+          },
+          "translations": [
+            {
+              "name": "Rata-rata biaya makan",
+              "language": "id"
+            }
+          ]
+        },
+        {
           "id": 11,
           "name": "Favorite Food",
           "order": 4,
