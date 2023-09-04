@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Form, Checkbox, Space, Row, Col, Input, Button } from 'antd';
 import styles from '../../styles.module.css';
 import { UIStore, questionGroupFn, generateId } from '../../lib/store';
@@ -9,6 +9,7 @@ import {
   MdOutlineArrowCircleUp,
 } from 'react-icons/md';
 import { orderBy, takeRight } from 'lodash';
+import { SketchPicker } from 'react-color';
 
 const defaultOptions = ({ init = false, order = 0 }) => {
   const option = {
@@ -58,6 +59,7 @@ const SettingOption = ({
         }))
       : defaultOptions({ init: true })
   );
+  const [displayColorPicker, setDisplayColorPicker] = useState(null);
 
   const updateState = useCallback(
     (name, value) => {
@@ -183,6 +185,31 @@ const SettingOption = ({
     );
   };
 
+  const handleDisplayColorPicker = (optionId) => {
+    if (displayColorPicker === optionId) {
+      // remove option id from display color picker
+      setDisplayColorPicker(null);
+      return;
+    }
+    setDisplayColorPicker(optionId);
+  };
+
+  const handleOnPickColor = (colorHex, current) => {
+    const { id: currentId } = current;
+    setOptions(
+      options.map((opt) => {
+        if (opt.id === currentId) {
+          return {
+            ...opt,
+            color: colorHex || null,
+          };
+        }
+        return opt;
+      })
+    );
+    setDisplayColorPicker(null);
+  };
+
   return (
     <div>
       <p className={styles['more-question-setting-text']}>
@@ -218,6 +245,7 @@ const SettingOption = ({
           </Col>
         )}
       </Row>
+      {/* Options */}
       {orderBy(options, 'order').map((d, di) => (
         <Row
           key={`option-${id}-${di}`}
@@ -237,7 +265,7 @@ const SettingOption = ({
               />
             </Form.Item>
           </Col>
-          <Col span={10}>
+          <Col span={8}>
             <Form.Item
               initialValue={d.name}
               name={`${namePreffix}-option_name_${d.id}`}
@@ -248,6 +276,29 @@ const SettingOption = ({
               />
             </Form.Item>
           </Col>
+          {/* color picker */}
+          <Col span={2}>
+            <Form.Item
+              initialValue={d?.color || null}
+              name={`${namePreffix}-option_color_${d.id}`}
+            >
+              <Input
+                onClick={() => handleDisplayColorPicker(d.id)}
+                onChange={(e) => handleOnPickColor(e?.target?.value, d)}
+                placeholder="#FFFFFF"
+                value={d?.color || null}
+              />
+              {displayColorPicker === d.id && (
+                <div style={{ position: 'absolute', zIndex: '2' }}>
+                  <SketchPicker
+                    color={d?.color || '#ffffff'}
+                    onChange={(e) => handleOnPickColor(e?.hex, d)}
+                  />
+                </div>
+              )}
+            </Form.Item>
+          </Col>
+          {/* eol color picker */}
           <Col>
             <Space>
               <Button
@@ -281,6 +332,7 @@ const SettingOption = ({
           </Col>
         </Row>
       ))}
+      {/* /* EOL Options */}
     </div>
   );
 };
