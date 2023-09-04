@@ -283,6 +283,17 @@ const SettingOption = ({
               name={`${namePreffix}-option_color_${d.id}`}
             >
               <Input
+                addonBefore={
+                  <div
+                    style={{
+                      width: 20,
+                      height: 15,
+                      backgroundColor: d?.color || '#fffffff',
+                    }}
+                  >
+                    &nbsp;
+                  </div>
+                }
                 onClick={() => handleDisplayColorPicker(d.id)}
                 onChange={(e) => handleOnPickColor(e?.target?.value, d)}
                 placeholder="#FFFFFF"
