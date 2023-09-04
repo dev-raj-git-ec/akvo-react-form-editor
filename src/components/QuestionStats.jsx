@@ -3,8 +3,6 @@ import styles from '../styles.module.css';
 import { Form, Input } from 'antd';
 import { UIStore, questionGroupFn } from '../lib/store';
 
-const urlRegex = /^(https?):\/\/[^\s/$.?#].[^\s]*$/i;
-
 const QuestionStats = ({ id, questionGroupId, dataApiUrl = null }) => {
   const namePreffix = `question-${id}`;
   const { UIText } = UIStore.useState((s) => s);
@@ -46,12 +44,6 @@ const QuestionStats = ({ id, questionGroupId, dataApiUrl = null }) => {
         label={UIText.inputStatsUrlText}
         name={`${namePreffix}-dataApiUrl`}
         initialValue={dataApiUrl}
-        rules={[
-          {
-            pattern: urlRegex,
-            message: 'Invalid URL format',
-          },
-        ]}
       >
         <Input onChange={handleChangeStatsEndpoint} />
       </Form.Item>

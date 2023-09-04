@@ -96,6 +96,7 @@ const UIStaticText = {
     inputQuestionAutofieldFnColor: 'Add Function Color Here',
     questionStatsSettingTest: 'Stats Setting',
     inputStatsUrlText: 'Add Stats Endpoint Here',
+    inpuStatsUrlValidationText: 'Invalid URL format',
   },
 };
 
