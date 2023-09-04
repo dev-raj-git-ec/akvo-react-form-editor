@@ -11,6 +11,7 @@ import {
   SettingDate,
   SettingTable,
   SettingImage,
+  SettingAutofield,
 } from './question-type';
 import QuestionHint from './QuestionHint';
 import { map, groupBy, orderBy, isEmpty } from 'lodash';
@@ -309,6 +310,7 @@ const QuestionSetting = ({ question, dependant }) => {
       {qType === questionType.date && <SettingDate {...question} />}
       {qType === questionType.table && <SettingTable {...question} />}
       {qType === questionType.image && <SettingImage {...question} />}
+      {qType === questionType.autofield && <SettingAutofield {...question} />}
     </div>
   );
 };
