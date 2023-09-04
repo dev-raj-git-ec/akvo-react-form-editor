@@ -7,8 +7,7 @@ import isEmpty from 'lodash/isEmpty';
 const fnStringExample =
   "function () { return #question_id / #question_id } OR () => { return #1.includes('Test') ? #question_id / #question_id : 0 }";
 
-const fnColorExample =
-  "{ '#question_id_1': '#CCFFC4', '#question_id_2': '#FECDCD' }";
+const fnColorExample = "{ 'answer_value': '#CCFFC4' }";
 
 const SettingAutofield = ({
   id,
