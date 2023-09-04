@@ -8,7 +8,7 @@ const fnStringExample =
   "function () { return #question_id / #question_id } OR () => { return #1.includes('Test') ? #question_id / #question_id : 0 }";
 
 const fnColorExample =
-  "'#question_id_1': '#CCFFC4', '#question_id_2': '#FECDCD'";
+  "{ '#question_id_1': '#CCFFC4', '#question_id_2': '#FECDCD' }";
 
 const SettingAutofield = ({
   id,
@@ -53,21 +53,13 @@ const SettingAutofield = ({
 
   const handleChangeFnColor = (e) => {
     let value = e?.target?.value;
-    if (!value.includes(',')) {
-      return;
+    try {
+      value = JSON.parse(value);
+      updateState('fn', { ...fn, fnColor: value });
+      return true;
+    } catch (error) {
+      return false;
     }
-    let objValue = {};
-    value = value?.split(',').map((x) => x?.trim());
-    value?.forEach((val) => {
-      const split = val?.split(':');
-      const qid = split?.[0]?.trim();
-      const color = split?.[1]?.trim();
-      objValue = {
-        ...objValue,
-        [qid]: color,
-      };
-    });
-    updateState('fn', { ...fn, fnColor: objValue });
   };
 
   return (
@@ -90,6 +82,7 @@ const SettingAutofield = ({
         label={UIText.inputQuestionAutofieldFnString}
         name={`${namePreffix}-autofield_fnString`}
         initialValue={fn?.fnString || null}
+        required
       >
         <Input.TextArea
           rows={5}
@@ -101,7 +94,7 @@ const SettingAutofield = ({
       <Form.Item
         label={UIText.inputQuestionAutofieldFnColor}
         name={`${namePreffix}-autofield_fnColor`}
-        initialValue={isEmpty(fn?.fnColor) ? null : fn?.fnColor}
+        initialValue={isEmpty(fn?.fnColor) ? null : JSON.stringify(fn?.fnColor)}
       >
         <Input.TextArea
           rows={5}
