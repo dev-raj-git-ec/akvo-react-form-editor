@@ -210,6 +210,7 @@
             {
               "name": "Single",
               "order": 1,
+              "color": "#7fc97f",
               "translations": [
                 {
                   "name": "Jomblo",
@@ -220,6 +221,7 @@
             {
               "name": "Maried",
               "order": 2,
+              "color": "#fdc086",
               "translations": [
                 {
                   "name": "Menikah",
@@ -230,6 +232,7 @@
             {
               "name": "Widowed",
               "order": 3,
+              "color": "#beaed4",
               "translations": [
                 {
                   "name": "Janda / Duda",
