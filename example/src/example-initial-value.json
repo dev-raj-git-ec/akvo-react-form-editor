@@ -210,6 +210,7 @@
             {
               "name": "Single",
               "order": 1,
+              "color": "#7fc97f",
               "translations": [
                 {
                   "name": "Jomblo",
@@ -220,6 +221,7 @@
             {
               "name": "Maried",
               "order": 2,
+              "color": "#fdc086",
               "translations": [
                 {
                   "name": "Menikah",
@@ -230,6 +232,7 @@
             {
               "name": "Widowed",
               "order": 3,
+              "color": "#beaed4",
               "translations": [
                 {
                   "name": "Janda / Duda",
@@ -303,7 +306,7 @@
           "name": "Average spent for meal",
           "order": 3,
           "type": "autofield",
-          "required": true,
+          "required": false,
           "fn": {
             "multiline": false,
             "fnString": "function () { return #8 / #9 || 0 }",
@@ -311,7 +314,7 @@
               "50000": "#ef6548"
             }
           },
-          "dataApiUrl": "https://form-service.akvotest.org/api/answer-stats/1693403547388",
+          "dataApiUrl": "https://akvo.github.io/akvo-react-form/api/meals",
           "translations": [
             {
               "name": "Rata-rata biaya makan",
