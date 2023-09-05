@@ -13,6 +13,7 @@ import { isEmpty, mapKeys, orderBy, findIndex, intersection, uniq, difference, t
 import orderBy$1 from 'lodash/orderBy';
 import 'akvo-react-form/dist/index.css';
 import { Webform } from 'akvo-react-form';
+import { SketchPicker } from 'react-color';
 import isEmpty$1 from 'lodash/isEmpty';
 import { VscPreview } from 'react-icons/vsc';
 
@@ -147,7 +148,14 @@ var UIStaticText = {
     inputSelectHintPathLabel: 'Hint Path',
     inputQuestionHintButtonTextLabel: 'Hint Button Text',
     questionMoreImageTypeSettingText: 'More Image Question Setting',
-    inputQuestionImageLimitValidationText: 'Limit / Max file size'
+    inputQuestionImageLimitValidationText: 'Limit / Max file size',
+    questionMoreAutofieldTypeSettingText: 'More Autofield Question Setting',
+    inputQuestionAutofieldMultiline: 'Support Multiline Function',
+    inputQuestionAutofieldFnString: 'Add Function (String) Here',
+    inputQuestionAutofieldFnColor: 'Add Function Color Here',
+    questionStatsSettingTest: 'Stats Setting',
+    inputStatsUrlText: 'Add Stats Endpoint Here',
+    inpuStatsUrlValidationText: 'Invalid URL format'
   }
 };
 
@@ -272,7 +280,8 @@ var questionType = {
   multiple_option: 'multiple_option',
   tree: 'tree',
   table: 'table',
-  image: 'image'
+  image: 'image',
+  autofield: 'autofield'
 };
 
 var defaultForm = function defaultForm() {
@@ -3449,6 +3458,10 @@ var SettingOption = function SettingOption(_ref2) {
       options = _useState[0],
       setOptions = _useState[1];
 
+  var _useState2 = useState(null),
+      displayColorPicker = _useState2[0],
+      setDisplayColorPicker = _useState2[1];
+
   var updateState = useCallback(function (name, value) {
     questionGroupFn.store.update(function (s) {
       s.questionGroups = s.questionGroups.map(function (qg) {
@@ -3569,6 +3582,29 @@ var SettingOption = function SettingOption(_ref2) {
     }));
   };
 
+  var handleDisplayColorPicker = function handleDisplayColorPicker(optionId) {
+    if (displayColorPicker === optionId) {
+      setDisplayColorPicker(null);
+      return;
+    }
+
+    setDisplayColorPicker(optionId);
+  };
+
+  var handleOnPickColor = function handleOnPickColor(colorHex, current) {
+    var currentId = current.id;
+    setOptions(options.map(function (opt) {
+      if (opt.id === currentId) {
+        return _extends({}, opt, {
+          color: colorHex || null
+        });
+      }
+
+      return opt;
+    }));
+    setDisplayColorPicker(null);
+  };
+
   return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("p", {
     className: styles['more-question-setting-text']
   }, UIText.questionMoreOptionTypeSettingText), /*#__PURE__*/React__default.createElement(Row, {
@@ -3606,7 +3642,7 @@ var SettingOption = function SettingOption(_ref2) {
       },
       allowClear: true
     }))), /*#__PURE__*/React__default.createElement(Col, {
-      span: 10
+      span: 8
     }, /*#__PURE__*/React__default.createElement(Form.Item, {
       initialValue: d.name,
       name: namePreffix + "-option_name_" + d.id
@@ -3615,7 +3651,40 @@ var SettingOption = function SettingOption(_ref2) {
         return handleOnChangeOption(e, d);
       },
       allowClear: true
-    }))), /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement(Space, null, /*#__PURE__*/React__default.createElement(Button, {
+    }))), /*#__PURE__*/React__default.createElement(Col, {
+      span: 2
+    }, /*#__PURE__*/React__default.createElement(Form.Item, {
+      initialValue: (d === null || d === void 0 ? void 0 : d.color) || null,
+      name: namePreffix + "-option_color_" + d.id
+    }, /*#__PURE__*/React__default.createElement(Input, {
+      addonBefore: /*#__PURE__*/React__default.createElement("div", {
+        style: {
+          width: 20,
+          height: 15,
+          backgroundColor: (d === null || d === void 0 ? void 0 : d.color) || '#fffffff'
+        }
+      }, "\xA0"),
+      onClick: function onClick() {
+        return handleDisplayColorPicker(d.id);
+      },
+      onChange: function onChange(e) {
+        var _e$target5;
+
+        return handleOnPickColor(e === null || e === void 0 ? void 0 : (_e$target5 = e.target) === null || _e$target5 === void 0 ? void 0 : _e$target5.value, d);
+      },
+      placeholder: "#FFFFFF",
+      value: (d === null || d === void 0 ? void 0 : d.color) || null
+    }), displayColorPicker === d.id && /*#__PURE__*/React__default.createElement("div", {
+      style: {
+        position: 'absolute',
+        zIndex: '2'
+      }
+    }, /*#__PURE__*/React__default.createElement(SketchPicker, {
+      color: (d === null || d === void 0 ? void 0 : d.color) || '#ffffff',
+      onChange: function onChange(e) {
+        return handleOnPickColor(e === null || e === void 0 ? void 0 : e.hex, d);
+      }
+    })))), /*#__PURE__*/React__default.createElement(Col, null, /*#__PURE__*/React__default.createElement(Space, null, /*#__PURE__*/React__default.createElement(Button, {
       type: "link",
       className: styles['button-icon'],
       icon: /*#__PURE__*/React__default.createElement(MdOutlineAddCircleOutline, null),
@@ -10045,6 +10114,111 @@ var SettingImage = function SettingImage(_ref) {
   })))));
 };
 
+var fnStringExample = "function () { return #question_id / #question_id } OR () => { return #1.includes('Test') ? #question_id / #question_id : 0 }";
+var fnColorExample = "{ 'answer_value': '#CCFFC4' }";
+
+var SettingAutofield = function SettingAutofield(_ref) {
+  var id = _ref.id,
+      questionGroupId = _ref.questionGroupId,
+      _ref$fn = _ref.fn,
+      fn = _ref$fn === void 0 ? {
+    multiline: false,
+    fnString: null,
+    fnColor: {}
+  } : _ref$fn;
+  var namePreffix = "question-" + id;
+  var UIText = UIStore.useState(function (s) {
+    return s.UIText;
+  });
+
+  var updateState = function updateState(name, value) {
+    questionGroupFn.store.update(function (s) {
+      s.questionGroups = s.questionGroups.map(function (qg) {
+        if (qg.id === questionGroupId) {
+          var questions = qg.questions.map(function (q) {
+            if (q.id === id) {
+              var _extends2;
+
+              return _extends({}, q, (_extends2 = {}, _extends2[name] = value, _extends2));
+            }
+
+            return q;
+          });
+          return _extends({}, qg, {
+            questions: questions
+          });
+        }
+
+        return qg;
+      });
+    });
+  };
+
+  var handleChangeMultiline = function handleChangeMultiline(e) {
+    var _e$target;
+
+    var value = e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.checked;
+    updateState('fn', _extends({}, fn, {
+      multiline: value
+    }));
+  };
+
+  var handleChangeFnString = function handleChangeFnString(e) {
+    var _e$target2;
+
+    var value = e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.value;
+    updateState('fn', _extends({}, fn, {
+      fnString: value
+    }));
+  };
+
+  var handleChangeFnColor = function handleChangeFnColor(e) {
+    var _e$target3;
+
+    var value = e === null || e === void 0 ? void 0 : (_e$target3 = e.target) === null || _e$target3 === void 0 ? void 0 : _e$target3.value;
+
+    try {
+      value = JSON.parse(value);
+      updateState('fn', _extends({}, fn, {
+        fnColor: value
+      }));
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("p", {
+    className: styles['more-question-setting-text']
+  }, UIText.questionMoreAutofieldTypeSettingText), /*#__PURE__*/React__default.createElement(Space, {
+    className: styles['space-align-left']
+  }, /*#__PURE__*/React__default.createElement(Form.Item, {
+    name: namePreffix + "-autofield_multiline"
+  }, /*#__PURE__*/React__default.createElement(Checkbox, {
+    onChange: handleChangeMultiline,
+    checked: (fn === null || fn === void 0 ? void 0 : fn.multiline) || false
+  }, ' ', UIText.inputQuestionAutofieldMultiline))), /*#__PURE__*/React__default.createElement(Form.Item, {
+    label: UIText.inputQuestionAutofieldFnString,
+    name: namePreffix + "-autofield_fnString",
+    initialValue: (fn === null || fn === void 0 ? void 0 : fn.fnString) || null,
+    required: true
+  }, /*#__PURE__*/React__default.createElement(Input.TextArea, {
+    rows: 5,
+    allowClear: true,
+    onChange: handleChangeFnString,
+    placeholder: fnStringExample
+  })), /*#__PURE__*/React__default.createElement(Form.Item, {
+    label: UIText.inputQuestionAutofieldFnColor,
+    name: namePreffix + "-autofield_fnColor",
+    initialValue: isEmpty$1(fn === null || fn === void 0 ? void 0 : fn.fnColor) ? null : JSON.stringify(fn === null || fn === void 0 ? void 0 : fn.fnColor)
+  }, /*#__PURE__*/React__default.createElement(Input.TextArea, {
+    rows: 5,
+    allowClear: true,
+    onChange: handleChangeFnColor,
+    placeholder: fnColorExample
+  })));
+};
+
 var QuestionHint = function QuestionHint(_ref) {
   var _hostParams$settingHi;
 
@@ -10222,6 +10396,59 @@ var QuestionHint = function QuestionHint(_ref) {
   }, /*#__PURE__*/React__default.createElement(Input, {
     onChange: handleChangeButtonText
   })))));
+};
+
+var QuestionStats = function QuestionStats(_ref) {
+  var id = _ref.id,
+      questionGroupId = _ref.questionGroupId,
+      _ref$dataApiUrl = _ref.dataApiUrl,
+      dataApiUrl = _ref$dataApiUrl === void 0 ? null : _ref$dataApiUrl;
+  var namePreffix = "question-" + id;
+
+  var _UIStore$useState = UIStore.useState(function (s) {
+    return s;
+  }),
+      UIText = _UIStore$useState.UIText;
+
+  var updateState = function updateState(name, value) {
+    questionGroupFn.store.update(function (s) {
+      s.questionGroups = s.questionGroups.map(function (qg) {
+        if (qg.id === questionGroupId) {
+          var questions = qg.questions.map(function (q) {
+            if (q.id === id) {
+              var _extends2;
+
+              return _extends({}, q, (_extends2 = {}, _extends2[name] = value, _extends2));
+            }
+
+            return q;
+          });
+          return _extends({}, qg, {
+            questions: questions
+          });
+        }
+
+        return qg;
+      });
+    });
+  };
+
+  var handleChangeStatsEndpoint = function handleChangeStatsEndpoint(e) {
+    var _e$target;
+
+    var value = e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.value;
+    updateState('dataApiUrl', value);
+  };
+
+  return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("p", {
+    className: styles['more-question-setting-text']
+  }, UIText.questionStatsSettingTest), /*#__PURE__*/React__default.createElement(Form.Item, {
+    label: UIText.inputStatsUrlText,
+    name: namePreffix + "-dataApiUrl",
+    initialValue: dataApiUrl
+  }, /*#__PURE__*/React__default.createElement(Input, {
+    onChange: handleChangeStatsEndpoint
+  })));
 };
 
 var QuestionSetting = function QuestionSetting(_ref) {
@@ -10476,7 +10703,7 @@ var QuestionSetting = function QuestionSetting(_ref) {
       cursor: 'pointer',
       marginLeft: '-4px'
     }
-  })))))), showHintSetting && /*#__PURE__*/React__default.createElement(QuestionHint, question), qType === questionType.input && /*#__PURE__*/React__default.createElement(SettingInput, question), qType === questionType.number && /*#__PURE__*/React__default.createElement(SettingNumber, question), [questionType.option, questionType.multiple_option].includes(qType) && /*#__PURE__*/React__default.createElement(SettingOption, question), qType === questionType.tree && /*#__PURE__*/React__default.createElement(SettingTree, question), qType === questionType.cascade && /*#__PURE__*/React__default.createElement(SettingCascade, question), qType === questionType.date && /*#__PURE__*/React__default.createElement(SettingDate, question), qType === questionType.table && /*#__PURE__*/React__default.createElement(SettingTable, question), qType === questionType.image && /*#__PURE__*/React__default.createElement(SettingImage, question));
+  })))))), showHintSetting && /*#__PURE__*/React__default.createElement(QuestionHint, question), qType === questionType.input && /*#__PURE__*/React__default.createElement(SettingInput, question), qType === questionType.number && /*#__PURE__*/React__default.createElement(SettingNumber, question), [questionType.option, questionType.multiple_option].includes(qType) && /*#__PURE__*/React__default.createElement(SettingOption, question), qType === questionType.tree && /*#__PURE__*/React__default.createElement(SettingTree, question), qType === questionType.cascade && /*#__PURE__*/React__default.createElement(SettingCascade, question), qType === questionType.date && /*#__PURE__*/React__default.createElement(SettingDate, question), qType === questionType.table && /*#__PURE__*/React__default.createElement(SettingTable, question), qType === questionType.image && /*#__PURE__*/React__default.createElement(SettingImage, question), qType === questionType.autofield && /*#__PURE__*/React__default.createElement(SettingAutofield, question), /*#__PURE__*/React__default.createElement(QuestionStats, question));
 };
 
 var dependencyTypes = [{
