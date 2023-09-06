@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Form, Checkbox, Row, Col, Input, InputNumber, Select } from 'antd';
+import { Form, Row, Col, Input, InputNumber, Select } from 'antd';
 import styles from '../../styles.module.css';
 import { UIStore, questionGroupFn } from '../../lib/store';
 
@@ -66,12 +66,6 @@ const SettingCascade = ({
     updateGlobalState({ initial: e });
   };
 
-  const handleChangeList = (value) => {
-    updateGlobalState({
-      list: value,
-    });
-  };
-
   return (
     <div>
       <p className={styles['more-question-setting-text']}>
@@ -121,33 +115,6 @@ const SettingCascade = ({
             />
           </Form.Item>
         </Col>
-        <Col>
-          <Form.Item name={`${namePreffix}-api_list_checkbox`}>
-            <Checkbox
-              onChange={(e) => handleChangeList(e?.target?.checked)}
-              checked={api?.list ? true : false}
-            >
-              {' '}
-              {UIText.inputQuestionListCheckbox}
-            </Checkbox>
-          </Form.Item>
-        </Col>
-        {api?.list && (
-          <Col span={8}>
-            <Form.Item
-              label={UIText.inputQuestionListLabel}
-              initialValue={
-                api?.list ? (api.list !== true ? api.list : null) : null
-              }
-              name={`${namePreffix}-api_list`}
-            >
-              <Input
-                onChange={(e) => handleChangeList(e?.target?.value)}
-                allowClear
-              />
-            </Form.Item>
-          </Col>
-        )}
       </Row>
     </div>
   );
