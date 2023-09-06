@@ -3,6 +3,8 @@ import { Form, Checkbox, Row, Col, Input, InputNumber, Select } from 'antd';
 import styles from '../../styles.module.css';
 import { UIStore, questionGroupFn } from '../../lib/store';
 
+const showSettingUseSpesificObjectNameSetting = false;
+
 const SettingCascade = ({
   id,
   questionGroupId,
@@ -121,33 +123,44 @@ const SettingCascade = ({
             />
           </Form.Item>
         </Col>
-        <Col>
-          <Form.Item name={`${namePreffix}-api_list_checkbox`}>
-            <Checkbox
-              onChange={(e) => handleChangeList(e?.target?.checked)}
-              checked={api?.list ? true : false}
+        {/* Use Spesific Object Name Setting */}
+        {showSettingUseSpesificObjectNameSetting && (
+          <Col>
+            <Row
+              align="bottom"
+              gutter={[24, 24]}
             >
-              {' '}
-              {UIText.inputQuestionListCheckbox}
-            </Checkbox>
-          </Form.Item>
-        </Col>
-        {api?.list && (
-          <Col span={8}>
-            <Form.Item
-              label={UIText.inputQuestionListLabel}
-              initialValue={
-                api?.list ? (api.list !== true ? api.list : null) : null
-              }
-              name={`${namePreffix}-api_list`}
-            >
-              <Input
-                onChange={(e) => handleChangeList(e?.target?.value)}
-                allowClear
-              />
-            </Form.Item>
+              <Col>
+                <Form.Item name={`${namePreffix}-api_list_checkbox`}>
+                  <Checkbox
+                    onChange={(e) => handleChangeList(e?.target?.checked)}
+                    checked={api?.list ? true : false}
+                  >
+                    {' '}
+                    {UIText.inputQuestionListCheckbox}
+                  </Checkbox>
+                </Form.Item>
+              </Col>
+              {api?.list && (
+                <Col span={8}>
+                  <Form.Item
+                    label={UIText.inputQuestionListLabel}
+                    initialValue={
+                      api?.list ? (api.list !== true ? api.list : null) : null
+                    }
+                    name={`${namePreffix}-api_list`}
+                  >
+                    <Input
+                      onChange={(e) => handleChangeList(e?.target?.value)}
+                      allowClear
+                    />
+                  </Form.Item>
+                </Col>
+              )}
+            </Row>
           </Col>
         )}
+        {/* EOL Use Spesific Object Name Setting */}
       </Row>
     </div>
   );
