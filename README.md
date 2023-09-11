@@ -32,6 +32,7 @@ yarn add akvo-react-form-editor
 | **Tree Select**               | tree            |
 | **Geolocation**               | geo             |
 | **Table (Multiple Question)** | table           |
+| **Autofield (fn string)**     | autofield       |
 
 ## Usage
 
