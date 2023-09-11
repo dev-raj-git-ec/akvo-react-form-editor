@@ -18,6 +18,8 @@ import QuestionStats from './QuestionStats';
 import { map, groupBy, orderBy, isEmpty } from 'lodash';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 
+const questionTypeWithRule = ['number', 'date'];
+
 const QuestionSetting = ({ question, dependant }) => {
   const {
     id,
@@ -94,6 +96,14 @@ const QuestionSetting = ({ question, dependant }) => {
           if (qg.id === questionGroupId) {
             const questions = qg.questions.map((q) => {
               if (q.id === id) {
+                // delete rule from number/date question
+                if (
+                  questionTypeWithRule.includes(q.type) &&
+                  questionTypeWithRule.includes(value)
+                ) {
+                  delete q?.rule;
+                }
+                // eol delete rule from number/date question
                 return {
                   ...q,
                   [name]: value,
