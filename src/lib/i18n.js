@@ -97,6 +97,9 @@ const UIStaticText = {
     questionStatsSettingTest: 'Stats Setting',
     inputStatsUrlText: 'Add Stats Endpoint Here',
     inpuStatsUrlValidationText: 'Invalid URL format',
+    questionIdText: 'Question ID',
+    copyQuestionIdToClipboardText: 'Copy Question ID',
+    copiedText: 'Copied',
   },
 };
 
