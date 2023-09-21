@@ -158,7 +158,10 @@ var UIStaticText = {
     inputQuestionAutofieldFnColor: 'Add Function Color Here',
     questionStatsSettingTest: 'Stats Setting',
     inputStatsUrlText: 'Add Stats Endpoint Here',
-    inpuStatsUrlValidationText: 'Invalid URL format'
+    inpuStatsUrlValidationText: 'Invalid URL format',
+    questionIdText: 'Question ID',
+    copyQuestionIdToClipboardText: 'Copy Question ID',
+    copiedText: 'Copied'
   }
 };
 
@@ -3855,12 +3858,6 @@ var SettingCascade = function SettingCascade(_ref) {
     });
   };
 
-  var handleChangeList = function handleChangeList(value) {
-    updateGlobalState({
-      list: value
-    });
-  };
-
   return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("p", {
     className: styles['more-question-setting-text']
   }, UIText.questionMoreCascadeSettingText), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
@@ -3901,28 +3898,6 @@ var SettingCascade = function SettingCascade(_ref) {
     controls: false,
     keyboard: false,
     onChange: handleChangeInitial
-  }))), /*#__PURE__*/React__default.createElement(antd.Col, null, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
-    name: namePreffix + "-api_list_checkbox"
-  }, /*#__PURE__*/React__default.createElement(antd.Checkbox, {
-    onChange: function onChange(e) {
-      var _e$target;
-
-      return handleChangeList(e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.checked);
-    },
-    checked: api !== null && api !== void 0 && api.list ? true : false
-  }, ' ', UIText.inputQuestionListCheckbox))), (api === null || api === void 0 ? void 0 : api.list) && /*#__PURE__*/React__default.createElement(antd.Col, {
-    span: 8
-  }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
-    label: UIText.inputQuestionListLabel,
-    initialValue: api !== null && api !== void 0 && api.list ? api.list !== true ? api.list : null : null,
-    name: namePreffix + "-api_list"
-  }, /*#__PURE__*/React__default.createElement(antd.Input, {
-    onChange: function onChange(e) {
-      var _e$target2;
-
-      return handleChangeList(e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.value);
-    },
-    allowClear: true
   })))));
 };
 
@@ -10454,6 +10429,8 @@ var QuestionStats = function QuestionStats(_ref) {
   })));
 };
 
+var questionTypeWithRule = ['number', 'date'];
+
 var QuestionSetting = function QuestionSetting(_ref) {
   var question = _ref.question,
       dependant = _ref.dependant;
@@ -10482,6 +10459,11 @@ var QuestionSetting = function QuestionSetting(_ref) {
   var questionGroups = questionGroupFn.store.useState(function (s) {
     return s.questionGroups;
   });
+
+  var _useState = React.useState(false),
+      copied = _useState[0],
+      setCopied = _useState[1];
+
   var disableMetaForGeo = React.useMemo(function () {
     var metaGeoQuestionDefined = questionGroups.flatMap(function (qg) {
       return qg.questions.filter(function (q) {
@@ -10532,6 +10514,10 @@ var QuestionSetting = function QuestionSetting(_ref) {
           var questions = qg.questions.map(function (q) {
             if (q.id === id) {
               var _extends2;
+
+              if (questionTypeWithRule.includes(q.type) && questionTypeWithRule.includes(value)) {
+                q === null || q === void 0 ? true : delete q.rule;
+              }
 
               return _extends({}, q, (_extends2 = {}, _extends2[name] = value, _extends2));
             }
@@ -10652,7 +10638,25 @@ var QuestionSetting = function QuestionSetting(_ref) {
   }, /*#__PURE__*/React__default.createElement(antd.Input, {
     onChange: handleChangeName,
     allowClear: true
-  })), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+  }), /*#__PURE__*/React__default.createElement(antd.Tag, {
+    style: {
+      marginTop: 8
+    }
+  }, UIText.questionIdText + ": " + id, " "), /*#__PURE__*/React__default.createElement(antd.Tooltip, {
+    title: copied ? UIText.copiedText : UIText.copyQuestionIdToClipboardText,
+    placement: "right"
+  }, /*#__PURE__*/React__default.createElement(antd.Button, {
+    type: "link",
+    icon: /*#__PURE__*/React__default.createElement(ai.AiOutlineCopy, null),
+    size: "small",
+    onClick: function onClick() {
+      navigator.clipboard.writeText(id);
+      setCopied(true);
+      setTimeout(function () {
+        setCopied(false);
+      }, 1000);
+    }
+  }))), /*#__PURE__*/React__default.createElement(antd.Form.Item, {
     label: UIText.inputQuestionTypeLabel,
     initialValue: defaultTypeValue,
     name: namePreffix + "-type",
