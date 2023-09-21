@@ -1,5 +1,17 @@
-import React, { useCallback, useMemo } from 'react';
-import { Form, Input, Select, Checkbox, Alert, Row, Col, Popover } from 'antd';
+import React, { useCallback, useMemo, useState } from 'react';
+import {
+  Form,
+  Input,
+  Select,
+  Checkbox,
+  Alert,
+  Row,
+  Col,
+  Popover,
+  Tag,
+  Button,
+  Tooltip,
+} from 'antd';
 import styles from '../styles.module.css';
 import { UIStore, questionType, questionGroupFn } from '../lib/store';
 import {
@@ -16,7 +28,7 @@ import {
 import QuestionHint from './QuestionHint';
 import QuestionStats from './QuestionStats';
 import { map, groupBy, orderBy, isEmpty } from 'lodash';
-import { AiOutlineQuestionCircle } from 'react-icons/ai';
+import { AiOutlineQuestionCircle, AiOutlineCopy } from 'react-icons/ai';
 
 const questionTypeWithRule = ['number', 'date'];
 
@@ -42,6 +54,7 @@ const QuestionSetting = ({ question, dependant }) => {
   const questionGroups = questionGroupFn.store.useState(
     (s) => s.questionGroups
   );
+  const [copied, setCopied] = useState(false);
 
   const disableMetaForGeo = useMemo(() => {
     const metaGeoQuestionDefined = questionGroups
@@ -223,6 +236,26 @@ const QuestionSetting = ({ question, dependant }) => {
           onChange={handleChangeName}
           allowClear
         />
+        <Tag style={{ marginTop: 8 }}>{`${UIText.questionIdText}: ${id}`} </Tag>
+        <Tooltip
+          title={
+            copied ? UIText.copiedText : UIText.copyQuestionIdToClipboardText
+          }
+          placement="right"
+        >
+          <Button
+            type="link"
+            icon={<AiOutlineCopy />}
+            size="small"
+            onClick={() => {
+              navigator.clipboard.writeText(id);
+              setCopied(true);
+              setTimeout(() => {
+                setCopied(false);
+              }, 1000);
+            }}
+          />
+        </Tooltip>
       </Form.Item>
       <Form.Item
         label={UIText.inputQuestionTypeLabel}
