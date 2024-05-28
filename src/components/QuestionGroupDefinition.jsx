@@ -20,7 +20,7 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
   } = UIStore.useState((s) => s);
   const defaultQuestionParam = hostParams?.defaultQuestionParam;
 
-  const { id, name, questions, order } = questionGroup;
+  const { id, label, questions, order } = questionGroup;
   const questionIds = questions.map((q) => q.id);
   const {
     buttonAddNewQuestionGroupText,
@@ -296,7 +296,7 @@ const QuestionGroupDefinition = ({ index, questionGroup, isLastItem }) => {
         title={
           <CardTitle
             buttons={leftButtons}
-            title={`${order}. ${name}`}
+            title={`${order}. ${label}`}
           />
         }
         headStyle={{

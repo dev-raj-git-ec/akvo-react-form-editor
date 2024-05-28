@@ -21,7 +21,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
   const isCopying = UIStore.useState((s) => s.isCopyingQuestion);
   const [activeTab, setActiveTab] = useState('setting');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { id, questionGroupId, order, name, dependency, disableDelete } =
+  const { id, questionGroupId, order, label, dependency, disableDelete } =
     question;
   const defaultQuestionParam = hostParams?.defaultQuestionParam;
   const customParams = hostParams?.customParams;
@@ -322,7 +322,7 @@ const QuestionDefinition = ({ index, question, questionGroup, isLastItem }) => {
         key={`${index}-${id}`}
         title={
           <CardTitle
-            title={`${questionGroup.order}.${order}. ${name}`}
+            title={`${questionGroup.order}.${order}. ${label}`}
             buttons={leftButtons}
           />
         }

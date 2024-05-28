@@ -200,6 +200,7 @@ const toWebform = (formData, questionGroups) => {
     });
     let result = {
       id: qg.id,
+      label: qg.label,
       name: qg.name,
       order: qg.order,
       repeatable: qg.repeatable,

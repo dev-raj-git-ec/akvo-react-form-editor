@@ -35,6 +35,7 @@ const questionTypeWithRule = ['number', 'date'];
 const QuestionSetting = ({ question, dependant }) => {
   const {
     id,
+    label,
     name,
     type,
     variable,
@@ -158,6 +159,10 @@ const QuestionSetting = ({ question, dependant }) => {
     return type;
   }, [type, questionTypeDropdownValue, defaultQuestionParam, updateState]);
 
+  const handleChangeLabel = (e) => {
+    updateState('label', e?.target?.value);
+  };
+
   const handleChangeName = (e) => {
     updateState('name', e?.target?.value);
   };
@@ -227,16 +232,19 @@ const QuestionSetting = ({ question, dependant }) => {
         />
       )}
       <Form.Item
-        label={UIText.inputQuestionNameLabel}
-        initialValue={name}
-        name={`${namePreffix}-name`}
+        label={UIText.inputQuestionLabelLabel}
+        initialValue={label}
+        name={`${namePreffix}-label`}
         required
       >
         <Input
-          onChange={handleChangeName}
+          onChange={handleChangeLabel}
           allowClear
         />
-        <Tag style={{ marginTop: 8 }}>{`${UIText.questionIdText}: ${id}`} </Tag>
+      </Form.Item>
+      {/* TAG QID */}
+      <div style={{ marginTop: '-18px', marginBottom: '24px' }}>
+        <Tag>{`${UIText.questionIdText}: ${id}`} </Tag>
         <Tooltip
           title={
             copied ? UIText.copiedText : UIText.copyQuestionIdToClipboardText
@@ -256,6 +264,18 @@ const QuestionSetting = ({ question, dependant }) => {
             }}
           />
         </Tooltip>
+      </div>
+      {/* EOL QID */}
+      <Form.Item
+        label={UIText.inputQuestionNameLabel}
+        initialValue={name}
+        name={`${namePreffix}-name`}
+        required
+      >
+        <Input
+          onChange={handleChangeName}
+          allowClear
+        />
       </Form.Item>
       <Form.Item
         label={UIText.inputQuestionTypeLabel}

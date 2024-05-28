@@ -5,6 +5,7 @@ import { UIStore, questionGroupFn } from '../lib/store';
 
 const QuestionGroupSetting = ({
   id,
+  label,
   name,
   description,
   repeatable,
@@ -12,6 +13,17 @@ const QuestionGroupSetting = ({
 }) => {
   const namePreffix = `question_group-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
+
+  const handleChangeLabel = (e) => {
+    questionGroupFn.store.update((s) => {
+      s.questionGroups = s.questionGroups.map((x) => {
+        if (x.id === id) {
+          return { ...x, label: e?.target?.value };
+        }
+        return x;
+      });
+    });
+  };
 
   const handleChangeName = (e) => {
     questionGroupFn.store.update((s) => {
@@ -59,6 +71,17 @@ const QuestionGroupSetting = ({
 
   return (
     <div>
+      <Form.Item
+        label={UIText.inputQuestionGroupLabelLabel}
+        initialValue={label}
+        name={`${namePreffix}-label`}
+        required
+      >
+        <Input
+          onChange={handleChangeLabel}
+          allowClear
+        />
+      </Form.Item>
       <Form.Item
         label={UIText.inputQuestionGroupNameLabel}
         initialValue={name}

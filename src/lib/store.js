@@ -3,6 +3,7 @@ import UIStaticText from './i18n';
 import { dummyName } from './debug';
 import * as locale from 'locale-codes';
 import uniqBy from 'lodash/uniqBy';
+import snakeCase from 'lodash/snakeCase';
 
 const localeDropdownValue = uniqBy(
   locale.all
@@ -40,17 +41,20 @@ const defaultForm = () => {
 
 const defaultQuestion = ({
   questionGroup,
+  label,
   name,
   prevOrder = 0,
   type = questionType.input,
   required = false,
   params = {},
 }) => {
+  const labelTemp = label ? label : dummyName(5);
   const q = {
     id: generateId() + 2,
     order: prevOrder + 1,
     questionGroupId: questionGroup.id,
-    name: name || dummyName(5),
+    label: labelTemp,
+    name: name ? name : snakeCase(labelTemp),
     type: type,
     required: required,
     meta: false,
@@ -77,13 +81,15 @@ const defaultQuestion = ({
 };
 
 const defaultQuestionGroup = ({
-  name = dummyName(),
+  label = dummyName(),
+  name,
   prevOrder = 0,
   defaultQuestionParam = {},
 }) => {
   const qg = {
     id: generateId() + 1,
-    name: name,
+    label: label,
+    name: name ? name : snakeCase(label),
     order: prevOrder + 1,
     description: null,
     repeatable: false,
