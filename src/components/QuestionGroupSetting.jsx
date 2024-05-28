@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Form, Input, Checkbox, Row, Col } from 'antd';
 import styles from '../styles.module.css';
 import { UIStore, questionGroupFn } from '../lib/store';
@@ -14,6 +14,9 @@ const QuestionGroupSetting = ({
 }) => {
   const namePreffix = `question_group-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
+  const [nameFieldValue, setNameFieldValue] = useState(
+    name ? name : snakeCase(label)
+  );
 
   const handleChangeLabel = (e) => {
     const labelValue = e?.target?.value;
@@ -21,6 +24,7 @@ const QuestionGroupSetting = ({
     if (!name.trim() || name === snakeCase(label)) {
       nameValue = snakeCase(labelValue);
     }
+    setNameFieldValue(nameValue);
     questionGroupFn.store.update((s) => {
       s.questionGroups = s.questionGroups.map((x) => {
         if (x.id === id) {
@@ -32,26 +36,29 @@ const QuestionGroupSetting = ({
   };
 
   const handleChangeName = (e) => {
-    questionGroupFn.store.update((s) => {
-      s.questionGroups = s.questionGroups.map((x) => {
-        if (x.id === id) {
-          return {
-            ...x,
-            name: e?.target?.value,
-          };
-        }
-        return x;
-      });
-    });
+    setNameFieldValue(e?.target?.value);
+    // questionGroupFn.store.update((s) => {
+    //   s.questionGroups = s.questionGroups.map((x) => {
+    //     if (x.id === id) {
+    //       return {
+    //         ...x,
+    //         name: e?.target?.value,
+    //       };
+    //     }
+    //     return x;
+    //   });
+    // });
   };
 
   const handleBlurName = () => {
+    setNameFieldValue(nameFieldValue ? snakeCase(nameFieldValue) : '');
     questionGroupFn.store.update((s) => {
       s.questionGroups = s.questionGroups.map((x) => {
         if (x.id === id) {
           return {
             ...x,
-            name: name ? snakeCase(name) : '',
+            name: nameFieldValue ? snakeCase(nameFieldValue) : '',
+            // name: name ? snakeCase(name) : '',
           };
         }
         return x;
@@ -114,7 +121,8 @@ const QuestionGroupSetting = ({
           onChange={handleChangeName}
           onBlur={handleBlurName}
           allowClear
-          value={name}
+          // value={name}
+          value={nameFieldValue}
         />
       </Form.Item>
       <Form.Item

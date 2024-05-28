@@ -126,6 +126,11 @@ const UIStore = new Store({
   hostParams: {},
 });
 
+const ErrorStore = new Store({
+  questionGroupErrors: [],
+  questionErrors: [],
+});
+
 const FormStore = new Store({
   ...defaultForm(),
 });
@@ -157,6 +162,7 @@ const questionFn = {
 
 export {
   UIStore,
+  ErrorStore,
   questionType,
   formFn,
   questionGroupFn,
