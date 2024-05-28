@@ -2,6 +2,7 @@ import React from 'react';
 import { Form, Input, Checkbox, Row, Col } from 'antd';
 import styles from '../styles.module.css';
 import { UIStore, questionGroupFn } from '../lib/store';
+import snakeCase from 'lodash/snakeCase';
 
 const QuestionGroupSetting = ({
   id,
@@ -15,10 +16,15 @@ const QuestionGroupSetting = ({
   const UIText = UIStore.useState((s) => s.UIText);
 
   const handleChangeLabel = (e) => {
+    const labelValue = e?.target?.value;
+    let nameValue = name;
+    if (!name.trim() || name === snakeCase(label)) {
+      nameValue = snakeCase(labelValue);
+    }
     questionGroupFn.store.update((s) => {
       s.questionGroups = s.questionGroups.map((x) => {
         if (x.id === id) {
-          return { ...x, label: e?.target?.value };
+          return { ...x, label: labelValue, name: nameValue };
         }
         return x;
       });
@@ -29,7 +35,24 @@ const QuestionGroupSetting = ({
     questionGroupFn.store.update((s) => {
       s.questionGroups = s.questionGroups.map((x) => {
         if (x.id === id) {
-          return { ...x, name: e?.target?.value };
+          return {
+            ...x,
+            name: e?.target?.value,
+          };
+        }
+        return x;
+      });
+    });
+  };
+
+  const handleBlurName = () => {
+    questionGroupFn.store.update((s) => {
+      s.questionGroups = s.questionGroups.map((x) => {
+        if (x.id === id) {
+          return {
+            ...x,
+            name: name ? snakeCase(name) : '',
+          };
         }
         return x;
       });
@@ -84,13 +107,14 @@ const QuestionGroupSetting = ({
       </Form.Item>
       <Form.Item
         label={UIText.inputQuestionGroupNameLabel}
-        initialValue={name}
-        name={`${namePreffix}-name`}
+        // name={`${namePreffix}-name`}
         required
       >
         <Input
           onChange={handleChangeName}
+          onBlur={handleBlurName}
           allowClear
+          value={name}
         />
       </Form.Item>
       <Form.Item
