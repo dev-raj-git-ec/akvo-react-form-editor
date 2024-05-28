@@ -27,7 +27,7 @@ import {
 } from './question-type';
 import QuestionHint from './QuestionHint';
 import QuestionStats from './QuestionStats';
-import { map, groupBy, orderBy, isEmpty } from 'lodash';
+import { map, groupBy, orderBy, isEmpty, snakeCase } from 'lodash';
 import { AiOutlineQuestionCircle, AiOutlineCopy } from 'react-icons/ai';
 
 const questionTypeWithRule = ['number', 'date'];
@@ -160,11 +160,21 @@ const QuestionSetting = ({ question, dependant }) => {
   }, [type, questionTypeDropdownValue, defaultQuestionParam, updateState]);
 
   const handleChangeLabel = (e) => {
-    updateState('label', e?.target?.value);
+    const labelValue = e?.target?.value;
+    let nameValue = name;
+    if (!name.trim() || name === snakeCase(label)) {
+      nameValue = snakeCase(labelValue);
+    }
+    updateState('label', labelValue);
+    updateState('name', nameValue);
   };
 
   const handleChangeName = (e) => {
     updateState('name', e?.target?.value);
+  };
+
+  const handleBlurName = () => {
+    updateState('name', name ? snakeCase(name) : '');
   };
 
   const handleChangeType = (e) => {
@@ -268,13 +278,14 @@ const QuestionSetting = ({ question, dependant }) => {
       {/* EOL QID */}
       <Form.Item
         label={UIText.inputQuestionNameLabel}
-        initialValue={name}
-        name={`${namePreffix}-name`}
+        // name={`${namePreffix}-name`}
         required
       >
         <Input
           onChange={handleChangeName}
+          onBlur={handleBlurName}
           allowClear
+          value={name}
         />
       </Form.Item>
       <Form.Item
