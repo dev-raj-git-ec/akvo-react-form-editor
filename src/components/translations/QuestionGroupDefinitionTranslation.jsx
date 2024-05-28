@@ -8,7 +8,7 @@ import { uniq, difference, intersection } from 'lodash';
 
 const QuestionGroupSettingTranslation = ({
   id,
-  name,
+  label,
   description,
   repeatable,
   repeatText,
@@ -57,11 +57,11 @@ const QuestionGroupSettingTranslation = ({
 
   return (
     <div>
-      {name && (
+      {label && (
         <TranslationFormItem
-          labelText={UIText.inputQuestionGroupNameLabel}
-          currentValue={name}
-          name={`${namePreffix}-name`}
+          labelText={UIText.inputQuestionGroupLabelLabel}
+          currentValue={label}
+          name={`${namePreffix}-label`}
           initialValue={existingTranslationValues?.name}
         >
           <Input
@@ -102,7 +102,7 @@ const QuestionGroupSettingTranslation = ({
 };
 
 const QuestionGroupDefinitionTranslation = ({ index, questionGroup }) => {
-  const { id, name, order, questions } = questionGroup;
+  const { id, label, order, questions } = questionGroup;
   const {
     activeTranslationQuestionGroups,
     activeEditTranslationQuestionGroups,
@@ -194,7 +194,7 @@ const QuestionGroupDefinitionTranslation = ({ index, questionGroup }) => {
       key={`translation-${index}-${id}`}
       title={
         <CardTitle
-          title={`${order}. ${name}`}
+          title={`${order}. ${label}`}
           buttons={cardTitleButton}
         />
       }
