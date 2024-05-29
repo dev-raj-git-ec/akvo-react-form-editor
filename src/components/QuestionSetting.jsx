@@ -68,8 +68,10 @@ const QuestionSetting = ({ question, dependant }) => {
   );
   const questionErrors = ErrorStore.useState((s) => s.questionErrors);
 
-  const currentQuestionError = useMemo(() => {
-    const findError = questionErrors.find((e) => e.id === id);
+  const currentQuestionNameError = useMemo(() => {
+    const findError = questionErrors.find(
+      (e) => e.id === id && e.field === 'name'
+    );
     if (findError) {
       return findError;
     }
@@ -87,13 +89,15 @@ const QuestionSetting = ({ question, dependant }) => {
       ErrorStore.update((s) => {
         s.questionErrors = [
           ...s.questionErrors,
-          { id: id, message: `${checkVal} exist.` },
+          { id: id, field: 'name', message: `${checkVal} exist` },
         ];
       });
     } else {
       // remove from error list
       ErrorStore.update((s) => {
-        s.questionErrors = s.questionErrors.filter((e) => e.id !== id);
+        s.questionErrors = s.questionErrors.filter(
+          (e) => e.id !== id && e.field !== 'name'
+        );
       });
     }
   };
@@ -334,9 +338,9 @@ const QuestionSetting = ({ question, dependant }) => {
           value={nameFieldValue}
         />
       </Form.Item>
-      {currentQuestionError?.id ? (
+      {currentQuestionNameError?.id ? (
         <div className={styles['field-error-wrapper']}>
-          <Text type="danger">{currentQuestionError.message}</Text>
+          <Text type="danger">{currentQuestionNameError.message}</Text>
         </div>
       ) : (
         ''
