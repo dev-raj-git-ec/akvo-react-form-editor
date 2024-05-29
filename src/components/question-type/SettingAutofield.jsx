@@ -167,10 +167,14 @@ const SettingAutofield = ({
   };
 
   const handleBlurFnString = (e) => {
-    setSearch(null);
     const val = e?.target?.value;
-    validateAndExecute(val);
-    updateState('fn', { ...fn, fnString: val });
+    // Regular expression to extract the contents inside the function body
+    const match = val?.match(/return\s+([^;]+)/);
+    // Extracted content from the function body (remove function)
+    const extractedContent = match ? match[1].trim() : val?.trim();
+    setSearch(null);
+    validateAndExecute(extractedContent);
+    updateState('fn', { ...fn, fnString: extractedContent });
   };
 
   const handleSelectAutoCompleteFnString = (val) => {
