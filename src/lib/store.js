@@ -127,8 +127,8 @@ const UIStore = new Store({
 });
 
 const ErrorStore = new Store({
-  questionGroupErrors: [],
-  questionErrors: [],
+  questionGroupErrors: [], // [{ id: int, message:'' }]
+  questionErrors: [], // [{ id: int, message:'' }]
 });
 
 const FormStore = new Store({

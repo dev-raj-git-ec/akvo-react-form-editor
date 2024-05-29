@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import { Form, Input, Checkbox, Row, Col } from 'antd';
+import React, { useState, useMemo } from 'react';
+import { Form, Input, Checkbox, Row, Col, Typography } from 'antd';
 import styles from '../styles.module.css';
-import { UIStore, questionGroupFn } from '../lib/store';
+import { UIStore, questionGroupFn, ErrorStore } from '../lib/store';
 import snakeCase from 'lodash/snakeCase';
+
+const { Text } = Typography;
 
 const QuestionGroupSetting = ({
   id,
@@ -17,6 +19,39 @@ const QuestionGroupSetting = ({
   const [nameFieldValue, setNameFieldValue] = useState(
     name ? name : snakeCase(label)
   );
+  const questionGroups = questionGroupFn.store.useState(
+    (s) => s.questionGroups
+  );
+  const questionGroupErrors = ErrorStore.useState((s) => s.questionGroupErrors);
+
+  const currentGroupError = useMemo(() => {
+    const findError = questionGroupErrors.find((e) => e.id === id);
+    if (findError) {
+      return findError;
+    }
+    return false;
+  }, [id, questionGroupErrors]);
+
+  const checkIfGroupNameExist = (val) => {
+    const checkVal = snakeCase(val);
+    const isNameExist = questionGroups.find((qg) => qg.name === checkVal);
+    if (isNameExist) {
+      // add to error list
+      ErrorStore.update((s) => {
+        s.questionGroupErrors = [
+          ...s.questionGroupErrors,
+          { id: id, message: `${checkVal} exist.` },
+        ];
+      });
+    } else {
+      // remove from error list
+      ErrorStore.update((s) => {
+        s.questionGroupErrors = s.questionGroupErrors.filter(
+          (e) => e.id !== id
+        );
+      });
+    }
+  };
 
   const handleChangeLabel = (e) => {
     const labelValue = e?.target?.value;
@@ -25,6 +60,7 @@ const QuestionGroupSetting = ({
       nameValue = snakeCase(labelValue);
     }
     setNameFieldValue(nameValue);
+    checkIfGroupNameExist(nameValue);
     questionGroupFn.store.update((s) => {
       s.questionGroups = s.questionGroups.map((x) => {
         if (x.id === id) {
@@ -36,18 +72,9 @@ const QuestionGroupSetting = ({
   };
 
   const handleChangeName = (e) => {
-    setNameFieldValue(e?.target?.value);
-    // questionGroupFn.store.update((s) => {
-    //   s.questionGroups = s.questionGroups.map((x) => {
-    //     if (x.id === id) {
-    //       return {
-    //         ...x,
-    //         name: e?.target?.value,
-    //       };
-    //     }
-    //     return x;
-    //   });
-    // });
+    const val = e?.target?.value || '';
+    setNameFieldValue(val);
+    checkIfGroupNameExist(val);
   };
 
   const handleBlurName = () => {
@@ -58,7 +85,6 @@ const QuestionGroupSetting = ({
           return {
             ...x,
             name: nameFieldValue ? snakeCase(nameFieldValue) : '',
-            // name: name ? snakeCase(name) : '',
           };
         }
         return x;
@@ -121,10 +147,16 @@ const QuestionGroupSetting = ({
           onChange={handleChangeName}
           onBlur={handleBlurName}
           allowClear
-          // value={name}
           value={nameFieldValue}
         />
       </Form.Item>
+      {currentGroupError?.id ? (
+        <div className={styles['field-error-wrapper']}>
+          <Text type="danger">{currentGroupError.message}</Text>
+        </div>
+      ) : (
+        ''
+      )}
       <Form.Item
         label={UIText.inputQuestionGroupDescriptionLabel}
         initialValue={description}
