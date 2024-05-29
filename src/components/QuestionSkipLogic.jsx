@@ -87,8 +87,8 @@ const fetchDependencyLogicDropdown = (question) => {
 const fetchDependencyAnswerDropdown = (question) => {
   if (question?.options) {
     return question.options.map((opt) => ({
-      label: opt.name,
-      value: opt.name,
+      label: opt?.label || opt.name,
+      value: opt?.value || opt.name,
     }));
   }
   return [];

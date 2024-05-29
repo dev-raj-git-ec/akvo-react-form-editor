@@ -8,13 +8,14 @@ import {
   MdOutlineArrowCircleDown,
   MdOutlineArrowCircleUp,
 } from 'react-icons/md';
-import { orderBy, takeRight } from 'lodash';
+import { orderBy, takeRight, snakeCase } from 'lodash';
 import { SketchPicker } from 'react-color';
 
 const defaultOptions = ({ init = false, order = 0 }) => {
+  const optTextTemp = 'New Option';
   const option = {
-    code: null,
-    name: 'New Option',
+    value: snakeCase(optTextTemp),
+    label: optTextTemp,
     order: 1,
   };
   if (init) {
@@ -22,13 +23,15 @@ const defaultOptions = ({ init = false, order = 0 }) => {
       {
         ...option,
         id: generateId(),
-        name: 'New Option 1',
+        label: `${optTextTemp} 1`,
+        value: snakeCase(`${optTextTemp} 1`),
         order: 1,
       },
       {
         ...option,
         id: generateId() + 1,
-        name: 'New Option 2',
+        label: `${optTextTemp} 2`,
+        value: snakeCase(`${optTextTemp} 2`),
         order: 2,
       },
     ];
@@ -53,7 +56,8 @@ const SettingOption = ({
     initialOptions?.length
       ? initialOptions.map((x, xi) => ({
           ...x,
-          code: x?.code || null,
+          label: x?.label || x.name,
+          value: x?.value || snakeCase(x.name),
           id: x?.id || generateId() + xi,
           order: x?.order || xi + 1,
         }))
@@ -101,12 +105,13 @@ const SettingOption = ({
 
   const handleOnChangeCode = (e, current) => {
     const { id: currentId } = current;
+    const val = e?.target?.value;
     setOptions(
       options.map((opt) => {
         if (opt.id === currentId) {
           return {
             ...opt,
-            code: e?.target?.value,
+            value: val ? val : '',
           };
         }
         return opt;
@@ -114,14 +119,29 @@ const SettingOption = ({
     );
   };
 
+  const handleOnBlurCode = () => {
+    const updatedOptions = options.map((opt) => ({
+      ...opt,
+      value: opt.value ? snakeCase(opt.value) : '',
+    }));
+    setOptions(updatedOptions);
+    updateState('options', updatedOptions);
+  };
+
   const handleOnChangeOption = (e, current) => {
     const { id: currentId } = current;
+    const val = e?.target?.value;
     setOptions(
       options.map((opt) => {
         if (opt.id === currentId) {
+          let valueTemp = opt.value;
+          if (!opt?.value?.trim() || opt.value === snakeCase(opt.label)) {
+            valueTemp = snakeCase(val);
+          }
           return {
             ...opt,
-            name: e?.target?.value,
+            label: val ? val : '',
+            value: valueTemp ? valueTemp : '',
           };
         }
         return opt;
@@ -255,20 +275,21 @@ const SettingOption = ({
         >
           <Col span={4}>
             <Form.Item
-              initialValue={d.code}
-              name={`${namePreffix}-option_code_${d.id}`}
+            // name={`${namePreffix}-option_value_${d.id}`}
             >
               <Input
-                placeholder="Code"
+                placeholder="Value"
                 onChange={(e) => handleOnChangeCode(e, d)}
+                onBlur={handleOnBlurCode}
                 allowClear
+                value={d.value}
               />
             </Form.Item>
           </Col>
           <Col span={8}>
             <Form.Item
-              initialValue={d.name}
-              name={`${namePreffix}-option_name_${d.id}`}
+              initialValue={d.label}
+              name={`${namePreffix}-option_label_${d.id}`}
             >
               <Input
                 onChange={(e) => handleOnChangeOption(e, d)}

@@ -200,7 +200,7 @@ const QuestionSettingTranslation = ({
             </TranslationFormItem>
           )}
           {orderBy(options, 'order')
-            .filter((d) => d?.name)
+            .filter((d) => d?.label || d?.value || d.name)
             .map((d, di) => {
               const existingOptionTranslationValues = d?.translations?.find(
                 (tl) => tl.language === existingTranslation
@@ -209,8 +209,8 @@ const QuestionSettingTranslation = ({
                 <TranslationFormItem
                   key={`translation-option-${d.id}-${di}`}
                   labelText={`${UIText.inputQuestionOptionNameLabel} ${d.order}`}
-                  currentValue={d.name}
-                  name={`${namePreffix}-option-name-${d?.id || d.name}`}
+                  currentValue={d?.label || d.name}
+                  name={`${namePreffix}-option-name-${d?.id || d?.value}`}
                   initialValue={existingOptionTranslationValues?.name}
                 >
                   <Input
