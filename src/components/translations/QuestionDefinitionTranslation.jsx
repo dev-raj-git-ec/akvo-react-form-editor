@@ -9,7 +9,7 @@ import orderBy from 'lodash/orderBy';
 const QuestionSettingTranslation = ({
   id,
   questionGroupId,
-  name,
+  label,
   type,
   tooltip = {},
   allowOther,
@@ -154,11 +154,11 @@ const QuestionSettingTranslation = ({
 
   return (
     <div>
-      {name && (
+      {label && (
         <TranslationFormItem
-          labelText={UIText.inputQuestionNameLabel}
-          currentValue={name}
-          name={`${namePreffix}-name`}
+          labelText={UIText.inputQuestionLabelLabel}
+          currentValue={label}
+          name={`${namePreffix}-label`}
           initialValue={existingTranslationValues?.name}
         >
           <Input
@@ -229,7 +229,7 @@ const QuestionSettingTranslation = ({
 };
 
 const QuestionDefinitionTranslation = ({ index, question }) => {
-  const { id, name, order, questionGroupOrder } = question;
+  const { id, label, order, questionGroupOrder } = question;
   const { activeEditTranslationQuestions } = UIStore.useState((s) => s);
 
   const isEditTranslationQuestion = useMemo(() => {
@@ -267,7 +267,7 @@ const QuestionDefinitionTranslation = ({ index, question }) => {
       key={`translation-question-${index}-${id}`}
       title={
         <CardTitle
-          title={`${questionGroupOrder}.${order}. ${name}`}
+          title={`${questionGroupOrder}.${order}. ${label}`}
           buttons={cardTitleButton}
         />
       }

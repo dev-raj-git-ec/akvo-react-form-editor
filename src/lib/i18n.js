@@ -13,6 +13,7 @@ const UIStaticText = {
     mandatoryQuestionCount: 'Mandatory Questions',
     version: 'Version',
     inputQuestionGroupNameLabel: 'Question Group Name',
+    inputQuestionGroupLabelLabel: 'Question Group Label',
     inputQuestionGroupDescriptionLabel: 'Question Group Description',
     inputRepeatThisGroupCheckbox: 'Repeat this group',
     inputRepeatTextLabel: 'Repeat Text',
@@ -28,6 +29,7 @@ const UIStaticText = {
     buttonAddNewQuestionText: 'Add new question',
     buttonCopyQuestionText: 'Copy question here',
     buttonMoveQuestionText: 'Move question here',
+    inputQuestionLabelLabel: 'Question Label',
     inputQuestionNameLabel: 'Question Name',
     inputQuestionTypeLabel: 'Question Type',
     inputQuestionVariableNameLabel: 'Variable Name',
@@ -100,6 +102,9 @@ const UIStaticText = {
     questionIdText: 'Question ID',
     copyQuestionIdToClipboardText: 'Copy Question ID',
     copiedText: 'Copied',
+    validationErrorTitle: 'Validation Error',
+    validationErrorDescription:
+      'Please fix all validation before save the form.',
   },
 };
 

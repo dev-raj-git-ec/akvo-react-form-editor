@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import 'antd/dist/antd.min.css';
 import styles from './styles.module.css';
-import { Card, Tabs, Tag, Space } from 'antd';
+import { Card, Tabs, Tag, Space, notification } from 'antd';
 import {
   FormWrapper,
   FormDefinition,
@@ -16,6 +16,7 @@ import {
   questionGroupFn,
   generateId,
   questionType,
+  ErrorStore,
 } from './lib/store';
 import data from './lib/data';
 import { isEmpty } from 'lodash';
@@ -79,7 +80,10 @@ const WebformEditor = ({
     questionGroupCount,
     mandatoryQuestionCount,
     version,
+    validationErrorTitle,
+    validationErrorDescription,
   } = UIText;
+  const { questionGroupErrors, questionErrors } = ErrorStore.useState((s) => s);
 
   if (!initialValue) {
     console.error('initialValue required as an empty object {}');
@@ -238,6 +242,14 @@ const WebformEditor = ({
 
   const handleSave = () => {
     if (onSave) {
+      // check error before save
+      if (questionGroupErrors.length || questionErrors.length) {
+        notification.error({
+          message: validationErrorTitle,
+          description: validationErrorDescription,
+        });
+        return;
+      }
       onSave(data.toWebform(formStore, questionGroups));
     }
   };
