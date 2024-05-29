@@ -56,8 +56,8 @@ const SettingOption = ({
     initialOptions?.length
       ? initialOptions.map((x, xi) => ({
           ...x,
-          label: x?.label || x?.name || null,
-          value: x?.value || x?.name || null,
+          label: x?.label || x.name,
+          value: x?.value || snakeCase(x.name),
           id: x?.id || generateId() + xi,
           order: x?.order || xi + 1,
         }))
