@@ -102,6 +102,9 @@ const UIStaticText = {
     questionIdText: 'Question ID',
     copyQuestionIdToClipboardText: 'Copy Question ID',
     copiedText: 'Copied',
+    validationErrorTitle: 'Validation Error',
+    validationErrorDescription:
+      'Please fix all validation before save the form.',
   },
 };
 
