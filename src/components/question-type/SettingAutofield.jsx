@@ -1,13 +1,22 @@
-import React from 'react';
-import { Form, Checkbox, Space, Input } from 'antd';
+import React, { useState, useMemo } from 'react';
+import { Form, Checkbox, Space, Input, AutoComplete } from 'antd';
 import styles from '../../styles.module.css';
-import { UIStore, questionGroupFn } from '../../lib/store';
+import { UIStore, questionGroupFn, questionType } from '../../lib/store';
 import isEmpty from 'lodash/isEmpty';
 
 const fnStringExample =
-  "function () { return #question_id / #question_id } OR () => { return #1.includes('Test') ? #question_id / #question_id : 0 }";
+  "Search question_name by typing #\nExample format below:\n#question_name# / #question_name#\nOR\n#question_name#.includes('Test') ? #question_name# / #question_name# : 0 }";
 
 const fnColorExample = "{ 'answer_value': '#CCFFC4' }";
+
+const allowedQuestionTypes = [
+  questionType.input,
+  questionType.number,
+  questionType.text,
+  questionType.option,
+  questionType.multiple_option,
+  questionType.autofield,
+];
 
 const SettingAutofield = ({
   id,
@@ -16,6 +25,28 @@ const SettingAutofield = ({
 }) => {
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
+  const questionGroups = questionGroupFn.store.useState(
+    (s) => s.questionGroups
+  );
+  const [search, setSearch] = useState(null);
+
+  const questionNames = useMemo(() => {
+    let preffix = '';
+    const regex = new RegExp(search, 'gi');
+    let res = questionGroups
+      .flatMap((qg) => qg.questions)
+      .filter((q) => q.id !== id && allowedQuestionTypes.includes(q.type));
+    if (search) {
+      res = res.filter((q) => q.name.match(regex)?.length);
+    }
+    if (fn.fnString) {
+      preffix = `${fn.fnString?.trim()} `;
+    }
+    return res.map((q) => ({
+      label: `${preffix}#${q.name}#`,
+      value: `${preffix}#${q.name}#`,
+    }));
+  }, [questionGroups, id, search, fn.fnString]);
 
   const updateState = (name, value) => {
     questionGroupFn.store.update((s) => {
@@ -46,8 +77,22 @@ const SettingAutofield = ({
   };
 
   const handleChangeFnString = (e) => {
-    const value = e?.target?.value;
-    updateState('fn', { ...fn, fnString: value });
+    const val = e?.target?.value;
+    const check = val ? val.split(' ').pop() : '';
+    if (!check.includes('#')) {
+      updateState('fn', { ...fn, fnString: val });
+    }
+  };
+
+  const handleBlurFnString = (e) => {
+    setSearch(null);
+    const val = e?.target?.value;
+    updateState('fn', { ...fn, fnString: val });
+  };
+
+  const handleSelectAutoCompleteFnString = (val) => {
+    setSearch(null);
+    updateState('fn', { ...fn, fnString: val });
   };
 
   const handleChangeFnColor = (e) => {
@@ -58,6 +103,15 @@ const SettingAutofield = ({
       return true;
     } catch (error) {
       return false;
+    }
+  };
+
+  const handleSearch = (val) => {
+    const searchTerm = val.split(' ').pop();
+    if (searchTerm.includes('#')) {
+      setSearch(searchTerm.replace(/#/g, ''));
+    } else {
+      setSearch(null);
     }
   };
 
@@ -83,12 +137,22 @@ const SettingAutofield = ({
         initialValue={fn?.fnString || null}
         required
       >
-        <Input.TextArea
-          rows={5}
-          allowClear
-          onChange={handleChangeFnString}
-          placeholder={fnStringExample}
-        />
+        <AutoComplete
+          options={questionNames}
+          onSearch={handleSearch}
+          onSelect={handleSelectAutoCompleteFnString}
+          getPopupContainer={(trigger) => trigger.parentNode}
+          backfill
+          open={search !== null}
+        >
+          <Input.TextArea
+            rows={5}
+            allowClear
+            onChange={handleChangeFnString}
+            onBlur={handleBlurFnString}
+            placeholder={fnStringExample}
+          />
+        </AutoComplete>
       </Form.Item>
       <Form.Item
         label={UIText.inputQuestionAutofieldFnColor}
