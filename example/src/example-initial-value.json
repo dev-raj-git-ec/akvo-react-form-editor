@@ -163,7 +163,8 @@
           "type": "option",
           "option": [
             {
-              "name": "Male",
+              "label": "Male",
+              "value": "male",
               "order": 1,
               "translations": [
                 {
@@ -173,7 +174,8 @@
               ]
             },
             {
-              "name": "Female",
+              "label": "Female",
+              "value": "female",
               "order": 2,
               "translations": [
                 {
@@ -183,7 +185,8 @@
               ]
             },
             {
-              "name": "Other",
+              "label": "Other",
+              "value": "other",
               "order": 3,
               "translations": [
                 {
@@ -209,14 +212,15 @@
           "dependency": [
             {
               "id": 6,
-              "options": ["Female", "Male"]
+              "options": ["female", "male"]
             }
           ],
           "order": 7,
           "type": "option",
           "option": [
             {
-              "name": "Single",
+              "label": "Single",
+              "value": "single",
               "order": 1,
               "color": "#7fc97f",
               "translations": [
@@ -227,7 +231,8 @@
               ]
             },
             {
-              "name": "Maried",
+              "label": "Maried",
+              "value": "maried",
               "order": 2,
               "color": "#fdc086",
               "translations": [
@@ -238,7 +243,8 @@
               ]
             },
             {
-              "name": "Widowed",
+              "label": "Widowed",
+              "value": "widowed",
               "order": 3,
               "color": "#beaed4",
               "translations": [
@@ -344,7 +350,8 @@
           "allowOtherText": "Please input other food if any",
           "option": [
             {
-              "name": "Asian",
+              "label": "Asian",
+              "value": "asian",
               "order": 1,
               "translations": [
                 {
@@ -354,7 +361,8 @@
               ]
             },
             {
-              "name": "Western",
+              "label": "Western",
+              "value": "western",
               "order": 2,
               "translations": [
                 {
@@ -364,7 +372,8 @@
               ]
             },
             {
-              "name": "Vegetarian",
+              "label": "Vegetarian",
+              "value": "vegetarian",
               "order": 3
             }
           ],
@@ -397,7 +406,7 @@
           "dependency": [
             {
               "id": 11,
-              "options": ["Asian", "Western"]
+              "options": ["asian", "western"]
             }
           ],
           "tooltip": {
@@ -426,7 +435,8 @@
           "allowOther": true,
           "option": [
             {
-              "name": "Yes",
+              "label": "Yes",
+              "value": "yes",
               "order": 1,
               "translations": [
                 {
@@ -436,7 +446,8 @@
               ]
             },
             {
-              "name": "No",
+              "label": "No",
+              "value": "no",
               "order": 2,
               "translations": [
                 {
@@ -481,7 +492,7 @@
           "dependency": [
             {
               "id": 13,
-              "options": ["Yes"]
+              "options": ["yes"]
             },
             {
               "id": 14,
@@ -492,11 +503,13 @@
           "type": "option",
           "option": [
             {
-              "name": "Pagi Sore",
+              "label": "Pagi Sore",
+              "value": "pagi_sore",
               "order": 1
             },
             {
-              "name": "Any Rendang Restaurant",
+              "label": "Any Rendang Restaurant",
+              "value": "any_rendang_restaurant",
               "order": 2,
               "translations": [
                 {
@@ -521,14 +534,15 @@
           "dependency": [
             {
               "id": 15,
-              "options": ["Pagi Sore"]
+              "options": ["pagi_sore"]
             }
           ],
           "order": 9,
           "type": "option",
           "option": [
             {
-              "name": "Yes",
+              "label": "Yes",
+              "value": "yes",
               "order": 1,
               "translations": [
                 {
@@ -538,7 +552,8 @@
               ]
             },
             {
-              "name": "No",
+              "label": "No",
+              "value": "no",
               "order": 2,
               "translations": [
                 {
@@ -563,7 +578,7 @@
           "dependency": [
             {
               "id": 16,
-              "options": ["Yes"]
+              "options": ["yes"]
             }
           ],
           "order": 10,
@@ -675,7 +690,8 @@
           "type": "option",
           "option": [
             {
-              "name": "Director",
+              "label": "Director",
+              "value": "director",
               "order": 1,
               "translations": [
                 {
@@ -685,7 +701,8 @@
               ]
             },
             {
-              "name": "Manager",
+              "label": "Manager",
+              "value": "manager",
               "order": 2,
               "translations": [
                 {
@@ -695,7 +712,8 @@
               ]
             },
             {
-              "name": "Staff",
+              "label": "Staff",
+              "value": "staff",
               "order": 3,
               "translations": [
                 {
@@ -720,7 +738,7 @@
           "dependency": [
             {
               "id": 6,
-              "options": ["Female", "Male"]
+              "options": ["female", "male"]
             }
           ],
           "order": 3,
@@ -734,18 +752,20 @@
           "dependency": [
             {
               "id": 19,
-              "options": ["Staff"]
+              "options": ["staff"]
             }
           ],
           "order": 4,
           "type": "option",
           "option": [
             {
-              "name": "Contract",
+              "label": "Contract",
+              "value": "contract",
               "order": 1
             },
             {
-              "name": "Internship",
+              "label": "Internship",
+              "value": "internship",
               "order": 2
             }
           ],
@@ -849,7 +869,7 @@
           "dependency": [
             {
               "id": 15,
-              "options": ["Pagi Sore"]
+              "options": ["pagi_sore"]
             }
           ]
         },
