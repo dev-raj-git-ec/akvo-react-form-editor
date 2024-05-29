@@ -128,7 +128,7 @@ const UIStore = new Store({
 
 const ErrorStore = new Store({
   questionGroupErrors: [], // [{ id: int, message:'' }]
-  questionErrors: [], // [{ id: int, message:'' }]
+  questionErrors: [], // [{ id: int, field: '', message:'' }]
 });
 
 const FormStore = new Store({
