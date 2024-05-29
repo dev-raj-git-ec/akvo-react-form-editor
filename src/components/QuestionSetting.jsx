@@ -11,9 +11,15 @@ import {
   Tag,
   Button,
   Tooltip,
+  Typography,
 } from 'antd';
 import styles from '../styles.module.css';
-import { UIStore, questionType, questionGroupFn } from '../lib/store';
+import {
+  UIStore,
+  questionType,
+  questionGroupFn,
+  ErrorStore,
+} from '../lib/store';
 import {
   SettingInput,
   SettingTree,
@@ -31,6 +37,7 @@ import { map, groupBy, orderBy, isEmpty, snakeCase } from 'lodash';
 import { AiOutlineQuestionCircle, AiOutlineCopy } from 'react-icons/ai';
 
 const questionTypeWithRule = ['number', 'date'];
+const { Text } = Typography;
 
 const QuestionSetting = ({ question, dependant }) => {
   const {
@@ -56,6 +63,40 @@ const QuestionSetting = ({ question, dependant }) => {
     (s) => s.questionGroups
   );
   const [copied, setCopied] = useState(false);
+  const [nameFieldValue, setNameFieldValue] = useState(
+    name ? name : snakeCase(label)
+  );
+  const questionErrors = ErrorStore.useState((s) => s.questionErrors);
+
+  const currentQuestionError = useMemo(() => {
+    const findError = questionErrors.find((e) => e.id === id);
+    if (findError) {
+      return findError;
+    }
+    return false;
+  }, [id, questionErrors]);
+
+  const checkIfQuestionNameExist = (val) => {
+    const checkVal = snakeCase(val);
+    const questions = questionGroups
+      .flatMap((qg) => qg.questions)
+      .filter((q) => q.id !== id);
+    const isNameExist = questions.find((q) => q.name === checkVal);
+    if (isNameExist) {
+      // add to error list
+      ErrorStore.update((s) => {
+        s.questionErrors = [
+          ...s.questionErrors,
+          { id: id, message: `${checkVal} exist.` },
+        ];
+      });
+    } else {
+      // remove from error list
+      ErrorStore.update((s) => {
+        s.questionErrors = s.questionErrors.filter((e) => e.id !== id);
+      });
+    }
+  };
 
   const disableMetaForGeo = useMemo(() => {
     const metaGeoQuestionDefined = questionGroups
@@ -165,16 +206,21 @@ const QuestionSetting = ({ question, dependant }) => {
     if (!name.trim() || name === snakeCase(label)) {
       nameValue = snakeCase(labelValue);
     }
+    setNameFieldValue(nameValue);
+    checkIfQuestionNameExist(nameValue);
     updateState('label', labelValue);
     updateState('name', nameValue);
   };
 
   const handleChangeName = (e) => {
-    updateState('name', e?.target?.value);
+    const val = e?.target?.value || '';
+    setNameFieldValue(val);
+    checkIfQuestionNameExist(val);
   };
 
   const handleBlurName = () => {
-    updateState('name', name ? snakeCase(name) : '');
+    setNameFieldValue(nameFieldValue ? snakeCase(nameFieldValue) : '');
+    updateState('name', nameFieldValue ? snakeCase(nameFieldValue) : '');
   };
 
   const handleChangeType = (e) => {
@@ -285,9 +331,16 @@ const QuestionSetting = ({ question, dependant }) => {
           onChange={handleChangeName}
           onBlur={handleBlurName}
           allowClear
-          value={name}
+          value={nameFieldValue}
         />
       </Form.Item>
+      {currentQuestionError?.id ? (
+        <div className={styles['field-error-wrapper']}>
+          <Text type="danger">{currentQuestionError.message}</Text>
+        </div>
+      ) : (
+        ''
+      )}
       <Form.Item
         label={UIText.inputQuestionTypeLabel}
         initialValue={defaultTypeValue}

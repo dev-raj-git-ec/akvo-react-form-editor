@@ -34,7 +34,9 @@ const QuestionGroupSetting = ({
 
   const checkIfGroupNameExist = (val) => {
     const checkVal = snakeCase(val);
-    const isNameExist = questionGroups.find((qg) => qg.name === checkVal);
+    const isNameExist = questionGroups
+      .filter((qg) => qg.id !== id)
+      .find((qg) => qg.name === checkVal);
     if (isNameExist) {
       // add to error list
       ErrorStore.update((s) => {
