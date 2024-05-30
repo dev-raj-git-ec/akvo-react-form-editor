@@ -64,7 +64,7 @@ const QuestionSetting = ({ question, dependant }) => {
   );
   const [copied, setCopied] = useState(false);
   const [nameFieldValue, setNameFieldValue] = useState(
-    name ? name : snakeCase(label)
+    name ? snakeCase(name) : snakeCase(label)
   );
   const questionErrors = ErrorStore.useState((s) => s.questionErrors);
 
@@ -293,7 +293,7 @@ const QuestionSetting = ({ question, dependant }) => {
       )}
       <Form.Item
         label={UIText.inputQuestionLabelLabel}
-        initialValue={label}
+        initialValue={label || name}
         name={`${namePreffix}-label`}
         required
       >

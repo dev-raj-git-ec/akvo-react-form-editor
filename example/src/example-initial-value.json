@@ -327,7 +327,7 @@
           "required": false,
           "fn": {
             "multiline": false,
-            "fnString": "function () { return #8 / #9 || 0 }",
+            "fnString": "#amount_spent_for_meals_a_day# / #times_eat_a_day#",
             "fnColor": {
               "50000": "#ef6548"
             }

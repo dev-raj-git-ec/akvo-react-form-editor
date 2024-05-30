@@ -17,7 +17,7 @@ const QuestionGroupSetting = ({
   const namePreffix = `question_group-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
   const [nameFieldValue, setNameFieldValue] = useState(
-    name ? name : snakeCase(label)
+    name ? snakeCase(name) : snakeCase(label)
   );
   const questionGroups = questionGroupFn.store.useState(
     (s) => s.questionGroups
@@ -131,7 +131,7 @@ const QuestionGroupSetting = ({
     <div>
       <Form.Item
         label={UIText.inputQuestionGroupLabelLabel}
-        initialValue={label}
+        initialValue={label || name}
         name={`${namePreffix}-label`}
         required
       >

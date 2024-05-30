@@ -241,7 +241,7 @@ const SettingAutofield = ({
           // getPopupContainer={(trigger) => console.log(trigger, '----===')}
           backfill
           open={search !== null}
-          // value={fn?.fnString || null}
+          value={fn?.fnString || null}
         >
           <Input.TextArea
             rows={5}
@@ -249,7 +249,7 @@ const SettingAutofield = ({
             onChange={handleChangeFnString}
             onBlur={handleBlurFnString}
             placeholder={fnStringExample}
-            // value={fn?.fnString || null}
+            value={fn?.fnString || null}
           />
         </AutoComplete>
       </Form.Item>
