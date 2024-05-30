@@ -59,10 +59,20 @@ const SettingAutofield = ({
 
   const questionNames = useMemo(() => {
     let preffix = '';
-    const regex = new RegExp(search, 'gi');
+    // Function to escape special characters in the search string
+    const escapeRegExp = (string) => {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+    };
+    // Ensure search is not empty or null and escape it
+    const searchPattern = search ? escapeRegExp(search) : '';
     let res = allAllowedQuestions.filter((q) => q.id !== id);
-    if (search) {
-      res = res.filter((q) => q.name.match(regex)?.length);
+    if (searchPattern) {
+      try {
+        const regex = new RegExp(searchPattern, 'gi');
+        res = res.filter((q) => q.name.match(regex)?.length);
+      } catch (e) {
+        console.error('Invalid regular expression:', e.message);
+      }
     }
     if (fn.fnString) {
       preffix = `${fn.fnString?.trim()} `;
@@ -99,15 +109,15 @@ const SettingAutofield = ({
 
   const validateAndExecute = (fnStringValue) => {
     // Replace placeholders with sample values
-    let processedStr = fnStringValue;
+    let functionBody = fnStringValue;
     Object.keys(sampleValues).forEach((key) => {
       const placeholder = new RegExp(key, 'g');
       const value = sampleValues[key];
-      processedStr = processedStr.replace(placeholder, JSON.stringify(value));
+      functionBody = functionBody.replace(placeholder, JSON.stringify(value));
     });
 
     try {
-      new Function(`return ${processedStr}`)();
+      new Function(`return ${functionBody}`)();
       ErrorStore.update((s) => {
         // remove from error list
         s.questionErrors = s.questionErrors.filter(
@@ -228,9 +238,10 @@ const SettingAutofield = ({
           options={questionNames}
           onSearch={handleSearch}
           onSelect={handleSelectAutoCompleteFnString}
-          getPopupContainer={(trigger) => trigger.parentNode}
+          // getPopupContainer={(trigger) => console.log(trigger, '----===')}
           backfill
           open={search !== null}
+          // value={fn?.fnString || null}
         >
           <Input.TextArea
             rows={5}
@@ -238,6 +249,7 @@ const SettingAutofield = ({
             onChange={handleChangeFnString}
             onBlur={handleBlurFnString}
             placeholder={fnStringExample}
+            // value={fn?.fnString || null}
           />
         </AutoComplete>
       </Form.Item>
