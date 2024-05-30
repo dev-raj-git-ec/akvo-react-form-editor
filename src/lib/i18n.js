@@ -105,6 +105,12 @@ const UIStaticText = {
     validationErrorTitle: 'Validation Error',
     validationErrorDescription:
       'Please fix all validation before save the form.',
+    inputQuestionShortLabelLabel: 'Short Label',
+    inputQuestionShortLabelTooltip:
+      'The value entered in the Sort Label field will be used as a replacement for the question label in the Excel export.',
+    inputQuestionDisplayOnlyCheckbox: 'Display Only',
+    inputQuestionDisplayOnlyCheckboxTooltip:
+      'If you check "Display Only", the answer value for this question will not be submitted.',
   },
 };
 

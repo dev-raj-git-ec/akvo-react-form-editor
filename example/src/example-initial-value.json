@@ -907,6 +907,16 @@
           "params_name_a": ["SO1"],
           "params_name_b": ["MO1", "MO2"],
           "params_name_c": ["member"]
+        },
+        {
+          "id": 29,
+          "label": "Question with Display Only and Short Label",
+          "name": "question_with_display_only_and_short_label",
+          "short_label": "Example short label",
+          "order": 4,
+          "type": "input",
+          "required": false,
+          "displayOnly": true
         }
       ]
     }

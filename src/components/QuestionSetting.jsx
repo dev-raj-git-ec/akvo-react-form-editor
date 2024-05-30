@@ -7,11 +7,11 @@ import {
   Alert,
   Row,
   Col,
-  Popover,
   Tag,
   Button,
   Tooltip,
   Typography,
+  Space,
 } from 'antd';
 import styles from '../styles.module.css';
 import {
@@ -44,12 +44,14 @@ const QuestionSetting = ({ question, dependant }) => {
     id,
     label,
     name,
+    short_label,
     type,
     variable,
     tooltip,
     required,
     questionGroupId,
     meta,
+    displayOnly,
     disableDelete,
   } = question;
   const namePreffix = `question-${id}`;
@@ -222,6 +224,10 @@ const QuestionSetting = ({ question, dependant }) => {
     checkIfQuestionNameExist(val);
   };
 
+  const handleChangeShortLabel = (e) => {
+    updateState('short_label', e?.target?.value);
+  };
+
   const handleBlurName = () => {
     setNameFieldValue(nameFieldValue ? snakeCase(nameFieldValue) : '');
     updateState('name', nameFieldValue ? snakeCase(nameFieldValue) : '');
@@ -246,6 +252,10 @@ const QuestionSetting = ({ question, dependant }) => {
 
   const handleChangeRequired = (e) => {
     updateState('required', e?.target?.checked);
+  };
+
+  const handleChangeDisplayOnly = (e) => {
+    updateState('displayOnly', e?.target?.checked);
   };
 
   const handleChangeMeta = (e) => {
@@ -346,6 +356,29 @@ const QuestionSetting = ({ question, dependant }) => {
         ''
       )}
       <Form.Item
+        label={
+          <Space align="center">
+            <div>{UIText.inputQuestionShortLabelLabel}</div>
+            <Tooltip
+              title={UIText.inputQuestionShortLabelTooltip}
+              placement="right"
+            >
+              <AiOutlineQuestionCircle
+                style={{ marginBottom: '-2px' }}
+                size={16}
+              />
+            </Tooltip>
+          </Space>
+        }
+        name={`${namePreffix}-short_label`}
+        initialValue={short_label}
+      >
+        <Input
+          onChange={handleChangeShortLabel}
+          allowClear
+        />
+      </Form.Item>
+      <Form.Item
         label={UIText.inputQuestionTypeLabel}
         initialValue={defaultTypeValue}
         name={`${namePreffix}-type`}
@@ -400,6 +433,32 @@ const QuestionSetting = ({ question, dependant }) => {
             </Checkbox>
           </Form.Item>
         </Col>
+        <Col>
+          <Form.Item
+            name={`${namePreffix}-displayOnly`}
+            className={styles['input-checkbox-wrapper']}
+          >
+            <Checkbox
+              onChange={handleChangeDisplayOnly}
+              checked={displayOnly}
+            >
+              {' '}
+              {UIText.inputQuestionDisplayOnlyCheckbox}
+            </Checkbox>
+            <Tooltip
+              placement="right"
+              title={UIText.inputQuestionDisplayOnlyCheckboxTooltip}
+            >
+              <AiOutlineQuestionCircle
+                style={{
+                  marginLeft: '-4px',
+                  marginBottom: '-2px',
+                }}
+                size={16}
+              />
+            </Tooltip>
+          </Form.Item>
+        </Col>
         {showMetaCheckbox && (
           <Col>
             <div>
@@ -415,17 +474,18 @@ const QuestionSetting = ({ question, dependant }) => {
                   {' '}
                   {UIText.inputQuestionMetaCheckbox}
                 </Checkbox>
-                <Popover
-                  placement="top"
-                  content={<i>{UIText.inputQuestionMetaCheckboxHint}</i>}
+                <Tooltip
+                  placement="right"
+                  title={UIText.inputQuestionMetaCheckboxHint}
                 >
                   <AiOutlineQuestionCircle
                     style={{
-                      cursor: 'pointer',
                       marginLeft: '-4px',
+                      marginBottom: '-2px',
                     }}
+                    size={16}
                   />
-                </Popover>
+                </Tooltip>
               </Form.Item>
             </div>
           </Col>

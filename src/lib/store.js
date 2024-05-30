@@ -55,10 +55,12 @@ const defaultQuestion = ({
     questionGroupId: questionGroup.id,
     label: labelTemp,
     name: name ? name : snakeCase(labelTemp),
+    short_label: null,
     type: type,
     required: required,
     meta: false,
     tooltip: null,
+    displayOnly: false,
   };
   if (type === questionType.option || type === questionType.multiple_option) {
     return {
