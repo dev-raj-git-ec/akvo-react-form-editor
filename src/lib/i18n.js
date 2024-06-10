@@ -111,6 +111,9 @@ const UIStaticText = {
     inputQuestionDisplayOnlyCheckbox: 'Display Only',
     inputQuestionDisplayOnlyCheckboxTooltip:
       'If you check "Display Only", the answer value for this question will not be submitted.',
+    evaluatefnStringButton: 'Evaluate Function',
+    evaluatefnStringError: 'Error evaluating function string',
+    evaluatefnStringSuccess: 'Function string evaluated correctly!',
   },
 };
 
