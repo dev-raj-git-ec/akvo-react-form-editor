@@ -4,13 +4,13 @@ import { Form, Row, Col, Button, Space, Tag, Typography, Modal, Input, Card, Sel
 import { Store } from 'pullstate';
 import { all } from 'locale-codes';
 import uniqBy from 'lodash/uniqBy';
-import snakeCase from 'lodash/snakeCase';
+import snakeCase$1 from 'lodash/snakeCase';
 import { TbEditOff, TbEdit } from 'react-icons/tb';
 import { RiDeleteBin2Line, RiSave3Fill, RiSettings5Fill, RiSettings5Line } from 'react-icons/ri';
 import { BiMove, BiCopy } from 'react-icons/bi';
 import { MdOutlineAddCircleOutline, MdOutlineArrowCircleUp, MdOutlineArrowCircleDown, MdOutlineRemoveCircleOutline, MdOutlineLanguage } from 'react-icons/md';
 import { AiOutlineEyeInvisible, AiOutlineEye, AiOutlineCopy, AiOutlineQuestionCircle } from 'react-icons/ai';
-import { isEmpty, mapKeys, orderBy, findIndex, intersection, uniq, difference, snakeCase as snakeCase$1, takeRight, map, groupBy, maxBy, minBy } from 'lodash';
+import { isEmpty, mapKeys, orderBy, findIndex, intersection, uniq, difference, takeRight, snakeCase as snakeCase$2, map, groupBy, maxBy, minBy } from 'lodash';
 import orderBy$1 from 'lodash/orderBy';
 import 'akvo-react-form/dist/index.css';
 import { Webform } from 'akvo-react-form';
@@ -167,7 +167,10 @@ var UIStaticText = {
     inputQuestionShortLabelLabel: 'Short Label',
     inputQuestionShortLabelTooltip: 'The value entered in the Sort Label field will be used as a replacement for the question label in the Excel export.',
     inputQuestionDisplayOnlyCheckbox: 'Display Only',
-    inputQuestionDisplayOnlyCheckboxTooltip: 'If you check "Display Only", the answer value for this question will not be submitted.'
+    inputQuestionDisplayOnlyCheckboxTooltip: 'If you check "Display Only", the answer value for this question will not be submitted.',
+    evaluatefnStringButton: 'Evaluate Function',
+    evaluatefnStringError: 'Error evaluating function string',
+    evaluatefnStringSuccess: 'Function string evaluated correctly!'
   }
 };
 
@@ -323,7 +326,7 @@ var defaultQuestion = function defaultQuestion(_ref) {
     order: prevOrder + 1,
     questionGroupId: questionGroup.id,
     label: labelTemp,
-    name: name ? name : snakeCase(labelTemp),
+    name: name ? name : snakeCase$1(labelTemp),
     short_label: null,
     type: type,
     required: required,
@@ -363,7 +366,7 @@ var defaultQuestionGroup = function defaultQuestionGroup(_ref2) {
   var qg = {
     id: generateId() + 1,
     label: label,
-    name: name ? name : snakeCase(label),
+    name: name ? name : snakeCase$1(label),
     order: prevOrder + 1,
     description: null,
     repeatable: false
@@ -1812,6 +1815,19 @@ Icon.getTwoToneColor = getTwoToneColor;
 Icon.setTwoToneColor = setTwoToneColor;
 
 // This icon file is generated automatically.
+var BugOutlined = { "icon": { "tag": "svg", "attrs": { "viewBox": "64 64 896 896", "focusable": "false" }, "children": [{ "tag": "path", "attrs": { "d": "M304 280h56c4.4 0 8-3.6 8-8 0-28.3 5.9-53.2 17.1-73.5 10.6-19.4 26-34.8 45.4-45.4C450.9 142 475.7 136 504 136h16c28.3 0 53.2 5.9 73.5 17.1 19.4 10.6 34.8 26 45.4 45.4C650 218.9 656 243.7 656 272c0 4.4 3.6 8 8 8h56c4.4 0 8-3.6 8-8 0-40-8.8-76.7-25.9-108.1a184.31 184.31 0 00-74-74C596.7 72.8 560 64 520 64h-16c-40 0-76.7 8.8-108.1 25.9a184.31 184.31 0 00-74 74C304.8 195.3 296 232 296 272c0 4.4 3.6 8 8 8z" } }, { "tag": "path", "attrs": { "d": "M940 512H792V412c76.8 0 139-62.2 139-139 0-4.4-3.6-8-8-8h-60c-4.4 0-8 3.6-8 8a63 63 0 01-63 63H232a63 63 0 01-63-63c0-4.4-3.6-8-8-8h-60c-4.4 0-8 3.6-8 8 0 76.8 62.2 139 139 139v100H84c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h148v96c0 6.5.2 13 .7 19.3C164.1 728.6 116 796.7 116 876c0 4.4 3.6 8 8 8h56c4.4 0 8-3.6 8-8 0-44.2 23.9-82.9 59.6-103.7a273 273 0 0022.7 49c24.3 41.5 59 76.2 100.5 100.5S460.5 960 512 960s99.8-13.9 141.3-38.2a281.38 281.38 0 00123.2-149.5A120 120 0 01836 876c0 4.4 3.6 8 8 8h56c4.4 0 8-3.6 8-8 0-79.3-48.1-147.4-116.7-176.7.4-6.4.7-12.8.7-19.3v-96h148c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM716 680c0 36.8-9.7 72-27.8 102.9-17.7 30.3-43 55.6-73.3 73.3C584 874.3 548.8 884 512 884s-72-9.7-102.9-27.8c-30.3-17.7-55.6-43-73.3-73.3A202.75 202.75 0 01308 680V412h408v268z" } }] }, "name": "bug", "theme": "outlined" };
+
+var BugOutlined$1 = function BugOutlined$1(props, ref) {
+  return /*#__PURE__*/createElement(Icon, _objectSpread2(_objectSpread2({}, props), {}, {
+    ref: ref,
+    icon: BugOutlined
+  }));
+};
+
+BugOutlined$1.displayName = 'BugOutlined';
+var BugOutlined$2 = /*#__PURE__*/forwardRef(BugOutlined$1);
+
+// This icon file is generated automatically.
 var CaretRightOutlined = { "icon": { "tag": "svg", "attrs": { "viewBox": "0 0 1024 1024", "focusable": "false" }, "children": [{ "tag": "path", "attrs": { "d": "M715.8 493.5L335 165.1c-14.2-12.2-35-1.2-35 18.5v656.8c0 19.7 20.8 30.7 35 18.5l380.8-328.4c10.9-9.4 10.9-27.6 0-37z" } }] }, "name": "caret-right", "theme": "outlined" };
 
 var CaretRightOutlined$1 = function CaretRightOutlined$1(props, ref) {
@@ -1823,6 +1839,32 @@ var CaretRightOutlined$1 = function CaretRightOutlined$1(props, ref) {
 
 CaretRightOutlined$1.displayName = 'CaretRightOutlined';
 var CaretRightOutlined$2 = /*#__PURE__*/forwardRef(CaretRightOutlined$1);
+
+// This icon file is generated automatically.
+var CheckCircleTwoTone = { "icon": function render(primaryColor, secondaryColor) { return { "tag": "svg", "attrs": { "viewBox": "64 64 896 896", "focusable": "false" }, "children": [{ "tag": "path", "attrs": { "d": "M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z", "fill": primaryColor } }, { "tag": "path", "attrs": { "d": "M512 140c-205.4 0-372 166.6-372 372s166.6 372 372 372 372-166.6 372-372-166.6-372-372-372zm193.4 225.7l-210.6 292a31.8 31.8 0 01-51.7 0L318.5 484.9c-3.8-5.3 0-12.7 6.5-12.7h46.9c10.3 0 19.9 5 25.9 13.3l71.2 98.8 157.2-218c6-8.4 15.7-13.3 25.9-13.3H699c6.5 0 10.3 7.4 6.4 12.7z", "fill": secondaryColor } }, { "tag": "path", "attrs": { "d": "M699 353h-46.9c-10.2 0-19.9 4.9-25.9 13.3L469 584.3l-71.2-98.8c-6-8.3-15.6-13.3-25.9-13.3H325c-6.5 0-10.3 7.4-6.5 12.7l124.6 172.8a31.8 31.8 0 0051.7 0l210.6-292c3.9-5.3.1-12.7-6.4-12.7z", "fill": primaryColor } }] }; }, "name": "check-circle", "theme": "twotone" };
+
+var CheckCircleTwoTone$1 = function CheckCircleTwoTone$1(props, ref) {
+  return /*#__PURE__*/createElement(Icon, _objectSpread2(_objectSpread2({}, props), {}, {
+    ref: ref,
+    icon: CheckCircleTwoTone
+  }));
+};
+
+CheckCircleTwoTone$1.displayName = 'CheckCircleTwoTone';
+var CheckCircleTwoTone$2 = /*#__PURE__*/forwardRef(CheckCircleTwoTone$1);
+
+// This icon file is generated automatically.
+var CloseCircleTwoTone = { "icon": function render(primaryColor, secondaryColor) { return { "tag": "svg", "attrs": { "viewBox": "64 64 896 896", "focusable": "false" }, "children": [{ "tag": "path", "attrs": { "d": "M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z", "fill": primaryColor } }, { "tag": "path", "attrs": { "d": "M512 140c-205.4 0-372 166.6-372 372s166.6 372 372 372 372-166.6 372-372-166.6-372-372-372zm171.8 527.1c1.2 1.5 1.9 3.3 1.9 5.2 0 4.5-3.6 8-8 8l-66-.3-99.3-118.4-99.3 118.5-66.1.3c-4.4 0-8-3.6-8-8 0-1.9.7-3.7 1.9-5.2L471 512.3l-130.1-155a8.32 8.32 0 01-1.9-5.2c0-4.5 3.6-8 8-8l66.1.3 99.3 118.4 99.4-118.5 66-.3c4.4 0 8 3.6 8 8 0 1.9-.6 3.8-1.8 5.2l-130.1 155 129.9 154.9z", "fill": secondaryColor } }, { "tag": "path", "attrs": { "d": "M685.8 352c0-4.4-3.6-8-8-8l-66 .3-99.4 118.5-99.3-118.4-66.1-.3c-4.4 0-8 3.5-8 8 0 1.9.7 3.7 1.9 5.2l130.1 155-130.1 154.9a8.32 8.32 0 00-1.9 5.2c0 4.4 3.6 8 8 8l66.1-.3 99.3-118.5L611.7 680l66 .3c4.4 0 8-3.5 8-8 0-1.9-.7-3.7-1.9-5.2L553.9 512.2l130.1-155c1.2-1.4 1.8-3.3 1.8-5.2z", "fill": primaryColor } }] }; }, "name": "close-circle", "theme": "twotone" };
+
+var CloseCircleTwoTone$1 = function CloseCircleTwoTone$1(props, ref) {
+  return /*#__PURE__*/createElement(Icon, _objectSpread2(_objectSpread2({}, props), {}, {
+    ref: ref,
+    icon: CloseCircleTwoTone
+  }));
+};
+
+CloseCircleTwoTone$1.displayName = 'CloseCircleTwoTone';
+var CloseCircleTwoTone$2 = /*#__PURE__*/forwardRef(CloseCircleTwoTone$1);
 
 // This icon file is generated automatically.
 var PlusOutlined = { "icon": { "tag": "svg", "attrs": { "viewBox": "64 64 896 896", "focusable": "false" }, "children": [{ "tag": "defs", "attrs": {}, "children": [{ "tag": "style", "attrs": {} }] }, { "tag": "path", "attrs": { "d": "M482 152h60q8 0 8 8v704q0 8-8 8h-60q-8 0-8-8V160q0-8 8-8z" } }, { "tag": "path", "attrs": { "d": "M176 474h672q8 0 8 8v60q0 8-8 8H176q-8 0-8-8v-60q0-8 8-8z" } }] }, "name": "plus", "theme": "outlined" };
@@ -3165,7 +3207,7 @@ var QuestionGroupSetting = function QuestionGroupSetting(_ref) {
     return s.UIText;
   });
 
-  var _useState = useState(name ? snakeCase(name) : snakeCase(label)),
+  var _useState = useState(name ? snakeCase$1(name) : snakeCase$1(label)),
       nameFieldValue = _useState[0],
       setNameFieldValue = _useState[1];
 
@@ -3188,7 +3230,7 @@ var QuestionGroupSetting = function QuestionGroupSetting(_ref) {
   }, [id, questionGroupErrors]);
 
   var checkIfGroupNameExist = function checkIfGroupNameExist(val) {
-    var checkVal = snakeCase(val);
+    var checkVal = snakeCase$1(val);
     var isNameExist = questionGroups.filter(function (qg) {
       return qg.id !== id;
     }).find(function (qg) {
@@ -3217,8 +3259,8 @@ var QuestionGroupSetting = function QuestionGroupSetting(_ref) {
     var labelValue = e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.value;
     var nameValue = name;
 
-    if (!name.trim() || name === snakeCase(label)) {
-      nameValue = snakeCase(labelValue);
+    if (!name.trim() || name === snakeCase$1(label)) {
+      nameValue = snakeCase$1(labelValue);
     }
 
     setNameFieldValue(nameValue);
@@ -3246,12 +3288,12 @@ var QuestionGroupSetting = function QuestionGroupSetting(_ref) {
   };
 
   var handleBlurName = function handleBlurName() {
-    setNameFieldValue(nameFieldValue ? snakeCase(nameFieldValue) : '');
+    setNameFieldValue(nameFieldValue ? snakeCase$1(nameFieldValue) : '');
     questionGroupFn.store.update(function (s) {
       s.questionGroups = s.questionGroups.map(function (x) {
         if (x.id === id) {
           return _extends({}, x, {
-            name: nameFieldValue ? snakeCase(nameFieldValue) : ''
+            name: nameFieldValue ? snakeCase$1(nameFieldValue) : ''
           });
         }
 
@@ -3524,6 +3566,16 @@ var SettingNumber = function SettingNumber(_ref) {
   })));
 };
 
+var snakeCase = function snakeCase(txt) {
+  var _txt, _txt$toLowerCase;
+
+  if (txt === void 0) {
+    txt = '';
+  }
+
+  return (_txt = txt) === null || _txt === void 0 ? void 0 : (_txt$toLowerCase = _txt.toLowerCase()) === null || _txt$toLowerCase === void 0 ? void 0 : _txt$toLowerCase.replace(/\s+/g, '_');
+};
+
 var defaultOptions = function defaultOptions(_ref) {
   var _ref$init = _ref.init,
       init = _ref$init === void 0 ? false : _ref$init,
@@ -3531,7 +3583,7 @@ var defaultOptions = function defaultOptions(_ref) {
       order = _ref$order === void 0 ? 0 : _ref$order;
   var optTextTemp = 'New Option';
   var option = {
-    value: snakeCase$1(optTextTemp),
+    value: snakeCase(optTextTemp),
     label: optTextTemp,
     order: 1
   };
@@ -3540,12 +3592,12 @@ var defaultOptions = function defaultOptions(_ref) {
     return [_extends({}, option, {
       id: generateId(),
       label: optTextTemp + " 1",
-      value: snakeCase$1(optTextTemp + " 1"),
+      value: snakeCase(optTextTemp + " 1"),
       order: 1
     }), _extends({}, option, {
       id: generateId() + 1,
       label: optTextTemp + " 2",
-      value: snakeCase$1(optTextTemp + " 2"),
+      value: snakeCase(optTextTemp + " 2"),
       order: 2
     })];
   }
@@ -3570,7 +3622,7 @@ var SettingOption = function SettingOption(_ref2) {
   var _useState = useState(initialOptions !== null && initialOptions !== void 0 && initialOptions.length ? initialOptions.map(function (x, xi) {
     return _extends({}, x, {
       label: (x === null || x === void 0 ? void 0 : x.label) || x.name,
-      value: (x === null || x === void 0 ? void 0 : x.value) || snakeCase$1(x.name),
+      value: (x === null || x === void 0 ? void 0 : x.value) || snakeCase(x.name),
       id: (x === null || x === void 0 ? void 0 : x.id) || generateId() + xi,
       order: (x === null || x === void 0 ? void 0 : x.order) || xi + 1
     });
@@ -3641,7 +3693,7 @@ var SettingOption = function SettingOption(_ref2) {
   var handleOnBlurCode = function handleOnBlurCode() {
     var updatedOptions = options.map(function (opt) {
       return _extends({}, opt, {
-        value: opt.value ? snakeCase$1(opt.value) : ''
+        value: opt.value ? snakeCase(opt.value) : ''
       });
     });
     setOptions(updatedOptions);
@@ -3659,8 +3711,8 @@ var SettingOption = function SettingOption(_ref2) {
 
         var valueTemp = opt.value;
 
-        if (!(opt !== null && opt !== void 0 && (_opt$value = opt.value) !== null && _opt$value !== void 0 && _opt$value.trim()) || opt.value === snakeCase$1(opt.label)) {
-          valueTemp = snakeCase$1(val);
+        if (!(opt !== null && opt !== void 0 && (_opt$value = opt.value) !== null && _opt$value !== void 0 && _opt$value.trim()) || opt.value === snakeCase(opt.label)) {
+          valueTemp = snakeCase(val);
         }
 
         return _extends({}, opt, {
@@ -10254,6 +10306,10 @@ var SettingAutofield = function SettingAutofield(_ref) {
       search = _useState[0],
       setSearch = _useState[1];
 
+  var _useState2 = useState(false),
+      isCorrect = _useState2[0],
+      setIsCorrect = _useState2[1];
+
   var questionErrors = ErrorStore.useState(function (s) {
     return s.questionErrors;
   });
@@ -10351,12 +10407,14 @@ var SettingAutofield = function SettingAutofield(_ref) {
           return e.id !== id && e.field !== 'autofield_fnString';
         });
       });
+      setIsCorrect(true);
     } catch (error) {
+      setIsCorrect(false);
       ErrorStore.update(function (s) {
         s.questionErrors = [].concat(s.questionErrors, [{
           id: id,
           field: 'autofield_fnString',
-          message: "Error evaluating function string" + (error !== null && error !== void 0 && error.message ? ": " + error.message : '')
+          message: "" + UIText.evaluatefnStringError + (error !== null && error !== void 0 && error.message ? ": " + error.message : '')
         }]);
       });
     }
@@ -10414,7 +10472,6 @@ var SettingAutofield = function SettingAutofield(_ref) {
     var match = val === null || val === void 0 ? void 0 : val.match(/return\s+([^;]+)/);
     var extractedContent = match ? match[1].trim() : val === null || val === void 0 ? void 0 : val.trim();
     setSearch(null);
-    validateAndExecute(extractedContent);
     updateState('fn', _extends({}, fn, {
       fnString: extractedContent
     }));
@@ -10466,6 +10523,8 @@ var SettingAutofield = function SettingAutofield(_ref) {
     label: UIText.inputQuestionAutofieldFnString,
     name: namePreffix + "-autofield_fnString",
     initialValue: (fn === null || fn === void 0 ? void 0 : fn.fnString) || null,
+    validateStatus: isCorrect ? 'success' : currentAutofieldFnStringError !== null && currentAutofieldFnStringError !== void 0 && currentAutofieldFnStringError.id ? 'error' : null,
+    hasFeedback: true,
     required: true
   }, /*#__PURE__*/React__default.createElement(AutoComplete, {
     options: questionNames,
@@ -10481,11 +10540,26 @@ var SettingAutofield = function SettingAutofield(_ref) {
     onBlur: handleBlurFnString,
     placeholder: fnStringExample,
     value: (fn === null || fn === void 0 ? void 0 : fn.fnString) || null
-  }))), currentAutofieldFnStringError !== null && currentAutofieldFnStringError !== void 0 && currentAutofieldFnStringError.id ? /*#__PURE__*/React__default.createElement("div", {
-    className: styles['field-error-wrapper']
-  }, /*#__PURE__*/React__default.createElement(Text$2, {
+  }))), /*#__PURE__*/React__default.createElement(Space, {
+    className: styles['field-error-wrapper'],
+    align: "center"
+  }, /*#__PURE__*/React__default.createElement(Button, {
+    icon: /*#__PURE__*/React__default.createElement(BugOutlined$2, null),
+    onClick: function onClick() {
+      return validateAndExecute(fn.fnString);
+    },
+    type: "primary",
+    size: "middle",
+    ghost: true
+  }, UIText.evaluatefnStringButton), (currentAutofieldFnStringError === null || currentAutofieldFnStringError === void 0 ? void 0 : currentAutofieldFnStringError.id) && /*#__PURE__*/React__default.createElement(Space, null, /*#__PURE__*/React__default.createElement(CloseCircleTwoTone$2, {
+    twoToneColor: "#ff4d4f"
+  }), /*#__PURE__*/React__default.createElement(Text$2, {
     type: "danger"
-  }, currentAutofieldFnStringError.message)) : '', /*#__PURE__*/React__default.createElement(Form.Item, {
+  }, currentAutofieldFnStringError.message)), isCorrect && /*#__PURE__*/React__default.createElement(Space, null, /*#__PURE__*/React__default.createElement(CheckCircleTwoTone$2, {
+    twoToneColor: '#52c41a'
+  }), /*#__PURE__*/React__default.createElement(Text$2, {
+    type: "success"
+  }, UIText.evaluatefnStringSuccess))), /*#__PURE__*/React__default.createElement(Form.Item, {
     label: UIText.inputQuestionAutofieldFnColor,
     name: namePreffix + "-autofield_fnColor",
     initialValue: isEmpty$1(fn === null || fn === void 0 ? void 0 : fn.fnColor) ? null : JSON.stringify(fn === null || fn === void 0 ? void 0 : fn.fnColor)
@@ -10768,7 +10842,7 @@ var QuestionSetting = function QuestionSetting(_ref) {
       copied = _useState[0],
       setCopied = _useState[1];
 
-  var _useState2 = useState(name ? snakeCase$1(name) : snakeCase$1(label)),
+  var _useState2 = useState(name ? snakeCase$2(name) : snakeCase$2(label)),
       nameFieldValue = _useState2[0],
       setNameFieldValue = _useState2[1];
 
@@ -10788,7 +10862,7 @@ var QuestionSetting = function QuestionSetting(_ref) {
   }, [id, questionErrors]);
 
   var checkIfQuestionNameExist = function checkIfQuestionNameExist(val) {
-    var checkVal = snakeCase$1(val);
+    var checkVal = snakeCase$2(val);
     var questions = questionGroups.flatMap(function (qg) {
       return qg.questions;
     }).filter(function (q) {
@@ -10918,8 +10992,8 @@ var QuestionSetting = function QuestionSetting(_ref) {
     var labelValue = e === null || e === void 0 ? void 0 : (_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.value;
     var nameValue = name;
 
-    if (!name.trim() || name === snakeCase$1(label)) {
-      nameValue = snakeCase$1(labelValue);
+    if (!name.trim() || name === snakeCase$2(label)) {
+      nameValue = snakeCase$2(labelValue);
     }
 
     setNameFieldValue(nameValue);
@@ -10943,8 +11017,8 @@ var QuestionSetting = function QuestionSetting(_ref) {
   };
 
   var handleBlurName = function handleBlurName() {
-    setNameFieldValue(nameFieldValue ? snakeCase$1(nameFieldValue) : '');
-    updateState('name', nameFieldValue ? snakeCase$1(nameFieldValue) : '');
+    setNameFieldValue(nameFieldValue ? snakeCase$2(nameFieldValue) : '');
+    updateState('name', nameFieldValue ? snakeCase$2(nameFieldValue) : '');
   };
 
   var handleChangeType = function handleChangeType(e) {
