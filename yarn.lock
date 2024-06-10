@@ -2593,10 +2593,10 @@ ajv@^8.0.0, ajv@^8.6.0, ajv@^8.8.0:
     require-from-string "^2.0.2"
     uri-js "^4.2.2"
 
-akvo-react-form@^2.2.7:
-  version "2.2.7"
-  resolved "https://registry.yarnpkg.com/akvo-react-form/-/akvo-react-form-2.2.7.tgz#542392cd0c076d88035b7927ddb1bab2322a99d4"
-  integrity sha512-2FJmS0LxH7LwmBjVArtoxBx5YmGR5cd9sGpUgu2IwpJfOhjQa2Irc0fAEi+qyFMUcvRoFyPta0VbjfILmkEM+g==
+akvo-react-form@^2.5.2:
+  version "2.5.2"
+  resolved "https://registry.yarnpkg.com/akvo-react-form/-/akvo-react-form-2.5.2.tgz#eb7c9ec1a231fca5530e425694a5e9e2ac23e3b2"
+  integrity sha512-6BdY6Rp34FTL1vRrnb69Vq7XXihxSmtz5U8ENuj1g5+vbrdvSGHVQKiPSKA4kXNR9lBDj271VFauqdHgmfy0zg==
   dependencies:
     "@react-leaflet/core" ">=1.0.0 <1.1.0 || ^1.1.1"
     antd "^4.20.0"
@@ -2611,6 +2611,7 @@ akvo-react-form@^2.2.7:
     react-html-parser "^2.0.2"
     react-icons "^4.3.1"
     react-leaflet "^4.0.2"
+    uuid "^9.0.1"
 
 alphanum-sort@^1.0.0:
   version "1.0.2"
@@ -10965,6 +10966,11 @@ uuid@^8.3.2:
   version "8.3.2"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.3.2.tgz#80d5b5ced271bb9af6c445f21a1a04c606cefbe2"
   integrity sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==
+
+uuid@^9.0.1:
+  version "9.0.1"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-9.0.1.tgz#e188d4c8853cc722220392c424cd637f32293f30"
+  integrity sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==
 
 v8-to-istanbul@^8.1.0:
   version "8.1.1"
