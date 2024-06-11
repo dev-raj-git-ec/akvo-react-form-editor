@@ -61,6 +61,7 @@ const defaultQuestion = ({
     meta: false,
     tooltip: null,
     displayOnly: false,
+    pre: {},
   };
   if (type === questionType.option || type === questionType.multiple_option) {
     return {
