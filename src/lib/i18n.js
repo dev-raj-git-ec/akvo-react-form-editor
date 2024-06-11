@@ -114,6 +114,15 @@ const UIStaticText = {
     evaluatefnStringButton: 'Evaluate Function',
     evaluatefnStringError: 'Error evaluating function string',
     evaluatefnStringSuccess: 'Function string evaluated correctly!',
+    prefilledQuestionTitle: 'Would you like to add a prefill to this question?',
+    prefilledYesText: 'Yes',
+    prefilledNoText: 'No',
+    prefilledSourceQuestion: 'Source Question',
+    prefilledSQPlaceholder: 'Select source question',
+    prefilledSourceAnswer: 'Source Answer',
+    prefilledSAPlaceholder: 'Select source answer',
+    prefilledDefaultValue: 'Default Value',
+    prefilledDVPlaceholder: 'Select default value',
   },
 };
 
