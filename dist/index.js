@@ -173,7 +173,16 @@ var UIStaticText = {
     inputQuestionDisplayOnlyCheckboxTooltip: 'If you check "Display Only", the answer value for this question will not be submitted.',
     evaluatefnStringButton: 'Evaluate Function',
     evaluatefnStringError: 'Error evaluating function string',
-    evaluatefnStringSuccess: 'Function string evaluated correctly!'
+    evaluatefnStringSuccess: 'Function string evaluated correctly!',
+    prefilledQuestionTitle: 'Would you like to add a prefill to this question?',
+    prefilledYesText: 'Yes',
+    prefilledNoText: 'No',
+    prefilledSourceQuestion: 'Source Question',
+    prefilledSQPlaceholder: 'Select source question',
+    prefilledSourceAnswer: 'Source Answer',
+    prefilledSAPlaceholder: 'Select source answer',
+    prefilledDefaultValue: 'Default Value',
+    prefilledDVPlaceholder: 'Select default value'
   }
 };
 
@@ -335,7 +344,8 @@ var defaultQuestion = function defaultQuestion(_ref) {
     required: required,
     meta: false,
     tooltip: null,
-    displayOnly: false
+    displayOnly: false,
+    pre: {}
   };
 
   if (type === questionType.option || type === questionType.multiple_option) {
@@ -3569,6 +3579,307 @@ var SettingNumber = function SettingNumber(_ref) {
   })));
 };
 
+var allowedQuestionTypes = [questionType.option, questionType.multiple_option];
+
+var QuestionPrefilled = function QuestionPrefilled(_ref) {
+  var id = _ref.id,
+      questionGroupId = _ref.questionGroupId,
+      _ref$options = _ref.options,
+      options = _ref$options === void 0 ? [] : _ref$options,
+      _ref$mode = _ref.mode,
+      mode = _ref$mode === void 0 ? null : _ref$mode;
+
+  var _useState = React.useState(0),
+      isPrefilled = _useState[0],
+      setIsPrefilled = _useState[1];
+
+  var _useState2 = React.useState([]),
+      settings = _useState2[0],
+      setSettings = _useState2[1];
+
+  var _UIStore$useState = UIStore.useState(function (s) {
+    return s;
+  }),
+      UIText = _UIStore$useState.UIText;
+
+  var questionGroups = questionGroupFn.store.useState(function (s) {
+    return s.questionGroups;
+  });
+  var namePreffix = "prefilled-" + id;
+  var allOptionTypeQuestions = React.useMemo(function () {
+    var _questionGroups$flatM, _questionGroups$flatM2;
+
+    return (questionGroups === null || questionGroups === void 0 ? void 0 : (_questionGroups$flatM = questionGroups.flatMap(function (qg) {
+      return qg.questions;
+    })) === null || _questionGroups$flatM === void 0 ? void 0 : (_questionGroups$flatM2 = _questionGroups$flatM.filter(function (q) {
+      return allowedQuestionTypes.includes(q.type) && (q === null || q === void 0 ? void 0 : q.id) < id;
+    })) === null || _questionGroups$flatM2 === void 0 ? void 0 : _questionGroups$flatM2.map(function (q) {
+      return {
+        value: q.name,
+        label: q.label
+      };
+    })) || [];
+  }, [id, questionGroups]);
+
+  var onChangeSettings = function onChangeSettings(sid, key, value) {
+    var updatedSettings = settings.map(function (s) {
+      if (s.id === sid) {
+        var _extends2;
+
+        return _extends({}, s, (_extends2 = {}, _extends2[key] = value, _extends2));
+      }
+
+      return s;
+    });
+    setSettings(updatedSettings);
+  };
+
+  var onChangeQuestion = function onChangeQuestion(sid, value) {
+    var question = questionGroups.flatMap(function (qg) {
+      return qg.questions;
+    }).find(function (q) {
+      return q.name === value;
+    });
+
+    if (question) {
+      var _question$options;
+
+      var existingAnswers = settings.filter(function (s) {
+        return s.question === value;
+      }).map(function (s) {
+        return s.answer;
+      });
+      var answerList = (question === null || question === void 0 ? void 0 : (_question$options = question.options) === null || _question$options === void 0 ? void 0 : _question$options.filter(function (o) {
+        return !existingAnswers.includes(o === null || o === void 0 ? void 0 : o.value);
+      })) || [];
+      var updatedSettings = settings.map(function (s) {
+        if (s.id === sid) {
+          return _extends({}, s, {
+            question: value,
+            answerList: answerList
+          });
+        }
+
+        return s;
+      });
+      setSettings(updatedSettings);
+    }
+  };
+
+  var onClearQuestion = function onClearQuestion(sid) {
+    onChangeSettings(sid, 'answerList', []);
+    onChangeSettings(sid, 'answer', null);
+  };
+
+  var handleOnAddSettings = function handleOnAddSettings() {
+    setSettings([].concat(settings, [{
+      id: generateId(),
+      question: null,
+      answer: null,
+      answerList: [],
+      value: null
+    }]));
+  };
+
+  var handleOnRemoveSettings = function handleOnRemoveSettings(id) {
+    var removedSettings = settings.filter(function (s) {
+      return s.id !== id;
+    });
+    var removedItem = settings.find(function (s) {
+      return s.id === id;
+    });
+    var removedAnswer = removedItem.answerList.find(function (a) {
+      return (a === null || a === void 0 ? void 0 : a.value) === removedItem.answer;
+    });
+
+    if (removedAnswer) {
+      removedSettings = removedSettings.map(function (s) {
+        if (!s.answerList.map(function (a) {
+          return a.value;
+        }).includes(removedAnswer.value)) {
+          return _extends({}, s, {
+            answerList: [].concat(s.answerList, [removedAnswer])
+          });
+        }
+
+        return s;
+      });
+    }
+
+    if (removedSettings.length === 0) {
+      setIsPrefilled(0);
+    }
+
+    setSettings(removedSettings);
+  };
+
+  var onChangeConfirm = function onChangeConfirm(e) {
+    if (e.target.value === 0) {
+      setSettings([]);
+    }
+
+    if (e.target.value === 1 && settings.length === 0) {
+      handleOnAddSettings();
+    }
+
+    setIsPrefilled(e.target.value);
+  };
+
+  var onChangeDefaultValue = function onChangeDefaultValue(sid, v) {
+    var updatedSettings = settings.map(function (s) {
+      if (s.id === sid) {
+        return _extends({}, s, {
+          value: v
+        });
+      }
+
+      return s;
+    });
+    setSettings(updatedSettings);
+    var pre = updatedSettings.reduce(function (acc, item) {
+      if (!acc[item.question]) {
+        acc[item.question] = {};
+      }
+
+      if (!acc[item.question][item.answer]) {
+        acc[item.question][item.answer] = [];
+      }
+
+      acc[item.question][item.answer].push(item.value);
+      return acc;
+    }, {});
+    updatePreState(pre);
+  };
+
+  var updatePreState = React.useCallback(function (pre) {
+    if (pre === void 0) {
+      pre = {};
+    }
+
+    questionGroupFn.store.update(function (s) {
+      s.questionGroups = s.questionGroups.map(function (qg) {
+        if (qg.id === questionGroupId) {
+          var questions = qg.questions.map(function (q) {
+            if (q.id === id) {
+              return _extends({}, q, {
+                pre: pre
+              });
+            }
+
+            return q;
+          });
+          return _extends({}, qg, {
+            questions: questions
+          });
+        }
+
+        return qg;
+      });
+    });
+  }, [id, questionGroupId]);
+
+  if (!allOptionTypeQuestions.length) {
+    return null;
+  }
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: styles['more-question-setting-text']
+  }, /*#__PURE__*/React__default.createElement(antd.Divider, {
+    orientation: "left",
+    orientationMargin: 0
+  }, /*#__PURE__*/React__default.createElement(antd.Space, null, UIText.prefilledQuestionTitle, /*#__PURE__*/React__default.createElement(antd.Radio.Group, {
+    onChange: onChangeConfirm,
+    value: isPrefilled,
+    name: namePreffix + "_confirm"
+  }, /*#__PURE__*/React__default.createElement(antd.Radio, {
+    value: 1
+  }, UIText.prefilledYesText), /*#__PURE__*/React__default.createElement(antd.Radio, {
+    value: 0
+  }, UIText.prefilledNoText)))), settings.map(function (s) {
+    return /*#__PURE__*/React__default.createElement(antd.Row, {
+      gutter: [16, 8],
+      align: "middle",
+      key: namePreffix + "_" + s.id
+    }, /*#__PURE__*/React__default.createElement(antd.Col, {
+      span: 20
+    }, /*#__PURE__*/React__default.createElement(antd.Row, {
+      gutter: [16, 8]
+    }, /*#__PURE__*/React__default.createElement(antd.Col, {
+      lg: 8
+    }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+      name: namePreffix + "_question_" + s.id,
+      label: UIText.prefilledSourceQuestion
+    }, /*#__PURE__*/React__default.createElement(antd.Select, {
+      showSearch: true,
+      placeholder: UIText.prefilledSQPlaceholder,
+      className: styles['select-dropdown'],
+      options: allOptionTypeQuestions,
+      getPopupContainer: function getPopupContainer(triggerNode) {
+        return triggerNode.parentElement;
+      },
+      onChange: function onChange(v) {
+        return onChangeQuestion(s.id, v);
+      },
+      value: s.question,
+      onClear: function onClear() {
+        return onClearQuestion(s.id);
+      },
+      allowClear: true
+    }))), /*#__PURE__*/React__default.createElement(antd.Col, {
+      lg: 8
+    }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+      name: namePreffix + "_answer_" + s.id,
+      label: UIText.prefilledSourceAnswer
+    }, /*#__PURE__*/React__default.createElement(antd.Select, {
+      showSearch: true,
+      placeholder: UIText.prefilledSAPlaceholder,
+      className: styles['select-dropdown'],
+      options: s.answerList,
+      getPopupContainer: function getPopupContainer(triggerNode) {
+        return triggerNode.parentElement;
+      },
+      onChange: function onChange(v) {
+        return onChangeSettings(s.id, 'answer', v);
+      },
+      value: s.answer
+    }))), /*#__PURE__*/React__default.createElement(antd.Col, {
+      lg: 8
+    }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+      name: namePreffix + "_value_" + s.id,
+      label: UIText.prefilledDefaultValue
+    }, /*#__PURE__*/React__default.createElement(antd.Select, {
+      showSearch: true,
+      placeholder: UIText.prefilledDVPlaceholder,
+      className: styles['select-dropdown'],
+      options: options,
+      getPopupContainer: function getPopupContainer(triggerNode) {
+        return triggerNode.parentElement;
+      },
+      disabled: s.answerList.length === 0,
+      onChange: function onChange(v) {
+        return onChangeDefaultValue(s.id, v);
+      },
+      value: s.value,
+      mode: mode
+    }))))), /*#__PURE__*/React__default.createElement(antd.Col, {
+      span: 4
+    }, /*#__PURE__*/React__default.createElement(antd.Button, {
+      type: "link",
+      className: styles['button-icon'],
+      icon: /*#__PURE__*/React__default.createElement(md.MdOutlineAddCircleOutline, null),
+      onClick: handleOnAddSettings,
+      disabled: s.answerList.length === 0
+    }), /*#__PURE__*/React__default.createElement(antd.Button, {
+      type: "link",
+      className: styles['button-icon'],
+      icon: /*#__PURE__*/React__default.createElement(md.MdOutlineRemoveCircleOutline, null),
+      onClick: function onClick() {
+        return handleOnRemoveSettings(s.id);
+      }
+    })));
+  }), settings.length > 0 && /*#__PURE__*/React__default.createElement(antd.Divider, null));
+};
+
 var snakeCase = function snakeCase(txt) {
   var _txt, _txt$toLowerCase;
 
@@ -3616,7 +3927,8 @@ var SettingOption = function SettingOption(_ref2) {
       questionGroupId = _ref2.questionGroupId,
       allowOther = _ref2.allowOther,
       allowOtherText = _ref2.allowOtherText,
-      initialOptions = _ref2.options;
+      initialOptions = _ref2.options,
+      optionType = _ref2.type;
   var namePreffix = "question-" + id;
   var UIText = UIStore.useState(function (s) {
     return s.UIText;
@@ -3913,6 +4225,11 @@ var SettingOption = function SettingOption(_ref2) {
       },
       disabled: options.length === 1
     }))));
+  }), /*#__PURE__*/React__default.createElement(QuestionPrefilled, {
+    id: id,
+    options: options,
+    questionGroupId: questionGroupId,
+    mode: questionType.multiple_option === optionType ? 'multiple' : null
   }));
 };
 
@@ -10285,7 +10602,7 @@ var SettingImage = function SettingImage(_ref) {
 
 var fnStringExample = "Search question_name by typing #\nExample format below:\n#question_name# / #question_name#\nOR\n#question_name#.includes('Test') ? #question_name# / #question_name# : 0 }";
 var fnColorExample = "{ 'answer_value': '#CCFFC4' }";
-var allowedQuestionTypes = [questionType.input, questionType.number, questionType.text, questionType.option, questionType.multiple_option, questionType.autofield];
+var allowedQuestionTypes$1 = [questionType.input, questionType.number, questionType.text, questionType.option, questionType.multiple_option, questionType.autofield];
 var Text$2 = antd.Typography.Text;
 
 var SettingAutofield = function SettingAutofield(_ref) {
@@ -10330,7 +10647,7 @@ var SettingAutofield = function SettingAutofield(_ref) {
   var allAllowedQuestions = questionGroups.flatMap(function (qg) {
     return qg.questions;
   }).filter(function (q) {
-    return allowedQuestionTypes.includes(q.type);
+    return allowedQuestionTypes$1.includes(q.type);
   }).map(function (q) {
     return {
       id: q.id,
