@@ -45,10 +45,10 @@ const QuestionPrefilled = ({
     );
   }, [id, questionGroups]);
 
-  const onChangeSettings = (sid, key, value) => {
+  const onChangeAnswer = (sid, answer) => {
     const updatedSettings = settings.map((s) => {
       if (s.id === sid) {
-        return { ...s, [key]: value };
+        return { ...s, answer };
       }
       return s;
     });
@@ -77,8 +77,13 @@ const QuestionPrefilled = ({
   };
 
   const onClearQuestion = (sid) => {
-    onChangeSettings(sid, 'answerList', []);
-    onChangeSettings(sid, 'answer', null);
+    const updatedSettings = settings.map((s) => {
+      if (s.id === sid) {
+        return { ...s, answer: null, value: null, answerList: [] };
+      }
+      return s;
+    });
+    setSettings(updatedSettings);
   };
 
   const handleOnAddSettings = () => {
@@ -203,12 +208,10 @@ const QuestionPrefilled = ({
           <Col span={20}>
             <Row gutter={[16, 8]}>
               <Col lg={8}>
-                <Form.Item
-                  name={`${namePreffix}_question_${s.id}`}
-                  label={UIText.prefilledSourceQuestion}
-                >
+                <Form.Item label={UIText.prefilledSourceQuestion}>
                   <Select
                     showSearch
+                    name={`${namePreffix}_question_${s.id}`}
                     placeholder={UIText.prefilledSQPlaceholder}
                     className={styles['select-dropdown']}
                     options={allOptionTypeQuestions}
@@ -223,30 +226,26 @@ const QuestionPrefilled = ({
                 </Form.Item>
               </Col>
               <Col lg={8}>
-                <Form.Item
-                  name={`${namePreffix}_answer_${s.id}`}
-                  label={UIText.prefilledSourceAnswer}
-                >
+                <Form.Item label={UIText.prefilledSourceAnswer}>
                   <Select
                     showSearch
+                    name={`${namePreffix}_answer_${s.id}`}
                     placeholder={UIText.prefilledSAPlaceholder}
                     className={styles['select-dropdown']}
                     options={s.answerList}
                     getPopupContainer={(triggerNode) =>
                       triggerNode.parentElement
                     }
-                    onChange={(v) => onChangeSettings(s.id, 'answer', v)}
+                    onChange={(v) => onChangeAnswer(s.id, v)}
                     value={s.answer}
                   />
                 </Form.Item>
               </Col>
               <Col lg={8}>
-                <Form.Item
-                  name={`${namePreffix}_value_${s.id}`}
-                  label={UIText.prefilledDefaultValue}
-                >
+                <Form.Item label={UIText.prefilledDefaultValue}>
                   <Select
                     showSearch
+                    name={`${namePreffix}_value_${s.id}`}
                     placeholder={UIText.prefilledDVPlaceholder}
                     className={styles['select-dropdown']}
                     options={options}
