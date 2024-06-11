@@ -8,8 +8,12 @@ import {
   MdOutlineArrowCircleDown,
   MdOutlineArrowCircleUp,
 } from 'react-icons/md';
-import { orderBy, takeRight, snakeCase } from 'lodash';
+import { orderBy, takeRight } from 'lodash';
 import { SketchPicker } from 'react-color';
+
+const snakeCase = (txt = '') => {
+  return txt?.toLowerCase()?.replace(/\s+/g, '_');
+};
 
 const defaultOptions = ({ init = false, order = 0 }) => {
   const optTextTemp = 'New Option';

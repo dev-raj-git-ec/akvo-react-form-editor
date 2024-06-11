@@ -1,5 +1,18 @@
 import React, { useState, useMemo } from 'react';
-import { Form, Checkbox, Space, Input, AutoComplete, Typography } from 'antd';
+import {
+  Form,
+  Checkbox,
+  Space,
+  Input,
+  AutoComplete,
+  Typography,
+  Button,
+} from 'antd';
+import {
+  CheckCircleTwoTone,
+  CloseCircleTwoTone,
+  BugOutlined,
+} from '@ant-design/icons';
 import styles from '../../styles.module.css';
 import {
   UIStore,
@@ -36,6 +49,7 @@ const SettingAutofield = ({
     (s) => s.questionGroups
   );
   const [search, setSearch] = useState(null);
+  const [isCorrect, setIsCorrect] = useState(false);
   const questionErrors = ErrorStore.useState((s) => s.questionErrors);
 
   const currentAutofieldFnStringError = useMemo(() => {
@@ -124,14 +138,16 @@ const SettingAutofield = ({
           (e) => e.id !== id && e.field !== 'autofield_fnString'
         );
       });
+      setIsCorrect(true);
     } catch (error) {
+      setIsCorrect(false);
       ErrorStore.update((s) => {
         s.questionErrors = [
           ...s.questionErrors,
           {
             id: id,
             field: 'autofield_fnString',
-            message: `Error evaluating function string${
+            message: `${UIText.evaluatefnStringError}${
               error?.message ? `: ${error.message}` : ''
             }`,
           },
@@ -183,7 +199,6 @@ const SettingAutofield = ({
     // Extracted content from the function body (remove function)
     const extractedContent = match ? match[1].trim() : val?.trim();
     setSearch(null);
-    validateAndExecute(extractedContent);
     updateState('fn', { ...fn, fnString: extractedContent });
   };
 
@@ -232,6 +247,14 @@ const SettingAutofield = ({
         label={UIText.inputQuestionAutofieldFnString}
         name={`${namePreffix}-autofield_fnString`}
         initialValue={fn?.fnString || null}
+        validateStatus={
+          isCorrect
+            ? 'success'
+            : currentAutofieldFnStringError?.id
+            ? 'error'
+            : null
+        }
+        hasFeedback
         required
       >
         <AutoComplete
@@ -253,13 +276,32 @@ const SettingAutofield = ({
           />
         </AutoComplete>
       </Form.Item>
-      {currentAutofieldFnStringError?.id ? (
-        <div className={styles['field-error-wrapper']}>
-          <Text type="danger">{currentAutofieldFnStringError.message}</Text>
-        </div>
-      ) : (
-        ''
-      )}
+      <Space
+        className={styles['field-error-wrapper']}
+        align="center"
+      >
+        <Button
+          icon={<BugOutlined />}
+          onClick={() => validateAndExecute(fn.fnString)}
+          type="primary"
+          size="middle"
+          ghost
+        >
+          {UIText.evaluatefnStringButton}
+        </Button>
+        {currentAutofieldFnStringError?.id && (
+          <Space>
+            <CloseCircleTwoTone twoToneColor="#ff4d4f" />
+            <Text type="danger">{currentAutofieldFnStringError.message}</Text>
+          </Space>
+        )}
+        {isCorrect && (
+          <Space>
+            <CheckCircleTwoTone twoToneColor={'#52c41a'} />
+            <Text type="success">{UIText.evaluatefnStringSuccess}</Text>
+          </Space>
+        )}
+      </Space>
       <Form.Item
         label={UIText.inputQuestionAutofieldFnColor}
         name={`${namePreffix}-autofield_fnColor`}
