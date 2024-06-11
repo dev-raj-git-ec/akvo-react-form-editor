@@ -3618,12 +3618,12 @@ var QuestionPrefilled = function QuestionPrefilled(_ref) {
     })) || [];
   }, [id, questionGroups]);
 
-  var onChangeSettings = function onChangeSettings(sid, key, value) {
+  var onChangeAnswer = function onChangeAnswer(sid, answer) {
     var updatedSettings = settings.map(function (s) {
       if (s.id === sid) {
-        var _extends2;
-
-        return _extends({}, s, (_extends2 = {}, _extends2[key] = value, _extends2));
+        return _extends({}, s, {
+          answer: answer
+        });
       }
 
       return s;
@@ -3664,8 +3664,18 @@ var QuestionPrefilled = function QuestionPrefilled(_ref) {
   };
 
   var onClearQuestion = function onClearQuestion(sid) {
-    onChangeSettings(sid, 'answerList', []);
-    onChangeSettings(sid, 'answer', null);
+    var updatedSettings = settings.map(function (s) {
+      if (s.id === sid) {
+        return _extends({}, s, {
+          answer: null,
+          value: null,
+          answerList: []
+        });
+      }
+
+      return s;
+    });
+    setSettings(updatedSettings);
   };
 
   var handleOnAddSettings = function handleOnAddSettings() {
@@ -3804,10 +3814,10 @@ var QuestionPrefilled = function QuestionPrefilled(_ref) {
     }, /*#__PURE__*/React__default.createElement(Col, {
       lg: 8
     }, /*#__PURE__*/React__default.createElement(Form.Item, {
-      name: namePreffix + "_question_" + s.id,
       label: UIText.prefilledSourceQuestion
     }, /*#__PURE__*/React__default.createElement(Select, {
       showSearch: true,
+      name: namePreffix + "_question_" + s.id,
       placeholder: UIText.prefilledSQPlaceholder,
       className: styles['select-dropdown'],
       options: allOptionTypeQuestions,
@@ -3825,10 +3835,10 @@ var QuestionPrefilled = function QuestionPrefilled(_ref) {
     }))), /*#__PURE__*/React__default.createElement(Col, {
       lg: 8
     }, /*#__PURE__*/React__default.createElement(Form.Item, {
-      name: namePreffix + "_answer_" + s.id,
       label: UIText.prefilledSourceAnswer
     }, /*#__PURE__*/React__default.createElement(Select, {
       showSearch: true,
+      name: namePreffix + "_answer_" + s.id,
       placeholder: UIText.prefilledSAPlaceholder,
       className: styles['select-dropdown'],
       options: s.answerList,
@@ -3836,16 +3846,16 @@ var QuestionPrefilled = function QuestionPrefilled(_ref) {
         return triggerNode.parentElement;
       },
       onChange: function onChange(v) {
-        return onChangeSettings(s.id, 'answer', v);
+        return onChangeAnswer(s.id, v);
       },
       value: s.answer
     }))), /*#__PURE__*/React__default.createElement(Col, {
       lg: 8
     }, /*#__PURE__*/React__default.createElement(Form.Item, {
-      name: namePreffix + "_value_" + s.id,
       label: UIText.prefilledDefaultValue
     }, /*#__PURE__*/React__default.createElement(Select, {
       showSearch: true,
+      name: namePreffix + "_value_" + s.id,
       placeholder: UIText.prefilledDVPlaceholder,
       className: styles['select-dropdown'],
       options: options,
