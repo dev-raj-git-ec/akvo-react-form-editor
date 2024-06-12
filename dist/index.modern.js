@@ -3584,15 +3584,21 @@ var QuestionPrefilled = function QuestionPrefilled(_ref) {
       _ref$options = _ref.options,
       options = _ref$options === void 0 ? [] : _ref$options,
       _ref$mode = _ref.mode,
-      mode = _ref$mode === void 0 ? null : _ref$mode;
+      mode = _ref$mode === void 0 ? null : _ref$mode,
+      _ref$initialPre = _ref.initialPre,
+      initialPre = _ref$initialPre === void 0 ? {} : _ref$initialPre;
 
   var _useState = useState(0),
       isPrefilled = _useState[0],
       setIsPrefilled = _useState[1];
 
-  var _useState2 = useState([]),
-      settings = _useState2[0],
-      setSettings = _useState2[1];
+  var _useState2 = useState(true),
+      preload = _useState2[0],
+      setPreload = _useState2[1];
+
+  var _useState3 = useState([]),
+      settings = _useState3[0],
+      setSettings = _useState3[1];
 
   var _UIStore$useState = UIStore.useState(function (s) {
     return s;
@@ -3668,7 +3674,7 @@ var QuestionPrefilled = function QuestionPrefilled(_ref) {
       if (s.id === sid) {
         return _extends({}, s, {
           answer: null,
-          value: null,
+          value: mode === 'multiple' ? [] : null,
           answerList: []
         });
       }
@@ -3684,7 +3690,7 @@ var QuestionPrefilled = function QuestionPrefilled(_ref) {
       question: null,
       answer: null,
       answerList: [],
-      value: null
+      value: mode === 'multiple' ? [] : null
     }]));
   };
 
@@ -3752,7 +3758,12 @@ var QuestionPrefilled = function QuestionPrefilled(_ref) {
         acc[item.question][item.answer] = [];
       }
 
-      acc[item.question][item.answer].push(item.value);
+      if (Array.isArray(item.value)) {
+        acc[item.question][item.answer] = [].concat(acc[item.question][item.answer], item.value);
+      } else {
+        acc[item.question][item.answer].push(item.value);
+      }
+
       return acc;
     }, {});
     updatePreState(pre);
@@ -3784,6 +3795,34 @@ var QuestionPrefilled = function QuestionPrefilled(_ref) {
       });
     });
   }, [id, questionGroupId]);
+  useEffect(function () {
+    if (preload && Object.keys(initialPre).length && isPrefilled === 0 && settings.length === 0) {
+      setPreload(false);
+      setIsPrefilled(1);
+      var initSettings = Object.keys(initialPre).flatMap(function (qn, qx) {
+        var fq = questionGroups.flatMap(function (qg) {
+          return qg.questions;
+        }).find(function (q) {
+          return q.name === qn;
+        });
+        return Object.keys(initialPre[qn]).map(function (av, ax) {
+          var _Object$keys, _fq$options, _initialPre$qn$av;
+
+          var prev = (_Object$keys = Object.keys(initialPre[qn])) === null || _Object$keys === void 0 ? void 0 : _Object$keys[ax - 1];
+          return {
+            id: "" + qx + ax,
+            question: qn,
+            answer: av,
+            answerList: fq === null || fq === void 0 ? void 0 : (_fq$options = fq.options) === null || _fq$options === void 0 ? void 0 : _fq$options.filter(function (o) {
+              return prev ? (o === null || o === void 0 ? void 0 : o.value) !== prev : o;
+            }),
+            value: mode === 'multiple' ? initialPre[qn][av] : (_initialPre$qn$av = initialPre[qn][av]) === null || _initialPre$qn$av === void 0 ? void 0 : _initialPre$qn$av[0]
+          };
+        });
+      });
+      setSettings(initSettings);
+    }
+  }, [preload, isPrefilled, questionGroups, settings, initialPre, mode]);
 
   if (!allOptionTypeQuestions.length) {
     return null;
@@ -3935,7 +3974,8 @@ var SettingOption = function SettingOption(_ref2) {
       allowOther = _ref2.allowOther,
       allowOtherText = _ref2.allowOtherText,
       initialOptions = _ref2.options,
-      optionType = _ref2.type;
+      optionType = _ref2.type,
+      initialPre = _ref2.pre;
   var namePreffix = "question-" + id;
   var UIText = UIStore.useState(function (s) {
     return s.UIText;
@@ -4236,6 +4276,7 @@ var SettingOption = function SettingOption(_ref2) {
     id: id,
     options: options,
     questionGroupId: questionGroupId,
+    initialPre: initialPre,
     mode: questionType.multiple_option === optionType ? 'multiple' : null
   }));
 };
