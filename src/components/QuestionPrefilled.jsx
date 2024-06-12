@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import styles from '../styles.module.css';
 import {
   MdOutlineAddCircleOutline,
@@ -22,8 +22,10 @@ const QuestionPrefilled = ({
   questionGroupId,
   options = [],
   mode = null,
+  initialPre = {},
 }) => {
   const [isPrefilled, setIsPrefilled] = useState(0);
+  const [preload, setPreload] = useState(true);
   const [settings, setSettings] = useState([]);
 
   const { UIText } = UIStore.useState((s) => s);
@@ -79,7 +81,12 @@ const QuestionPrefilled = ({
   const onClearQuestion = (sid) => {
     const updatedSettings = settings.map((s) => {
       if (s.id === sid) {
-        return { ...s, answer: null, value: null, answerList: [] };
+        return {
+          ...s,
+          answer: null,
+          value: mode === 'multiple' ? [] : null,
+          answerList: [],
+        };
       }
       return s;
     });
@@ -94,7 +101,7 @@ const QuestionPrefilled = ({
         question: null,
         answer: null,
         answerList: [],
-        value: null,
+        value: mode === 'multiple' ? [] : null,
       },
     ]);
   };
@@ -145,7 +152,15 @@ const QuestionPrefilled = ({
       if (!acc[item.question][item.answer]) {
         acc[item.question][item.answer] = [];
       }
-      acc[item.question][item.answer].push(item.value);
+      if (Array.isArray(item.value)) {
+        acc[item.question][item.answer] = [
+          ...acc[item.question][item.answer],
+          ...item.value,
+        ];
+      } else {
+        acc[item.question][item.answer].push(item.value);
+      }
+
       return acc;
     }, {});
     updatePreState(pre);
@@ -176,6 +191,39 @@ const QuestionPrefilled = ({
     },
     [id, questionGroupId]
   );
+
+  useEffect(() => {
+    if (
+      preload &&
+      Object.keys(initialPre).length &&
+      isPrefilled === 0 &&
+      settings.length === 0
+    ) {
+      setPreload(false);
+      setIsPrefilled(1);
+      const initSettings = Object.keys(initialPre).flatMap((qn, qx) => {
+        const fq = questionGroups
+          .flatMap((qg) => qg.questions)
+          .find((q) => q.name === qn);
+        return Object.keys(initialPre[qn]).map((av, ax) => {
+          const prev = Object.keys(initialPre[qn])?.[ax - 1];
+          return {
+            id: `${qx}${ax}`,
+            question: qn,
+            answer: av,
+            answerList: fq?.options?.filter((o) =>
+              prev ? o?.value !== prev : o
+            ),
+            value:
+              mode === 'multiple'
+                ? initialPre[qn][av]
+                : initialPre[qn][av]?.[0],
+          };
+        });
+      });
+      setSettings(initSettings);
+    }
+  }, [preload, isPrefilled, questionGroups, settings, initialPre, mode]);
 
   if (!allOptionTypeQuestions.length) {
     return null;
