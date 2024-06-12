@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Form, Checkbox, Space, Row, Col, Input, Button } from 'antd';
 import styles from '../../styles.module.css';
-import { UIStore, questionGroupFn, generateId } from '../../lib/store';
+import {
+  UIStore,
+  questionGroupFn,
+  generateId,
+  questionType,
+} from '../../lib/store';
 import {
   MdOutlineRemoveCircleOutline,
   MdOutlineAddCircleOutline,
@@ -10,6 +15,7 @@ import {
 } from 'react-icons/md';
 import { orderBy, takeRight } from 'lodash';
 import { SketchPicker } from 'react-color';
+import QuestionPrefilled from '../QuestionPrefilled';
 
 const snakeCase = (txt = '') => {
   return txt?.toLowerCase()?.replace(/\s+/g, '_');
@@ -53,6 +59,8 @@ const SettingOption = ({
   allowOther,
   allowOtherText,
   options: initialOptions,
+  type: optionType,
+  pre: initialPre,
 }) => {
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
@@ -369,6 +377,10 @@ const SettingOption = ({
         </Row>
       ))}
       {/* /* EOL Options */}
+      <QuestionPrefilled
+        {...{ id, options, questionGroupId, initialPre }}
+        mode={questionType.multiple_option === optionType ? 'multiple' : null}
+      />
     </div>
   );
 };
