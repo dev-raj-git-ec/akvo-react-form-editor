@@ -394,7 +394,13 @@
               "allowOtherText": "Silahkan menambahkan menu lain jika ada",
               "language": "id"
             }
-          ]
+          ],
+          "pre": {
+            "gender": {
+              "male": ["asian"],
+              "female": ["asian", "western"]
+            }
+          }
         },
         {
           "id": 12,
