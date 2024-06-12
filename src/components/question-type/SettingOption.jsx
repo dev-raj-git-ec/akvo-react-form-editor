@@ -60,6 +60,7 @@ const SettingOption = ({
   allowOtherText,
   options: initialOptions,
   type: optionType,
+  pre: initialPre,
 }) => {
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
@@ -377,7 +378,7 @@ const SettingOption = ({
       ))}
       {/* /* EOL Options */}
       <QuestionPrefilled
-        {...{ id, options, questionGroupId }}
+        {...{ id, options, questionGroupId, initialPre }}
         mode={questionType.multiple_option === optionType ? 'multiple' : null}
       />
     </div>
