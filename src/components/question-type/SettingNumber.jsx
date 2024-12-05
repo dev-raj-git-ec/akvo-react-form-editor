@@ -2,6 +2,7 @@ import React from 'react';
 import { Form, Checkbox, Space, InputNumber, Row, Col } from 'antd';
 import styles from '../../styles.module.css';
 import { UIStore, questionGroupFn } from '../../lib/store';
+import { SettingAddons } from '../../support';
 
 const SettingNumber = ({
   id,
@@ -11,6 +12,8 @@ const SettingNumber = ({
     min: null,
     max: null,
   },
+  addonBefore,
+  addonAfter,
 }) => {
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
@@ -45,6 +48,12 @@ const SettingNumber = ({
         if (qg.id === questionGroupId) {
           const questions = qg.questions.map((q) => {
             if (q.id === id) {
+              if (['addonBefore', 'addonAfter'].includes(name)) {
+                return {
+                  ...q,
+                  [name]: value,
+                };
+              }
               return {
                 ...q,
                 rule: {
@@ -72,6 +81,9 @@ const SettingNumber = ({
   const handleChangeMinMax = (key, e) => {
     updateState(key, e);
   };
+
+  const onAddonBefore = (value) => updateState('addonBefore', value);
+  const onAddonAfter = (value) => updateState('addonAfter', value);
 
   return (
     <div>
@@ -114,6 +126,15 @@ const SettingNumber = ({
           </Col>
         ))}
       </Row>
+      <SettingAddons
+        {...{
+          namePreffix,
+          addonBefore,
+          addonAfter,
+          onAddonBefore,
+          onAddonAfter,
+        }}
+      />
     </div>
   );
 };
