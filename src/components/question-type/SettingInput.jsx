@@ -2,12 +2,15 @@ import React from 'react';
 import { Form, Checkbox, Space } from 'antd';
 import styles from '../../styles.module.css';
 import { UIStore, questionGroupFn } from '../../lib/store';
+import { SettingAddons } from '../../support';
 
 const SettingInput = ({
   id,
   questionGroupId,
   requiredDoubleEntry,
   hiddenString,
+  addonBefore,
+  addonAfter,
 }) => {
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
@@ -43,6 +46,9 @@ const SettingInput = ({
     updateState('hiddenString', e?.target?.checked);
   };
 
+  const onAddonBefore = (value) => updateState('addonBefore', value);
+  const onAddonAfter = (value) => updateState('addonAfter', value);
+
   return (
     <div>
       <p className={styles['more-question-setting-text']}>
@@ -68,6 +74,15 @@ const SettingInput = ({
           </Checkbox>
         </Form.Item>
       </Space>
+      <SettingAddons
+        {...{
+          namePreffix,
+          addonBefore,
+          addonAfter,
+          onAddonBefore,
+          onAddonAfter,
+        }}
+      />
     </div>
   );
 };

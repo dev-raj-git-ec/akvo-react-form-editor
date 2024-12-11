@@ -21,6 +21,7 @@ import {
   ErrorStore,
 } from '../../lib/store';
 import isEmpty from 'lodash/isEmpty';
+import { SettingAddons } from '../../support';
 
 const fnStringExample =
   "Search question_name by typing #\nExample format below:\n#question_name# / #question_name#\nOR\n#question_name#.includes('Test') ? #question_name# / #question_name# : 0 }";
@@ -42,6 +43,8 @@ const SettingAutofield = ({
   id,
   questionGroupId,
   fn = { multiline: false, fnString: null, fnColor: {} },
+  addonBefore,
+  addonAfter,
 }) => {
   const namePreffix = `question-${id}`;
   const UIText = UIStore.useState((s) => s.UIText);
@@ -227,6 +230,9 @@ const SettingAutofield = ({
     }
   };
 
+  const onAddonBefore = (value) => updateState('addonBefore', value);
+  const onAddonAfter = (value) => updateState('addonAfter', value);
+
   return (
     <div>
       <p className={styles['more-question-setting-text']}>
@@ -314,6 +320,15 @@ const SettingAutofield = ({
           placeholder={fnColorExample}
         />
       </Form.Item>
+      <SettingAddons
+        {...{
+          namePreffix,
+          addonBefore,
+          addonAfter,
+          onAddonBefore,
+          onAddonAfter,
+        }}
+      />
     </div>
   );
 };

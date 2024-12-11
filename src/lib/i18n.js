@@ -123,6 +123,11 @@ const UIStaticText = {
     prefilledSAPlaceholder: 'Select source answer',
     prefilledDefaultValue: 'Default Value',
     prefilledDVPlaceholder: 'Select default value',
+    addonBefore: 'AddonBefore',
+    addonBeforePlaceholder: 'e.g., +62 or other required prefixes',
+    addonAfter: 'AddonAfter',
+    addonAfterPlaceholder:
+      'e.g., Kilogram, Unit, or any other necessary suffix.',
   },
 };
 

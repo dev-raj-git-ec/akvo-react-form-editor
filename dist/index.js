@@ -182,7 +182,11 @@ var UIStaticText = {
     prefilledSourceAnswer: 'Source Answer',
     prefilledSAPlaceholder: 'Select source answer',
     prefilledDefaultValue: 'Default Value',
-    prefilledDVPlaceholder: 'Select default value'
+    prefilledDVPlaceholder: 'Select default value',
+    addonBefore: 'AddonBefore',
+    addonBeforePlaceholder: 'e.g., +62 or other required prefixes',
+    addonAfter: 'AddonAfter',
+    addonAfterPlaceholder: 'e.g., Kilogram, Unit, or any other necessary suffix.'
   }
 };
 
@@ -2125,6 +2129,44 @@ var AlertPopup = function AlertPopup(_ref) {
   }, children);
 };
 
+var SettingAddons = function SettingAddons(_ref) {
+  var namePreffix = _ref.namePreffix,
+      addonBefore = _ref.addonBefore,
+      addonAfter = _ref.addonAfter,
+      onAddonBefore = _ref.onAddonBefore,
+      onAddonAfter = _ref.onAddonAfter;
+  var UIText = UIStore.useState(function (s) {
+    return s.UIText;
+  });
+  return /*#__PURE__*/React__default.createElement(antd.Row, {
+    gutter: [16, 8]
+  }, /*#__PURE__*/React__default.createElement(antd.Col, {
+    span: 12
+  }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    label: UIText.addonBefore,
+    name: namePreffix + "-addon_before"
+  }, /*#__PURE__*/React__default.createElement(antd.Input, {
+    placeholder: UIText.addonBeforePlaceholder,
+    onChange: function onChange(e) {
+      return onAddonBefore(e.target.value);
+    },
+    defaultValue: addonBefore,
+    maxLength: 50
+  }))), /*#__PURE__*/React__default.createElement(antd.Col, {
+    span: 12
+  }, /*#__PURE__*/React__default.createElement(antd.Form.Item, {
+    label: UIText.addonAfter,
+    name: namePreffix + "-addon_after"
+  }, /*#__PURE__*/React__default.createElement(antd.Input, {
+    placeholder: UIText.addonAfterPlaceholder,
+    onChange: function onChange(e) {
+      return onAddonAfter(e.target.value);
+    },
+    defaultValue: addonAfter,
+    maxLength: 50
+  }))));
+};
+
 var clearQuestionObj = function clearQuestionObj(keysToRemove, obj, checkEmpty) {
   if (keysToRemove === void 0) {
     keysToRemove = [];
@@ -3416,7 +3458,9 @@ var SettingInput = function SettingInput(_ref) {
   var id = _ref.id,
       questionGroupId = _ref.questionGroupId,
       requiredDoubleEntry = _ref.requiredDoubleEntry,
-      hiddenString = _ref.hiddenString;
+      hiddenString = _ref.hiddenString,
+      addonBefore = _ref.addonBefore,
+      addonAfter = _ref.addonAfter;
   var namePreffix = "question-" + id;
   var UIText = UIStore.useState(function (s) {
     return s.UIText;
@@ -3457,6 +3501,14 @@ var SettingInput = function SettingInput(_ref) {
     updateState('hiddenString', e === null || e === void 0 ? void 0 : (_e$target2 = e.target) === null || _e$target2 === void 0 ? void 0 : _e$target2.checked);
   };
 
+  var onAddonBefore = function onAddonBefore(value) {
+    return updateState('addonBefore', value);
+  };
+
+  var onAddonAfter = function onAddonAfter(value) {
+    return updateState('addonAfter', value);
+  };
+
   return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("p", {
     className: styles['more-question-setting-text']
   }, UIText.questionMoreInputTypeSettingText), /*#__PURE__*/React__default.createElement(antd.Space, {
@@ -3471,7 +3523,13 @@ var SettingInput = function SettingInput(_ref) {
   }, /*#__PURE__*/React__default.createElement(antd.Checkbox, {
     onChange: handleChangeHiddenString,
     checked: hiddenString
-  }, ' ', UIText.inputQuestionHiddenStringCheckbox))));
+  }, ' ', UIText.inputQuestionHiddenStringCheckbox))), /*#__PURE__*/React__default.createElement(SettingAddons, {
+    namePreffix: namePreffix,
+    addonBefore: addonBefore,
+    addonAfter: addonAfter,
+    onAddonBefore: onAddonBefore,
+    onAddonAfter: onAddonAfter
+  }));
 };
 
 var SettingNumber = function SettingNumber(_ref) {
@@ -3482,7 +3540,9 @@ var SettingNumber = function SettingNumber(_ref) {
     allowDecimal: false,
     min: null,
     max: null
-  } : _ref$rule;
+  } : _ref$rule,
+      addonBefore = _ref.addonBefore,
+      addonAfter = _ref.addonAfter;
   var namePreffix = "question-" + id;
   var UIText = UIStore.useState(function (s) {
     return s.UIText;
@@ -3514,10 +3574,16 @@ var SettingNumber = function SettingNumber(_ref) {
         if (qg.id === questionGroupId) {
           var questions = qg.questions.map(function (q) {
             if (q.id === id) {
-              var _extends2;
+              var _extends3;
+
+              if (['addonBefore', 'addonAfter'].includes(name)) {
+                var _extends2;
+
+                return _extends({}, q, (_extends2 = {}, _extends2[name] = value, _extends2));
+              }
 
               return _extends({}, q, {
-                rule: _extends({}, q === null || q === void 0 ? void 0 : q.rule, (_extends2 = {}, _extends2[name] = value, _extends2))
+                rule: _extends({}, q === null || q === void 0 ? void 0 : q.rule, (_extends3 = {}, _extends3[name] = value, _extends3))
               });
             }
 
@@ -3541,6 +3607,14 @@ var SettingNumber = function SettingNumber(_ref) {
 
   var handleChangeMinMax = function handleChangeMinMax(key, e) {
     updateState(key, e);
+  };
+
+  var onAddonBefore = function onAddonBefore(value) {
+    return updateState('addonBefore', value);
+  };
+
+  var onAddonAfter = function onAddonAfter(value) {
+    return updateState('addonAfter', value);
   };
 
   return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("p", {
@@ -3576,7 +3650,13 @@ var SettingNumber = function SettingNumber(_ref) {
         return handleChangeMinMax(x.key, e);
       }
     })));
-  })));
+  })), /*#__PURE__*/React__default.createElement(SettingAddons, {
+    namePreffix: namePreffix,
+    addonBefore: addonBefore,
+    addonAfter: addonAfter,
+    onAddonBefore: onAddonBefore,
+    onAddonAfter: onAddonAfter
+  }));
 };
 
 var allowedQuestionTypes = [questionType.option, questionType.multiple_option];
@@ -10664,7 +10744,9 @@ var SettingAutofield = function SettingAutofield(_ref) {
     multiline: false,
     fnString: null,
     fnColor: {}
-  } : _ref$fn;
+  } : _ref$fn,
+      addonBefore = _ref.addonBefore,
+      addonAfter = _ref.addonAfter;
   var namePreffix = "question-" + id;
   var UIText = UIStore.useState(function (s) {
     return s.UIText;
@@ -10881,6 +10963,14 @@ var SettingAutofield = function SettingAutofield(_ref) {
     }
   };
 
+  var onAddonBefore = function onAddonBefore(value) {
+    return updateState('addonBefore', value);
+  };
+
+  var onAddonAfter = function onAddonAfter(value) {
+    return updateState('addonAfter', value);
+  };
+
   return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("p", {
     className: styles['more-question-setting-text']
   }, UIText.questionMoreAutofieldTypeSettingText), /*#__PURE__*/React__default.createElement(antd.Space, {
@@ -10939,7 +11029,13 @@ var SettingAutofield = function SettingAutofield(_ref) {
     allowClear: true,
     onChange: handleChangeFnColor,
     placeholder: fnColorExample
-  })));
+  })), /*#__PURE__*/React__default.createElement(SettingAddons, {
+    namePreffix: namePreffix,
+    addonBefore: addonBefore,
+    addonAfter: addonAfter,
+    onAddonBefore: onAddonBefore,
+    onAddonAfter: onAddonAfter
+  }));
 };
 
 var QuestionHint = function QuestionHint(_ref) {
