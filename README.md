@@ -1,4 +1,6 @@
-# akvo-react-form-editor
+# akvo-react-form-editor - clone
+
+need to make it work and understand how to use it everywhere
 
 Survey Editor for generating **[Akvo React Form](https://www.npmjs.com/package/akvo-react-form)** survey definition. [View Demo](https://akvo.github.io/akvo-react-form-editor/)
 
